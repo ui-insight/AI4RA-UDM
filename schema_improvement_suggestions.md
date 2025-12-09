@@ -397,28 +397,59 @@ CREATE INDEX idx_effort_role_period ON Effort(Role_ID, Period_Start_Date, Period
 
 ---
 
-## 10. Specific Recommendations Priority
+## 10. Implementation Checklist
+
+Use this checklist to track progress on implementing schema improvements:
 
 ### High Priority (Implement Soon)
-1. **Standardize naming conventions** (Organization vs Org)
-2. **Add missing foreign keys** on audit columns
-3. **Increase DECIMAL precision** for monetary values
-4. **Add date range validation** constraints
-5. **Review and fix nullability** for critical fields
+
+- [x] **Document naming conventions** - Added to README.md (PascalCase tables, Snake_case columns)
+- [ ] **Standardize Organization vs Org** - Decide on full word or abbreviation
+- [ ] **Standardize ID column naming** - Apply TableName_ID pattern consistently
+- [ ] **Add missing foreign keys** on audit columns (Last_Modified_By, Created_By_Personnel_ID)
+- [ ] **Increase DECIMAL precision** for monetary values (15,2 → 18,2)
+- [ ] **Add date range validation** constraints (end_date >= start_date)
+- [ ] **Review and fix nullability** for critical fields (Primary_Email, CFDA_Number, etc.)
+- [ ] **Add email format validation** constraints
 
 ### Medium Priority (Next Phase)
-6. **Add indexes** for common query patterns
-7. **Create BudgetRevision** table
-8. **Add InstitutionalPolicy** table
-9. **Enhance subaward tracking**
-10. **Move CHECK constraints** to AllowedValues where appropriate
+
+- [ ] **Add indexes** for common query patterns
+  - [ ] Status columns (Award_Status, Project_Status)
+  - [ ] Date range queries (Award dates)
+  - [ ] Sponsor queries
+  - [ ] Personnel name searches
+- [ ] **Create BudgetRevision** table for tracking budget changes
+- [ ] **Add InstitutionalPolicy** table
+- [ ] **Enhance subaward tracking**
+  - [ ] SubawardBudgetPeriod table
+  - [ ] SubawardInvoice table
+- [ ] **Move CHECK constraints** to AllowedValues where appropriate
+- [ ] **Add SponsorContact** table or enhance Contact
+- [ ] **Prefix ambiguous column names** (Title, Status, Name)
 
 ### Low Priority (Future Enhancements)
-11. **Add calculated/derived fields**
-12. **Implement temporal tables** for critical entities
-13. **Add multi-institution collaboration** support
-14. **Create user roles/permissions** tables
-15. **Add electronic signature** support
+
+- [ ] **Add calculated/derived fields** or views
+  - [ ] Award burn rate
+  - [ ] Days until expiration
+  - [ ] Budget percentage spent
+- [ ] **Implement temporal tables** for critical entities
+- [ ] **Add multi-institution collaboration** support (AwardCollaboration table)
+- [ ] **Create user roles/permissions** tables
+  - [ ] UserRole table
+  - [ ] UserPermission table
+  - [ ] AuditPermission table
+- [ ] **Add electronic signature** support (EffortCertification table)
+- [ ] **Add data retention** fields and archival strategy
+- [ ] **Create composite indexes** for multi-column queries
+
+### Completed
+
+- [x] **Document naming conventions** in README.md (2024-12-08)
+- [x] **Create comprehensive testing suite** (udm_testing.sql)
+- [x] **Generate ERD documentation** (Mermaid diagram in README.md)
+- [x] **Populate DataDictionary** table (72 entity definitions)
 
 ---
 
