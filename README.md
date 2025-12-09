@@ -25,8 +25,8 @@ The UDM follows consistent naming conventions throughout the schema:
 
 **Column Names**: Snake_case
 - Examples: `Allowed_Value_ID`, `Project_ID`, `Is_Active`, `Date_Created`
-- Primary keys: `TableName_ID` format (e.g., `Personnel_ID`, `Award_ID`)
-- Foreign keys: Match the referenced primary key name (e.g., `Parent_Org_ID` references `Organization.Org_ID`)
+- Primary keys: `TableName_ID` format (e.g., `Personnel_ID`, `Award_ID`, `Organization_ID`)
+- Foreign keys: Match the referenced primary key name (e.g., `Parent_Organization_ID` references `Organization.Organization_ID`)
 - Boolean flags: Prefixed with `Is_` (e.g., `Is_Active`, `Is_Primary`)
 - Audit fields: `Date_Created`, `Last_Modified_Date`, `Last_Modified_By`, `Created_By_Personnel_ID`
 
