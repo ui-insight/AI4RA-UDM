@@ -11,7 +11,7 @@
 - [ ] Rename `IndirectRate.Rate_ID` $\rightarrow$ **`IndirectRate_ID`**
 - [ ] Rename `ComplianceRequirement.Requirement_ID` $\rightarrow$ **`ComplianceRequirement_ID`**
 - [ ] Rename `ConflictOfInterest.COI_ID` $\rightarrow$ **`ConflictOfInterest_ID`**
-- [ ] **NEW:** Rename `Terms.Terms_ID` $\rightarrow$ **`AwardTerms_ID`**
+- [ ] Rename `Terms.Terms_ID` $\rightarrow$ **`AwardTerms_ID`**
 
 ## 2. Organization References (Foreign Keys)
 *Update generic `Organization_ID` columns to context-specific, role-based names.* Document this in the README.md. 
@@ -21,7 +21,7 @@
 - [ ] **Proposal Table:**
   - [ ] Rename sponsor FK to **`Sponsor_Organization_ID`**
   - [ ] Add new column: **`Submitting_Organization_ID`** (The unit that prepares and submits the proposal)
-  - [ ] **NEW:** Add new column: **`Administering_Organization_ID`** (The unit responsible for the financial administration of the potential award)
+  - [ ] Add new column: **`Administering_Organization_ID`** (The unit responsible for the financial administration of the potential award)
 - [ ] **Award Table:**
   - [ ] Rename sponsor FK to **`Sponsor_Organization_ID`**
   - [ ] Ensure **`Prime_Sponsor_Organization_ID`** exists
@@ -47,7 +47,7 @@
   - [ ] Update `ProposalBudget` and `AwardBudget` to reference this table.
 - [ ] **Indirect Cost Transparency:**
   - [ ] Add **`Applied_Indirect_Rate_ID`** (FK to `IndirectRate`) to the `ProposalBudget` table.
-  - [ ] **NEW:** Add **`Rate_Base_Used`** (e.g., 'MTDC', 'TDC') to **both** `ProposalBudget` and `AwardBudget`.
+  - [ ] Add **`Rate_Base_Used`** (e.g., 'MTDC', 'TDC') to **both** `ProposalBudget` and `AwardBudget`.
   - [ ] **CLARIFICATION:** The `Indirect_Costs` columns should store the **Original Approved Amount** for audit purposes, even if the system dynamically calculates the *current* amount using the rate table.
 - [ ] **Budget Versioning:**
   - [ ] Add **`Version_No`** to `ProposalBudget` table.
@@ -58,6 +58,6 @@
 
 ## 6. General
 - [ ] Review instructions.md and the notebook to record the schema ontology into the README.md. Add a section on tables amd views summarizing each.
-## 6. Dashboard
+## 7. Dashboard
 - [ ] Look at the udm_dashboard.md and make a todo list for that. Things like create the github action. Set up access on dolthub.
 
