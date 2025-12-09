@@ -33,7 +33,9 @@ CREATE TABLE Organization (
     CONSTRAINT fk_organization_parent FOREIGN KEY (Parent_Organization_ID)
         REFERENCES Organization(Organization_ID)
         ON DELETE SET NULL
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_organization_modified_by FOREIGN KEY (Last_Modified_By) REFERENCES Personnel(Personnel_ID) ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT fk_organization_created_by FOREIGN KEY (Created_By_Personnel_ID) REFERENCES Personnel(Personnel_ID) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- Then Personnel (depends on Organization)
@@ -44,7 +46,7 @@ CREATE TABLE Personnel (
     Last_Name VARCHAR(100) NOT NULL,
     Middle_Name VARCHAR(100),
     Institutional_ID VARCHAR(50) UNIQUE,
-    Primary_Email VARCHAR(255),
+    Primary_Email VARCHAR(320) NOT NULL,
     Person_Type VARCHAR(50),
     Department_Organization_ID VARCHAR(50),
     Is_Active BOOLEAN DEFAULT TRUE,
@@ -54,10 +56,13 @@ CREATE TABLE Personnel (
     Created_By_Personnel_ID VARCHAR(50),
     CONSTRAINT chk_personnel_type CHECK (Person_Type IN ('Faculty','Staff','Student','External','Postdoc','Resident','Fellow')),
     CONSTRAINT chk_orcid_format CHECK (ORCID IS NULL OR ORCID REGEXP '^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]$'),
+    CONSTRAINT chk_personnel_email_format CHECK (Primary_Email REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$'),
     CONSTRAINT fk_personnel_dept FOREIGN KEY (Department_Organization_ID)
         REFERENCES Organization(Organization_ID)
         ON DELETE SET NULL
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_personnel_modified_by FOREIGN KEY (Last_Modified_By) REFERENCES Personnel(Personnel_ID) ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT fk_personnel_created_by FOREIGN KEY (Created_By_Personnel_ID) REFERENCES Personnel(Personnel_ID) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- Contact (depends on Personnel and AllowedValues)
@@ -86,7 +91,7 @@ CREATE TABLE Project (
     Parent_Project_ID VARCHAR(50),
     Project_Type VARCHAR(50),
     Abstract TEXT,
-    Start_Date DATE,
+    Start_Date DATE NOT NULL,
     End_Date DATE,
     Lead_Organization_ID VARCHAR(50) NOT NULL,
     Status VARCHAR(50) DEFAULT 'Active',
@@ -102,7 +107,10 @@ CREATE TABLE Project (
         ON UPDATE CASCADE,
     CONSTRAINT fk_project_org FOREIGN KEY (Lead_Organization_ID)
         REFERENCES Organization(Organization_ID)
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT chk_project_date_range CHECK (End_Date IS NULL OR End_Date >= Start_Date),
+    CONSTRAINT fk_project_modified_by FOREIGN KEY (Last_Modified_By) REFERENCES Personnel(Personnel_ID) ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT fk_project_created_by FOREIGN KEY (Created_By_Personnel_ID) REFERENCES Personnel(Personnel_ID) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- RFA
@@ -132,9 +140,9 @@ CREATE TABLE Proposal (
     RFA_ID VARCHAR(50),
     Proposed_Start_Date DATE,
     Proposed_End_Date DATE,
-    Total_Proposed_Direct DECIMAL(15,2),
-    Total_Proposed_Indirect DECIMAL(15,2),
-    Total_Proposed_Budget DECIMAL(15,2),
+    Total_Proposed_Direct DECIMAL(18,2),
+    Total_Proposed_Indirect DECIMAL(18,2),
+    Total_Proposed_Budget DECIMAL(18,2),
     Submission_Deadline DATE,
     Submission_Date DATE,
     Internal_Approval_Status VARCHAR(50) DEFAULT 'Draft',
@@ -157,7 +165,10 @@ CREATE TABLE Proposal (
     CONSTRAINT fk_proposal_rfa FOREIGN KEY (RFA_ID)
         REFERENCES RFA(RFA_ID)
         ON DELETE SET NULL
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT chk_proposal_date_range CHECK (Proposed_End_Date IS NULL OR Proposed_End_Date >= Proposed_Start_Date),
+    CONSTRAINT fk_proposal_modified_by FOREIGN KEY (Last_Modified_By) REFERENCES Personnel(Personnel_ID) ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT fk_proposal_created_by FOREIGN KEY (Created_By_Personnel_ID) REFERENCES Personnel(Personnel_ID) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- ProposalBudget
@@ -167,11 +178,11 @@ CREATE TABLE ProposalBudget (
     Period_Number INT NOT NULL,
     Budget_Category VARCHAR(100) NOT NULL,
     Line_Item_Description VARCHAR(500),
-    Direct_Cost DECIMAL(15,2),
-    Indirect_Cost DECIMAL(15,2),
-    Total_Cost DECIMAL(15,2),
+    Direct_Cost DECIMAL(18,2),
+    Indirect_Cost DECIMAL(18,2),
+    Total_Cost DECIMAL(18,2),
     Quantity DECIMAL(10,2),
-    Unit_Cost DECIMAL(15,2),
+    Unit_Cost DECIMAL(18,2),
     Date_Created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT chk_budget_category CHECK (Budget_Category IN (
         'Senior Personnel','Other Personnel','Fringe Benefits','Equipment',
@@ -196,9 +207,9 @@ CREATE TABLE Award (
     Proposal_ID VARCHAR(50),
     Original_Start_Date DATE NOT NULL,
     Original_End_Date DATE NOT NULL,
-    Current_Total_Funded DECIMAL(15,2) NOT NULL DEFAULT 0,
+    Current_Total_Funded DECIMAL(18,2) NOT NULL DEFAULT 0,
     Current_End_Date DATE NOT NULL,
-    Total_Anticipated_Funding DECIMAL(15,2),
+    Total_Anticipated_Funding DECIMAL(18,2),
     Status VARCHAR(50) DEFAULT 'Pending',
     CFDA_Number VARCHAR(20),
     Federal_Award_ID VARCHAR(100),
@@ -226,7 +237,11 @@ CREATE TABLE Award (
     CONSTRAINT fk_award_prime_sponsor FOREIGN KEY (Prime_Sponsor_Organization_ID)
         REFERENCES Organization(Organization_ID)
         ON DELETE SET NULL
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT chk_award_date_range CHECK (Current_End_Date >= Original_Start_Date),
+    CONSTRAINT chk_award_original_dates CHECK (Original_End_Date >= Original_Start_Date),
+    CONSTRAINT fk_award_modified_by FOREIGN KEY (Last_Modified_By) REFERENCES Personnel(Personnel_ID) ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT fk_award_created_by FOREIGN KEY (Created_By_Personnel_ID) REFERENCES Personnel(Personnel_ID) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- Modification
@@ -237,7 +252,7 @@ CREATE TABLE Modification (
     Event_Type VARCHAR(50) NOT NULL,
     Event_Timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     Effective_Date DATE NOT NULL,
-    Funding_Amount_Change DECIMAL(15,2) DEFAULT 0,
+    Funding_Amount_Change DECIMAL(18,2) DEFAULT 0,
     New_End_Date DATE,
     Affected_Personnel_ID VARCHAR(50),
     Change_Description TEXT,
@@ -268,7 +283,8 @@ CREATE TABLE Modification (
     CONSTRAINT fk_mod_affected_personnel FOREIGN KEY (Affected_Personnel_ID)
         REFERENCES Personnel(Personnel_ID)
         ON DELETE SET NULL
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_modification_created_by FOREIGN KEY (Created_By_Personnel_ID) REFERENCES Personnel(Personnel_ID) ON UPDATE CASCADE
 );
 
 -- Terms
@@ -306,10 +322,10 @@ CREATE TABLE AwardBudgetPeriod (
     Period_Number INT NOT NULL,
     Start_Date DATE NOT NULL,
     End_Date DATE NOT NULL,
-    Direct_Costs DECIMAL(15,2) DEFAULT 0,
-    Indirect_Costs DECIMAL(15,2) DEFAULT 0,
-    Total_Costs DECIMAL(15,2) DEFAULT 0,
-    Cost_Share_Amount DECIMAL(15,2) DEFAULT 0,
+    Direct_Costs DECIMAL(18,2) DEFAULT 0,
+    Indirect_Costs DECIMAL(18,2) DEFAULT 0,
+    Total_Costs DECIMAL(18,2) DEFAULT 0,
+    Cost_Share_Amount DECIMAL(18,2) DEFAULT 0,
     Status VARCHAR(50) DEFAULT 'Pending',
     Date_Created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     Last_Modified_Date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -318,7 +334,8 @@ CREATE TABLE AwardBudgetPeriod (
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     CONSTRAINT chk_period_status CHECK (Status IN ('Pending','Released','Active','Closed')),
-    CONSTRAINT uq_award_period UNIQUE (Award_ID, Period_Number)
+    CONSTRAINT uq_award_period UNIQUE (Award_ID, Period_Number),
+    CONSTRAINT chk_period_date_range CHECK (End_Date >= Start_Date)
 );
 
 -- AwardBudget
@@ -328,12 +345,12 @@ CREATE TABLE AwardBudget (
     Period_ID INT NOT NULL,
     Budget_Category VARCHAR(100) NOT NULL,
     Line_Item_Description VARCHAR(500),
-    Approved_Direct_Cost DECIMAL(15,2),
-    Approved_Indirect_Cost DECIMAL(15,2),
-    Approved_Total_Cost DECIMAL(15,2),
-    Current_Direct_Cost DECIMAL(15,2),
-    Current_Indirect_Cost DECIMAL(15,2),
-    Current_Total_Cost DECIMAL(15,2),
+    Approved_Direct_Cost DECIMAL(18,2),
+    Approved_Indirect_Cost DECIMAL(18,2),
+    Approved_Total_Cost DECIMAL(18,2),
+    Current_Direct_Cost DECIMAL(18,2),
+    Current_Indirect_Cost DECIMAL(18,2),
+    Current_Total_Cost DECIMAL(18,2),
     Date_Created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     Last_Modified_Date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     Last_Modified_By VARCHAR(50),
@@ -350,7 +367,8 @@ CREATE TABLE AwardBudget (
         REFERENCES AwardBudgetPeriod(Period_ID)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CONSTRAINT uq_award_budget_item UNIQUE (Award_ID, Period_ID, Budget_Category, Line_Item_Description)
+    CONSTRAINT uq_award_budget_item UNIQUE (Award_ID, Period_ID, Budget_Category, Line_Item_Description),
+    CONSTRAINT fk_awardbudget_modified_by FOREIGN KEY (Last_Modified_By) REFERENCES Personnel(Personnel_ID) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- Subaward
@@ -359,7 +377,7 @@ CREATE TABLE Subaward (
     Prime_Award_ID VARCHAR(50) NOT NULL,
     Subrecipient_Organization_ID VARCHAR(50) NOT NULL,
     Subaward_Number VARCHAR(100) UNIQUE,
-    Amount DECIMAL(15,2),
+    Amount DECIMAL(18,2),
     Start_Date DATE,
     End_Date DATE,
     Status VARCHAR(50) DEFAULT 'Active',
@@ -378,21 +396,23 @@ CREATE TABLE Subaward (
         ON UPDATE CASCADE,
     CONSTRAINT fk_subaward_org FOREIGN KEY (Subrecipient_Organization_ID)
         REFERENCES Organization(Organization_ID)
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT chk_subaward_date_range CHECK (End_Date IS NULL OR End_Date >= Start_Date),
+    CONSTRAINT fk_subaward_created_by FOREIGN KEY (Created_By_Personnel_ID) REFERENCES Personnel(Personnel_ID) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- CostShare
 CREATE TABLE CostShare (
     CostShare_ID INT AUTO_INCREMENT PRIMARY KEY,
     Award_ID VARCHAR(50) NOT NULL,
-    Committed_Amount DECIMAL(15,2) NOT NULL,
+    Committed_Amount DECIMAL(18,2) NOT NULL,
     Commitment_Type VARCHAR(50),
     Source_Organization_ID VARCHAR(50),
     Source_Fund_Code VARCHAR(20),
     Source_Description VARCHAR(500),
     Is_Mandatory BOOLEAN DEFAULT FALSE,
     Status VARCHAR(50) DEFAULT 'Committed',
-    Met_Amount DECIMAL(15,2) DEFAULT 0,
+    Met_Amount DECIMAL(18,2) DEFAULT 0,
     Date_Created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     Last_Modified_Date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT chk_commitment_type CHECK (Commitment_Type IN ('Cash','In-Kind','Third-Party','Waived IDC')),
@@ -416,14 +436,14 @@ CREATE TABLE Invoice (
     Invoice_Date DATE NOT NULL,
     Period_Start_Date DATE NOT NULL,
     Period_End_Date DATE NOT NULL,
-    Direct_Costs DECIMAL(15,2) DEFAULT 0,
-    Indirect_Costs DECIMAL(15,2) DEFAULT 0,
-    Cost_Share DECIMAL(15,2) DEFAULT 0,
-    Total_Amount DECIMAL(15,2) NOT NULL,
+    Direct_Costs DECIMAL(18,2) DEFAULT 0,
+    Indirect_Costs DECIMAL(18,2) DEFAULT 0,
+    Cost_Share DECIMAL(18,2) DEFAULT 0,
+    Total_Amount DECIMAL(18,2) NOT NULL,
     Status VARCHAR(50) DEFAULT 'Draft',
     Submission_Date DATE,
     Payment_Date DATE,
-    Payment_Amount DECIMAL(15,2),
+    Payment_Amount DECIMAL(18,2),
     Date_Created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     Created_By_Personnel_ID VARCHAR(50),
     CONSTRAINT chk_invoice_status CHECK (Status IN ('Draft','Submitted','Under Review','Approved','Paid','Rejected')),
@@ -434,7 +454,9 @@ CREATE TABLE Invoice (
     CONSTRAINT fk_invoice_period FOREIGN KEY (Period_ID)
         REFERENCES AwardBudgetPeriod(Period_ID)
         ON DELETE SET NULL
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT chk_invoice_period_range CHECK (Period_End_Date >= Period_Start_Date),
+    CONSTRAINT fk_invoice_created_by FOREIGN KEY (Created_By_Personnel_ID) REFERENCES Personnel(Personnel_ID) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- AwardDeliverable
@@ -489,7 +511,7 @@ CREATE TABLE ProjectRole (
     Start_Date DATE NOT NULL,
     End_Date DATE,
     FTE_Percent DECIMAL(5,2),
-    Salary_Charged DECIMAL(15,2),
+    Salary_Charged DECIMAL(18,2),
     Date_Created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     Last_Modified_Date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     Created_By_Personnel_ID VARCHAR(50),
@@ -509,7 +531,8 @@ CREATE TABLE ProjectRole (
     CONSTRAINT fk_role_value FOREIGN KEY (Role_Value_ID)
         REFERENCES AllowedValues(Allowed_Value_ID)
         ON UPDATE CASCADE,
-    CONSTRAINT uq_project_role UNIQUE (Project_ID, Personnel_ID, Role_Value_ID, Start_Date)
+    CONSTRAINT uq_project_role UNIQUE (Project_ID, Personnel_ID, Role_Value_ID, Start_Date),
+    CONSTRAINT fk_projectrole_created_by FOREIGN KEY (Created_By_Personnel_ID) REFERENCES Personnel(Personnel_ID) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- Fund
@@ -606,7 +629,8 @@ CREATE TABLE IndirectRate (
     )),
     CONSTRAINT chk_base_type CHECK (Base_Type IN (
         'MTDC','TDC','Salaries and Wages','Direct Salaries'
-    ))
+    )),
+    CONSTRAINT chk_rate_date_range CHECK (Effective_End_Date IS NULL OR Effective_End_Date >= Effective_Start_Date)
 );
 
 -- Transaction
@@ -619,7 +643,7 @@ CREATE TABLE Transaction (
     Transaction_Date DATE NOT NULL,
     Fiscal_Year INT,
     Fiscal_Period INT,
-    Amount DECIMAL(15,2) NOT NULL,
+    Amount DECIMAL(18,2) NOT NULL,
     Transaction_Type VARCHAR(50),
     Description VARCHAR(500),
     Award_ID VARCHAR(50),
@@ -666,7 +690,8 @@ CREATE TABLE Transaction (
     CONSTRAINT fk_trans_personnel FOREIGN KEY (Personnel_ID)
         REFERENCES Personnel(Personnel_ID)
         ON DELETE SET NULL
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_transaction_created_by FOREIGN KEY (Created_By_Personnel_ID) REFERENCES Personnel(Personnel_ID) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- Effort
@@ -698,7 +723,8 @@ CREATE TABLE Effort (
     CONSTRAINT fk_effort_certifier FOREIGN KEY (Certified_By_Personnel_ID)
         REFERENCES Personnel(Personnel_ID)
         ON DELETE SET NULL
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT chk_effort_date_range CHECK (Period_End_Date >= Period_Start_Date)
 );
 
 -- ComplianceRequirement
@@ -732,7 +758,8 @@ CREATE TABLE ComplianceRequirement (
         ON UPDATE CASCADE,
     CONSTRAINT fk_requirement_pi FOREIGN KEY (Principal_Investigator_ID)
         REFERENCES Personnel(Personnel_ID)
-        ON UPDATE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_compliancereq_created_by FOREIGN KEY (Created_By_Personnel_ID) REFERENCES Personnel(Personnel_ID) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 -- ConflictOfInterest
@@ -744,7 +771,7 @@ CREATE TABLE ConflictOfInterest (
     Disclosure_Date DATE NOT NULL,
     Relationship_Type VARCHAR(100),
     Entity_Name VARCHAR(255),
-    Financial_Interest_Amount DECIMAL(15,2),
+    Financial_Interest_Amount DECIMAL(18,2),
     Relationship_Description TEXT,
     Management_Plan TEXT,
     Status VARCHAR(50) DEFAULT 'Under Review',
