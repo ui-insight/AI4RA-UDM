@@ -56,5 +56,8 @@
 - [ ] **Refine Enums:**
   - [ ] (Optional) Create dedicated lookup tables for high-traffic enums (e.g., `PersonType`, `ProjectStatus`) instead of relying solely on the generic `AllowedValues` table for strict SQL constraint enforcement.
 
+## 6. General
+- [ ] Review instructions.md and the notebook to record the schema ontology into the README.md. Add a section on tables amd views summarizing each.
 ## 6. Dashboard
 - [ ] Look at the udm_dashboard.md and make a todo list for that. Things like create the github action. Set up access on dolthub.
+
