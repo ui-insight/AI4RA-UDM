@@ -14,6 +14,15 @@ CREATE TABLE AllowedValues (
         ON UPDATE CASCADE
 );
 
+-- BudgetCategory reference table
+CREATE TABLE BudgetCategory (
+    BudgetCategory_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Category_Code VARCHAR(50) UNIQUE NOT NULL,
+    Category_Name VARCHAR(100) NOT NULL,
+    Category_Description TEXT,
+    Display_Order INT
+);
+
 -- Then create Organization (no external dependencies)
 CREATE TABLE Organization (
     Organization_ID VARCHAR(50) PRIMARY KEY,
@@ -130,7 +139,11 @@ CREATE TABLE Proposal (
     Proposal_Title VARCHAR(500) NOT NULL,
     Project_ID VARCHAR(50),
     Sponsor_Organization_ID VARCHAR(50) NOT NULL,
+    Submitting_Organization_ID VARCHAR(50),
+    Administering_Organization_ID VARCHAR(50),
     RFA_ID VARCHAR(50),
+    Previous_Proposal_ID VARCHAR(50),
+    Submission_Version INT DEFAULT 1,
     Proposed_Start_Date DATE,
     Proposed_End_Date DATE,
     Total_Proposed_Direct DECIMAL(18,2),
@@ -151,8 +164,20 @@ CREATE TABLE Proposal (
     CONSTRAINT fk_proposal_sponsor FOREIGN KEY (Sponsor_Organization_ID)
         REFERENCES Organization(Organization_ID)
         ON UPDATE CASCADE,
+    CONSTRAINT fk_proposal_submitting_org FOREIGN KEY (Submitting_Organization_ID)
+        REFERENCES Organization(Organization_ID)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_proposal_administering_org FOREIGN KEY (Administering_Organization_ID)
+        REFERENCES Organization(Organization_ID)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE,
     CONSTRAINT fk_proposal_rfa FOREIGN KEY (RFA_ID)
         REFERENCES RFA(RFA_ID)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_proposal_previous FOREIGN KEY (Previous_Proposal_ID)
+        REFERENCES Proposal(Proposal_ID)
         ON DELETE SET NULL
         ON UPDATE CASCADE,
     CONSTRAINT chk_proposal_date_range CHECK (Proposed_End_Date IS NULL OR Proposed_End_Date >= Proposed_Start_Date)
@@ -160,26 +185,32 @@ CREATE TABLE Proposal (
 
 -- ProposalBudget
 CREATE TABLE ProposalBudget (
-    Budget_ID INT AUTO_INCREMENT PRIMARY KEY,
+    ProposalBudget_ID INT AUTO_INCREMENT PRIMARY KEY,
     Proposal_ID VARCHAR(50) NOT NULL,
     Period_Number INT NOT NULL,
-    Budget_Category VARCHAR(100) NOT NULL,
+    BudgetCategory_ID INT NOT NULL,
     Line_Item_Description VARCHAR(500),
     Direct_Cost DECIMAL(18,2),
     Indirect_Cost DECIMAL(18,2),
     Total_Cost DECIMAL(18,2),
     Quantity DECIMAL(10,2),
     Unit_Cost DECIMAL(18,2),
-    CONSTRAINT chk_budget_category CHECK (Budget_Category IN (
-        'Senior Personnel','Other Personnel','Fringe Benefits','Equipment',
-        'Travel','Participant Support','Other Direct Costs','Consultants',
-        'Subawards','Indirect Costs','Fee'
-    )),
+    Applied_Indirect_Rate_ID INT,
+    Rate_Base_Used VARCHAR(50),
+    Version_No INT DEFAULT 1,
+    CONSTRAINT chk_rate_base_used CHECK (Rate_Base_Used IN ('MTDC','TDC','Salaries and Wages','Direct Salaries')),
     CONSTRAINT fk_propbudget_proposal FOREIGN KEY (Proposal_ID)
         REFERENCES Proposal(Proposal_ID)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CONSTRAINT uq_proposal_budget_item UNIQUE (Proposal_ID, Period_Number, Budget_Category, Line_Item_Description)
+    CONSTRAINT fk_propbudget_category FOREIGN KEY (BudgetCategory_ID)
+        REFERENCES BudgetCategory(BudgetCategory_ID)
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_propbudget_indirect_rate FOREIGN KEY (Applied_Indirect_Rate_ID)
+        REFERENCES IndirectRate(IndirectRate_ID)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE,
+    CONSTRAINT uq_proposal_budget_item UNIQUE (Proposal_ID, Period_Number, BudgetCategory_ID, Line_Item_Description)
 );
 
 -- Award
@@ -226,7 +257,7 @@ CREATE TABLE Award (
 
 -- Modification
 CREATE TABLE Modification (
-    Event_ID VARCHAR(50) PRIMARY KEY,
+    Modification_ID VARCHAR(50) PRIMARY KEY,
     Award_ID VARCHAR(50) NOT NULL,
     Modification_Number VARCHAR(20) NOT NULL,
     Event_Type VARCHAR(50) NOT NULL,
@@ -237,6 +268,7 @@ CREATE TABLE Modification (
     Affected_Personnel_ID VARCHAR(50),
     Change_Description TEXT,
     Justification TEXT,
+    Impact_on_Budget BOOLEAN DEFAULT FALSE,
     Requires_Prior_Approval BOOLEAN DEFAULT FALSE,
     Approval_Status VARCHAR(50) DEFAULT 'Pending',
     Approved_By_Personnel_ID VARCHAR(50),
@@ -263,7 +295,7 @@ CREATE TABLE Modification (
 
 -- Terms
 CREATE TABLE Terms (
-    Terms_ID INT AUTO_INCREMENT PRIMARY KEY,
+    AwardTerms_ID INT AUTO_INCREMENT PRIMARY KEY,
     Award_ID VARCHAR(50) NOT NULL,
     Payment_Method VARCHAR(50),
     Invoicing_Frequency VARCHAR(50),
@@ -289,7 +321,7 @@ CREATE TABLE Terms (
 
 -- AwardBudgetPeriod
 CREATE TABLE AwardBudgetPeriod (
-    Period_ID INT AUTO_INCREMENT PRIMARY KEY,
+    AwardBudgetPeriod_ID INT AUTO_INCREMENT PRIMARY KEY,
     Award_ID VARCHAR(50) NOT NULL,
     Period_Number INT NOT NULL,
     Start_Date DATE NOT NULL,
@@ -312,8 +344,8 @@ CREATE TABLE AwardBudgetPeriod (
 CREATE TABLE AwardBudget (
     Award_Budget_ID INT AUTO_INCREMENT PRIMARY KEY,
     Award_ID VARCHAR(50) NOT NULL,
-    Period_ID INT NOT NULL,
-    Budget_Category VARCHAR(100) NOT NULL,
+    AwardBudgetPeriod_ID INT NOT NULL,
+    BudgetCategory_ID INT NOT NULL,
     Line_Item_Description VARCHAR(500),
     Approved_Direct_Cost DECIMAL(18,2),
     Approved_Indirect_Cost DECIMAL(18,2),
@@ -321,20 +353,20 @@ CREATE TABLE AwardBudget (
     Current_Direct_Cost DECIMAL(18,2),
     Current_Indirect_Cost DECIMAL(18,2),
     Current_Total_Cost DECIMAL(18,2),
-    CONSTRAINT chk_award_budget_category CHECK (Budget_Category IN (
-        'Senior Personnel','Other Personnel','Fringe Benefits','Equipment',
-        'Travel','Participant Support','Other Direct Costs','Consultants',
-        'Subawards','Indirect Costs','Fee'
-    )),
+    Rate_Base_Used VARCHAR(50),
+    CONSTRAINT chk_award_rate_base_used CHECK (Rate_Base_Used IN ('MTDC','TDC','Salaries and Wages','Direct Salaries')),
     CONSTRAINT fk_awardbudget_award FOREIGN KEY (Award_ID)
         REFERENCES Award(Award_ID)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CONSTRAINT fk_awardbudget_period FOREIGN KEY (Period_ID)
-        REFERENCES AwardBudgetPeriod(Period_ID)
+    CONSTRAINT fk_awardbudget_period FOREIGN KEY (AwardBudgetPeriod_ID)
+        REFERENCES AwardBudgetPeriod(AwardBudgetPeriod_ID)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CONSTRAINT uq_award_budget_item UNIQUE (Award_ID, Period_ID, Budget_Category, Line_Item_Description)
+    CONSTRAINT fk_awardbudget_category FOREIGN KEY (BudgetCategory_ID)
+        REFERENCES BudgetCategory(BudgetCategory_ID)
+        ON UPDATE CASCADE,
+    CONSTRAINT uq_award_budget_item UNIQUE (Award_ID, AwardBudgetPeriod_ID, BudgetCategory_ID, Line_Item_Description)
 );
 
 -- Subaward
@@ -392,7 +424,7 @@ CREATE TABLE Invoice (
     Invoice_ID VARCHAR(50) PRIMARY KEY,
     Award_ID VARCHAR(50) NOT NULL,
     Invoice_Number VARCHAR(100) UNIQUE NOT NULL,
-    Period_ID INT,
+    AwardBudgetPeriod_ID INT,
     Invoice_Date DATE NOT NULL,
     Period_Start_Date DATE NOT NULL,
     Period_End_Date DATE NOT NULL,
@@ -409,8 +441,8 @@ CREATE TABLE Invoice (
         REFERENCES Award(Award_ID)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CONSTRAINT fk_invoice_period FOREIGN KEY (Period_ID)
-        REFERENCES AwardBudgetPeriod(Period_ID)
+    CONSTRAINT fk_invoice_period FOREIGN KEY (AwardBudgetPeriod_ID)
+        REFERENCES AwardBudgetPeriod(AwardBudgetPeriod_ID)
         ON DELETE SET NULL
         ON UPDATE CASCADE,
     CONSTRAINT chk_invoice_period_range CHECK (Period_End_Date >= Period_Start_Date)
@@ -418,10 +450,10 @@ CREATE TABLE Invoice (
 
 -- AwardDeliverable
 CREATE TABLE AwardDeliverable (
-    Deliverable_ID INT AUTO_INCREMENT PRIMARY KEY,
+    AwardDeliverable_ID INT AUTO_INCREMENT PRIMARY KEY,
     Award_ID VARCHAR(50) NOT NULL,
     Deliverable_Type VARCHAR(50) NOT NULL,
-    Period_ID INT,
+    AwardBudgetPeriod_ID INT,
     Deliverable_Number VARCHAR(50),
     Due_Date DATE NOT NULL,
     Submission_Date DATE,
@@ -442,8 +474,8 @@ CREATE TABLE AwardDeliverable (
         REFERENCES Award(Award_ID)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CONSTRAINT fk_deliverable_period FOREIGN KEY (Period_ID)
-        REFERENCES AwardBudgetPeriod(Period_ID)
+    CONSTRAINT fk_deliverable_period FOREIGN KEY (AwardBudgetPeriod_ID)
+        REFERENCES AwardBudgetPeriod(AwardBudgetPeriod_ID)
         ON DELETE SET NULL
         ON UPDATE CASCADE,
     CONSTRAINT fk_deliverable_responsible FOREIGN KEY (Responsible_Personnel_ID)
@@ -458,7 +490,7 @@ CREATE TABLE AwardDeliverable (
 
 -- ProjectRole
 CREATE TABLE ProjectRole (
-    Role_ID INT AUTO_INCREMENT PRIMARY KEY,
+    ProjectRole_ID INT AUTO_INCREMENT PRIMARY KEY,
     Project_ID VARCHAR(50) NOT NULL,
     Personnel_ID VARCHAR(50) NOT NULL,
     Role_Value_ID INT NOT NULL,
@@ -552,15 +584,15 @@ CREATE TABLE ActivityCode (
 
 -- IndirectRate
 CREATE TABLE IndirectRate (
-    Rate_ID INT AUTO_INCREMENT PRIMARY KEY,
-    Organization_ID VARCHAR(50) NOT NULL,
+    IndirectRate_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Applicable_Organization_ID VARCHAR(50) NOT NULL,
     Rate_Type VARCHAR(50),
     Rate_Percentage DECIMAL(5,2) NOT NULL,
     Effective_Start_Date DATE NOT NULL,
     Effective_End_Date DATE,
     Base_Type VARCHAR(50),
     Negotiated_Agreement_ID VARCHAR(50),
-    CONSTRAINT fk_rate_org FOREIGN KEY (Organization_ID)
+    CONSTRAINT fk_rate_org FOREIGN KEY (Applicable_Organization_ID)
         REFERENCES Organization(Organization_ID)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
@@ -589,7 +621,7 @@ CREATE TABLE Transaction (
     Description VARCHAR(500),
     Award_ID VARCHAR(50),
     Project_ID VARCHAR(50),
-    Period_ID INT,
+    AwardBudgetPeriod_ID INT,
     Document_Number VARCHAR(100),
     Journal_ID VARCHAR(50),
     Vendor_ID VARCHAR(50),
@@ -622,8 +654,8 @@ CREATE TABLE Transaction (
         REFERENCES Project(Project_ID)
         ON DELETE SET NULL
         ON UPDATE CASCADE,
-    CONSTRAINT fk_trans_period FOREIGN KEY (Period_ID)
-        REFERENCES AwardBudgetPeriod(Period_ID)
+    CONSTRAINT fk_trans_period FOREIGN KEY (AwardBudgetPeriod_ID)
+        REFERENCES AwardBudgetPeriod(AwardBudgetPeriod_ID)
         ON DELETE SET NULL
         ON UPDATE CASCADE,
     CONSTRAINT fk_trans_personnel FOREIGN KEY (Personnel_ID)
@@ -635,7 +667,7 @@ CREATE TABLE Transaction (
 -- Effort
 CREATE TABLE Effort (
     Effort_ID INT AUTO_INCREMENT PRIMARY KEY,
-    Role_ID INT NOT NULL,
+    ProjectRole_ID INT NOT NULL,
     Period_Start_Date DATE NOT NULL,
     Period_End_Date DATE NOT NULL,
     Committed_Percent DECIMAL(5,2) NOT NULL,
@@ -652,8 +684,8 @@ CREATE TABLE Effort (
     CONSTRAINT chk_actual_percent CHECK (Actual_Percent IS NULL OR (Actual_Percent BETWEEN 0 AND 100)),
     CONSTRAINT chk_certification_method CHECK (Certification_Method IN ('PAR','Activity Report','Timesheet','Other')),
     CONSTRAINT chk_prior_approval_status CHECK (Prior_Approval_Status IN ('Not Required','Pending','Approved','Denied')),
-    CONSTRAINT fk_effort_role FOREIGN KEY (Role_ID)
-        REFERENCES ProjectRole(Role_ID)
+    CONSTRAINT fk_effort_role FOREIGN KEY (ProjectRole_ID)
+        REFERENCES ProjectRole(ProjectRole_ID)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     CONSTRAINT fk_effort_certifier FOREIGN KEY (Certified_By_Personnel_ID)
@@ -665,7 +697,7 @@ CREATE TABLE Effort (
 
 -- ComplianceRequirement
 CREATE TABLE ComplianceRequirement (
-    Requirement_ID VARCHAR(50) PRIMARY KEY,
+    ComplianceRequirement_ID VARCHAR(50) PRIMARY KEY,
     Requirement_Number VARCHAR(100) UNIQUE NOT NULL,
     Requirement_Title VARCHAR(500) NOT NULL,
     Requirement_Type VARCHAR(50) NOT NULL,
@@ -696,7 +728,7 @@ CREATE TABLE ComplianceRequirement (
 
 -- ConflictOfInterest
 CREATE TABLE ConflictOfInterest (
-    COI_ID INT AUTO_INCREMENT PRIMARY KEY,
+    ConflictOfInterest_ID INT AUTO_INCREMENT PRIMARY KEY,
     Personnel_ID VARCHAR(50) NOT NULL,
     Project_ID VARCHAR(50),
     Award_ID VARCHAR(50),

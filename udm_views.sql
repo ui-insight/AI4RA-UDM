@@ -1,5 +1,34 @@
 -- Views for URADM Enhanced Schema
 
+CREATE VIEW vw_All_ContactDetails AS
+SELECT
+    cd.ContactDetails_ID,
+    'Personnel' AS Entity_Type,
+    cd.Personnel_ID AS Entity_ID,
+    CONCAT(p.First_Name, ' ', p.Last_Name) AS Entity_Name,
+    av.Allowed_Value_Label AS Contact_Type,
+    cd.ContactDetails_Value AS Contact_Value,
+    cd.Is_Primary
+FROM ContactDetails cd
+JOIN Personnel p ON cd.Personnel_ID = p.Personnel_ID
+LEFT JOIN AllowedValues av ON cd.AllowedValue_ID = av.Allowed_Value_ID
+WHERE cd.Personnel_ID IS NOT NULL
+
+UNION ALL
+
+SELECT
+    cd.ContactDetails_ID,
+    'Organization' AS Entity_Type,
+    cd.Organization_ID AS Entity_ID,
+    o.Organization_Name AS Entity_Name,
+    av.Allowed_Value_Label AS Contact_Type,
+    cd.ContactDetails_Value AS Contact_Value,
+    cd.Is_Primary
+FROM ContactDetails cd
+JOIN Organization o ON cd.Organization_ID = o.Organization_ID
+LEFT JOIN AllowedValues av ON cd.AllowedValue_ID = av.Allowed_Value_ID
+WHERE cd.Organization_ID IS NOT NULL;
+
 CREATE VIEW vw_Active_Awards AS
 SELECT
     a.Award_ID,
@@ -66,7 +95,7 @@ SELECT
         COALESCE(SUM(CASE WHEN t.Transaction_Type IN ('Expense','Encumbrance') THEN t.Transaction_Amount ELSE 0 END), 0) AS Period_Available
 FROM Award a
 LEFT JOIN AwardBudgetPeriod bp ON a.Award_ID = bp.Award_ID
-LEFT JOIN Transaction t ON bp.Period_ID = t.Period_ID
+LEFT JOIN Transaction t ON bp.AwardBudgetPeriod_ID = t.AwardBudgetPeriod_ID
 WHERE a.Award_Status = 'Active'
 GROUP BY a.Award_ID, a.Award_Number, a.Award_Title, a.Current_Total_Funded,
          bp.Period_Number, bp.Start_Date, bp.End_Date, bp.Total_Costs;
@@ -131,7 +160,7 @@ SELECT
     a.Award_ID,
     a.Award_Number,
     bp.Period_Number,
-    ab.Budget_Category,
+    bc.Category_Name AS Budget_Category,
     ab.Line_Item_Description,
     pb.Total_Cost AS Proposed_Amount,
     ab.Approved_Total_Cost AS Approved_Amount,
@@ -145,15 +174,16 @@ SELECT
     END AS Percent_Change_From_Proposal
 FROM Award a
 JOIN AwardBudgetPeriod bp ON a.Award_ID = bp.Award_ID
-LEFT JOIN AwardBudget ab ON bp.Period_ID = ab.Period_ID
+LEFT JOIN AwardBudget ab ON bp.AwardBudgetPeriod_ID = ab.AwardBudgetPeriod_ID
+LEFT JOIN BudgetCategory bc ON ab.BudgetCategory_ID = bc.BudgetCategory_ID
 LEFT JOIN Proposal p ON a.Proposal_ID = p.Proposal_ID
 LEFT JOIN ProposalBudget pb ON p.Proposal_ID = pb.Proposal_ID
     AND bp.Period_Number = pb.Period_Number
-    AND ab.Budget_Category = pb.Budget_Category
+    AND ab.BudgetCategory_ID = pb.BudgetCategory_ID
     AND (ab.Line_Item_Description = pb.Line_Item_Description
          OR (ab.Line_Item_Description IS NULL AND pb.Line_Item_Description IS NULL))
 LEFT JOIN Transaction t ON ab.Award_ID = t.Award_ID
-    AND ab.Period_ID = t.Period_ID
+    AND ab.AwardBudgetPeriod_ID = t.AwardBudgetPeriod_ID
 WHERE a.Award_Status = 'Active'
-GROUP BY a.Award_ID, a.Award_Number, bp.Period_Number, ab.Budget_Category,
+GROUP BY a.Award_ID, a.Award_Number, bp.Period_Number, bc.Category_Name,
          ab.Line_Item_Description, pb.Total_Cost, ab.Approved_Total_Cost, ab.Current_Total_Cost;
