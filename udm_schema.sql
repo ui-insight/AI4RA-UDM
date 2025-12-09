@@ -60,38 +60,61 @@ CREATE TABLE Personnel (
 
 CREATE TABLE ContactDetails (
     ContactDetails_ID INT AUTO_INCREMENT PRIMARY KEY,
-    
+
     -- Only one of these can be non-null
     Personnel_ID VARCHAR(50),
     Organization_ID VARCHAR(50),
-    
+
     -- Contact type controlled by AllowedValues (e.g., Email, Phone, Fax)
     AllowedValue_ID INT,
-    
+
     -- Contact information
     ContactDetails_Value VARCHAR(255) NOT NULL,
     Is_Primary BOOLEAN DEFAULT FALSE,
-    
+
     -- Constraints
     CONSTRAINT chk_contact_entity CHECK (
         (Personnel_ID IS NOT NULL AND Organization_ID IS NULL) OR
         (Personnel_ID IS NULL AND Organization_ID IS NOT NULL)
     ),
-    
+
     -- Foreign keys
     CONSTRAINT fk_contact_personnel FOREIGN KEY (Personnel_ID)
         REFERENCES Personnel(Personnel_ID)
         ON DELETE CASCADE,
-    
+
     CONSTRAINT fk_contact_org FOREIGN KEY (Organization_ID)
         REFERENCES Organization(Organization_ID)
         ON DELETE CASCADE,
-    
+
     CONSTRAINT fk_contact_type FOREIGN KEY (AllowedValue_ID)
         REFERENCES AllowedValues(Allowed_Value_ID)
         ON UPDATE CASCADE
 );
 
+-- IndirectRate (moved here because ProposalBudget references it)
+CREATE TABLE IndirectRate (
+    IndirectRate_ID INT AUTO_INCREMENT PRIMARY KEY,
+    Applicable_Organization_ID VARCHAR(50) NOT NULL,
+    Rate_Type VARCHAR(50),
+    Rate_Percentage DECIMAL(5,2) NOT NULL,
+    Effective_Start_Date DATE NOT NULL,
+    Effective_End_Date DATE,
+    Base_Type VARCHAR(50),
+    Negotiated_Agreement_ID VARCHAR(50),
+    CONSTRAINT fk_rate_org FOREIGN KEY (Applicable_Organization_ID)
+        REFERENCES Organization(Organization_ID)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT chk_rate_type CHECK (Rate_Type IN (
+        'On-Campus','Off-Campus','MTDC','TDC','Clinical Trial',
+        'Fringe Benefits','Facilities','Administrative'
+    )),
+    CONSTRAINT chk_base_type CHECK (Base_Type IN (
+        'MTDC','TDC','Salaries and Wages','Direct Salaries'
+    )),
+    CONSTRAINT chk_rate_date_range CHECK (Effective_End_Date IS NULL OR Effective_End_Date >= Effective_Start_Date)
+);
 
 -- Project
 CREATE TABLE Project (
@@ -580,30 +603,6 @@ CREATE TABLE ActivityCode (
         'Instruction','Research','Public Service','Academic Support',
         'Student Services','Institutional Support','Operations'
     ))
-);
-
--- IndirectRate
-CREATE TABLE IndirectRate (
-    IndirectRate_ID INT AUTO_INCREMENT PRIMARY KEY,
-    Applicable_Organization_ID VARCHAR(50) NOT NULL,
-    Rate_Type VARCHAR(50),
-    Rate_Percentage DECIMAL(5,2) NOT NULL,
-    Effective_Start_Date DATE NOT NULL,
-    Effective_End_Date DATE,
-    Base_Type VARCHAR(50),
-    Negotiated_Agreement_ID VARCHAR(50),
-    CONSTRAINT fk_rate_org FOREIGN KEY (Applicable_Organization_ID)
-        REFERENCES Organization(Organization_ID)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    CONSTRAINT chk_rate_type CHECK (Rate_Type IN (
-        'On-Campus','Off-Campus','MTDC','TDC','Clinical Trial',
-        'Fringe Benefits','Facilities','Administrative'
-    )),
-    CONSTRAINT chk_base_type CHECK (Base_Type IN (
-        'MTDC','TDC','Salaries and Wages','Direct Salaries'
-    )),
-    CONSTRAINT chk_rate_date_range CHECK (Effective_End_Date IS NULL OR Effective_End_Date >= Effective_Start_Date)
 );
 
 -- Transaction
