@@ -275,9 +275,9 @@ SELECT 'Transaction Test' as test_name, COUNT(*) as inserted_rows FROM Transacti
 -- ========================================
 -- 22. Test Effort
 -- ========================================
-INSERT INTO Effort (Role_ID, Period_Start_Date, Period_End_Date, Committed_Percent, Committed_Person_Months, Actual_Percent, Is_Certified, Certification_Method, Requires_Prior_Approval, Prior_Approval_Status) VALUES
-((SELECT Role_ID FROM ProjectRole WHERE Personnel_ID = 'PER001' AND Project_ID = 'PROJ001' LIMIT 1), '2024-01-01', '2024-06-30', 25.00, 1.50, 25.00, TRUE, 'PAR', FALSE, 'Not Required'),
-((SELECT Role_ID FROM ProjectRole WHERE Personnel_ID = 'PER002' AND Project_ID = 'PROJ001' LIMIT 1), '2024-01-01', '2024-06-30', 15.00, 0.90, 16.00, FALSE, 'PAR', FALSE, 'Not Required');
+INSERT INTO Effort (ProjectRole_ID, Period_Start_Date, Period_End_Date, Committed_Percent, Committed_Person_Months, Actual_Percent, Is_Certified, Certification_Method, Requires_Prior_Approval, Prior_Approval_Status) VALUES
+((SELECT ProjectRole_ID FROM ProjectRole WHERE Personnel_ID = 'PER001' AND Project_ID = 'PROJ001' LIMIT 1), '2024-01-01', '2024-06-30', 25.00, 1.50, 25.00, TRUE, 'PAR', FALSE, 'Not Required'),
+((SELECT ProjectRole_ID FROM ProjectRole WHERE Personnel_ID = 'PER002' AND Project_ID = 'PROJ001' LIMIT 1), '2024-01-01', '2024-06-30', 15.00, 0.90, 16.00, FALSE, 'PAR', FALSE, 'Not Required');
 
 SELECT 'Effort Test' as test_name, COUNT(*) as inserted_rows FROM Effort;
 
