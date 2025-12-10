@@ -17,9 +17,10 @@ cd /Users/nlayman/Documents/osp/granted/repos/AI4RA-UDM
 # Remove any existing test database
 rm -rf test_db
 
-# Create brand new Dolt database
-dolt init test_db
+# Create directory and initialize Dolt database
+mkdir test_db
 cd test_db
+dolt init
 ```
 
 ## Step 2: Load Schema and Views

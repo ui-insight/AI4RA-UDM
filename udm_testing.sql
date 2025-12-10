@@ -1,8 +1,8 @@
 -- UDM Testing SQL
 -- This file contains test INSERT and SELECT statements to verify schema integrity
--- Run this on the test branch only - changes should be dropped, not committed
+-- Run in fresh test_db/ only - see udm_testing.md for protocol
 
--- Clean up any existing test data
+-- Clean up any existing test data (not needed if using fresh database per protocol)
 DELETE FROM ActivityLog;
 DELETE FROM Effort;
 DELETE FROM ConflictOfInterest;
@@ -31,6 +31,7 @@ DELETE FROM Project;
 DELETE FROM ContactDetails;
 DELETE FROM Personnel;
 DELETE FROM Organization;
+DELETE FROM BudgetCategory;
 DELETE FROM AllowedValues;
 
 -- ========================================
@@ -179,9 +180,9 @@ SELECT 'AwardBudgetPeriod Test' as test_name, COUNT(*) as inserted_rows FROM Awa
 -- ========================================
 -- 13. Test AwardBudget
 -- ========================================
-INSERT INTO AwardBudget (Award_ID, Period_ID, Budget_Category, Line_Item_Description, Approved_Direct_Cost, Approved_Indirect_Cost, Approved_Total_Cost, Current_Direct_Cost, Current_Indirect_Cost, Current_Total_Cost) VALUES
-((SELECT Award_ID FROM Award WHERE Award_Number = 'NSF-2024-12345'), (SELECT Period_ID FROM AwardBudgetPeriod WHERE Award_ID = 'AWD001' AND Period_Number = 1), 'Senior Personnel', 'PI Salary', 80000.00, 26666.67, 106666.67, 80000.00, 26666.67, 106666.67),
-((SELECT Award_ID FROM Award WHERE Award_Number = 'NSF-2024-12345'), (SELECT Period_ID FROM AwardBudgetPeriod WHERE Award_ID = 'AWD001' AND Period_Number = 1), 'Equipment', 'Computing Equipment', 50000.00, 0.00, 50000.00, 50000.00, 0.00, 50000.00);
+INSERT INTO AwardBudget (Award_ID, AwardBudgetPeriod_ID, BudgetCategory_ID, Line_Item_Description, Approved_Direct_Cost, Approved_Indirect_Cost, Approved_Total_Cost, Current_Direct_Cost, Current_Indirect_Cost, Current_Total_Cost) VALUES
+('AWD001', (SELECT AwardBudgetPeriod_ID FROM AwardBudgetPeriod WHERE Award_ID = 'AWD001' AND Period_Number = 1), (SELECT BudgetCategory_ID FROM BudgetCategory WHERE Category_Code = 'A'), 'PI Salary', 80000.00, 26666.67, 106666.67, 80000.00, 26666.67, 106666.67),
+('AWD001', (SELECT AwardBudgetPeriod_ID FROM AwardBudgetPeriod WHERE Award_ID = 'AWD001' AND Period_Number = 1), (SELECT BudgetCategory_ID FROM BudgetCategory WHERE Category_Code = 'D'), 'Computing Equipment', 50000.00, 0.00, 50000.00, 50000.00, 0.00, 50000.00);
 
 SELECT 'AwardBudget Test' as test_name, COUNT(*) as inserted_rows FROM AwardBudget;
 
