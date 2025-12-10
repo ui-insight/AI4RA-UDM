@@ -365,7 +365,7 @@ SELECT 'Organization', COUNT(*) FROM Organization
 UNION ALL
 SELECT 'Personnel', COUNT(*) FROM Personnel
 UNION ALL
-SELECT 'Contact', COUNT(*) FROM Contact
+SELECT 'ContactDetails', COUNT(*) FROM ContactDetails
 UNION ALL
 SELECT 'Project', COUNT(*) FROM Project
 UNION ALL
