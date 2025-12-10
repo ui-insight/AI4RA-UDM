@@ -1,39 +1,59 @@
 # UDM Testing Protocol
 
-**EVERY TIME YOU TEST: Drop tables → Load schema → Run tests**
+**EVERY TIME YOU TEST: Create fresh DB → Load schema → Run tests → Delete DB**
 
-## Step 1: Drop All Tables
+## Critical Rules
+
+1. **NEVER test in `dolt_db/`** - That's connected to DoltHub
+2. **ALWAYS create a fresh temporary database** for each test run
+3. **ALWAYS delete the test database** when done
+4. **Start from scratch every single time**
+
+## Step 1: Create Fresh Test Database
 
 ```bash
-cd /Users/nlayman/Documents/osp/granted/repos/AI4RA-UDM/dolt_db
+cd /Users/nlayman/Documents/osp/granted/repos/AI4RA-UDM
 
-dolt sql << 'EOF'
-SET FOREIGN_KEY_CHECKS = 0;
-DROP VIEW IF EXISTS vw_All_ContactDetails, vw_Active_Awards, vw_Active_Personnel_Roles, vw_Award_Financial_Summary, vw_Expiring_Awards, vw_Overdue_Deliverables, vw_ComplianceRequirement_Status, vw_Budget_Comparison;
-DROP TABLE IF EXISTS Account, ActivityCode, ActivityLog, AllowedValues, Award, AwardBudget, AwardBudgetPeriod, AwardDeliverable, BudgetCategory, ComplianceRequirement, ConflictOfInterest, ContactDetails, CostShare, DataDictionary, Document, Effort, FinanceCode, Fund, IndirectRate, Invoice, Modification, Organization, Personnel, Project, ProjectRole, Proposal, ProposalBudget, RFA, Subaward, Terms, Transaction;
-SET FOREIGN_KEY_CHECKS = 1;
-EOF
+# Remove any existing test database
+rm -rf test_db
+
+# Create brand new Dolt database
+dolt init test_db
+cd test_db
 ```
 
-Verify: `dolt sql -q "SHOW TABLES"` should return nothing.
-
-## Step 2: Recreate Tables and Views
+## Step 2: Load Schema and Views
 
 ```bash
+# Load schema
 dolt sql < ../udm_schema.sql
+
+# Load views
 dolt sql < ../udm_views.sql
 ```
 
 ## Step 3: Run Tests
 
 ```bash
+# Run test suite
 dolt sql < ../udm_testing.sql 2>&1
 ```
 
 Review output for errors. All test sections should complete successfully.
 
+## Step 4: Clean Up
+
+```bash
+# Return to project root
+cd /Users/nlayman/Documents/osp/granted/repos/AI4RA-UDM
+
+# Delete the test database completely
+rm -rf test_db
+```
+
 ## Notes
 
-- Always test on `test` branch
-- If any step fails, start over from Step 1
-- Test data is not committed - it's for validation only
+- **test_db/** is temporary and NOT tracked in Git (should be in .gitignore)
+- **test_db/** has NO connection to DoltHub
+- **dolt_db/** should NEVER be used for testing
+- If any step fails, delete test_db and start over from Step 1

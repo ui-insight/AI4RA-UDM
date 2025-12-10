@@ -1,3 +1,6 @@
 # Dolt database directory
 AI4RA-UDM/
 dolt_db/
+
+# Temporary test database (NEVER commit this)
+test_db/
