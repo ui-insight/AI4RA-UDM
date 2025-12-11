@@ -9,5 +9,5 @@
 - [x] COI_Status should be ConflictOfInterest_Status to stick with naming scheme
 - [ ] Can there be multiple Is_Primary ContactDetails per project?
 - [ ] Document table is too complex
-- [ ] Date_Created and Date_Modified aren't necessary for Dolt across any tables
+- [x] Date_Created and Date_Modified aren't necessary for Dolt across any tables
 - [x] `Applicable_Organization_ID` should be `Organization_ID` to match naming ontology in the `IndirectRate` table
