@@ -81,10 +81,10 @@ SELECT 'Personnel Test' as test_name, COUNT(*) as inserted_rows FROM Personnel;
 -- ========================================
 -- 4. Test ContactDetails
 -- ========================================
-INSERT INTO ContactDetails (Personnel_ID, AllowedValue_ID, ContactDetails_Value, Is_Primary) VALUES
-('PER001', (SELECT Allowed_Value_ID FROM AllowedValues WHERE Allowed_Value_Code = 'EMAIL' AND Allowed_Value_Group = 'ContactType'), 'jane.doe@uidaho.edu', TRUE),
-('PER001', (SELECT Allowed_Value_ID FROM AllowedValues WHERE Allowed_Value_Code = 'PHONE' AND Allowed_Value_Group = 'ContactType'), '208-555-1234', FALSE),
-('PER002', (SELECT Allowed_Value_ID FROM AllowedValues WHERE Allowed_Value_Code = 'EMAIL' AND Allowed_Value_Group = 'ContactType'), 'john.smith@uidaho.edu', TRUE);
+INSERT INTO ContactDetails (Personnel_ID, AllowedValue_ID, ContactDetails_Value) VALUES
+('PER001', (SELECT Allowed_Value_ID FROM AllowedValues WHERE Allowed_Value_Code = 'EMAIL' AND Allowed_Value_Group = 'ContactType'), 'jane.doe@uidaho.edu'),
+('PER001', (SELECT Allowed_Value_ID FROM AllowedValues WHERE Allowed_Value_Code = 'PHONE' AND Allowed_Value_Group = 'ContactType'), '208-555-1234'),
+('PER002', (SELECT Allowed_Value_ID FROM AllowedValues WHERE Allowed_Value_Code = 'EMAIL' AND Allowed_Value_Group = 'ContactType'), 'john.smith@uidaho.edu');
 
 SELECT 'ContactDetails Test' as test_name, COUNT(*) as inserted_rows FROM ContactDetails;
 

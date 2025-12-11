@@ -146,7 +146,6 @@ INSERT IGNORE INTO DataDictionary (Entity, Entity_Type, Parent_Entity, Descripti
 ('Organization_ID', 'Column', 'ContactDetails', 'Reference to organization (mutually exclusive with Personnel_ID)', 'Org ID', FALSE),
 ('AllowedValue_ID', 'Column', 'ContactDetails', 'Type of contact (Email, Phone, Fax) from AllowedValues', 'Contact Type ID', FALSE),
 ('ContactDetails_Value', 'Column', 'ContactDetails', 'The actual contact value (email address, phone number, etc.)', 'Value, Contact Info', TRUE),
-('Is_Primary', 'Column', 'ContactDetails', 'Flag indicating if this is the primary contact method', 'Primary Flag, Default', FALSE),
 
 -- ========================================
 -- IndirectRate Columns

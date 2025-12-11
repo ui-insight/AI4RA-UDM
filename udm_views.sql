@@ -7,8 +7,7 @@ SELECT
     cd.Personnel_ID AS Entity_ID,
     CONCAT(p.First_Name, ' ', p.Last_Name) AS Entity_Name,
     av.Allowed_Value_Label AS Contact_Type,
-    cd.ContactDetails_Value AS Contact_Value,
-    cd.Is_Primary
+    cd.ContactDetails_Value AS Contact_Value
 FROM ContactDetails cd
 JOIN Personnel p ON cd.Personnel_ID = p.Personnel_ID
 LEFT JOIN AllowedValues av ON cd.AllowedValue_ID = av.Allowed_Value_ID
@@ -22,8 +21,7 @@ SELECT
     cd.Organization_ID AS Entity_ID,
     o.Organization_Name AS Entity_Name,
     av.Allowed_Value_Label AS Contact_Type,
-    cd.ContactDetails_Value AS Contact_Value,
-    cd.Is_Primary
+    cd.ContactDetails_Value AS Contact_Value
 FROM ContactDetails cd
 JOIN Organization o ON cd.Organization_ID = o.Organization_ID
 LEFT JOIN AllowedValues av ON cd.AllowedValue_ID = av.Allowed_Value_ID

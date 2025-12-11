@@ -63,7 +63,6 @@ CREATE TABLE ContactDetails (
 
     -- Contact information
     ContactDetails_Value VARCHAR(255) NOT NULL,
-    Is_Primary BOOLEAN DEFAULT FALSE,
 
     -- Constraints
     CONSTRAINT chk_contact_entity CHECK (

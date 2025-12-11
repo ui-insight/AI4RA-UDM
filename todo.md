@@ -4,7 +4,7 @@
 - [x] Update data_dictionary_values.sql to fill the data dictionary with all the stuff from the schema but don't include anything from the views. Just table names and columns of all tables except the data dictionary one.
 - [x] Once that's been done remove udm_data_dictionary_complete.sql
 - [x] What is ActivityCode table for? Should it be a table?
-- [ ] Update allowedvalues column as follows:
+- [x] Update allowedvalues column as follows:
  1. For each business‑logic enum (e.g., Organization.Organization_Type), add a stored generated
  column that returns the constant domain literal (e.g., Organization_Type_Group VARCHAR(50)
  GENERATED ALWAYS AS ('Organization_Type') STORED).
@@ -21,7 +21,7 @@
  AllowedValues without further schema changes.
 - [x] What is `Display_Order` in `BudgetCategory` table
 - [x] COI_Status should be ConflictOfInterest_Status to stick with naming scheme
-- [ ] Do we really need `Is_Primary` in the ContactDetails table? Could there be more than one primary contact per person or organization? Shouldn't primary contact be a property of person or organization and not of the contact method itself?
+- [x] Do we really need `Is_Primary` in the ContactDetails table? Could there be more than one primary contact per person or organization? Shouldn't primary contact be a property of person or organization and not of the contact method itself?
 - [x] Document table is too complex
 - [x] Date_Created and Date_Modified aren't necessary for Dolt across any tables
 - [x] `Applicable_Organization_ID` should be `Organization_ID` to match naming ontology in the `IndirectRate` table
