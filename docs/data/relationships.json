@@ -1,0 +1,437 @@
+{
+  "relationships": [
+    {
+      "from_table": "Organization",
+      "from_column": "Parent_Organization_ID",
+      "to_table": "Organization",
+      "to_column": "Organization_ID"
+    },
+    {
+      "from_table": "Personnel",
+      "from_column": "Department_Organization_ID",
+      "to_table": "Organization",
+      "to_column": "Organization_ID"
+    },
+    {
+      "from_table": "ContactDetails",
+      "from_column": "Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "ContactDetails",
+      "from_column": "Organization_ID",
+      "to_table": "Organization",
+      "to_column": "Organization_ID"
+    },
+    {
+      "from_table": "ContactDetails",
+      "from_column": "AllowedValue_ID",
+      "to_table": "AllowedValues",
+      "to_column": "Allowed_Value_ID"
+    },
+    {
+      "from_table": "IndirectRate",
+      "from_column": "Organization_ID",
+      "to_table": "Organization",
+      "to_column": "Organization_ID"
+    },
+    {
+      "from_table": "Project",
+      "from_column": "Project_Type_Value_ID",
+      "to_table": "AllowedValues",
+      "to_column": "Allowed_Value_ID"
+    },
+    {
+      "from_table": "Project",
+      "from_column": "Parent_Project_ID",
+      "to_table": "Project",
+      "to_column": "Project_ID"
+    },
+    {
+      "from_table": "Project",
+      "from_column": "Lead_Organization_ID",
+      "to_table": "Organization",
+      "to_column": "Organization_ID"
+    },
+    {
+      "from_table": "RFA",
+      "from_column": "Sponsor_Organization_ID",
+      "to_table": "Organization",
+      "to_column": "Organization_ID"
+    },
+    {
+      "from_table": "Proposal",
+      "from_column": "Project_ID",
+      "to_table": "Project",
+      "to_column": "Project_ID"
+    },
+    {
+      "from_table": "Proposal",
+      "from_column": "Sponsor_Organization_ID",
+      "to_table": "Organization",
+      "to_column": "Organization_ID"
+    },
+    {
+      "from_table": "Proposal",
+      "from_column": "Submitting_Organization_ID",
+      "to_table": "Organization",
+      "to_column": "Organization_ID"
+    },
+    {
+      "from_table": "Proposal",
+      "from_column": "Administering_Organization_ID",
+      "to_table": "Organization",
+      "to_column": "Organization_ID"
+    },
+    {
+      "from_table": "Proposal",
+      "from_column": "RFA_ID",
+      "to_table": "RFA",
+      "to_column": "RFA_ID"
+    },
+    {
+      "from_table": "Proposal",
+      "from_column": "Previous_Proposal_ID",
+      "to_table": "Proposal",
+      "to_column": "Proposal_ID"
+    },
+    {
+      "from_table": "ProposalBudget",
+      "from_column": "Proposal_ID",
+      "to_table": "Proposal",
+      "to_column": "Proposal_ID"
+    },
+    {
+      "from_table": "ProposalBudget",
+      "from_column": "BudgetCategory_ID",
+      "to_table": "BudgetCategory",
+      "to_column": "BudgetCategory_ID"
+    },
+    {
+      "from_table": "ProposalBudget",
+      "from_column": "Applied_Indirect_Rate_ID",
+      "to_table": "IndirectRate",
+      "to_column": "IndirectRate_ID"
+    },
+    {
+      "from_table": "Award",
+      "from_column": "Project_ID",
+      "to_table": "Project",
+      "to_column": "Project_ID"
+    },
+    {
+      "from_table": "Award",
+      "from_column": "Sponsor_Organization_ID",
+      "to_table": "Organization",
+      "to_column": "Organization_ID"
+    },
+    {
+      "from_table": "Award",
+      "from_column": "RFA_ID",
+      "to_table": "RFA",
+      "to_column": "RFA_ID"
+    },
+    {
+      "from_table": "Award",
+      "from_column": "Proposal_ID",
+      "to_table": "Proposal",
+      "to_column": "Proposal_ID"
+    },
+    {
+      "from_table": "Award",
+      "from_column": "Prime_Sponsor_Organization_ID",
+      "to_table": "Organization",
+      "to_column": "Organization_ID"
+    },
+    {
+      "from_table": "Modification",
+      "from_column": "Event_Type_Value_ID",
+      "to_table": "AllowedValues",
+      "to_column": "Allowed_Value_ID"
+    },
+    {
+      "from_table": "Modification",
+      "from_column": "Award_ID",
+      "to_table": "Award",
+      "to_column": "Award_ID"
+    },
+    {
+      "from_table": "Modification",
+      "from_column": "Approved_By_Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "Modification",
+      "from_column": "Affected_Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "Terms",
+      "from_column": "Award_ID",
+      "to_table": "Award",
+      "to_column": "Award_ID"
+    },
+    {
+      "from_table": "AwardBudgetPeriod",
+      "from_column": "Award_ID",
+      "to_table": "Award",
+      "to_column": "Award_ID"
+    },
+    {
+      "from_table": "AwardBudget",
+      "from_column": "Award_ID",
+      "to_table": "Award",
+      "to_column": "Award_ID"
+    },
+    {
+      "from_table": "AwardBudget",
+      "from_column": "AwardBudgetPeriod_ID",
+      "to_table": "AwardBudgetPeriod",
+      "to_column": "AwardBudgetPeriod_ID"
+    },
+    {
+      "from_table": "AwardBudget",
+      "from_column": "BudgetCategory_ID",
+      "to_table": "BudgetCategory",
+      "to_column": "BudgetCategory_ID"
+    },
+    {
+      "from_table": "Subaward",
+      "from_column": "Prime_Award_ID",
+      "to_table": "Award",
+      "to_column": "Award_ID"
+    },
+    {
+      "from_table": "Subaward",
+      "from_column": "Subrecipient_Organization_ID",
+      "to_table": "Organization",
+      "to_column": "Organization_ID"
+    },
+    {
+      "from_table": "CostShare",
+      "from_column": "Award_ID",
+      "to_table": "Award",
+      "to_column": "Award_ID"
+    },
+    {
+      "from_table": "CostShare",
+      "from_column": "Source_Organization_ID",
+      "to_table": "Organization",
+      "to_column": "Organization_ID"
+    },
+    {
+      "from_table": "Invoice",
+      "from_column": "Award_ID",
+      "to_table": "Award",
+      "to_column": "Award_ID"
+    },
+    {
+      "from_table": "Invoice",
+      "from_column": "AwardBudgetPeriod_ID",
+      "to_table": "AwardBudgetPeriod",
+      "to_column": "AwardBudgetPeriod_ID"
+    },
+    {
+      "from_table": "AwardDeliverable",
+      "from_column": "Deliverable_Type_Value_ID",
+      "to_table": "AllowedValues",
+      "to_column": "Allowed_Value_ID"
+    },
+    {
+      "from_table": "AwardDeliverable",
+      "from_column": "Award_ID",
+      "to_table": "Award",
+      "to_column": "Award_ID"
+    },
+    {
+      "from_table": "AwardDeliverable",
+      "from_column": "AwardBudgetPeriod_ID",
+      "to_table": "AwardBudgetPeriod",
+      "to_column": "AwardBudgetPeriod_ID"
+    },
+    {
+      "from_table": "AwardDeliverable",
+      "from_column": "Responsible_Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "AwardDeliverable",
+      "from_column": "Reviewed_By_Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "ProjectRole",
+      "from_column": "Project_ID",
+      "to_table": "Project",
+      "to_column": "Project_ID"
+    },
+    {
+      "from_table": "ProjectRole",
+      "from_column": "Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "ProjectRole",
+      "from_column": "Funding_Award_ID",
+      "to_table": "Award",
+      "to_column": "Award_ID"
+    },
+    {
+      "from_table": "ProjectRole",
+      "from_column": "Role_Value_ID",
+      "to_table": "AllowedValues",
+      "to_column": "Allowed_Value_ID"
+    },
+    {
+      "from_table": "Fund",
+      "from_column": "Fund_Type_Value_ID",
+      "to_table": "AllowedValues",
+      "to_column": "Allowed_Value_ID"
+    },
+    {
+      "from_table": "Fund",
+      "from_column": "Organization_ID",
+      "to_table": "Organization",
+      "to_column": "Organization_ID"
+    },
+    {
+      "from_table": "Account",
+      "from_column": "Parent_Account_Code",
+      "to_table": "Account",
+      "to_column": "Account_Code"
+    },
+    {
+      "from_table": "FinanceCode",
+      "from_column": "Purpose_Value_ID",
+      "to_table": "AllowedValues",
+      "to_column": "Allowed_Value_ID"
+    },
+    {
+      "from_table": "FinanceCode",
+      "from_column": "Award_ID",
+      "to_table": "Award",
+      "to_column": "Award_ID"
+    },
+    {
+      "from_table": "FinanceCode",
+      "from_column": "Organization_ID",
+      "to_table": "Organization",
+      "to_column": "Organization_ID"
+    },
+    {
+      "from_table": "Transaction",
+      "from_column": "Transaction_Type_Value_ID",
+      "to_table": "AllowedValues",
+      "to_column": "Allowed_Value_ID"
+    },
+    {
+      "from_table": "Transaction",
+      "from_column": "Fund_Code",
+      "to_table": "Fund",
+      "to_column": "Fund_Code"
+    },
+    {
+      "from_table": "Transaction",
+      "from_column": "Account_Code",
+      "to_table": "Account",
+      "to_column": "Account_Code"
+    },
+    {
+      "from_table": "Transaction",
+      "from_column": "Finance_Code",
+      "to_table": "FinanceCode",
+      "to_column": "Finance_Code"
+    },
+    {
+      "from_table": "Transaction",
+      "from_column": "Award_ID",
+      "to_table": "Award",
+      "to_column": "Award_ID"
+    },
+    {
+      "from_table": "Transaction",
+      "from_column": "Project_ID",
+      "to_table": "Project",
+      "to_column": "Project_ID"
+    },
+    {
+      "from_table": "Transaction",
+      "from_column": "AwardBudgetPeriod_ID",
+      "to_table": "AwardBudgetPeriod",
+      "to_column": "AwardBudgetPeriod_ID"
+    },
+    {
+      "from_table": "Transaction",
+      "from_column": "Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "Effort",
+      "from_column": "ProjectRole_ID",
+      "to_table": "ProjectRole",
+      "to_column": "ProjectRole_ID"
+    },
+    {
+      "from_table": "Effort",
+      "from_column": "Certified_By_Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "ComplianceRequirement",
+      "from_column": "Project_ID",
+      "to_table": "Project",
+      "to_column": "Project_ID"
+    },
+    {
+      "from_table": "ComplianceRequirement",
+      "from_column": "Principal_Investigator_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "ConflictOfInterest",
+      "from_column": "Relationship_Type_Value_ID",
+      "to_table": "AllowedValues",
+      "to_column": "Allowed_Value_ID"
+    },
+    {
+      "from_table": "ConflictOfInterest",
+      "from_column": "Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "ConflictOfInterest",
+      "from_column": "Project_ID",
+      "to_table": "Project",
+      "to_column": "Project_ID"
+    },
+    {
+      "from_table": "ConflictOfInterest",
+      "from_column": "Award_ID",
+      "to_table": "Award",
+      "to_column": "Award_ID"
+    },
+    {
+      "from_table": "ConflictOfInterest",
+      "from_column": "Reviewed_By_Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "Document",
+      "from_column": "Document_Type_Value_ID",
+      "to_table": "AllowedValues",
+      "to_column": "Allowed_Value_ID"
+    }
+  ],
+  "relationship_count": 72
+}

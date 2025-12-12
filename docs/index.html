@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UDM Dashboard - Organization-Centric View</title>
+    <script src="https://cdn.jsdelivr.net/npm/webcola@3.4.0/WebCola/cola.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape-cola@2.5.1/cytoscape-cola.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 0.25rem;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        #cy {
+            flex: 1;
+            background: white;
+            border-right: 1px solid #ddd;
+        }
+
+        .sidebar {
+            width: 350px;
+            background: white;
+            overflow-y: auto;
+            box-shadow: -2px 0 8px rgba(0,0,0,0.05);
+        }
+
+        .panel {
+            padding: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .panel h2 {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-card h3 {
+            font-size: 1rem;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card p {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .legend {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 0.75rem;
+            border: 2px solid #ddd;
+            flex-shrink: 0;
+        }
+
+        .legend-label {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .controls {
+            background: #fff;
+            padding: 1rem 2rem;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .button-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .button-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        #node-info {
+            display: none;
+        }
+
+        #node-info.active {
+            display: block;
+        }
+
+        .column-list {
+            font-size: 0.85rem;
+            color: #666;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .column-item {
+            padding: 0.4rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .column-item:last-child {
+            border-bottom: none;
+        }
+
+        .column-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .column-type {
+            color: #667eea;
+            font-family: monospace;
+            font-size: 0.8rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            margin-left: 0.3rem;
+            font-weight: 600;
+        }
+
+        .badge-pk {
+            background: #ffd700;
+            color: #333;
+        }
+
+        .badge-required {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .connections-list {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .connection-item {
+            padding: 0.5rem;
+            background: white;
+            border-left: 3px solid #667eea;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .connection-item:hover {
+            background: #f0f0f0;
+            border-left-color: #5568d3;
+        }
+
+        .connection-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .connection-desc {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                max-height: 40vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>UDM Dashboard</h1>
+        <div class="subtitle">Organization-Centric View - Click tables to explore</div>
+    </header>
+
+    <div class="container">
+        <div id="cy">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #667eea;">
+                <div style="text-align: center;">
+                    <h2>Loading Dashboard...</h2>
+                    <p style="margin-top: 1rem; color: #666;">Please wait while we load the UDM schema</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="panel">
+                <h2>Getting Started</h2>
+                <div class="info-card">
+                    <p><strong>🏢 Start with Organization</strong> - The hub of all funding flows</p>
+                    <p><strong>💰 Award</strong> - Money flowing between organizations and projects</p>
+                    <p><strong>🔬 Project</strong> - Research work being done</p>
+                    <p><strong>👤 Personnel</strong> - People doing the work</p>
+                </div>
+                <div class="info-card" style="background: #fff3cd; border-left: 4px solid #ffc107;">
+                    <p><strong>💡 Tip:</strong> Click any table to reveal its related tables. Click again to explore deeper connections!</p>
+                </div>
+            </div>
+
+            <div class="panel" id="node-info">
+                <h2>Table Details</h2>
+                <div class="info-card">
+                    <h3 id="table-name"></h3>
+                    <p id="table-category"></p>
+                    <div id="table-connections" class="connections-list"></div>
+                </div>
+                <div class="info-card">
+                    <h3>Columns</h3>
+                    <div id="table-columns" class="column-list"></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>Legend</h2>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #4A90E2;"></div>
+                        <div class="legend-label">Organization</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #7ED321;"></div>
+                        <div class="legend-label">Award / Financial</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #BD10E0;"></div>
+                        <div class="legend-label">Project / Proposal</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #F5A623;"></div>
+                        <div class="legend-label">Personnel</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #D0021B;"></div>
+                        <div class="legend-label">Compliance</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #D8D8D8;"></div>
+                        <div class="legend-label">Reference / Supporting</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="btn-fit">Fit to Screen</button>
+        <button id="btn-expand-one">+ Expand One Level</button>
+        <button id="btn-collapse">⊖ Collapse All</button>
+        <button id="btn-show-all" class="button-secondary">Show All Tables</button>
+    </div>
+
+    <script>
+        let cy;
+        let allData = {};
+        let expandedNodes = new Set(['Organization', 'Award', 'Project', 'Personnel']);
+
+        // Define the organization-centric hierarchy
+        const tableHierarchy = {
+            'Organization': ['RFA', 'Proposal', 'Award', 'Project', 'Personnel', 'IndirectRate', 'Fund', 'Subaward', 'ContactDetails'],
+            'Award': ['Proposal', 'Project', 'Terms', 'Modification', 'AwardBudgetPeriod', 'Invoice', 'AwardDeliverable', 'Subaward', 'CostShare', 'FinanceCode', 'Transaction'],
+            'Project': ['Award', 'Proposal', 'ProjectRole', 'ComplianceRequirement', 'ConflictOfInterest', 'Document'],
+            'Personnel': ['Organization', 'ProjectRole', 'Effort', 'ComplianceRequirement', 'ConflictOfInterest', 'AwardDeliverable', 'Modification', 'ContactDetails'],
+            'Proposal': ['RFA', 'ProposalBudget', 'Award', 'Project'],
+            'RFA': ['Proposal', 'Award'],
+            'ProjectRole': ['Effort', 'Project', 'Personnel', 'Award'],
+            'AwardBudgetPeriod': ['AwardBudget', 'Transaction', 'Invoice', 'AwardDeliverable'],
+            'Transaction': ['Fund', 'Account', 'FinanceCode', 'Award', 'Project', 'AwardBudgetPeriod', 'Personnel'],
+            'ComplianceRequirement': ['Project', 'Personnel'],
+            'ConflictOfInterest': ['Personnel', 'Project', 'Award']
+        };
+
+        // Load data and initialize visualization
+        fetch('data/cytoscape-data.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                allData = data;
+                initCytoscape();
+            })
+            .catch(error => {
+                console.error('Error loading data:', error);
+                document.getElementById('cy').innerHTML = `
+                    <div style="padding: 2rem; text-align: center; color: #D0021B;">
+                        <h2>Error Loading Dashboard</h2>
+                        <p style="margin-top: 1rem; color: #666;">${error.message}</p>
+                        <p style="margin-top: 1rem; color: #666;">Check browser console for details.</p>
+                    </div>
+                `;
+            });
+
+        function initCytoscape() {
+            // Clear loading message
+            document.getElementById('cy').innerHTML = '';
+
+            // Start with only core tables visible
+            const coreNodes = allData.nodes.filter(n =>
+                ['Organization', 'Award', 'Project', 'Personnel'].includes(n.data.id)
+            );
+
+            // Show only core relationships
+            const coreEdges = allData.edges.filter(e => {
+                const source = e.data.source;
+                const target = e.data.target;
+                return expandedNodes.has(source) && expandedNodes.has(target);
+            });
+
+            cy = cytoscape({
+                container: document.getElementById('cy'),
+
+                elements: {
+                    nodes: coreNodes,
+                    edges: coreEdges
+                },
+
+                style: [
+                    {
+                        selector: 'node',
+                        style: {
+                            'background-color': 'data(color)',
+                            'label': 'data(label)',
+                            'color': '#333',
+                            'text-valign': 'center',
+                            'text-halign': 'center',
+                            'font-size': '13px',
+                            'font-weight': '600',
+                            'width': 70,
+                            'height': 70,
+                            'border-width': 3,
+                            'border-color': '#fff',
+                            'text-outline-width': 3,
+                            'text-outline-color': '#fff',
+                            'transition-property': 'border-width, border-color',
+                            'transition-duration': '0.2s'
+                        }
+                    },
+                    {
+                        selector: 'node[category="core"]',
+                        style: {
+                            'width': 90,
+                            'height': 90,
+                            'font-size': '15px',
+                            'font-weight': 'bold'
+                        }
+                    },
+                    {
+                        selector: 'node:selected',
+                        style: {
+                            'border-width': 5,
+                            'border-color': '#667eea'
+                        }
+                    },
+                    {
+                        selector: 'edge',
+                        style: {
+                            'width': 2,
+                            'line-color': '#ccc',
+                            'target-arrow-color': '#ccc',
+                            'target-arrow-shape': 'triangle',
+                            'curve-style': 'bezier',
+                            'arrow-scale': 1.3,
+                            'opacity': 0.6
+                        }
+                    },
+                    {
+                        selector: 'edge.highlighted',
+                        style: {
+                            'line-color': '#667eea',
+                            'target-arrow-color': '#667eea',
+                            'width': 3,
+                            'opacity': 1
+                        }
+                    },
+                    {
+                        selector: '.new-node',
+                        style: {
+                            'border-width': 5,
+                            'border-color': '#7ED321'
+                        }
+                    }
+                ],
+
+                layout: {
+                    name: 'cola',
+                    animate: true,
+                    randomize: false,
+                    maxSimulationTime: 2000,
+                    nodeSpacing: 50,
+                    edgeLength: 150
+                },
+
+                minZoom: 0.2,
+                maxZoom: 3,
+                wheelSensitivity: 0.2
+            });
+
+            // Event handlers
+            cy.on('tap', 'node', function(evt) {
+                const node = evt.target;
+                expandNode(node);
+                showNodeInfo(node);
+            });
+
+            cy.on('tap', function(evt) {
+                if (evt.target === cy) {
+                    cy.edges().removeClass('highlighted');
+                    hideNodeInfo();
+                }
+            });
+
+            // Button handlers
+            document.getElementById('btn-fit').addEventListener('click', () => {
+                cy.fit(null, 50);
+            });
+
+            document.getElementById('btn-expand-one').addEventListener('click', () => {
+                expandOneLevel();
+            });
+
+            document.getElementById('btn-collapse').addEventListener('click', () => {
+                collapseAll();
+            });
+
+            document.getElementById('btn-show-all').addEventListener('click', () => {
+                showAllTables();
+            });
+
+            // Initial fit
+            setTimeout(() => cy.fit(null, 50), 100);
+        }
+
+        function expandNode(node) {
+            const nodeId = node.data('id');
+
+            if (!tableHierarchy[nodeId]) {
+                return; // No expansion rules for this table
+            }
+
+            const relatedTables = tableHierarchy[nodeId];
+            const newNodes = [];
+            const newEdges = [];
+
+            // Find nodes and edges to add
+            relatedTables.forEach(tableName => {
+                if (!cy.$id(tableName).length) {
+                    // Node doesn't exist, add it
+                    const nodeData = allData.nodes.find(n => n.data.id === tableName);
+                    if (nodeData) {
+                        newNodes.push(nodeData);
+                        expandedNodes.add(tableName);
+                    }
+                }
+            });
+
+            // Add edges between visible nodes
+            allData.edges.forEach(edge => {
+                const source = edge.data.source;
+                const target = edge.data.target;
+
+                if ((source === nodeId || target === nodeId || expandedNodes.has(source)) &&
+                    expandedNodes.has(target) &&
+                    !cy.$id(edge.data.id).length) {
+                    newEdges.push(edge);
+                }
+            });
+
+            if (newNodes.length > 0 || newEdges.length > 0) {
+                // Add new elements
+                cy.add(newNodes);
+                cy.add(newEdges);
+
+                // Highlight new nodes temporarily
+                cy.nodes().forEach(n => {
+                    if (newNodes.find(nn => nn.data.id === n.data('id'))) {
+                        n.addClass('new-node');
+                        setTimeout(() => n.removeClass('new-node'), 2000);
+                    }
+                });
+
+                // Re-layout
+                cy.layout({
+                    name: 'cola',
+                    animate: true,
+                    randomize: false,
+                    maxSimulationTime: 1500,
+                    nodeSpacing: 40,
+                    edgeLength: 120,
+                    fit: true,
+                    padding: 50
+                }).run();
+            }
+
+            // Highlight connections
+            highlightConnections(node);
+        }
+
+        function expandOneLevel() {
+            const currentNodes = cy.nodes().map(n => n.data('id'));
+            currentNodes.forEach(nodeId => {
+                const node = cy.$id(nodeId);
+                expandNode(node);
+            });
+        }
+
+        function collapseAll() {
+            // Reset to core tables only
+            expandedNodes = new Set(['Organization', 'Award', 'Project', 'Personnel']);
+
+            const coreNodes = allData.nodes.filter(n =>
+                expandedNodes.has(n.data.id)
+            );
+
+            const coreEdges = allData.edges.filter(e =>
+                expandedNodes.has(e.data.source) && expandedNodes.has(e.data.target)
+            );
+
+            cy.elements().remove();
+            cy.add(coreNodes);
+            cy.add(coreEdges);
+
+            cy.layout({
+                name: 'cola',
+                animate: true,
+                randomize: false
+            }).run();
+
+            hideNodeInfo();
+        }
+
+        function showAllTables() {
+            cy.elements().remove();
+            cy.add(allData.nodes);
+            cy.add(allData.edges);
+
+            allData.nodes.forEach(n => expandedNodes.add(n.data.id));
+
+            cy.layout({
+                name: 'cola',
+                animate: true,
+                randomize: true,
+                maxSimulationTime: 3000
+            }).run();
+        }
+
+        function showNodeInfo(node) {
+            const data = node.data();
+            const infoPanel = document.getElementById('node-info');
+
+            document.getElementById('table-name').textContent = data.label;
+            document.getElementById('table-category').textContent =
+                `Category: ${data.category.charAt(0).toUpperCase() + data.category.slice(1)}`;
+
+            // Show connections
+            const connectionsList = document.getElementById('table-connections');
+            connectionsList.innerHTML = '';
+
+            const connectedEdges = node.connectedEdges();
+            const connections = new Set();
+
+            connectedEdges.forEach(edge => {
+                const source = edge.source().data('label');
+                const target = edge.target().data('label');
+                const other = source === data.label ? target : source;
+                connections.add(other);
+            });
+
+            if (connections.size > 0) {
+                connections.forEach(conn => {
+                    const connDiv = document.createElement('div');
+                    connDiv.className = 'connection-item';
+                    connDiv.innerHTML = `<div class="connection-label">${conn}</div>`;
+                    connDiv.addEventListener('click', () => {
+                        const targetNode = cy.nodes().filter(n => n.data('label') === conn);
+                        if (targetNode.length) {
+                            expandNode(targetNode);
+                            showNodeInfo(targetNode);
+                            cy.animate({
+                                center: { eles: targetNode },
+                                zoom: 1.5
+                            }, {
+                                duration: 500
+                            });
+                        }
+                    });
+                    connectionsList.appendChild(connDiv);
+                });
+            } else {
+                connectionsList.innerHTML = '<p style="color: #999; font-size: 0.9rem;">No connections visible yet</p>';
+            }
+
+            // Show columns
+            const columnsList = document.getElementById('table-columns');
+            columnsList.innerHTML = '';
+
+            if (data.columns && data.columns.length > 0) {
+                data.columns.forEach(col => {
+                    const colDiv = document.createElement('div');
+                    colDiv.className = 'column-item';
+
+                    let badges = '';
+                    if (col.primary_key) badges += '<span class="badge badge-pk">PK</span>';
+                    if (col.required) badges += '<span class="badge badge-required">Required</span>';
+
+                    colDiv.innerHTML = `
+                        <div class="column-name">${col.name}${badges}</div>
+                        <div class="column-type">${col.type}</div>
+                    `;
+                    columnsList.appendChild(colDiv);
+                });
+            }
+
+            infoPanel.classList.add('active');
+        }
+
+        function hideNodeInfo() {
+            document.getElementById('node-info').classList.remove('active');
+        }
+
+        function highlightConnections(node) {
+            cy.edges().removeClass('highlighted');
+            node.connectedEdges().addClass('highlighted');
+        }
+    </script>
+</body>
+</html>

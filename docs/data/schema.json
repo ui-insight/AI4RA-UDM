@@ -1,0 +1,4142 @@
+{
+  "tables": {
+    "AllowedValues": {
+      "name": "AllowedValues",
+      "columns": [
+        {
+          "name": "Allowed_Value_ID",
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true
+        },
+        {
+          "name": "Allowed_Value_Group",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Allowed_Value_Code",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Allowed_Value_Label",
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Allowed_Value_Description",
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "BudgetCategory": {
+      "name": "BudgetCategory",
+      "columns": [
+        {
+          "name": "BudgetCategory_ID",
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true
+        },
+        {
+          "name": "Category_Code",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": true,
+          "auto_increment": false
+        },
+        {
+          "name": "Category_Name",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Category_Description",
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "Organization": {
+      "name": "Organization",
+      "columns": [
+        {
+          "name": "Organization_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Organization_Name",
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Organization_Type",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Parent_Organization_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "UEI",
+          "type": "VARCHAR(12)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Organization(Organization_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "Personnel": {
+      "name": "Personnel",
+      "columns": [
+        {
+          "name": "Personnel_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ORCID",
+          "type": "VARCHAR(19)",
+          "primary_key": false,
+          "required": false,
+          "unique": true,
+          "auto_increment": false
+        },
+        {
+          "name": "First_Name",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Last_Name",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Middle_Name",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Institutional_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": true,
+          "auto_increment": false
+        },
+        {
+          "name": "Primary_Email",
+          "type": "VARCHAR(320)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Person_Type",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Department_Organization_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Organization(Organization_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "ContactDetails": {
+      "name": "ContactDetails",
+      "columns": [
+        {
+          "name": "ContactDetails_ID",
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true
+        },
+        {
+          "name": "Personnel_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Organization_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "AllowedValue_ID",
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ContactDetails_Value",
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Personnel(Personnel_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Organization(Organization_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "AllowedValues(Allowed_Value_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "IndirectRate": {
+      "name": "IndirectRate",
+      "columns": [
+        {
+          "name": "IndirectRate_ID",
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true
+        },
+        {
+          "name": "Organization_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Rate_Type",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Rate_Percentage",
+          "type": "DECIMAL(5,2)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Effective_Start_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Effective_End_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Base_Type",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Negotiated_Agreement_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Organization(Organization_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "Project": {
+      "name": "Project",
+      "columns": [
+        {
+          "name": "Project_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Project_Title",
+          "type": "VARCHAR(500)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Acronym",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Parent_Project_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Project_Type_Value_ID",
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Abstract",
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Start_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "End_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Lead_Organization_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Project_Status",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "AllowedValues(Allowed_Value_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Project(Project_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Organization(Organization_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "RFA": {
+      "name": "RFA",
+      "columns": [
+        {
+          "name": "RFA_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Sponsor_Organization_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "RFA_Number",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "RFA_Title",
+          "type": "VARCHAR(500)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Program_Code",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Announcement_URL",
+          "type": "VARCHAR(1000)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Opportunity_Number",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "CFDA_Number",
+          "type": "VARCHAR(20)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Organization(Organization_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "Proposal": {
+      "name": "Proposal",
+      "columns": [
+        {
+          "name": "Proposal_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Proposal_Number",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": false,
+          "unique": true,
+          "auto_increment": false
+        },
+        {
+          "name": "Proposal_Title",
+          "type": "VARCHAR(500)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Project_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Sponsor_Organization_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Submitting_Organization_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Administering_Organization_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "RFA_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Previous_Proposal_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Submission_Version",
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Proposed_Start_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Proposed_End_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Total_Proposed_Direct",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Total_Proposed_Indirect",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Total_Proposed_Budget",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Submission_Deadline",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Submission_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Internal_Approval_Status",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Decision_Status",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Decision_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "PAF_Routing_Status",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Project(Project_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Organization(Organization_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Organization(Organization_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Organization(Organization_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "RFA(RFA_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Proposal(Proposal_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "ProposalBudget": {
+      "name": "ProposalBudget",
+      "columns": [
+        {
+          "name": "ProposalBudget_ID",
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true
+        },
+        {
+          "name": "Proposal_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Period_Number",
+          "type": "INT",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "BudgetCategory_ID",
+          "type": "INT",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Line_Item_Description",
+          "type": "VARCHAR(500)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Direct_Cost",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Indirect_Cost",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Total_Cost",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Quantity",
+          "type": "DECIMAL(10,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Unit_Cost",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Applied_Indirect_Rate_ID",
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Rate_Base_Used",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Version_No",
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Proposal(Proposal_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "BudgetCategory(BudgetCategory_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "IndirectRate(IndirectRate_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "Award": {
+      "name": "Award",
+      "columns": [
+        {
+          "name": "Award_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Award_Number",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": true,
+          "unique": true,
+          "auto_increment": false
+        },
+        {
+          "name": "Award_Title",
+          "type": "VARCHAR(500)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Project_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Sponsor_Organization_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "RFA_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Proposal_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Original_Start_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Original_End_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Current_Total_Funded",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Current_End_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Total_Anticipated_Funding",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Award_Status",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "CFDA_Number",
+          "type": "VARCHAR(20)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Federal_Award_ID",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Prime_Sponsor_Organization_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Flow_Through_Indicator",
+          "type": "BOOLEAN",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Project(Project_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Organization(Organization_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "RFA(RFA_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Proposal(Proposal_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Organization(Organization_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "Modification": {
+      "name": "Modification",
+      "columns": [
+        {
+          "name": "Modification_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Award_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Modification_Number",
+          "type": "VARCHAR(20)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Event_Type_Value_ID",
+          "type": "INT",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Event_Timestamp",
+          "type": "TIMESTAMP",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Effective_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Funding_Amount_Change",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "New_End_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Affected_Personnel_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Change_Description",
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Justification",
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Impact_on_Budget",
+          "type": "BOOLEAN",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Requires_Prior_Approval",
+          "type": "BOOLEAN",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Approval_Status",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Approved_By_Personnel_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Approval_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "AllowedValues(Allowed_Value_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Award(Award_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Personnel(Personnel_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Personnel(Personnel_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "Terms": {
+      "name": "Terms",
+      "columns": [
+        {
+          "name": "AwardTerms_ID",
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true
+        },
+        {
+          "name": "Award_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Payment_Method",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Invoicing_Frequency",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Invoice_Submission_Days",
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Reporting_Requirements",
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Special_Conditions",
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Property_Requirements",
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Publication_Requirements",
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Closeout_Requirements",
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Record_Retention_Years",
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Award(Award_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "AwardBudgetPeriod": {
+      "name": "AwardBudgetPeriod",
+      "columns": [
+        {
+          "name": "AwardBudgetPeriod_ID",
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true
+        },
+        {
+          "name": "Award_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Period_Number",
+          "type": "INT",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Start_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "End_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Direct_Costs",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Indirect_Costs",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Total_Costs",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Cost_Share_Amount",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Period_Status",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Award(Award_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "AwardBudget": {
+      "name": "AwardBudget",
+      "columns": [
+        {
+          "name": "Award_Budget_ID",
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true
+        },
+        {
+          "name": "Award_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "AwardBudgetPeriod_ID",
+          "type": "INT",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "BudgetCategory_ID",
+          "type": "INT",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Line_Item_Description",
+          "type": "VARCHAR(500)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Approved_Direct_Cost",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Approved_Indirect_Cost",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Approved_Total_Cost",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Current_Direct_Cost",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Current_Indirect_Cost",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Current_Total_Cost",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Rate_Base_Used",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Award(Award_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "AwardBudgetPeriod(AwardBudgetPeriod_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "BudgetCategory(BudgetCategory_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "Subaward": {
+      "name": "Subaward",
+      "columns": [
+        {
+          "name": "Subaward_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Prime_Award_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Subrecipient_Organization_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Subaward_Number",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": false,
+          "unique": true,
+          "auto_increment": false
+        },
+        {
+          "name": "Subaward_Amount",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Start_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "End_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Subaward_Status",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Statement_of_Work",
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "PI_Name",
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Monitoring_Plan",
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Risk_Level",
+          "type": "VARCHAR(20)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Award(Award_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Organization(Organization_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "CostShare": {
+      "name": "CostShare",
+      "columns": [
+        {
+          "name": "CostShare_ID",
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true
+        },
+        {
+          "name": "Award_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Committed_Amount",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Commitment_Type",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Source_Organization_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Source_Fund_Code",
+          "type": "VARCHAR(20)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Source_Description",
+          "type": "VARCHAR(500)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Is_Mandatory",
+          "type": "BOOLEAN",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "CostShare_Status",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Met_Amount",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Award(Award_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Organization(Organization_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "Invoice": {
+      "name": "Invoice",
+      "columns": [
+        {
+          "name": "Invoice_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Award_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Invoice_Number",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": true,
+          "unique": true,
+          "auto_increment": false
+        },
+        {
+          "name": "AwardBudgetPeriod_ID",
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Invoice_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Period_Start_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Period_End_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Direct_Costs",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Indirect_Costs",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Cost_Share",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Total_Amount",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Invoice_Status",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Submission_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Payment_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Payment_Amount",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Award(Award_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "AwardBudgetPeriod(AwardBudgetPeriod_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "AwardDeliverable": {
+      "name": "AwardDeliverable",
+      "columns": [
+        {
+          "name": "AwardDeliverable_ID",
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true
+        },
+        {
+          "name": "Award_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Deliverable_Type_Value_ID",
+          "type": "INT",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "AwardBudgetPeriod_ID",
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Deliverable_Number",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Due_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Submission_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Deliverable_Status",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Responsible_Personnel_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Reviewed_By_Personnel_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Review_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Comments",
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "AllowedValues(Allowed_Value_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Award(Award_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "AwardBudgetPeriod(AwardBudgetPeriod_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Personnel(Personnel_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Personnel(Personnel_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "ProjectRole": {
+      "name": "ProjectRole",
+      "columns": [
+        {
+          "name": "ProjectRole_ID",
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true
+        },
+        {
+          "name": "Project_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Personnel_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Role_Value_ID",
+          "type": "INT",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Is_Key_Personnel",
+          "type": "BOOLEAN",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Funding_Award_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Start_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "End_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "FTE_Percent",
+          "type": "DECIMAL(5,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Salary_Charged",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Project(Project_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Personnel(Personnel_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Award(Award_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "AllowedValues(Allowed_Value_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "Fund": {
+      "name": "Fund",
+      "columns": [
+        {
+          "name": "Fund_Code",
+          "type": "VARCHAR(20)",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Fund_Name",
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Fund_Type_Value_ID",
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Organization_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "AllowedValues(Allowed_Value_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Organization(Organization_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "Account": {
+      "name": "Account",
+      "columns": [
+        {
+          "name": "Account_Code",
+          "type": "VARCHAR(20)",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Account_Name",
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Account_Category",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Account_Type",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Parent_Account_Code",
+          "type": "VARCHAR(20)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Account(Account_Code)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "FinanceCode": {
+      "name": "FinanceCode",
+      "columns": [
+        {
+          "name": "Finance_Code",
+          "type": "VARCHAR(20)",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Finance_Name",
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Award_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Purpose_Value_ID",
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Organization_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "AllowedValues(Allowed_Value_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Award(Award_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Organization(Organization_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "Transaction": {
+      "name": "Transaction",
+      "columns": [
+        {
+          "name": "Transaction_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Fund_Code",
+          "type": "VARCHAR(20)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Account_Code",
+          "type": "VARCHAR(20)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Finance_Code",
+          "type": "VARCHAR(20)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Transaction_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Fiscal_Year",
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Fiscal_Period",
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Transaction_Amount",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Transaction_Type_Value_ID",
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Description",
+          "type": "VARCHAR(500)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Award_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Project_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "AwardBudgetPeriod_ID",
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Document_Number",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Journal_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Vendor_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Personnel_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Reference_Number",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Is_Reconciled",
+          "type": "BOOLEAN",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "AllowedValues(Allowed_Value_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Fund(Fund_Code)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Account(Account_Code)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "FinanceCode(Finance_Code)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Award(Award_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Project(Project_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "AwardBudgetPeriod(AwardBudgetPeriod_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Personnel(Personnel_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "Effort": {
+      "name": "Effort",
+      "columns": [
+        {
+          "name": "Effort_ID",
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true
+        },
+        {
+          "name": "ProjectRole_ID",
+          "type": "INT",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Period_Start_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Period_End_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Committed_Percent",
+          "type": "DECIMAL(5,2)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Committed_Person_Months",
+          "type": "DECIMAL(4,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Actual_Percent",
+          "type": "DECIMAL(5,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Variance_Percent",
+          "type": "DECIMAL(5,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Is_Certified",
+          "type": "BOOLEAN",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Certification_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Certified_By_Personnel_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Certification_Method",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Requires_Prior_Approval",
+          "type": "BOOLEAN",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Prior_Approval_Status",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "ProjectRole(ProjectRole_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Personnel(Personnel_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "ComplianceRequirement": {
+      "name": "ComplianceRequirement",
+      "columns": [
+        {
+          "name": "ComplianceRequirement_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Requirement_Number",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": true,
+          "unique": true,
+          "auto_increment": false
+        },
+        {
+          "name": "Requirement_Title",
+          "type": "VARCHAR(500)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Requirement_Type",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Project_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Review_Type",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Initial_Approval_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Expiration_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Requirement_Status",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Principal_Investigator_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Approval_Body",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Risk_Level",
+          "type": "VARCHAR(20)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Project(Project_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Personnel(Personnel_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "ConflictOfInterest": {
+      "name": "ConflictOfInterest",
+      "columns": [
+        {
+          "name": "ConflictOfInterest_ID",
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true
+        },
+        {
+          "name": "Personnel_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Project_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Award_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Disclosure_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Relationship_Type_Value_ID",
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Entity_Name",
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Financial_Interest_Amount",
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Relationship_Description",
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Management_Plan",
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ConflictOfInterest_Status",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Review_Date",
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Reviewed_By_Personnel_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "AllowedValues(Allowed_Value_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Personnel(Personnel_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Project(Project_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Award(Award_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "Personnel(Personnel_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "DELETE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "Document": {
+      "name": "Document",
+      "columns": [
+        {
+          "name": "Document_ID",
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true
+        },
+        {
+          "name": "Document_Type_Value_ID",
+          "type": "INT",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Related_Entity_Type",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Related_Entity_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "File_Name",
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Storage_Location",
+          "type": "VARCHAR(500)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "File_Size_Bytes",
+          "type": "BIGINT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "MIME_Type",
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "File_Hash",
+          "type": "VARCHAR(128)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Version_Number",
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Description",
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "REFERENCES",
+          "type": "AllowedValues(Allowed_Value_ID)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "ON",
+          "type": "UPDATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    },
+    "ActivityLog": {
+      "name": "ActivityLog",
+      "columns": [
+        {
+          "name": "Activity_ID",
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true
+        },
+        {
+          "name": "Table_Name",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Record_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Action_Type",
+          "type": "VARCHAR(20)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Action_Timestamp",
+          "type": "TIMESTAMP",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "User_ID",
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Old_Values",
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "New_Values",
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "IP_Address",
+          "type": "VARCHAR(45)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        },
+        {
+          "name": "Session_ID",
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false
+        }
+      ]
+    }
+  },
+  "table_count": 29
+}

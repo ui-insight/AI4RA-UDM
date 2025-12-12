@@ -60,7 +60,7 @@ INSERT IGNORE INTO DataDictionary (Entity, Entity_Type, Parent_Entity, Descripti
 ('Modification', 'Table', NULL, 'Award modifications tracking funding changes, extensions, and amendments', 'Award Amendments, Changes, Revisions', FALSE),
 
 -- Organization
-('Organization', 'Table', NULL, 'Stores information about organizations, departments, colleges, sponsors, and other units', 'Org', FALSE),
+('Organization', 'Table', NULL, 'Institutional entities (not individuals) that participate in research funding flows - includes sponsors that award funding, academic units that receive and administer funding, subrecipients that receive subawards, and vendors that provide goods/services', 'Org, Institution, Entity', FALSE),
 
 -- Personnel
 ('Personnel', 'Table', NULL, 'Stores information about individuals involved in projects and awards', 'Person, Employee', FALSE),
