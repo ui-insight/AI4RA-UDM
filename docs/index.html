@@ -36,6 +36,24 @@
             font-size: 1rem;
         }
 
+        header nav {
+            margin-top: 1rem;
+        }
+
+        header nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 1.5rem;
+            font-weight: 500;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        header nav a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -291,6 +309,9 @@
     <header>
         <h1>UDM Data Dictionary Browser</h1>
         <p>Explore the Universal Data Model for Research Administration</p>
+        <nav>
+            <a href="ontology.html">Ontology & Design Conventions</a>
+        </nav>
     </header>
 
     <div class="container">
