@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UDM Data Dictionary Browser</title>
+    <title>UDM Dashboard - Data Dictionary, ERD & Ontology</title>
     <style>
         * {
             margin: 0;
@@ -54,10 +54,61 @@
             text-decoration: underline;
         }
 
+        /* Tabs */
+        .tabs {
+            background: white;
+            border-bottom: 2px solid #e9ecef;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .tabs-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0;
+        }
+
+        .tab-button {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #546e7a;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-button:hover {
+            color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
+        }
+
+        /* ERD container full height */
+        #tab-erd .container {
+            padding: 0;
+            max-width: 100%;
+            height: calc(100vh - 250px);
         }
 
         /* Breadcrumb Navigation */
@@ -304,16 +355,28 @@
             color: #95a5a6;
         }
     </style>
+
+    <!-- GoJS library for ERD visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/gojs@3/release/go.js"></script>
 </head>
 <body>
     <header>
-        <h1>UDM Data Dictionary Browser</h1>
-        <p>Explore the Universal Data Model for Research Administration</p>
-        <nav>
-            <a href="ontology.html">Ontology & Design Conventions</a>
-        </nav>
+        <h1>UDM Dashboard</h1>
+        <p>Universal Data Model for Research Administration</p>
     </header>
 
+    <!-- Tabs Navigation -->
+    <div class="tabs">
+        <div class="tabs-container">
+            <button class="tab-button active" onclick="switchTab('dictionary')">Data Dictionary</button>
+            <button class="tab-button" onclick="switchTab('erd')">ERD Visualization</button>
+            <button class="tab-button" onclick="switchTab('views')">Example Views</button>
+            <button class="tab-button" onclick="switchTab('ontology')">Ontology & Design</button>
+        </div>
+    </div>
+
+    <!-- Tab: Data Dictionary -->
+    <div id="tab-dictionary" class="tab-content active">
     <div class="container">
         <!-- Breadcrumb Navigation -->
         <div id="breadcrumb" class="breadcrumb hidden">
@@ -587,6 +650,626 @@
 
         // Initialize
         loadData();
+
+        // Tab switching function
+        function switchTab(tabName) {
+            console.log('[DEBUG] Switching to tab:', tabName);
+
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById('tab-' + tabName).classList.add('active');
+
+            // Mark button as active
+            event.target.classList.add('active');
+
+            // Load ERD if switching to ERD tab for the first time
+            if (tabName === 'erd') {
+                console.log('[DEBUG] ERD tab selected, erdLoaded:', window.erdLoaded);
+                if (!window.erdLoaded) {
+                    loadERD();
+                    window.erdLoaded = true;
+                }
+            }
+        }
+
+        // Load ERD using GoJS
+        async function loadERD() {
+            console.log('[DEBUG] loadERD called');
+
+            if (!window.go) {
+                console.error('[DEBUG] GoJS not loaded');
+                document.getElementById('erd-diagram').innerHTML = '<p style="color: #e74c3c; padding: 2rem;">Error: GoJS library not loaded</p>';
+                return;
+            }
+
+            const $ = go.GraphObject.make;
+
+            // Create diagram
+            const diagram = $(go.Diagram, 'erd-diagram', {
+                'undoManager.isEnabled': true,
+                layout: $(go.LayeredDigraphLayout, {
+                    direction: 90,
+                    layerSpacing: 50,
+                    columnSpacing: 30,
+                    setsPortSpots: false
+                })
+            });
+
+            // Define node template (database tables)
+            diagram.nodeTemplate =
+                $(go.Node, 'Auto',
+                    $(go.Shape, 'RoundedRectangle', {
+                        fill: 'white',
+                        stroke: '#667eea',
+                        strokeWidth: 2
+                    }),
+                    $(go.Panel, 'Vertical',
+                        $(go.TextBlock, {
+                            margin: 8,
+                            font: 'bold 14px sans-serif',
+                            stroke: '#2c3e50'
+                        }, new go.Binding('text', 'key'))
+                    )
+                );
+
+            // Define link template (relationships)
+            diagram.linkTemplate =
+                $(go.Link,
+                    {
+                        routing: go.Link.AvoidsNodes,
+                        curve: go.Link.JumpOver,
+                        corner: 5
+                    },
+                    $(go.Shape, { strokeWidth: 1.5, stroke: '#95a5a6' }),
+                    $(go.Shape, { toArrow: 'OpenTriangle', stroke: '#667eea', fill: '#667eea' }),
+                    $(go.TextBlock, {
+                        segmentOffset: new go.Point(0, -10),
+                        font: '10px sans-serif',
+                        stroke: '#546e7a'
+                    }, new go.Binding('text', 'relationship'))
+                );
+
+            // Build node data from data dictionary
+            const nodeDataArray = Object.keys(dataDictionary).map(tableName => ({
+                key: tableName
+            }));
+
+            // Build link data from relationships
+            const linkDataArray = relationships.map(rel => ({
+                from: rel.from_table,
+                to: rel.to_table,
+                relationship: rel.from_column
+            }));
+
+            // Set model
+            diagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
+
+            console.log('[DEBUG] GoJS ERD rendered with', nodeDataArray.length, 'nodes and', linkDataArray.length, 'links');
+        }
     </script>
+    </div> <!-- Close tab-dictionary container -->
+    </div> <!-- Close tab-dictionary -->
+
+    <!-- Tab: ERD Visualization -->
+    <div id="tab-erd" class="tab-content">
+        <div style="padding: 1rem; background: white;">
+            <div style="margin-bottom: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 4px;">
+                <p style="margin: 0; color: #546e7a;">Interactive Entity Relationship Diagram showing table relationships and foreign keys. Drag nodes to rearrange. Uses GoJS (evaluation version).</p>
+            </div>
+            <div id="erd-diagram" style="width: 100%; height: calc(100vh - 280px); background: white; border: 1px solid #e9ecef; border-radius: 8px;"></div>
+        </div>
+    </div>
+
+    <!-- Tab: Example Views -->
+    <div id="tab-views" class="tab-content">
+        <div class="container" style="max-width: 1200px;">
+            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <h2 style="color: #2c3e50; margin-bottom: 1rem; font-size: 1.8rem;">Useful Database Views</h2>
+                <p style="color: #546e7a; margin-bottom: 2rem;">
+                    The UDM includes pre-built SQL views that combine data from multiple tables for common reporting needs.
+                    These views simplify complex queries and provide ready-to-use data for dashboards and reports.
+                </p>
+
+                <!-- View: Active Awards -->
+                <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 6px; border-left: 4px solid #4A90E2; margin-bottom: 1.5rem;">
+                    <h3 style="color: #2c3e50; margin-bottom: 0.5rem; font-size: 1.2rem;">vw_Active_Awards</h3>
+                    <p style="color: #546e7a; font-size: 0.95rem; margin-bottom: 1rem;">
+                        Summary of all active awards with financial tracking including expenses, encumbrances, available balance, and days until expiration.
+                    </p>
+                    <div style="background: white; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: #f8f9fa; border-bottom: 2px solid #e9ecef;">
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Award_Number</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Award_Title</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Sponsor_Name</th>
+                                    <th style="padding: 0.5rem; text-align: right; font-weight: 600; color: #495057;">Total_Funded</th>
+                                    <th style="padding: 0.5rem; text-align: right; font-weight: 600; color: #495057;">Expenses</th>
+                                    <th style="padding: 0.5rem; text-align: right; font-weight: 600; color: #495057;">Available</th>
+                                    <th style="padding: 0.5rem; text-align: right; font-weight: 600; color: #495057;">Days_Left</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #2c3e50;">R01-GM123456</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">AI in Medical Diagnostics</td>
+                                    <td style="padding: 0.5rem; color: #546e7a;">NIH</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">$500,000</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">$287,500</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #27ae60; font-weight: 600;">$212,500</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">245</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #2c3e50;">NSF-2145789</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Quantum Computing Research</td>
+                                    <td style="padding: 0.5rem; color: #546e7a;">NSF</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">$350,000</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">$298,000</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #e67e22; font-weight: 600;">$52,000</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">89</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #2c3e50;">W911NF-23-001</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Cybersecurity Framework</td>
+                                    <td style="padding: 0.5rem; color: #546e7a;">DoD</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">$750,000</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">$125,000</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #27ae60; font-weight: 600;">$625,000</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">412</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- View: Active Personnel Roles -->
+                <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 6px; border-left: 4px solid #F5A623; margin-bottom: 1.5rem;">
+                    <h3 style="color: #2c3e50; margin-bottom: 0.5rem; font-size: 1.2rem;">vw_Active_Personnel_Roles</h3>
+                    <p style="color: #546e7a; font-size: 0.95rem; margin-bottom: 1rem;">
+                        All active personnel assignments to projects and awards, showing roles, FTE percentages, and key personnel designations.
+                    </p>
+                    <div style="background: white; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: #f8f9fa; border-bottom: 2px solid #e9ecef;">
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Name</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Email</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Role</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Project_Title</th>
+                                    <th style="padding: 0.5rem; text-align: center; font-weight: 600; color: #495057;">Key?</th>
+                                    <th style="padding: 0.5rem; text-align: right; font-weight: 600; color: #495057;">FTE%</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Award</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Jane Smith</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #546e7a; font-size: 0.8rem;">jane.smith@uni.edu</td>
+                                    <td style="padding: 0.5rem; color: #667eea; font-weight: 600;">PI</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">AI in Medical Diagnostics</td>
+                                    <td style="padding: 0.5rem; text-align: center; color: #27ae60; font-weight: 600;">✓</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">25%</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #546e7a;">R01-GM123456</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.5rem; color: #2c3e50;">John Doe</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #546e7a; font-size: 0.8rem;">john.doe@uni.edu</td>
+                                    <td style="padding: 0.5rem; color: #667eea; font-weight: 600;">Co-I</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">AI in Medical Diagnostics</td>
+                                    <td style="padding: 0.5rem; text-align: center; color: #27ae60; font-weight: 600;">✓</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">15%</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #546e7a;">R01-GM123456</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Maria Garcia</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #546e7a; font-size: 0.8rem;">maria.garcia@uni.edu</td>
+                                    <td style="padding: 0.5rem; color: #667eea; font-weight: 600;">PI</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Quantum Computing Research</td>
+                                    <td style="padding: 0.5rem; text-align: center; color: #27ae60; font-weight: 600;">✓</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">30%</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #546e7a;">NSF-2145789</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Michael Brown</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #546e7a; font-size: 0.8rem;">m.brown@uni.edu</td>
+                                    <td style="padding: 0.5rem; color: #546e7a;">Postdoc</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Quantum Computing Research</td>
+                                    <td style="padding: 0.5rem; text-align: center; color: #95a5a6;">–</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">100%</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #546e7a;">NSF-2145789</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- View: Expiring Awards -->
+                <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 6px; border-left: 4px solid #e74c3c; margin-bottom: 1.5rem;">
+                    <h3 style="color: #2c3e50; margin-bottom: 0.5rem; font-size: 1.2rem;">vw_Expiring_Awards</h3>
+                    <p style="color: #546e7a; font-size: 0.95rem; margin-bottom: 1rem;">
+                        Awards expiring within 90 days, with PI contact information for renewal planning and closeout coordination.
+                    </p>
+                    <div style="background: white; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: #f8f9fa; border-bottom: 2px solid #e9ecef;">
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Award_Number</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Award_Title</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">End_Date</th>
+                                    <th style="padding: 0.5rem; text-align: right; font-weight: 600; color: #495057;">Days_Left</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">PI</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Contact</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #2c3e50;">R21-CA987654</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Cancer Biomarker Study</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">2025-02-28</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #e74c3c; font-weight: 600;">78</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Linda Martinez</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #546e7a; font-size: 0.8rem;">l.martinez@uni.edu</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #2c3e50;">NSF-2145789</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Quantum Computing Research</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">2025-03-10</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #e67e22; font-weight: 600;">89</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Maria Garcia</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #546e7a; font-size: 0.8rem;">maria.garcia@uni.edu</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- View: Overdue Deliverables -->
+                <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 6px; border-left: 4px solid #ffc107; margin-bottom: 1.5rem;">
+                    <h3 style="color: #2c3e50; margin-bottom: 0.5rem; font-size: 1.2rem;">vw_Overdue_Deliverables</h3>
+                    <p style="color: #546e7a; font-size: 0.95rem; margin-bottom: 1rem;">
+                        All pending or overdue deliverables with responsible personnel contact information for follow-up.
+                    </p>
+                    <div style="background: white; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: #f8f9fa; border-bottom: 2px solid #e9ecef;">
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Type</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Due_Date</th>
+                                    <th style="padding: 0.5rem; text-align: right; font-weight: 600; color: #495057;">Days_Late</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Award</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Responsible</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Contact</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.5rem; color: #e74c3c; font-weight: 600;">Progress Report</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">2024-11-15</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #e74c3c; font-weight: 600;">28</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #546e7a;">R01-GM123456</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Jane Smith</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #546e7a; font-size: 0.8rem;">jane.smith@uni.edu</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.5rem; color: #e74c3c; font-weight: 600;">Financial Report</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">2024-12-01</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #e67e22; font-weight: 600;">12</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #546e7a;">W911NF-23-001</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Robert Wilson</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #546e7a; font-size: 0.8rem;">r.wilson@uni.edu</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0.5rem; color: #e74c3c; font-weight: 600;">Technical Milestone</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">2024-12-07</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #ffc107; font-weight: 600;">6</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #546e7a;">NSF-2145789</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Maria Garcia</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #546e7a; font-size: 0.8rem;">maria.garcia@uni.edu</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- View: Award Financial Summary -->
+                <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 6px; border-left: 4px solid #7ED321; margin-bottom: 1.5rem;">
+                    <h3 style="color: #2c3e50; margin-bottom: 0.5rem; font-size: 1.2rem;">vw_Award_Financial_Summary</h3>
+                    <p style="color: #546e7a; font-size: 0.95rem; margin-bottom: 1rem;">
+                        Financial summary by award budget period, showing budget vs. actual expenses and encumbrances for each period.
+                    </p>
+                    <div style="background: white; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: #f8f9fa; border-bottom: 2px solid #e9ecef;">
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Award</th>
+                                    <th style="padding: 0.5rem; text-align: center; font-weight: 600; color: #495057;">Period</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Period_Start</th>
+                                    <th style="padding: 0.5rem; text-align: right; font-weight: 600; color: #495057;">Budget</th>
+                                    <th style="padding: 0.5rem; text-align: right; font-weight: 600; color: #495057;">Expenses</th>
+                                    <th style="padding: 0.5rem; text-align: right; font-weight: 600; color: #495057;">Available</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #2c3e50;">R01-GM123456</td>
+                                    <td style="padding: 0.5rem; text-align: center; color: #2c3e50;">1</td>
+                                    <td style="padding: 0.5rem; color: #546e7a;">2023-07-01</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">$125,000</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">$124,200</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #27ae60;">$800</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #2c3e50;">R01-GM123456</td>
+                                    <td style="padding: 0.5rem; text-align: center; color: #667eea; font-weight: 600;">2</td>
+                                    <td style="padding: 0.5rem; color: #546e7a;">2024-07-01</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">$125,000</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">$78,300</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #27ae60;">$46,700</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #2c3e50;">NSF-2145789</td>
+                                    <td style="padding: 0.5rem; text-align: center; color: #667eea; font-weight: 600;">1</td>
+                                    <td style="padding: 0.5rem; color: #546e7a;">2024-04-01</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">$175,000</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">$149,000</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #e67e22;">$26,000</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- View: Budget Comparison -->
+                <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 6px; border-left: 4px solid #BD10E0; margin-bottom: 1.5rem;">
+                    <h3 style="color: #2c3e50; margin-bottom: 0.5rem; font-size: 1.2rem;">vw_Budget_Comparison</h3>
+                    <p style="color: #546e7a; font-size: 0.95rem; margin-bottom: 1rem;">
+                        Compares proposed, approved, current, and actual spending by budget category and period. Includes percent change from proposal.
+                    </p>
+                    <div style="background: white; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: #f8f9fa; border-bottom: 2px solid #e9ecef;">
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Award</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Category</th>
+                                    <th style="padding: 0.5rem; text-align: right; font-weight: 600; color: #495057;">Proposed</th>
+                                    <th style="padding: 0.5rem; text-align: right; font-weight: 600; color: #495057;">Approved</th>
+                                    <th style="padding: 0.5rem; text-align: right; font-weight: 600; color: #495057;">Actual</th>
+                                    <th style="padding: 0.5rem; text-align: right; font-weight: 600; color: #495057;">% Change</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #2c3e50;">R01-GM123456</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Senior Personnel</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #546e7a;">$80,000</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">$75,000</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">$72,100</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #e74c3c;">-6.3%</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #2c3e50;">R01-GM123456</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Equipment</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #546e7a;">$25,000</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">$30,000</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">$28,500</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #27ae60;">+20.0%</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #2c3e50;">NSF-2145789</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Travel</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #546e7a;">$15,000</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">$15,000</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #2c3e50;">$12,300</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #546e7a;">0.0%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- View: Compliance Requirements -->
+                <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 6px; border-left: 4px solid #9b59b6; margin-bottom: 1.5rem;">
+                    <h3 style="color: #2c3e50; margin-bottom: 0.5rem; font-size: 1.2rem;">vw_ComplianceRequirement_Status</h3>
+                    <p style="color: #546e7a; font-size: 0.95rem; margin-bottom: 1rem;">
+                        All compliance requirements (IRB, IACUC, etc.) with expiration tracking and PI contact information.
+                    </p>
+                    <div style="background: white; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: #f8f9fa; border-bottom: 2px solid #e9ecef;">
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Number</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Type</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Status</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Expiration</th>
+                                    <th style="padding: 0.5rem; text-align: right; font-weight: 600; color: #495057;">Days_Left</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">PI</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #2c3e50;">IRB-2023-145</td>
+                                    <td style="padding: 0.5rem; color: #9b59b6; font-weight: 600;">IRB</td>
+                                    <td style="padding: 0.5rem; color: #27ae60;">Approved</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">2025-06-15</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #27ae60;">185</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Jane Smith</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #2c3e50;">IACUC-2024-089</td>
+                                    <td style="padding: 0.5rem; color: #9b59b6; font-weight: 600;">IACUC</td>
+                                    <td style="padding: 0.5rem; color: #27ae60;">Approved</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">2025-03-30</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #e67e22;">108</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Linda Martinez</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #2c3e50;">IBC-2024-012</td>
+                                    <td style="padding: 0.5rem; color: #9b59b6; font-weight: 600;">IBC</td>
+                                    <td style="padding: 0.5rem; color: #e67e22;">Conditional</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">2025-02-15</td>
+                                    <td style="padding: 0.5rem; text-align: right; color: #e74c3c;">65</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">David Chen</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- View: All Contact Details -->
+                <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 6px; border-left: 4px solid #34495e; margin-bottom: 1.5rem;">
+                    <h3 style="color: #2c3e50; margin-bottom: 0.5rem; font-size: 1.2rem;">vw_All_ContactDetails</h3>
+                    <p style="color: #546e7a; font-size: 0.95rem; margin-bottom: 1rem;">
+                        Unified view of contact details for both personnel and organizations, with entity type and name.
+                    </p>
+                    <div style="background: white; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="background: #f8f9fa; border-bottom: 2px solid #e9ecef;">
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Entity_Type</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Entity_Name</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Contact_Type</th>
+                                    <th style="padding: 0.5rem; text-align: left; font-weight: 600; color: #495057;">Contact_Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.5rem; color: #667eea; font-weight: 600;">Personnel</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Jane Smith</td>
+                                    <td style="padding: 0.5rem; color: #546e7a;">Email</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #2c3e50;">jane.smith@stateuniversity.edu</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.5rem; color: #667eea; font-weight: 600;">Personnel</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">Jane Smith</td>
+                                    <td style="padding: 0.5rem; color: #546e7a;">Office Phone</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #2c3e50;">555-0101</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid #e9ecef;">
+                                    <td style="padding: 0.5rem; color: #e67e22; font-weight: 600;">Organization</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">National Institutes of Health</td>
+                                    <td style="padding: 0.5rem; color: #546e7a;">Email</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #2c3e50;">grants@nih.gov</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 0.5rem; color: #e67e22; font-weight: 600;">Organization</td>
+                                    <td style="padding: 0.5rem; color: #2c3e50;">National Institutes of Health</td>
+                                    <td style="padding: 0.5rem; color: #546e7a;">Office Phone</td>
+                                    <td style="padding: 0.5rem; font-family: monospace; color: #2c3e50;">301-496-4000</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; padding: 1rem; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px;">
+                    <strong style="color: #856404;">SQL Location:</strong>
+                    <code style="background: white; padding: 2px 6px; border-radius: 3px; font-size: 0.9rem; color: #667eea;">udm_views.sql</code>
+                    <p style="color: #856404; margin-top: 0.5rem; font-size: 0.9rem;">
+                        These views are defined in the udm_views.sql file and can be queried directly from any SQL client or embedded in reporting tools.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab: Ontology & Design -->
+    <div id="tab-ontology" class="tab-content">
+        <div class="container" style="max-width: 1000px;">
+            <!-- Ontology Content (moved from ontology.html) -->
+            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <h2 style="color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 0.5rem; margin-bottom: 1rem;">Naming Conventions</h2>
+                <p style="color: #546e7a; margin-bottom: 1rem;">The UDM follows consistent naming patterns to ensure clarity and predictability across the schema.</p>
+
+                <h3 style="color: #2c3e50; margin-top: 1.5rem; margin-bottom: 0.75rem;">Tables</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 0.75rem 0; border-bottom: 1px solid #e9ecef;"><strong style="font-family: monospace;">PascalCase</strong> - All table names use PascalCase with no underscores</li>
+                    <li style="padding: 0.75rem 0; border-bottom: 1px solid #e9ecef;">Examples: <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">Organization</code>, <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">ProjectRole</code>, <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">AwardBudgetPeriod</code></li>
+                    <li style="padding: 0.75rem 0;">Singular nouns (e.g., <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">Personnel</code> not <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">People</code>, <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">Organization</code> not <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">Organizations</code>)</li>
+                </ul>
+
+                <h3 style="color: #2c3e50; margin-top: 1.5rem; margin-bottom: 0.75rem;">Columns</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 0.75rem 0; border-bottom: 1px solid #e9ecef;"><strong style="font-family: monospace;">Snake_Case</strong> - All column names use Snake_Case with underscores separating words</li>
+                    <li style="padding: 0.75rem 0; border-bottom: 1px solid #e9ecef;">Examples: <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">Organization_ID</code>, <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">First_Name</code>, <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">Sponsor_Organization_ID</code></li>
+                    <li style="padding: 0.75rem 0;">First letter of each word is capitalized (e.g., <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">Start_Date</code> not <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">start_date</code>)</li>
+                </ul>
+
+                <h3 style="color: #2c3e50; margin-top: 1.5rem; margin-bottom: 0.75rem;">Primary Keys</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 0.75rem 0; border-bottom: 1px solid #e9ecef;"><strong>Pattern:</strong> <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">TableName_ID</code></li>
+                    <li style="padding: 0.75rem 0; border-bottom: 1px solid #e9ecef;">Examples: <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">Organization_ID</code>, <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">Project_ID</code>, <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">Personnel_ID</code></li>
+                    <li style="padding: 0.75rem 0;">Always ends with <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">_ID</code> suffix</li>
+                </ul>
+
+                <h3 style="color: #2c3e50; margin-top: 1.5rem; margin-bottom: 0.75rem;">Foreign Keys</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 0.75rem 0; border-bottom: 1px solid #e9ecef;"><strong>Pattern:</strong> <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">ReferencedTableName_ID</code></li>
+                    <li style="padding: 0.75rem 0; border-bottom: 1px solid #e9ecef;">Examples: <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">Organization_ID</code>, <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">Sponsor_Organization_ID</code>, <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">Award_ID</code></li>
+                    <li style="padding: 0.75rem 0;">Descriptive prefix when multiple FKs reference the same table (e.g., <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">Sponsor_Organization_ID</code>, <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">Lead_Organization_ID</code>)</li>
+                </ul>
+            </div>
+
+            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <h2 style="color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 0.5rem; margin-bottom: 1rem;">Design Patterns</h2>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px; border-left: 3px solid #667eea;">
+                        <h4 style="color: #2c3e50; margin-bottom: 0.5rem; font-size: 1rem;">AllowedValues Table</h4>
+                        <p style="color: #546e7a; font-size: 0.9rem; margin-bottom: 0.5rem;">Extensible controlled vocabulary for enumerations that may change or vary by institution.</p>
+                        <p style="color: #546e7a; font-size: 0.9rem;"><strong>Pattern:</strong> <code style="background: white; padding: 2px 6px; border-radius: 3px; font-size: 0.85rem; color: #667eea;">TableName_Type_Value_ID</code></p>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px; border-left: 3px solid #667eea;">
+                        <h4 style="color: #2c3e50; margin-bottom: 0.5rem; font-size: 1rem;">Self-Referential Foreign Keys</h4>
+                        <p style="color: #546e7a; font-size: 0.9rem; margin-bottom: 0.5rem;">Tables that reference themselves to represent hierarchies.</p>
+                        <p style="color: #546e7a; font-size: 0.9rem;"><strong>Pattern:</strong> <code style="background: white; padding: 2px 6px; border-radius: 3px; font-size: 0.85rem; color: #667eea;">Parent_TableName_ID</code></p>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px; border-left: 3px solid #667eea;">
+                        <h4 style="color: #2c3e50; margin-bottom: 0.5rem; font-size: 1rem;">Bridge/Junction Tables</h4>
+                        <p style="color: #546e7a; font-size: 0.9rem; margin-bottom: 0.5rem;">Many-to-many relationships use compound names.</p>
+                        <p style="color: #546e7a; font-size: 0.9rem;"><strong>Example:</strong> <code style="background: white; padding: 2px 6px; border-radius: 3px; font-size: 0.85rem; color: #667eea;">ProjectRole</code> (links Project + Personnel + Role)</p>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px; border-left: 3px solid #667eea;">
+                        <h4 style="color: #2c3e50; margin-bottom: 0.5rem; font-size: 1rem;">Status vs Type</h4>
+                        <p style="color: #546e7a; font-size: 0.9rem; margin-bottom: 0.5rem;"><strong>Status:</strong> Current state (often changes) - stored as ENUM</p>
+                        <p style="color: #546e7a; font-size: 0.9rem;"><strong>Type:</strong> Category/classification (institution-specific) - use AllowedValues</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <h2 style="color: #2c3e50; border-bottom: 2px solid #667eea; padding-bottom: 0.5rem; margin-bottom: 1rem;">Dolt Version Control Integration</h2>
+                <p style="color: #546e7a; margin-bottom: 1rem;">The UDM is designed to work with Dolt, a version-controlled SQL database.</p>
+
+                <h3 style="color: #2c3e50; margin-top: 1.5rem; margin-bottom: 0.75rem;">Design Implications</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 0.75rem 0; border-bottom: 1px solid #e9ecef;"><strong>No Date_Created/Date_Modified:</strong> Dolt's commit history provides complete audit trail</li>
+                    <li style="padding: 0.75rem 0; border-bottom: 1px solid #e9ecef;"><strong>No Is_Current_Version:</strong> Dolt handles versioning natively via branches and commits</li>
+                    <li style="padding: 0.75rem 0; border-bottom: 1px solid #e9ecef;"><strong>Branch-based workflows:</strong> Different versions of data can coexist in branches</li>
+                    <li style="padding: 0.75rem 0;"><strong>Temporal queries:</strong> Historical data accessible via <code style="background: #f8f9fa; padding: 2px 6px; border-radius: 3px;">AS OF</code> queries</li>
+                </ul>
+
+                <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin: 1rem 0; font-family: monospace; font-size: 0.9rem; color: #495057;">
+-- Query data as of a specific date<br>
+SELECT * FROM Award AS OF '2024-01-01';<br>
+<br>
+-- Compare versions between dates<br>
+SELECT * FROM DOLT_DIFF('2024-01-01', '2024-06-01', 'Award');
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
