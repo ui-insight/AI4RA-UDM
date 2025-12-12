@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UDM Ontology & Design Conventions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        header nav {
+            margin-top: 1rem;
+        }
+
+        header nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 1.5rem;
+            font-weight: 500;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        header nav a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+
+        .section h3 {
+            color: #2c3e50;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 1.2rem;
+        }
+
+        .section p {
+            color: #546e7a;
+            margin-bottom: 1rem;
+        }
+
+        .convention-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .convention-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .convention-list li:last-child {
+            border-bottom: none;
+        }
+
+        .convention-list strong {
+            color: #2c3e50;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        .example {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #495057;
+        }
+
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .pattern-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+        }
+
+        .pattern-card h4 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .pattern-card p {
+            color: #546e7a;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .pattern-card code {
+            background: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.85rem;
+            color: #667eea;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        table th {
+            background: #f8f9fa;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        table td:first-child {
+            font-family: 'Monaco', 'Courier New', monospace;
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .note strong {
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>UDM Ontology & Design Conventions</h1>
+        <p>Naming patterns, design decisions, and structural guidelines for the Universal Data Model</p>
+        <nav>
+            <a href="index.html">← Back to Data Dictionary</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Naming Conventions -->
+        <div class="section">
+            <h2>Naming Conventions</h2>
+            <p>The UDM follows consistent naming patterns to ensure clarity and predictability across the schema.</p>
+
+            <h3>Tables</h3>
+            <ul class="convention-list">
+                <li><strong>PascalCase</strong> - All table names use PascalCase with no underscores</li>
+                <li>Examples: <code>Organization</code>, <code>ProjectRole</code>, <code>AwardBudgetPeriod</code></li>
+                <li>Singular nouns (e.g., <code>Personnel</code> not <code>People</code>, <code>Organization</code> not <code>Organizations</code>)</li>
+            </ul>
+
+            <h3>Columns</h3>
+            <ul class="convention-list">
+                <li><strong>Snake_Case</strong> - All column names use Snake_Case with underscores separating words</li>
+                <li>Examples: <code>Organization_ID</code>, <code>First_Name</code>, <code>Sponsor_Organization_ID</code></li>
+                <li>First letter of each word is capitalized (e.g., <code>Start_Date</code> not <code>start_date</code>)</li>
+            </ul>
+
+            <h3>Primary Keys</h3>
+            <ul class="convention-list">
+                <li><strong>Pattern:</strong> <code>TableName_ID</code></li>
+                <li>Examples: <code>Organization_ID</code>, <code>Project_ID</code>, <code>Personnel_ID</code></li>
+                <li>Always ends with <code>_ID</code> suffix</li>
+            </ul>
+
+            <h3>Foreign Keys</h3>
+            <ul class="convention-list">
+                <li><strong>Pattern:</strong> <code>ReferencedTableName_ID</code></li>
+                <li>Examples: <code>Organization_ID</code>, <code>Sponsor_Organization_ID</code>, <code>Award_ID</code></li>
+                <li>Descriptive prefix when multiple FKs reference the same table (e.g., <code>Sponsor_Organization_ID</code>, <code>Lead_Organization_ID</code>)</li>
+            </ul>
+        </div>
+
+        <!-- Field Naming Patterns -->
+        <div class="section">
+            <h2>Common Field Suffixes</h2>
+            <p>Standard suffixes indicate field purpose and data type:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Suffix</th>
+                        <th>Purpose</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>_ID</td>
+                        <td>Primary or foreign key identifier</td>
+                        <td>Organization_ID, Award_ID</td>
+                    </tr>
+                    <tr>
+                        <td>_Code</td>
+                        <td>Short, human-readable identifier</td>
+                        <td>Fund_Code, Account_Code</td>
+                    </tr>
+                    <tr>
+                        <td>_Name</td>
+                        <td>Human-readable name or title</td>
+                        <td>Organization_Name, First_Name</td>
+                    </tr>
+                    <tr>
+                        <td>_Description</td>
+                        <td>Longer text description</td>
+                        <td>Project_Description, Role_Description</td>
+                    </tr>
+                    <tr>
+                        <td>_Date</td>
+                        <td>Date or datetime value</td>
+                        <td>Start_Date, Award_Date</td>
+                    </tr>
+                    <tr>
+                        <td>_Type</td>
+                        <td>Classification or category (deprecated - use AllowedValues)</td>
+                        <td>Organization_Type → use Type_Value_ID</td>
+                    </tr>
+                    <tr>
+                        <td>_Status</td>
+                        <td>Current state or status</td>
+                        <td>Award_Status, Proposal_Status</td>
+                    </tr>
+                    <tr>
+                        <td>_Amount</td>
+                        <td>Monetary value</td>
+                        <td>Award_Amount, Transaction_Amount</td>
+                    </tr>
+                    <tr>
+                        <td>_Percent</td>
+                        <td>Percentage value</td>
+                        <td>Effort_Percent, Indirect_Rate_Percent</td>
+                    </tr>
+                    <tr>
+                        <td>_Number</td>
+                        <td>Sequential or reference number</td>
+                        <td>Award_Number, Period_Number</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Design Patterns -->
+        <div class="section">
+            <h2>Design Patterns</h2>
+
+            <div class="pattern-grid">
+                <div class="pattern-card">
+                    <h4>AllowedValues Table</h4>
+                    <p>Extensible controlled vocabulary for enumerations that may change or vary by institution.</p>
+                    <p><strong>Use for:</strong> Organization types, project types, contact types, relationship types, etc.</p>
+                    <p><strong>Pattern:</strong> <code>TableName_Type_Value_ID</code></p>
+                    <p><strong>Example:</strong> <code>Project_Type_Value_ID</code> references <code>AllowedValues</code></p>
+                </div>
+
+                <div class="pattern-card">
+                    <h4>Self-Referential Foreign Keys</h4>
+                    <p>Tables that reference themselves to represent hierarchies.</p>
+                    <p><strong>Pattern:</strong> <code>Parent_TableName_ID</code></p>
+                    <p><strong>Examples:</strong> <code>Parent_Organization_ID</code>, <code>Parent_Project_ID</code>, <code>Parent_Account_Code</code></p>
+                </div>
+
+                <div class="pattern-card">
+                    <h4>Bridge/Junction Tables</h4>
+                    <p>Many-to-many relationships use compound names.</p>
+                    <p><strong>Examples:</strong> <code>ProjectRole</code> (links Project + Personnel + Role)</p>
+                    <p><strong>Key:</strong> Contains FKs to both related tables plus relationship attributes</p>
+                </div>
+
+                <div class="pattern-card">
+                    <h4>Status vs Type</h4>
+                    <p><strong>Status:</strong> Current state (often changes) - stored as ENUM</p>
+                    <p><strong>Type:</strong> Category/classification (institution-specific) - use AllowedValues</p>
+                    <p><strong>Why:</strong> Status values are universal and stable, types vary by institution</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Structural Tables -->
+        <div class="section">
+            <h2>Structural Tables</h2>
+            <p>These tables provide infrastructure but are not domain-specific entities in research administration.</p>
+
+            <h3>AllowedValues</h3>
+            <p>Stores controlled vocabularies for fields that need extensible enumerations.</p>
+
+            <div class="example">
+-- Example: Organization types
+INSERT INTO AllowedValues
+  (Allowed_Value_Group, Allowed_Value_Code, Allowed_Value_Label, Allowed_Value_Description)
+VALUES
+  ('OrganizationType', 'UNIVERSITY', 'University', 'Academic institution'),
+  ('OrganizationType', 'FEDERAL', 'Federal Agency', 'Federal government sponsor'),
+  ('OrganizationType', 'FOUNDATION', 'Foundation', 'Private foundation');
+            </div>
+
+            <p><strong>Why use AllowedValues?</strong></p>
+            <ul class="convention-list">
+                <li>Different institutions classify organizations, projects, and other entities differently</li>
+                <li>New categories can be added without schema changes</li>
+                <li>Provides labels, descriptions, and codes for UI display</li>
+                <li>Allows institution-specific customization of controlled vocabularies</li>
+            </ul>
+
+            <div class="note">
+                <strong>Design Decision:</strong> The AllowedValues pattern converts "mutable enums" into data-driven lookups.
+                Status fields (Award_Status, Proposal_Status) remain as ENUMs because they represent universal, stable states.
+            </div>
+
+            <h3>ActivityLog</h3>
+            <p>Audit trail for tracking system-level events and changes.</p>
+
+            <div class="example">
+-- Tracks who did what and when
+ActivityLog_ID, Activity_Type, Entity_Type, Entity_ID,
+User_ID, Activity_Timestamp, Activity_Description
+            </div>
+
+            <p><strong>Why ActivityLog is structural:</strong></p>
+            <ul class="convention-list">
+                <li>Not a research administration domain concept - it's a technical infrastructure table</li>
+                <li>Logs system activity rather than representing business entities</li>
+                <li>Exists for audit, compliance, and debugging purposes</li>
+                <li>Not typically exposed in domain models or user interfaces</li>
+            </ul>
+
+            <h3>BudgetCategory</h3>
+            <p>Reference table for standardized budget line item categories.</p>
+            <p><strong>Note:</strong> While domain-adjacent, this is structural because it standardizes budget categories across institutions rather than representing institution-specific data.</p>
+        </div>
+
+        <!-- Dolt Integration -->
+        <div class="section">
+            <h2>Dolt Version Control Integration</h2>
+            <p>The UDM is designed to work with Dolt, a version-controlled SQL database.</p>
+
+            <h3>Design Implications</h3>
+            <ul class="convention-list">
+                <li><strong>No Date_Created/Date_Modified:</strong> Dolt's commit history provides complete audit trail</li>
+                <li><strong>No Is_Current_Version:</strong> Dolt handles versioning natively via branches and commits</li>
+                <li><strong>Branch-based workflows:</strong> Different versions of data can coexist in branches</li>
+                <li><strong>Temporal queries:</strong> Historical data accessible via <code>AS OF</code> queries</li>
+            </ul>
+
+            <div class="example">
+-- Query data as of a specific date
+SELECT * FROM Award AS OF '2024-01-01';
+
+-- Compare versions between dates
+SELECT * FROM DOLT_DIFF('2024-01-01', '2024-06-01', 'Award');
+            </div>
+        </div>
+
+        <!-- Referential Integrity -->
+        <div class="section">
+            <h2>Referential Integrity</h2>
+
+            <h3>Foreign Key Cascades</h3>
+            <p>Most foreign keys use <code>ON DELETE RESTRICT</code> to prevent accidental data loss:</p>
+
+            <div class="example">
+CONSTRAINT fk_award_organization
+  FOREIGN KEY (Sponsor_Organization_ID)
+  REFERENCES Organization(Organization_ID)
+  ON DELETE RESTRICT
+  ON UPDATE CASCADE
+            </div>
+
+            <p><strong>Rationale:</strong> Research administration data is highly interconnected. Deleting a sponsor organization that has awards should require explicit handling of those awards first.</p>
+
+            <h3>Optional vs Required Foreign Keys</h3>
+            <ul class="convention-list">
+                <li><strong>NULL allowed:</strong> Relationships that may not exist yet (e.g., <code>Proposal_ID</code> in Award - not all awards start from proposals)</li>
+                <li><strong>NOT NULL:</strong> Essential relationships (e.g., <code>Project_ID</code> in Proposal - every proposal must relate to a project)</li>
+            </ul>
+        </div>
+
+        <!-- Navigation -->
+        <div class="section">
+            <h2>Table Relationships</h2>
+
+            <h3>Core Entity Hierarchy</h3>
+            <p>Understanding the "contains" relationships in the UDM:</p>
+
+            <ul class="convention-list">
+                <li><strong>Organization</strong> contains: Personnel, Projects, Awards (as sponsor), Funds, Indirect Rates</li>
+                <li><strong>Project</strong> contains: Proposals, Awards, ProjectRoles, Compliance Requirements</li>
+                <li><strong>Award</strong> contains: Budget Periods, Budgets, Modifications, Terms, Subawards, Deliverables, Invoices</li>
+                <li><strong>Proposal</strong> contains: Proposal Budgets, references to RFA and previous proposals</li>
+                <li><strong>Personnel</strong> contains: Contact Details, ProjectRoles, Effort certifications</li>
+            </ul>
+
+            <div class="note">
+                <strong>Navigation Tip:</strong> Use the data dictionary browser's bidirectional navigation to explore both "up" (what does this reference?) and "down" (what references this?) relationships.
+            </div>
+        </div>
+    </div>
+</body>
+</html>
