@@ -4,3 +4,6 @@ dolt_db/
 
 # Temporary test database (NEVER commit this)
 test_db/
+
+# Configuration file with API token (use config.template.js as template)
+docs/config.js
