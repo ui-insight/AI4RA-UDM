@@ -110,10 +110,12 @@ When working with the DoltHub repository (`n8layman/AI4RA-UDM`):
 
 ## Files in This Project
 
-- `udm_schema.sql`: Main schema definition (source of truth)
-- `udm_values.sql`: Sample data to populate the unified data model
-- `udm_views.sql`: Database views
-- `udm_data_dictionary_schema.sql`: Data dictionary schema
-- `udm_data_dictionary_values.sql`: Data dictionary values
-- `udm_testing.sql`: Test data and validation queries
-- `scripts/`: Python scripts for automation (use sparingly)
+- `udm_schema.json`: **Single Source of Truth (SSOT)** — unified schema with tables, columns, types, constraints, descriptions, synonyms, PII flags, and views
+- `udm_schema.sql`: SQL table definitions (input to SSOT generation)
+- `udm_views.sql`: SQL view definitions (input to SSOT generation)
+- `udm_data_dictionary_values.sql`: Table/column descriptions, synonyms, PII flags (input to SSOT generation)
+- `udm_values.sql`: Sample data for testing
+- `scripts/generate_unified_schema.py`: Generates `udm_schema.json` from the three SQL source files
+- `scripts/generate_dashboard_data.py`: Generates dashboard data files from `udm_schema.json`
+- `docs/`: Dashboard and GitHub Pages site
+- `docs/data/`: Generated JSON files served as API endpoints

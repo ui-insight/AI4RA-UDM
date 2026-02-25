@@ -38,15 +38,15 @@
     },
     {
       "from_table": "Project",
-      "from_column": "Project_Type_Value_ID",
-      "to_table": "AllowedValues",
-      "to_column": "Allowed_Value_ID"
-    },
-    {
-      "from_table": "Project",
       "from_column": "Parent_Project_ID",
       "to_table": "Project",
       "to_column": "Project_ID"
+    },
+    {
+      "from_table": "Project",
+      "from_column": "Project_Type_Value_ID",
+      "to_table": "AllowedValues",
+      "to_column": "Allowed_Value_ID"
     },
     {
       "from_table": "Project",
@@ -146,25 +146,25 @@
     },
     {
       "from_table": "Modification",
-      "from_column": "Event_Type_Value_ID",
-      "to_table": "AllowedValues",
-      "to_column": "Allowed_Value_ID"
-    },
-    {
-      "from_table": "Modification",
       "from_column": "Award_ID",
       "to_table": "Award",
       "to_column": "Award_ID"
     },
     {
       "from_table": "Modification",
-      "from_column": "Approved_By_Personnel_ID",
+      "from_column": "Event_Type_Value_ID",
+      "to_table": "AllowedValues",
+      "to_column": "Allowed_Value_ID"
+    },
+    {
+      "from_table": "Modification",
+      "from_column": "Affected_Personnel_ID",
       "to_table": "Personnel",
       "to_column": "Personnel_ID"
     },
     {
       "from_table": "Modification",
-      "from_column": "Affected_Personnel_ID",
+      "from_column": "Approved_By_Personnel_ID",
       "to_table": "Personnel",
       "to_column": "Personnel_ID"
     },
@@ -236,15 +236,15 @@
     },
     {
       "from_table": "AwardDeliverable",
-      "from_column": "Deliverable_Type_Value_ID",
-      "to_table": "AllowedValues",
-      "to_column": "Allowed_Value_ID"
-    },
-    {
-      "from_table": "AwardDeliverable",
       "from_column": "Award_ID",
       "to_table": "Award",
       "to_column": "Award_ID"
+    },
+    {
+      "from_table": "AwardDeliverable",
+      "from_column": "Deliverable_Type_Value_ID",
+      "to_table": "AllowedValues",
+      "to_column": "Allowed_Value_ID"
     },
     {
       "from_table": "AwardDeliverable",
@@ -278,15 +278,15 @@
     },
     {
       "from_table": "ProjectRole",
-      "from_column": "Funding_Award_ID",
-      "to_table": "Award",
-      "to_column": "Award_ID"
-    },
-    {
-      "from_table": "ProjectRole",
       "from_column": "Role_Value_ID",
       "to_table": "AllowedValues",
       "to_column": "Allowed_Value_ID"
+    },
+    {
+      "from_table": "ProjectRole",
+      "from_column": "Funding_Award_ID",
+      "to_table": "Award",
+      "to_column": "Award_ID"
     },
     {
       "from_table": "Fund",
@@ -308,27 +308,21 @@
     },
     {
       "from_table": "FinanceCode",
-      "from_column": "Purpose_Value_ID",
-      "to_table": "AllowedValues",
-      "to_column": "Allowed_Value_ID"
-    },
-    {
-      "from_table": "FinanceCode",
       "from_column": "Award_ID",
       "to_table": "Award",
       "to_column": "Award_ID"
     },
     {
       "from_table": "FinanceCode",
+      "from_column": "Purpose_Value_ID",
+      "to_table": "AllowedValues",
+      "to_column": "Allowed_Value_ID"
+    },
+    {
+      "from_table": "FinanceCode",
       "from_column": "Organization_ID",
       "to_table": "Organization",
       "to_column": "Organization_ID"
-    },
-    {
-      "from_table": "Transaction",
-      "from_column": "Transaction_Type_Value_ID",
-      "to_table": "AllowedValues",
-      "to_column": "Allowed_Value_ID"
     },
     {
       "from_table": "Transaction",
@@ -347,6 +341,12 @@
       "from_column": "Finance_Code",
       "to_table": "FinanceCode",
       "to_column": "Finance_Code"
+    },
+    {
+      "from_table": "Transaction",
+      "from_column": "Transaction_Type_Value_ID",
+      "to_table": "AllowedValues",
+      "to_column": "Allowed_Value_ID"
     },
     {
       "from_table": "Transaction",
@@ -398,12 +398,6 @@
     },
     {
       "from_table": "ConflictOfInterest",
-      "from_column": "Relationship_Type_Value_ID",
-      "to_table": "AllowedValues",
-      "to_column": "Allowed_Value_ID"
-    },
-    {
-      "from_table": "ConflictOfInterest",
       "from_column": "Personnel_ID",
       "to_table": "Personnel",
       "to_column": "Personnel_ID"
@@ -419,6 +413,12 @@
       "from_column": "Award_ID",
       "to_table": "Award",
       "to_column": "Award_ID"
+    },
+    {
+      "from_table": "ConflictOfInterest",
+      "from_column": "Relationship_Type_Value_ID",
+      "to_table": "AllowedValues",
+      "to_column": "Allowed_Value_ID"
     },
     {
       "from_table": "ConflictOfInterest",

@@ -7,37 +7,49 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": true
+          "auto_increment": true,
+          "description": "Primary key for allowed values",
+          "synonyms": "Value ID"
         },
         "Allowed_Value_Group": {
           "type": "VARCHAR(50)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Grouping category for related allowed values",
+          "synonyms": "Group, Category"
         },
         "Allowed_Value_Code": {
           "type": "VARCHAR(50)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Short code identifier for the value",
+          "synonyms": "Code, Key"
         },
         "Allowed_Value_Label": {
           "type": "VARCHAR(255)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Display label for the value in user interfaces",
+          "synonyms": "Label, Display Name"
         },
         "Allowed_Value_Description": {
           "type": "TEXT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Detailed description of the value and its usage",
+          "synonyms": "Description"
         }
-      }
+      },
+      "description": "Stores allowed values for controlled vocabularies used in other tables",
+      "synonyms": "ValueList, LookupTable"
     },
     "BudgetCategory": {
       "columns": {
@@ -46,30 +58,40 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": true
+          "auto_increment": true,
+          "description": "Primary key for budget category",
+          "synonyms": "Category ID"
         },
         "Category_Code": {
           "type": "VARCHAR(50)",
           "primary_key": false,
           "required": true,
           "unique": true,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Short code for budget category",
+          "synonyms": "Code"
         },
         "Category_Name": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Name of budget category (e.g., Personnel, Equipment, Travel)",
+          "synonyms": "Name"
         },
         "Category_Description": {
           "type": "TEXT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Description of what expenses belong in this category",
+          "synonyms": "Description"
         }
-      }
+      },
+      "description": "Reference table for standardized budget categories used in proposals and awards",
+      "synonyms": "Budget Categories, Cost Categories"
     },
     "Organization": {
       "columns": {
@@ -78,14 +100,18 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Primary key for organization",
+          "synonyms": "Org ID"
         },
         "Organization_Name": {
           "type": "VARCHAR(255)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Full name of the organization",
+          "synonyms": "Name, Org Name"
         },
         "Organization_Type": {
           "type": "VARCHAR(50)",
@@ -102,7 +128,9 @@
             "Vendor",
             "Institute",
             "Center"
-          ]
+          ],
+          "description": "Type of organization (Department, College, School, Sponsor, Subrecipient, Vendor, Institute, Center)",
+          "synonyms": "Type, Org Type"
         },
         "Parent_Organization_ID": {
           "type": "VARCHAR(50)",
@@ -113,16 +141,22 @@
           "references": {
             "table": "Organization",
             "column": "Organization_ID"
-          }
+          },
+          "description": "Reference to parent organization in hierarchy",
+          "synonyms": "Parent Org ID"
         },
         "UEI": {
           "type": "VARCHAR(12)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Unique Entity Identifier (12-character SAM registration number)",
+          "synonyms": "UEI, SAM Number"
         }
-      }
+      },
+      "description": "Institutional entities (not individuals) that participate in research funding flows - includes sponsors that award funding, academic units that receive and administer funding, subrecipients that receive subawards, and vendors that provide goods/services",
+      "synonyms": "Org, Institution, Entity"
     },
     "Personnel": {
       "columns": {
@@ -131,49 +165,68 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Primary key for personnel record",
+          "synonyms": "Person ID, Employee ID"
         },
         "ORCID": {
           "type": "VARCHAR(19)",
           "primary_key": false,
           "required": false,
           "unique": true,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Open Researcher and Contributor ID in format XXXX-XXXX-XXXX-XXXX",
+          "synonyms": "ORCID iD",
+          "pii": true
         },
         "First_Name": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "First name of individual",
+          "synonyms": "Given Name, Forename",
+          "pii": true
         },
         "Last_Name": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Last name of individual",
+          "synonyms": "Surname, Family Name",
+          "pii": true
         },
         "Middle_Name": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Middle name or initial of individual",
+          "synonyms": "Middle Initial",
+          "pii": true
         },
         "Institutional_ID": {
           "type": "VARCHAR(50)",
           "primary_key": false,
           "required": false,
           "unique": true,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Institution-specific identifier for personnel",
+          "synonyms": "Employee ID, Net ID"
         },
         "Primary_Email": {
           "type": "VARCHAR(320)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Primary email address for communication",
+          "synonyms": "Email, Work Email",
+          "pii": true
         },
         "Person_Type": {
           "type": "VARCHAR(50)",
@@ -189,7 +242,9 @@
             "Postdoc",
             "Resident",
             "Fellow"
-          ]
+          ],
+          "description": "Type of personnel (Faculty, Staff, Student, External, Postdoc, Resident, Fellow)",
+          "synonyms": "Type, Role"
         },
         "Department_Organization_ID": {
           "type": "VARCHAR(50)",
@@ -200,9 +255,13 @@
           "references": {
             "table": "Organization",
             "column": "Organization_ID"
-          }
+          },
+          "description": "Reference to primary department organization",
+          "synonyms": "Department ID, Org ID"
         }
-      }
+      },
+      "description": "Stores information about individuals involved in projects and awards",
+      "synonyms": "Person, Employee"
     },
     "ContactDetails": {
       "columns": {
@@ -211,7 +270,9 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": true
+          "auto_increment": true,
+          "description": "Primary key for contact detail record",
+          "synonyms": "Contact ID"
         },
         "Personnel_ID": {
           "type": "VARCHAR(50)",
@@ -222,7 +283,9 @@
           "references": {
             "table": "Personnel",
             "column": "Personnel_ID"
-          }
+          },
+          "description": "Reference to personnel (mutually exclusive with Organization_ID)",
+          "synonyms": "Person ID"
         },
         "Organization_ID": {
           "type": "VARCHAR(50)",
@@ -233,7 +296,9 @@
           "references": {
             "table": "Organization",
             "column": "Organization_ID"
-          }
+          },
+          "description": "Reference to organization (mutually exclusive with Personnel_ID)",
+          "synonyms": "Org ID"
         },
         "AllowedValue_ID": {
           "type": "INT",
@@ -244,16 +309,23 @@
           "references": {
             "table": "AllowedValues",
             "column": "Allowed_Value_ID"
-          }
+          },
+          "description": "Type of contact (Email, Phone, Fax) from AllowedValues",
+          "synonyms": "Contact Type ID"
         },
         "ContactDetails_Value": {
           "type": "VARCHAR(255)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "The actual contact value (email address, phone number, etc.)",
+          "synonyms": "Value, Contact Info",
+          "pii": true
         }
-      }
+      },
+      "description": "Stores contact information for personnel and organizations",
+      "synonyms": "Contact, ContactInfo"
     },
     "IndirectRate": {
       "columns": {
@@ -262,7 +334,9 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": true
+          "auto_increment": true,
+          "description": "Primary key for indirect rate record",
+          "synonyms": "Rate ID"
         },
         "Organization_ID": {
           "type": "VARCHAR(50)",
@@ -273,7 +347,9 @@
           "references": {
             "table": "Organization",
             "column": "Organization_ID"
-          }
+          },
+          "description": "Organization to which this indirect cost rate applies",
+          "synonyms": "Applicable Organization, Org ID"
         },
         "Rate_Type": {
           "type": "VARCHAR(50)",
@@ -290,28 +366,36 @@
             "Fringe Benefits",
             "Facilities",
             "Administrative"
-          ]
+          ],
+          "description": "Type of indirect rate (On-Campus, Off-Campus, MTDC, TDC, Clinical Trial, Fringe Benefits, Facilities, Administrative)",
+          "synonyms": "Type"
         },
         "Rate_Percentage": {
           "type": "DECIMAL(5,2)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Percentage rate as decimal (e.g., 55.50 for 55.5%)",
+          "synonyms": "Rate, Percentage"
         },
         "Effective_Start_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date when rate becomes effective",
+          "synonyms": "Start Date, Effective Date"
         },
         "Effective_End_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date when rate expires (NULL if still active)",
+          "synonyms": "End Date, Expiration Date"
         },
         "Base_Type": {
           "type": "VARCHAR(50)",
@@ -324,16 +408,22 @@
             "TDC",
             "Salaries and Wages",
             "Direct Salaries"
-          ]
+          ],
+          "description": "Base type for rate calculation (MTDC, TDC, Salaries and Wages, Direct Salaries)",
+          "synonyms": "Base"
         },
         "Negotiated_Agreement_ID": {
           "type": "VARCHAR(50)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Reference to negotiated rate agreement document",
+          "synonyms": "NICRA ID, Agreement ID"
         }
-      }
+      },
+      "description": "Negotiated indirect cost rates (F&A rates) for organizations",
+      "synonyms": "F&A Rates, Overhead Rates, IDC Rates, NICRA"
     },
     "Project": {
       "columns": {
@@ -342,21 +432,27 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Primary key for project",
+          "synonyms": "Project Number"
         },
         "Project_Title": {
           "type": "VARCHAR(500)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Full title of the project",
+          "synonyms": "Title"
         },
         "Acronym": {
           "type": "VARCHAR(50)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Short acronym or abbreviation for project",
+          "synonyms": "Short Name, Abbreviation"
         },
         "Parent_Project_ID": {
           "type": "VARCHAR(50)",
@@ -367,7 +463,9 @@
           "references": {
             "table": "Project",
             "column": "Project_ID"
-          }
+          },
+          "description": "Reference to parent project for sub-projects",
+          "synonyms": "Parent Project"
         },
         "Project_Type_Value_ID": {
           "type": "INT",
@@ -378,28 +476,36 @@
           "references": {
             "table": "AllowedValues",
             "column": "Allowed_Value_ID"
-          }
+          },
+          "description": "Type of project from AllowedValues (Research, Training, Service, Clinical Trial, Fellowship, Infrastructure, Other)",
+          "synonyms": "Type"
         },
         "Abstract": {
           "type": "TEXT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Abstract or summary description of project",
+          "synonyms": "Summary, Description"
         },
         "Start_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Project start date",
+          "synonyms": "Begin Date"
         },
         "End_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Project end date",
+          "synonyms": "Completion Date"
         },
         "Lead_Organization_ID": {
           "type": "VARCHAR(50)",
@@ -410,7 +516,9 @@
           "references": {
             "table": "Organization",
             "column": "Organization_ID"
-          }
+          },
+          "description": "Primary organization leading the project",
+          "synonyms": "Lead Org, Primary Org"
         },
         "Project_Status": {
           "type": "VARCHAR(50)",
@@ -425,9 +533,12 @@
             "Completed",
             "Suspended",
             "Cancelled"
-          ]
+          ],
+          "description": "Current status (Planning, Active, Completed, Suspended, Cancelled)",
+          "synonyms": "Status"
         }
-      }
+      },
+      "description": "Represents research or training projects"
     },
     "RFA": {
       "columns": {
@@ -436,7 +547,9 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Primary key for request for application",
+          "synonyms": "RFA Number, Opportunity ID"
         },
         "Sponsor_Organization_ID": {
           "type": "VARCHAR(50)",
@@ -447,51 +560,67 @@
           "references": {
             "table": "Organization",
             "column": "Organization_ID"
-          }
+          },
+          "description": "Sponsoring organization issuing the RFA",
+          "synonyms": "Sponsor ID, Agency ID"
         },
         "RFA_Number": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Official RFA or funding opportunity number",
+          "synonyms": "FOA Number, Number"
         },
         "RFA_Title": {
           "type": "VARCHAR(500)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Title of the funding opportunity",
+          "synonyms": "Opportunity Title, Title"
         },
         "Program_Code": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Program code or activity code for the opportunity",
+          "synonyms": "Activity Code"
         },
         "Announcement_URL": {
           "type": "VARCHAR(1000)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "URL to the full announcement",
+          "synonyms": "URL, Link"
         },
         "Opportunity_Number": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Grants.gov or other system opportunity number",
+          "synonyms": "Opp Number"
         },
         "CFDA_Number": {
           "type": "VARCHAR(20)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Catalog of Federal Domestic Assistance number",
+          "synonyms": "CFDA, Assistance Listing Number"
         }
-      }
+      },
+      "description": "Represents Request for Applications or funding announcements",
+      "synonyms": "Funding Opportunity"
     },
     "Proposal": {
       "columns": {
@@ -500,21 +629,27 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Primary key for proposal",
+          "synonyms": "Proposal Number"
         },
         "Proposal_Number": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": false,
           "unique": true,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Institution-assigned proposal number",
+          "synonyms": "Number, Ref Number"
         },
         "Proposal_Title": {
           "type": "VARCHAR(500)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Title of the proposal",
+          "synonyms": "Title"
         },
         "Project_ID": {
           "type": "VARCHAR(50)",
@@ -525,7 +660,9 @@
           "references": {
             "table": "Project",
             "column": "Project_ID"
-          }
+          },
+          "description": "Associated project (may be NULL for new projects)",
+          "synonyms": "Project"
         },
         "Sponsor_Organization_ID": {
           "type": "VARCHAR(50)",
@@ -536,7 +673,9 @@
           "references": {
             "table": "Organization",
             "column": "Organization_ID"
-          }
+          },
+          "description": "Organization to which proposal is submitted",
+          "synonyms": "Sponsor ID, Agency ID"
         },
         "Submitting_Organization_ID": {
           "type": "VARCHAR(50)",
@@ -547,7 +686,9 @@
           "references": {
             "table": "Organization",
             "column": "Organization_ID"
-          }
+          },
+          "description": "Organization submitting the proposal",
+          "synonyms": "Submitter Org ID"
         },
         "Administering_Organization_ID": {
           "type": "VARCHAR(50)",
@@ -558,7 +699,9 @@
           "references": {
             "table": "Organization",
             "column": "Organization_ID"
-          }
+          },
+          "description": "Organization that will administer the award if funded",
+          "synonyms": "Admin Org ID"
         },
         "RFA_ID": {
           "type": "VARCHAR(50)",
@@ -569,7 +712,9 @@
           "references": {
             "table": "RFA",
             "column": "RFA_ID"
-          }
+          },
+          "description": "Associated request for application",
+          "synonyms": "RFA, Opportunity"
         },
         "Previous_Proposal_ID": {
           "type": "VARCHAR(50)",
@@ -580,7 +725,9 @@
           "references": {
             "table": "Proposal",
             "column": "Proposal_ID"
-          }
+          },
+          "description": "Reference to previous related proposal (renewals, resubmissions)",
+          "synonyms": "Parent Proposal, Prior Proposal"
         },
         "Submission_Version": {
           "type": "INT",
@@ -588,56 +735,72 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": 1
+          "default": 1,
+          "description": "Version number for resubmissions",
+          "synonyms": "Version"
         },
         "Proposed_Start_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Proposed project start date",
+          "synonyms": "Start Date"
         },
         "Proposed_End_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Proposed project end date",
+          "synonyms": "End Date"
         },
         "Total_Proposed_Direct": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Total direct costs proposed",
+          "synonyms": "Direct Costs"
         },
         "Total_Proposed_Indirect": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Total indirect costs proposed",
+          "synonyms": "Indirect Costs, F&A Costs"
         },
         "Total_Proposed_Budget": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Total budget proposed (direct + indirect)",
+          "synonyms": "Total Budget"
         },
         "Submission_Deadline": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Sponsor deadline for submission",
+          "synonyms": "Deadline, Due Date"
         },
         "Submission_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Actual date submitted to sponsor",
+          "synonyms": "Submit Date"
         },
         "Internal_Approval_Status": {
           "type": "VARCHAR(50)",
@@ -652,7 +815,9 @@
             "Approved",
             "Rejected",
             "Withdrawn"
-          ]
+          ],
+          "description": "Internal approval status (Draft, In Review, Approved, Rejected, Withdrawn)",
+          "synonyms": "Approval Status"
         },
         "Decision_Status": {
           "type": "VARCHAR(50)",
@@ -668,23 +833,30 @@
             "Awarded",
             "Declined",
             "Withdrawn"
-          ]
+          ],
+          "description": "Sponsor decision status (Pending, Submitted, Under Review, Awarded, Declined, Withdrawn)",
+          "synonyms": "Status"
         },
         "Decision_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date sponsor made funding decision",
+          "synonyms": "Award Date, Decline Date"
         },
         "PAF_Routing_Status": {
           "type": "VARCHAR(50)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Proposal approval form routing status",
+          "synonyms": "Routing Status, Workflow Status"
         }
-      }
+      },
+      "description": "Represents submitted proposals for projects"
     },
     "ProposalBudget": {
       "columns": {
@@ -693,7 +865,9 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": true
+          "auto_increment": true,
+          "description": "Primary key for proposal budget line item",
+          "synonyms": "Budget Line ID"
         },
         "Proposal_ID": {
           "type": "VARCHAR(50)",
@@ -704,14 +878,18 @@
           "references": {
             "table": "Proposal",
             "column": "Proposal_ID"
-          }
+          },
+          "description": "Reference to parent proposal",
+          "synonyms": "Proposal"
         },
         "Period_Number": {
           "type": "INT",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Budget period number (typically 1-5 for multi-year budgets)",
+          "synonyms": "Period, Year"
         },
         "BudgetCategory_ID": {
           "type": "INT",
@@ -722,49 +900,63 @@
           "references": {
             "table": "BudgetCategory",
             "column": "BudgetCategory_ID"
-          }
+          },
+          "description": "Budget category for this line item",
+          "synonyms": "Category"
         },
         "Line_Item_Description": {
           "type": "VARCHAR(500)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Description of specific budget line item",
+          "synonyms": "Description, Line Item"
         },
         "Direct_Cost": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Direct cost amount for this line item",
+          "synonyms": "Direct"
         },
         "Indirect_Cost": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Indirect cost amount for this line item",
+          "synonyms": "Indirect, F&A"
         },
         "Total_Cost": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Total cost (direct + indirect) for this line item",
+          "synonyms": "Total"
         },
         "Quantity": {
           "type": "DECIMAL(10,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Quantity of units for calculation",
+          "synonyms": "Qty, Units"
         },
         "Unit_Cost": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Cost per unit",
+          "synonyms": "Rate, Price"
         },
         "Applied_Indirect_Rate_ID": {
           "type": "INT",
@@ -775,7 +967,9 @@
           "references": {
             "table": "IndirectRate",
             "column": "IndirectRate_ID"
-          }
+          },
+          "description": "Indirect rate applied to this line item",
+          "synonyms": "IDC Rate ID"
         },
         "Rate_Base_Used": {
           "type": "VARCHAR(50)",
@@ -788,7 +982,9 @@
             "TDC",
             "Salaries and Wages",
             "Direct Salaries"
-          ]
+          ],
+          "description": "Base type used for indirect rate calculation (MTDC, TDC, Salaries and Wages, Direct Salaries)",
+          "synonyms": "Base"
         },
         "Version_No": {
           "type": "INT",
@@ -796,9 +992,13 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": 1
+          "default": 1,
+          "description": "Budget version number for tracking revisions",
+          "synonyms": "Version"
         }
-      }
+      },
+      "description": "Detailed budget line items for proposals by period and category",
+      "synonyms": "Proposal Budget Lines"
     },
     "Award": {
       "columns": {
@@ -807,21 +1007,27 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Primary key for award",
+          "synonyms": "Award Number"
         },
         "Award_Number": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": true,
           "unique": true,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Official sponsor-assigned award number",
+          "synonyms": "Number"
         },
         "Award_Title": {
           "type": "VARCHAR(500)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Title of the award",
+          "synonyms": "Title"
         },
         "Project_ID": {
           "type": "VARCHAR(50)",
@@ -832,7 +1038,9 @@
           "references": {
             "table": "Project",
             "column": "Project_ID"
-          }
+          },
+          "description": "Associated project",
+          "synonyms": "Project"
         },
         "Sponsor_Organization_ID": {
           "type": "VARCHAR(50)",
@@ -843,7 +1051,9 @@
           "references": {
             "table": "Organization",
             "column": "Organization_ID"
-          }
+          },
+          "description": "Direct sponsor providing funding",
+          "synonyms": "Sponsor ID, Agency ID"
         },
         "RFA_ID": {
           "type": "VARCHAR(50)",
@@ -854,7 +1064,9 @@
           "references": {
             "table": "RFA",
             "column": "RFA_ID"
-          }
+          },
+          "description": "Original request for application",
+          "synonyms": "RFA, Opportunity"
         },
         "Proposal_ID": {
           "type": "VARCHAR(50)",
@@ -865,21 +1077,27 @@
           "references": {
             "table": "Proposal",
             "column": "Proposal_ID"
-          }
+          },
+          "description": "Proposal that resulted in this award",
+          "synonyms": "Proposal"
         },
         "Original_Start_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Original project period start date",
+          "synonyms": "Start Date, Begin Date"
         },
         "Original_End_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Original project period end date",
+          "synonyms": "End Date"
         },
         "Current_Total_Funded": {
           "type": "DECIMAL(18,2)",
@@ -887,21 +1105,27 @@
           "required": true,
           "unique": false,
           "auto_increment": false,
-          "default": 0
+          "default": 0,
+          "description": "Current total funded amount including modifications",
+          "synonyms": "Total Funding, Funded Amount"
         },
         "Current_End_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Current project period end date (may differ from original due to extensions)",
+          "synonyms": "End Date"
         },
         "Total_Anticipated_Funding": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Total anticipated funding over full award life",
+          "synonyms": "Total Award"
         },
         "Award_Status": {
           "type": "VARCHAR(50)",
@@ -916,21 +1140,27 @@
             "Closed",
             "Suspended",
             "Terminated"
-          ]
+          ],
+          "description": "Current status (Pending, Active, Closed, Suspended, Terminated)",
+          "synonyms": "Status"
         },
         "CFDA_Number": {
           "type": "VARCHAR(20)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Catalog of Federal Domestic Assistance number",
+          "synonyms": "CFDA, Assistance Listing Number"
         },
         "Federal_Award_ID": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Federal award identification number for federal awards",
+          "synonyms": "FAIN"
         },
         "Prime_Sponsor_Organization_ID": {
           "type": "VARCHAR(50)",
@@ -941,7 +1171,9 @@
           "references": {
             "table": "Organization",
             "column": "Organization_ID"
-          }
+          },
+          "description": "Ultimate funding source for flow-through awards",
+          "synonyms": "Prime Sponsor, Prime Agency"
         },
         "Flow_Through_Indicator": {
           "type": "BOOLEAN",
@@ -949,9 +1181,12 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": false
+          "default": false,
+          "description": "Flag indicating if this is a flow-through award",
+          "synonyms": "Flow Through, Pass Through"
         }
-      }
+      },
+      "description": "Represents awarded funding for projects"
     },
     "Modification": {
       "columns": {
@@ -960,7 +1195,9 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Primary key for modification",
+          "synonyms": "Mod ID, Amendment ID"
         },
         "Award_ID": {
           "type": "VARCHAR(50)",
@@ -971,14 +1208,18 @@
           "references": {
             "table": "Award",
             "column": "Award_ID"
-          }
+          },
+          "description": "Award being modified",
+          "synonyms": "Award"
         },
         "Modification_Number": {
           "type": "VARCHAR(20)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Sequential modification number",
+          "synonyms": "Mod Number, Amendment Number"
         },
         "Event_Type_Value_ID": {
           "type": "INT",
@@ -989,7 +1230,9 @@
           "references": {
             "table": "AllowedValues",
             "column": "Allowed_Value_ID"
-          }
+          },
+          "description": "Type of modification event from AllowedValues (Initial Award, Incremental Funding, No Cost Extension, Budget Revision, Scope Change, Personnel Change, Termination, Supplement, Carryforward, Administrative Change)",
+          "synonyms": "Type"
         },
         "Event_Timestamp": {
           "type": "TIMESTAMP",
@@ -997,14 +1240,18 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": "CURRENT_TIMESTAMP"
+          "default": "CURRENT_TIMESTAMP",
+          "description": "Date and time modification was recorded in system",
+          "synonyms": "Timestamp"
         },
         "Effective_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date modification becomes effective",
+          "synonyms": "Effective Date"
         },
         "Funding_Amount_Change": {
           "type": "DECIMAL(18,2)",
@@ -1012,14 +1259,18 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": 0
+          "default": 0,
+          "description": "Change in funding amount (positive or negative)",
+          "synonyms": "Funding Change, Amount Change"
         },
         "New_End_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "New end date if modification includes date extension",
+          "synonyms": "End Date"
         },
         "Affected_Personnel_ID": {
           "type": "VARCHAR(50)",
@@ -1030,21 +1281,27 @@
           "references": {
             "table": "Personnel",
             "column": "Personnel_ID"
-          }
+          },
+          "description": "Personnel affected by modification (for personnel changes)",
+          "synonyms": "Person ID"
         },
         "Change_Description": {
           "type": "TEXT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Description of what changed",
+          "synonyms": "Description, Details"
         },
         "Justification": {
           "type": "TEXT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Justification for the modification",
+          "synonyms": "Reason"
         },
         "Impact_on_Budget": {
           "type": "BOOLEAN",
@@ -1052,7 +1309,9 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": false
+          "default": false,
+          "description": "Flag indicating if modification impacts budget",
+          "synonyms": "Budget Impact"
         },
         "Requires_Prior_Approval": {
           "type": "BOOLEAN",
@@ -1060,7 +1319,9 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": false
+          "default": false,
+          "description": "Flag indicating if sponsor prior approval was required",
+          "synonyms": "Prior Approval Required"
         },
         "Approval_Status": {
           "type": "VARCHAR(50)",
@@ -1074,7 +1335,9 @@
             "Approved",
             "Rejected",
             "Not Required"
-          ]
+          ],
+          "description": "Status of approval (Pending, Approved, Rejected, Not Required)",
+          "synonyms": "Status"
         },
         "Approved_By_Personnel_ID": {
           "type": "VARCHAR(50)",
@@ -1085,16 +1348,22 @@
           "references": {
             "table": "Personnel",
             "column": "Personnel_ID"
-          }
+          },
+          "description": "Personnel who approved the modification",
+          "synonyms": "Approver ID"
         },
         "Approval_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date modification was approved",
+          "synonyms": "Approval Date"
         }
-      }
+      },
+      "description": "Award modifications tracking funding changes, extensions, and amendments",
+      "synonyms": "Award Amendments, Changes, Revisions"
     },
     "Terms": {
       "columns": {
@@ -1103,7 +1372,9 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": true
+          "auto_increment": true,
+          "description": "Primary key for award terms",
+          "synonyms": "Terms ID"
         },
         "Award_ID": {
           "type": "VARCHAR(50)",
@@ -1114,7 +1385,9 @@
           "references": {
             "table": "Award",
             "column": "Award_ID"
-          }
+          },
+          "description": "Award these terms apply to",
+          "synonyms": "Award"
         },
         "Payment_Method": {
           "type": "VARCHAR(50)",
@@ -1129,7 +1402,9 @@
             "Fixed-Price",
             "Letter-of-Credit",
             "Payment-Request"
-          ]
+          ],
+          "description": "Payment method (Reimbursement, Advance, Cost-Reimbursement, Fixed-Price, Letter-of-Credit, Payment-Request)",
+          "synonyms": "Payment Type"
         },
         "Invoicing_Frequency": {
           "type": "VARCHAR(50)",
@@ -1144,49 +1419,63 @@
             "Annual",
             "Upon-Request",
             "Milestone"
-          ]
+          ],
+          "description": "How often invoices should be submitted (Monthly, Quarterly, Semi-Annual, Annual, Upon-Request, Milestone)",
+          "synonyms": "Billing Frequency"
         },
         "Invoice_Submission_Days": {
           "type": "INT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Number of days allowed for invoice submission after period end",
+          "synonyms": "Submission Days"
         },
         "Reporting_Requirements": {
           "type": "TEXT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Description of reporting requirements",
+          "synonyms": "Reports Required"
         },
         "Special_Conditions": {
           "type": "TEXT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Special terms and conditions of the award",
+          "synonyms": "Conditions"
         },
         "Property_Requirements": {
           "type": "TEXT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Equipment and property management requirements",
+          "synonyms": "Property Rules"
         },
         "Publication_Requirements": {
           "type": "TEXT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Requirements for publications and acknowledgments",
+          "synonyms": "Publication Rules"
         },
         "Closeout_Requirements": {
           "type": "TEXT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Requirements for award closeout",
+          "synonyms": "Closeout"
         },
         "Record_Retention_Years": {
           "type": "INT",
@@ -1194,9 +1483,13 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": 3
+          "default": 3,
+          "description": "Number of years records must be retained",
+          "synonyms": "Retention Period"
         }
-      }
+      },
+      "description": "Terms and conditions for awards including payment, reporting, and special requirements",
+      "synonyms": "Award Terms, Conditions, Requirements"
     },
     "AwardBudgetPeriod": {
       "columns": {
@@ -1205,7 +1498,9 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": true
+          "auto_increment": true,
+          "description": "Primary key for award budget period",
+          "synonyms": "Period ID"
         },
         "Award_ID": {
           "type": "VARCHAR(50)",
@@ -1216,28 +1511,36 @@
           "references": {
             "table": "Award",
             "column": "Award_ID"
-          }
+          },
+          "description": "Award this period belongs to",
+          "synonyms": "Award"
         },
         "Period_Number": {
           "type": "INT",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Sequential period number",
+          "synonyms": "Period, Year"
         },
         "Start_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Period start date",
+          "synonyms": "Begin Date"
         },
         "End_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Period end date",
+          "synonyms": "End Date"
         },
         "Direct_Costs": {
           "type": "DECIMAL(18,2)",
@@ -1245,7 +1548,9 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": 0
+          "default": 0,
+          "description": "Total direct costs for period",
+          "synonyms": "Direct"
         },
         "Indirect_Costs": {
           "type": "DECIMAL(18,2)",
@@ -1253,7 +1558,9 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": 0
+          "default": 0,
+          "description": "Total indirect costs for period",
+          "synonyms": "Indirect, F&A"
         },
         "Total_Costs": {
           "type": "DECIMAL(18,2)",
@@ -1261,7 +1568,9 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": 0
+          "default": 0,
+          "description": "Total costs for period (direct + indirect)",
+          "synonyms": "Total"
         },
         "Cost_Share_Amount": {
           "type": "DECIMAL(18,2)",
@@ -1269,7 +1578,9 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": 0
+          "default": 0,
+          "description": "Cost share required for period",
+          "synonyms": "Cost Share"
         },
         "Period_Status": {
           "type": "VARCHAR(50)",
@@ -1283,9 +1594,13 @@
             "Released",
             "Active",
             "Closed"
-          ]
+          ],
+          "description": "Status of period (Pending, Released, Active, Closed)",
+          "synonyms": "Status"
         }
-      }
+      },
+      "description": "Budget periods for awards with funding amounts and dates",
+      "synonyms": "Award Periods, Budget Years"
     },
     "AwardBudget": {
       "columns": {
@@ -1294,7 +1609,9 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": true
+          "auto_increment": true,
+          "description": "Primary key for award budget line item",
+          "synonyms": "Budget Line ID"
         },
         "Award_ID": {
           "type": "VARCHAR(50)",
@@ -1305,7 +1622,9 @@
           "references": {
             "table": "Award",
             "column": "Award_ID"
-          }
+          },
+          "description": "Award this budget line belongs to",
+          "synonyms": "Award"
         },
         "AwardBudgetPeriod_ID": {
           "type": "INT",
@@ -1316,7 +1635,9 @@
           "references": {
             "table": "AwardBudgetPeriod",
             "column": "AwardBudgetPeriod_ID"
-          }
+          },
+          "description": "Budget period this line belongs to",
+          "synonyms": "Period ID"
         },
         "BudgetCategory_ID": {
           "type": "INT",
@@ -1327,56 +1648,72 @@
           "references": {
             "table": "BudgetCategory",
             "column": "BudgetCategory_ID"
-          }
+          },
+          "description": "Budget category for this line",
+          "synonyms": "Category"
         },
         "Line_Item_Description": {
           "type": "VARCHAR(500)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Description of budget line item",
+          "synonyms": "Description, Line Item"
         },
         "Approved_Direct_Cost": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Originally approved direct cost amount",
+          "synonyms": "Approved Direct"
         },
         "Approved_Indirect_Cost": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Originally approved indirect cost amount",
+          "synonyms": "Approved Indirect"
         },
         "Approved_Total_Cost": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Originally approved total cost amount",
+          "synonyms": "Approved Total"
         },
         "Current_Direct_Cost": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Current direct cost amount after modifications",
+          "synonyms": "Current Direct"
         },
         "Current_Indirect_Cost": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Current indirect cost amount after modifications",
+          "synonyms": "Current Indirect"
         },
         "Current_Total_Cost": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Current total cost amount after modifications",
+          "synonyms": "Current Total"
         },
         "Rate_Base_Used": {
           "type": "VARCHAR(50)",
@@ -1389,9 +1726,13 @@
             "TDC",
             "Salaries and Wages",
             "Direct Salaries"
-          ]
+          ],
+          "description": "Base type used for indirect rate calculation (MTDC, TDC, Salaries and Wages, Direct Salaries)",
+          "synonyms": "Base"
         }
-      }
+      },
+      "description": "Detailed budget line items for awards by budget period and category",
+      "synonyms": "Award Budget Lines"
     },
     "Subaward": {
       "columns": {
@@ -1400,7 +1741,9 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Primary key for subaward",
+          "synonyms": "Subaward Number"
         },
         "Prime_Award_ID": {
           "type": "VARCHAR(50)",
@@ -1411,7 +1754,9 @@
           "references": {
             "table": "Award",
             "column": "Award_ID"
-          }
+          },
+          "description": "Prime award funding this subaward",
+          "synonyms": "Prime Award"
         },
         "Subrecipient_Organization_ID": {
           "type": "VARCHAR(50)",
@@ -1422,35 +1767,45 @@
           "references": {
             "table": "Organization",
             "column": "Organization_ID"
-          }
+          },
+          "description": "Organization receiving subaward",
+          "synonyms": "Subrecipient ID, Sub Org ID"
         },
         "Subaward_Number": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": false,
           "unique": true,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Institution-assigned subaward number",
+          "synonyms": "Number"
         },
         "Subaward_Amount": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Total subaward amount",
+          "synonyms": "Amount"
         },
         "Start_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Subaward start date",
+          "synonyms": "Begin Date"
         },
         "End_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Subaward end date",
+          "synonyms": "End Date"
         },
         "Subaward_Status": {
           "type": "VARCHAR(50)",
@@ -1465,28 +1820,37 @@
             "Closed",
             "Terminated",
             "Suspended"
-          ]
+          ],
+          "description": "Current status (Pending, Active, Closed, Terminated, Suspended)",
+          "synonyms": "Status"
         },
         "Statement_of_Work": {
           "type": "TEXT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Statement of work for subrecipient",
+          "synonyms": "SOW, Scope of Work"
         },
         "PI_Name": {
           "type": "VARCHAR(255)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Name of principal investigator at subrecipient institution",
+          "synonyms": "Subrecipient PI",
+          "pii": true
         },
         "Monitoring_Plan": {
           "type": "TEXT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Plan for monitoring subrecipient performance",
+          "synonyms": "Monitoring"
         },
         "Risk_Level": {
           "type": "VARCHAR(20)",
@@ -1498,9 +1862,12 @@
             "Low",
             "Medium",
             "High"
-          ]
+          ],
+          "description": "Risk assessment level (Low, Medium, High)",
+          "synonyms": "Risk"
         }
-      }
+      },
+      "description": "Represents subawards issued under prime awards"
     },
     "CostShare": {
       "columns": {
@@ -1509,7 +1876,9 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": true
+          "auto_increment": true,
+          "description": "Primary key for cost share commitment",
+          "synonyms": "Cost Share ID"
         },
         "Award_ID": {
           "type": "VARCHAR(50)",
@@ -1520,14 +1889,18 @@
           "references": {
             "table": "Award",
             "column": "Award_ID"
-          }
+          },
+          "description": "Award requiring cost share",
+          "synonyms": "Award"
         },
         "Committed_Amount": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Amount committed for cost sharing",
+          "synonyms": "Commitment, Amount"
         },
         "Commitment_Type": {
           "type": "VARCHAR(50)",
@@ -1540,7 +1913,9 @@
             "In-Kind",
             "Third-Party",
             "Waived IDC"
-          ]
+          ],
+          "description": "Type of cost share (Cash, In-Kind, Third-Party, Waived IDC)",
+          "synonyms": "Type"
         },
         "Source_Organization_ID": {
           "type": "VARCHAR(50)",
@@ -1551,21 +1926,27 @@
           "references": {
             "table": "Organization",
             "column": "Organization_ID"
-          }
+          },
+          "description": "Organization providing cost share",
+          "synonyms": "Source Org"
         },
         "Source_Fund_Code": {
           "type": "VARCHAR(20)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Fund code for cost share source",
+          "synonyms": "Fund"
         },
         "Source_Description": {
           "type": "VARCHAR(500)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Description of cost share source",
+          "synonyms": "Description"
         },
         "Is_Mandatory": {
           "type": "BOOLEAN",
@@ -1573,7 +1954,9 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": false
+          "default": false,
+          "description": "Flag indicating if cost share is mandatory or voluntary",
+          "synonyms": "Mandatory"
         },
         "CostShare_Status": {
           "type": "VARCHAR(50)",
@@ -1587,7 +1970,9 @@
             "In Progress",
             "Met",
             "Waived"
-          ]
+          ],
+          "description": "Status (Committed, In Progress, Met, Waived)",
+          "synonyms": "Status"
         },
         "Met_Amount": {
           "type": "DECIMAL(18,2)",
@@ -1595,9 +1980,13 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": 0
+          "default": 0,
+          "description": "Amount of cost share commitment actually met",
+          "synonyms": "Met"
         }
-      }
+      },
+      "description": "Cost sharing commitments and contributions for awards",
+      "synonyms": "Cost Sharing, Matching Funds"
     },
     "Invoice": {
       "columns": {
@@ -1606,7 +1995,9 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Primary key for invoice",
+          "synonyms": "Invoice Number"
         },
         "Award_ID": {
           "type": "VARCHAR(50)",
@@ -1617,14 +2008,18 @@
           "references": {
             "table": "Award",
             "column": "Award_ID"
-          }
+          },
+          "description": "Award being invoiced",
+          "synonyms": "Award"
         },
         "Invoice_Number": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": true,
           "unique": true,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Institution-assigned invoice number",
+          "synonyms": "Number"
         },
         "AwardBudgetPeriod_ID": {
           "type": "INT",
@@ -1635,28 +2030,36 @@
           "references": {
             "table": "AwardBudgetPeriod",
             "column": "AwardBudgetPeriod_ID"
-          }
+          },
+          "description": "Budget period being invoiced",
+          "synonyms": "Period ID"
         },
         "Invoice_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date invoice was created",
+          "synonyms": "Date"
         },
         "Period_Start_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Start date of period covered by invoice",
+          "synonyms": "Period Start"
         },
         "Period_End_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "End date of period covered by invoice",
+          "synonyms": "Period End"
         },
         "Direct_Costs": {
           "type": "DECIMAL(18,2)",
@@ -1664,7 +2067,9 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": 0
+          "default": 0,
+          "description": "Direct costs invoiced",
+          "synonyms": "Direct"
         },
         "Indirect_Costs": {
           "type": "DECIMAL(18,2)",
@@ -1672,7 +2077,9 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": 0
+          "default": 0,
+          "description": "Indirect costs invoiced",
+          "synonyms": "Indirect, F&A"
         },
         "Cost_Share": {
           "type": "DECIMAL(18,2)",
@@ -1680,14 +2087,18 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": 0
+          "default": 0,
+          "description": "Cost share amount reported on invoice",
+          "synonyms": "Cost Share"
         },
         "Total_Amount": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Total amount invoiced",
+          "synonyms": "Total"
         },
         "Invoice_Status": {
           "type": "VARCHAR(50)",
@@ -1703,30 +2114,40 @@
             "Approved",
             "Paid",
             "Rejected"
-          ]
+          ],
+          "description": "Status (Draft, Submitted, Under Review, Approved, Paid, Rejected)",
+          "synonyms": "Status"
         },
         "Submission_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date invoice was submitted to sponsor",
+          "synonyms": "Submit Date"
         },
         "Payment_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date payment was received",
+          "synonyms": "Paid Date"
         },
         "Payment_Amount": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Amount of payment received",
+          "synonyms": "Payment"
         }
-      }
+      },
+      "description": "Invoices submitted to sponsors for reimbursement or payment",
+      "synonyms": "Billing, Invoices, Payment Requests"
     },
     "AwardDeliverable": {
       "columns": {
@@ -1735,7 +2156,9 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": true
+          "auto_increment": true,
+          "description": "Primary key for award deliverable",
+          "synonyms": "Deliverable ID"
         },
         "Award_ID": {
           "type": "VARCHAR(50)",
@@ -1746,7 +2169,9 @@
           "references": {
             "table": "Award",
             "column": "Award_ID"
-          }
+          },
+          "description": "Award requiring deliverable",
+          "synonyms": "Award"
         },
         "Deliverable_Type_Value_ID": {
           "type": "INT",
@@ -1757,7 +2182,9 @@
           "references": {
             "table": "AllowedValues",
             "column": "Allowed_Value_ID"
-          }
+          },
+          "description": "Type of deliverable from AllowedValues (Technical Progress Report, Financial Report, Annual Report, Final Technical Report, Final Financial Report, Property Report, Invention Disclosure, Animal Welfare Report, Data Submission, Software Release, Clinical Trial Registration, Publication, Presentation, Material Transfer, Other)",
+          "synonyms": "Type"
         },
         "AwardBudgetPeriod_ID": {
           "type": "INT",
@@ -1768,28 +2195,36 @@
           "references": {
             "table": "AwardBudgetPeriod",
             "column": "AwardBudgetPeriod_ID"
-          }
+          },
+          "description": "Budget period deliverable is due for",
+          "synonyms": "Period ID"
         },
         "Deliverable_Number": {
           "type": "VARCHAR(50)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Sequential deliverable number",
+          "synonyms": "Number"
         },
         "Due_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date deliverable is due",
+          "synonyms": "Due Date, Deadline"
         },
         "Submission_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date deliverable was submitted",
+          "synonyms": "Submit Date"
         },
         "Deliverable_Status": {
           "type": "VARCHAR(50)",
@@ -1805,7 +2240,9 @@
             "Accepted",
             "Revision Required",
             "Overdue"
-          ]
+          ],
+          "description": "Status (Pending, In Progress, Submitted, Accepted, Revision Required, Overdue)",
+          "synonyms": "Status"
         },
         "Responsible_Personnel_ID": {
           "type": "VARCHAR(50)",
@@ -1816,7 +2253,9 @@
           "references": {
             "table": "Personnel",
             "column": "Personnel_ID"
-          }
+          },
+          "description": "Personnel responsible for completing deliverable",
+          "synonyms": "Responsible Person"
         },
         "Reviewed_By_Personnel_ID": {
           "type": "VARCHAR(50)",
@@ -1827,23 +2266,31 @@
           "references": {
             "table": "Personnel",
             "column": "Personnel_ID"
-          }
+          },
+          "description": "Personnel who reviewed deliverable",
+          "synonyms": "Reviewer"
         },
         "Review_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date deliverable was reviewed",
+          "synonyms": "Review Date"
         },
         "Comments": {
           "type": "TEXT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Comments or notes about deliverable",
+          "synonyms": "Notes"
         }
-      }
+      },
+      "description": "Required deliverables and reports for awards with due dates and status tracking",
+      "synonyms": "Reports, Deliverables, Milestones"
     },
     "ProjectRole": {
       "columns": {
@@ -1852,7 +2299,9 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": true
+          "auto_increment": true,
+          "description": "Primary key for project role",
+          "synonyms": "Role ID"
         },
         "Project_ID": {
           "type": "VARCHAR(50)",
@@ -1863,7 +2312,9 @@
           "references": {
             "table": "Project",
             "column": "Project_ID"
-          }
+          },
+          "description": "Project this role belongs to",
+          "synonyms": "Project"
         },
         "Personnel_ID": {
           "type": "VARCHAR(50)",
@@ -1874,7 +2325,9 @@
           "references": {
             "table": "Personnel",
             "column": "Personnel_ID"
-          }
+          },
+          "description": "Person assigned to role",
+          "synonyms": "Person ID"
         },
         "Role_Value_ID": {
           "type": "INT",
@@ -1885,7 +2338,9 @@
           "references": {
             "table": "AllowedValues",
             "column": "Allowed_Value_ID"
-          }
+          },
+          "description": "Role type from AllowedValues (PI, Co-PI, Co-I, Key Personnel, etc.)",
+          "synonyms": "Role"
         },
         "Is_Key_Personnel": {
           "type": "BOOLEAN",
@@ -1893,7 +2348,9 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": false
+          "default": false,
+          "description": "Flag indicating if this is key personnel",
+          "synonyms": "Key Personnel"
         },
         "Funding_Award_ID": {
           "type": "VARCHAR(50)",
@@ -1904,37 +2361,49 @@
           "references": {
             "table": "Award",
             "column": "Award_ID"
-          }
+          },
+          "description": "Award funding this role",
+          "synonyms": "Award"
         },
         "Start_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date person started in role",
+          "synonyms": "Begin Date"
         },
         "End_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date person ended in role",
+          "synonyms": "End Date"
         },
         "FTE_Percent": {
           "type": "DECIMAL(5,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Full-time equivalent percentage allocated to role",
+          "synonyms": "FTE, Effort"
         },
         "Salary_Charged": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Salary amount charged to project",
+          "synonyms": "Salary"
         }
-      }
+      },
+      "description": "Personnel roles and assignments on projects with effort allocation",
+      "synonyms": "Project Team, Personnel Assignments, Roles"
     },
     "Fund": {
       "columns": {
@@ -1943,14 +2412,18 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Primary key fund code from institutional accounting system",
+          "synonyms": "Fund"
         },
         "Fund_Name": {
           "type": "VARCHAR(255)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Descriptive name of fund",
+          "synonyms": "Name"
         },
         "Fund_Type_Value_ID": {
           "type": "INT",
@@ -1961,7 +2434,9 @@
           "references": {
             "table": "AllowedValues",
             "column": "Allowed_Value_ID"
-          }
+          },
+          "description": "Fund type from AllowedValues",
+          "synonyms": "Fund Type"
         },
         "Organization_ID": {
           "type": "VARCHAR(50)",
@@ -1972,9 +2447,13 @@
           "references": {
             "table": "Organization",
             "column": "Organization_ID"
-          }
+          },
+          "description": "Organization responsible for fund",
+          "synonyms": "Org ID"
         }
-      }
+      },
+      "description": "Fund codes from institutional accounting system",
+      "synonyms": "Funds, Fund Codes"
     },
     "Account": {
       "columns": {
@@ -1983,21 +2462,27 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Primary key account code from chart of accounts",
+          "synonyms": "Account"
         },
         "Account_Name": {
           "type": "VARCHAR(255)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Descriptive name of account",
+          "synonyms": "Name"
         },
         "Account_Category": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Category of account describing the nature of the expense (e.g., Salaries, Supplies, Equipment, Travel)",
+          "synonyms": "Natural Classification, Category"
         },
         "Account_Type": {
           "type": "VARCHAR(50)",
@@ -2011,7 +2496,9 @@
             "Asset",
             "Liability",
             "Equity"
-          ]
+          ],
+          "description": "Type of account (Expense, Revenue, Asset, Liability, Equity)",
+          "synonyms": "Type"
         },
         "Parent_Account_Code": {
           "type": "VARCHAR(20)",
@@ -2022,9 +2509,13 @@
           "references": {
             "table": "Account",
             "column": "Account_Code"
-          }
+          },
+          "description": "Parent account for hierarchical chart of accounts",
+          "synonyms": "Parent Account"
         }
-      }
+      },
+      "description": "Chart of accounts for financial transactions and general ledger coding",
+      "synonyms": "GL Accounts, Account Codes"
     },
     "FinanceCode": {
       "columns": {
@@ -2033,14 +2524,18 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Primary key finance code",
+          "synonyms": "Finance String, FOAP"
         },
         "Finance_Name": {
           "type": "VARCHAR(255)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Descriptive name of finance code",
+          "synonyms": "Name"
         },
         "Award_ID": {
           "type": "VARCHAR(50)",
@@ -2051,7 +2546,9 @@
           "references": {
             "table": "Award",
             "column": "Award_ID"
-          }
+          },
+          "description": "Award associated with finance code",
+          "synonyms": "Award"
         },
         "Purpose_Value_ID": {
           "type": "INT",
@@ -2062,7 +2559,9 @@
           "references": {
             "table": "AllowedValues",
             "column": "Allowed_Value_ID"
-          }
+          },
+          "description": "Purpose of finance code from AllowedValues (Direct Costs, Cost Share, Indirect Costs, Subcontract, Department Share, Program Income, Other)",
+          "synonyms": "Use"
         },
         "Organization_ID": {
           "type": "VARCHAR(50)",
@@ -2073,9 +2572,13 @@
           "references": {
             "table": "Organization",
             "column": "Organization_ID"
-          }
+          },
+          "description": "Organization responsible for finance code",
+          "synonyms": "Org ID"
         }
-      }
+      },
+      "description": "Finance system codes linking awards to institutional accounting strings",
+      "synonyms": "Financial Codes, Account Strings, FOAP"
     },
     "Transaction": {
       "columns": {
@@ -2084,7 +2587,9 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Primary key for transaction",
+          "synonyms": "Trans ID"
         },
         "Fund_Code": {
           "type": "VARCHAR(20)",
@@ -2095,7 +2600,9 @@
           "references": {
             "table": "Fund",
             "column": "Fund_Code"
-          }
+          },
+          "description": "Fund code transaction is charged to",
+          "synonyms": "Fund"
         },
         "Account_Code": {
           "type": "VARCHAR(20)",
@@ -2106,7 +2613,9 @@
           "references": {
             "table": "Account",
             "column": "Account_Code"
-          }
+          },
+          "description": "Account code transaction is charged to",
+          "synonyms": "Account"
         },
         "Finance_Code": {
           "type": "VARCHAR(20)",
@@ -2117,35 +2626,45 @@
           "references": {
             "table": "FinanceCode",
             "column": "Finance_Code"
-          }
+          },
+          "description": "Finance code transaction is charged to",
+          "synonyms": "Finance String"
         },
         "Transaction_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date transaction occurred",
+          "synonyms": "Date"
         },
         "Fiscal_Year": {
           "type": "INT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Fiscal year of transaction",
+          "synonyms": "FY"
         },
         "Fiscal_Period": {
           "type": "INT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Fiscal period of transaction (typically 1-12 for months)",
+          "synonyms": "Period, Month"
         },
         "Transaction_Amount": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Dollar amount of transaction",
+          "synonyms": "Amount"
         },
         "Transaction_Type_Value_ID": {
           "type": "INT",
@@ -2156,14 +2675,18 @@
           "references": {
             "table": "AllowedValues",
             "column": "Allowed_Value_ID"
-          }
+          },
+          "description": "Type of transaction from AllowedValues (Expense, Revenue, Encumbrance, Transfer, Adjustment, Reversal, Cost Share)",
+          "synonyms": "Type"
         },
         "Description": {
           "type": "VARCHAR(500)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Description of transaction",
+          "synonyms": "Details, Memo"
         },
         "Award_ID": {
           "type": "VARCHAR(50)",
@@ -2174,7 +2697,9 @@
           "references": {
             "table": "Award",
             "column": "Award_ID"
-          }
+          },
+          "description": "Award transaction is associated with",
+          "synonyms": "Award"
         },
         "Project_ID": {
           "type": "VARCHAR(50)",
@@ -2185,7 +2710,9 @@
           "references": {
             "table": "Project",
             "column": "Project_ID"
-          }
+          },
+          "description": "Project transaction is associated with",
+          "synonyms": "Project"
         },
         "AwardBudgetPeriod_ID": {
           "type": "INT",
@@ -2196,28 +2723,36 @@
           "references": {
             "table": "AwardBudgetPeriod",
             "column": "AwardBudgetPeriod_ID"
-          }
+          },
+          "description": "Budget period transaction is associated with",
+          "synonyms": "Period ID"
         },
         "Document_Number": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Document number from source system",
+          "synonyms": "Doc Number"
         },
         "Journal_ID": {
           "type": "VARCHAR(50)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Journal entry identifier",
+          "synonyms": "Journal Number"
         },
         "Vendor_ID": {
           "type": "VARCHAR(50)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Vendor identifier for expense transactions",
+          "synonyms": "Vendor"
         },
         "Personnel_ID": {
           "type": "VARCHAR(50)",
@@ -2228,14 +2763,18 @@
           "references": {
             "table": "Personnel",
             "column": "Personnel_ID"
-          }
+          },
+          "description": "Personnel associated with transaction (for salary transactions)",
+          "synonyms": "Person ID"
         },
         "Reference_Number": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Reference or confirmation number",
+          "synonyms": "Reference"
         },
         "Is_Reconciled": {
           "type": "BOOLEAN",
@@ -2243,9 +2782,13 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": false
+          "default": false,
+          "description": "Flag indicating if transaction has been reconciled",
+          "synonyms": "Reconciled"
         }
-      }
+      },
+      "description": "Financial transactions charged to awards from institutional accounting system",
+      "synonyms": "Expenses, Charges, Ledger Entries"
     },
     "Effort": {
       "columns": {
@@ -2254,7 +2797,9 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": true
+          "auto_increment": true,
+          "description": "Primary key for effort record",
+          "synonyms": "Effort ID"
         },
         "ProjectRole_ID": {
           "type": "INT",
@@ -2265,49 +2810,63 @@
           "references": {
             "table": "ProjectRole",
             "column": "ProjectRole_ID"
-          }
+          },
+          "description": "Project role this effort record belongs to",
+          "synonyms": "Role ID"
         },
         "Period_Start_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Start date of effort reporting period",
+          "synonyms": "Period Start"
         },
         "Period_End_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "End date of effort reporting period",
+          "synonyms": "Period End"
         },
         "Committed_Percent": {
           "type": "DECIMAL(5,2)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Committed effort percentage",
+          "synonyms": "Committed Effort"
         },
         "Committed_Person_Months": {
           "type": "DECIMAL(4,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Committed effort in person months",
+          "synonyms": "Person Months"
         },
         "Actual_Percent": {
           "type": "DECIMAL(5,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Actual effort percentage expended",
+          "synonyms": "Actual Effort"
         },
         "Variance_Percent": {
           "type": "DECIMAL(5,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Variance between committed and actual effort",
+          "synonyms": "Variance"
         },
         "Is_Certified": {
           "type": "BOOLEAN",
@@ -2315,14 +2874,18 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": false
+          "default": false,
+          "description": "Flag indicating if effort has been certified",
+          "synonyms": "Certified"
         },
         "Certification_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date effort was certified",
+          "synonyms": "Cert Date"
         },
         "Certified_By_Personnel_ID": {
           "type": "VARCHAR(50)",
@@ -2333,7 +2896,9 @@
           "references": {
             "table": "Personnel",
             "column": "Personnel_ID"
-          }
+          },
+          "description": "Person who certified the effort",
+          "synonyms": "Certifier"
         },
         "Certification_Method": {
           "type": "VARCHAR(50)",
@@ -2346,7 +2911,9 @@
             "Activity Report",
             "Timesheet",
             "Other"
-          ]
+          ],
+          "description": "Method used for certification (PAR, Activity Report, Timesheet, Other)",
+          "synonyms": "Method"
         },
         "Requires_Prior_Approval": {
           "type": "BOOLEAN",
@@ -2354,7 +2921,9 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": false
+          "default": false,
+          "description": "Flag indicating if variance requires sponsor prior approval",
+          "synonyms": "Prior Approval Required"
         },
         "Prior_Approval_Status": {
           "type": "VARCHAR(50)",
@@ -2367,9 +2936,13 @@
             "Pending",
             "Approved",
             "Denied"
-          ]
+          ],
+          "description": "Status of prior approval (Not Required, Pending, Approved, Denied)",
+          "synonyms": "Approval Status"
         }
-      }
+      },
+      "description": "Effort certification and tracking for personnel time charged to projects",
+      "synonyms": "Effort Reporting, Time Allocation, PAR"
     },
     "ComplianceRequirement": {
       "columns": {
@@ -2378,21 +2951,27 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Primary key for compliance requirement",
+          "synonyms": "Requirement ID, Protocol ID"
         },
         "Requirement_Number": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": true,
           "unique": true,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Institution-assigned requirement number",
+          "synonyms": "Protocol Number, IRB Number"
         },
         "Requirement_Title": {
           "type": "VARCHAR(500)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Title of compliance requirement or protocol",
+          "synonyms": "Title"
         },
         "Requirement_Type": {
           "type": "VARCHAR(50)",
@@ -2407,7 +2986,9 @@
             "COI",
             "Radiation",
             "Other"
-          ]
+          ],
+          "description": "Type of requirement (IRB, IACUC, IBC, COI, Radiation, Other)",
+          "synonyms": "Type"
         },
         "Project_ID": {
           "type": "VARCHAR(50)",
@@ -2418,7 +2999,9 @@
           "references": {
             "table": "Project",
             "column": "Project_ID"
-          }
+          },
+          "description": "Project this requirement applies to",
+          "synonyms": "Project"
         },
         "Review_Type": {
           "type": "VARCHAR(50)",
@@ -2432,21 +3015,27 @@
             "Full Board",
             "Not Human Subjects",
             "Administrative"
-          ]
+          ],
+          "description": "Type of review (Exempt, Expedited, Full Board, Not Human Subjects, Administrative)",
+          "synonyms": "Review Level"
         },
         "Initial_Approval_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date of initial approval",
+          "synonyms": "Approval Date"
         },
         "Expiration_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date approval expires",
+          "synonyms": "Expiry Date"
         },
         "Requirement_Status": {
           "type": "VARCHAR(50)",
@@ -2466,7 +3055,9 @@
             "Terminated",
             "Suspended",
             "Closed"
-          ]
+          ],
+          "description": "Current status (Draft, Submitted, In Review, Approved, Expired, Conditional Approval, Disapproved, Terminated, Suspended, Closed)",
+          "synonyms": "Status"
         },
         "Principal_Investigator_ID": {
           "type": "VARCHAR(50)",
@@ -2477,14 +3068,18 @@
           "references": {
             "table": "Personnel",
             "column": "Personnel_ID"
-          }
+          },
+          "description": "Principal investigator for requirement",
+          "synonyms": "PI"
         },
         "Approval_Body": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Name of approving committee or body",
+          "synonyms": "Committee"
         },
         "Risk_Level": {
           "type": "VARCHAR(20)",
@@ -2496,9 +3091,13 @@
             "Minimal",
             "More than Minimal",
             "High"
-          ]
+          ],
+          "description": "Risk level assessment (Minimal, More than Minimal, High)",
+          "synonyms": "Risk"
         }
-      }
+      },
+      "description": "Regulatory compliance requirements (IRB, IACUC, IBC, COI) for projects",
+      "synonyms": "IRB, IACUC, Compliance, Ethics Approvals"
     },
     "ConflictOfInterest": {
       "columns": {
@@ -2507,7 +3106,9 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": true
+          "auto_increment": true,
+          "description": "Primary key for conflict of interest disclosure",
+          "synonyms": "COI ID"
         },
         "Personnel_ID": {
           "type": "VARCHAR(50)",
@@ -2518,7 +3119,9 @@
           "references": {
             "table": "Personnel",
             "column": "Personnel_ID"
-          }
+          },
+          "description": "Person making disclosure",
+          "synonyms": "Person ID"
         },
         "Project_ID": {
           "type": "VARCHAR(50)",
@@ -2529,7 +3132,9 @@
           "references": {
             "table": "Project",
             "column": "Project_ID"
-          }
+          },
+          "description": "Project disclosure relates to",
+          "synonyms": "Project"
         },
         "Award_ID": {
           "type": "VARCHAR(50)",
@@ -2540,14 +3145,18 @@
           "references": {
             "table": "Award",
             "column": "Award_ID"
-          }
+          },
+          "description": "Award disclosure relates to",
+          "synonyms": "Award"
         },
         "Disclosure_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date disclosure was made",
+          "synonyms": "Date"
         },
         "Relationship_Type_Value_ID": {
           "type": "INT",
@@ -2558,35 +3167,45 @@
           "references": {
             "table": "AllowedValues",
             "column": "Allowed_Value_ID"
-          }
+          },
+          "description": "Type of relationship from AllowedValues (Financial, Consulting, Employment, Equity, Intellectual Property, Board Membership, Family, Other)",
+          "synonyms": "Type"
         },
         "Entity_Name": {
           "type": "VARCHAR(255)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Name of entity involved in potential conflict",
+          "synonyms": "Company, Organization"
         },
         "Financial_Interest_Amount": {
           "type": "DECIMAL(18,2)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Dollar value of financial interest",
+          "synonyms": "Amount"
         },
         "Relationship_Description": {
           "type": "TEXT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Description of relationship and potential conflict",
+          "synonyms": "Description"
         },
         "Management_Plan": {
           "type": "TEXT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Plan for managing identified conflict",
+          "synonyms": "Plan"
         },
         "ConflictOfInterest_Status": {
           "type": "VARCHAR(50)",
@@ -2602,14 +3221,18 @@
             "Unmanageable Conflict",
             "Management Plan Required",
             "Cleared"
-          ]
+          ],
+          "description": "Status (Under Review, No Conflict, Manageable Conflict, Unmanageable Conflict, Management Plan Required, Cleared)",
+          "synonyms": "COI Status, Status"
         },
         "Review_Date": {
           "type": "DATE",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Date disclosure was reviewed",
+          "synonyms": "Review Date"
         },
         "Reviewed_By_Personnel_ID": {
           "type": "VARCHAR(50)",
@@ -2620,9 +3243,13 @@
           "references": {
             "table": "Personnel",
             "column": "Personnel_ID"
-          }
+          },
+          "description": "Person who reviewed disclosure",
+          "synonyms": "Reviewer"
         }
-      }
+      },
+      "description": "Conflict of interest disclosures and management plans for personnel",
+      "synonyms": "COI, Disclosures"
     },
     "Document": {
       "columns": {
@@ -2631,7 +3258,9 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": true
+          "auto_increment": true,
+          "description": "Primary key for document",
+          "synonyms": "Doc ID"
         },
         "Document_Type_Value_ID": {
           "type": "INT",
@@ -2642,7 +3271,9 @@
           "references": {
             "table": "AllowedValues",
             "column": "Allowed_Value_ID"
-          }
+          },
+          "description": "Type of document from AllowedValues (Proposal, Progress Report, Financial Report, Final Report, Closeout Document, Award Notice, Modification, Correspondence, Compliance Approval, Budget, SOW, Contract, Subaward, Invoice, Receipt, Data Submission, Software Release, Publication, Presentation, Other)",
+          "synonyms": "Type"
         },
         "Related_Entity_Type": {
           "type": "VARCHAR(50)",
@@ -2661,49 +3292,63 @@
             "Invoice",
             "AwardDeliverable",
             "ConflictOfInterest"
-          ]
+          ],
+          "description": "Type of entity document is related to (Award, Proposal, Project, ComplianceRequirement, Subaward, Organization, Personnel, Invoice, AwardDeliverable, ConflictOfInterest)",
+          "synonyms": "Entity Type"
         },
         "Related_Entity_ID": {
           "type": "VARCHAR(50)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "ID of related entity",
+          "synonyms": "Entity ID"
         },
         "File_Name": {
           "type": "VARCHAR(255)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Original filename",
+          "synonyms": "Filename"
         },
         "Storage_Location": {
           "type": "VARCHAR(500)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Storage location or path",
+          "synonyms": "Location, Path"
         },
         "File_Size_Bytes": {
           "type": "BIGINT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "File size in bytes",
+          "synonyms": "Size, File Size"
         },
         "MIME_Type": {
           "type": "VARCHAR(255)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "MIME type of document (e.g., application/pdf, image/jpeg)",
+          "synonyms": "Content Type, File Type"
         },
         "File_Hash": {
           "type": "VARCHAR(128)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Cryptographic hash for file integrity verification (SHA-256, SHA-512, etc.)",
+          "synonyms": "Hash, Checksum"
         },
         "Version_Number": {
           "type": "INT",
@@ -2711,16 +3356,22 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": 1
+          "default": 1,
+          "description": "Version number for document versioning",
+          "synonyms": "Version"
         },
         "Description": {
           "type": "TEXT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Description of document contents",
+          "synonyms": "Details"
         }
-      }
+      },
+      "description": "Document management system for proposals, awards, reports, and other files",
+      "synonyms": "Files, Attachments, Documents"
     },
     "ActivityLog": {
       "columns": {
@@ -2729,21 +3380,27 @@
           "primary_key": true,
           "required": false,
           "unique": false,
-          "auto_increment": true
+          "auto_increment": true,
+          "description": "Primary key for activity log entry",
+          "synonyms": "Log ID"
         },
         "Table_Name": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Name of table that was modified",
+          "synonyms": "Table"
         },
         "Record_ID": {
           "type": "VARCHAR(50)",
           "primary_key": false,
           "required": true,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "ID of record that was modified",
+          "synonyms": "Record ID"
         },
         "Action_Type": {
           "type": "VARCHAR(20)",
@@ -2756,7 +3413,9 @@
             "UPDATE",
             "DELETE",
             "SELECT"
-          ]
+          ],
+          "description": "Type of action (INSERT, UPDATE, DELETE, SELECT)",
+          "synonyms": "Action"
         },
         "Action_Timestamp": {
           "type": "TIMESTAMP",
@@ -2764,46 +3423,96 @@
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "default": "CURRENT_TIMESTAMP"
+          "default": "CURRENT_TIMESTAMP",
+          "description": "Date and time action occurred",
+          "synonyms": "Timestamp"
         },
         "User_ID": {
           "type": "VARCHAR(50)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "User who performed action",
+          "synonyms": "User"
         },
         "Old_Values": {
           "type": "TEXT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "JSON of values before change",
+          "synonyms": "Before"
         },
         "New_Values": {
           "type": "TEXT",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "JSON of values after change",
+          "synonyms": "After"
         },
         "IP_Address": {
           "type": "VARCHAR(45)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "IP address of user",
+          "synonyms": "IP",
+          "pii": true
         },
         "Session_ID": {
           "type": "VARCHAR(100)",
           "primary_key": false,
           "required": false,
           "unique": false,
-          "auto_increment": false
+          "auto_increment": false,
+          "description": "Session identifier",
+          "synonyms": "Session"
         }
-      }
+      },
+      "description": "Audit trail of all data changes and user actions in the system",
+      "synonyms": "Audit Log, Change Log, History"
+    }
+  },
+  "views": {
+    "vw_All_ContactDetails": {
+      "sql": "SELECT\n    cd.ContactDetails_ID,\n    'Personnel' AS Entity_Type,\n    cd.Personnel_ID AS Entity_ID,\n    CONCAT(p.First_Name, ' ', p.Last_Name) AS Entity_Name,\n    av.Allowed_Value_Label AS Contact_Type,\n    cd.ContactDetails_Value AS Contact_Value\nFROM ContactDetails cd\nJOIN Personnel p ON cd.Personnel_ID = p.Personnel_ID\nLEFT JOIN AllowedValues av ON cd.AllowedValue_ID = av.Allowed_Value_ID\nWHERE cd.Personnel_ID IS NOT NULL\n\nUNION ALL\n\nSELECT\n    cd.ContactDetails_ID,\n    'Organization' AS Entity_Type,\n    cd.Organization_ID AS Entity_ID,\n    o.Organization_Name AS Entity_Name,\n    av.Allowed_Value_Label AS Contact_Type,\n    cd.ContactDetails_Value AS Contact_Value\nFROM ContactDetails cd\nJOIN Organization o ON cd.Organization_ID = o.Organization_ID\nLEFT JOIN AllowedValues av ON cd.AllowedValue_ID = av.Allowed_Value_ID\nWHERE cd.Organization_ID IS NOT NULL",
+      "description": "Unified view of all contact details from both Personnel and Organizations"
+    },
+    "vw_Active_Awards": {
+      "sql": "SELECT\n    a.Award_ID,\n    a.Award_Number,\n    a.Award_Title,\n    a.Award_Status,\n    a.Current_Total_Funded,\n    a.Original_Start_Date,\n    a.Current_End_Date,\n    o.Organization_Name AS Sponsor_Name,\n    p.Project_Title AS Project_Title,\n    COALESCE(SUM(CASE WHEN t.Transaction_Type = 'Expense' THEN t.Transaction_Amount ELSE 0 END), 0) AS Total_Expenses,\n    COALESCE(SUM(CASE WHEN t.Transaction_Type = 'Encumbrance' THEN t.Transaction_Amount ELSE 0 END), 0) AS Total_Encumbrances,\n    a.Current_Total_Funded -\n        COALESCE(SUM(CASE WHEN t.Transaction_Type IN ('Expense','Encumbrance') THEN t.Transaction_Amount ELSE 0 END), 0) AS Available_Balance,\n    DATEDIFF(a.Current_End_Date, CURRENT_DATE) AS Days_Until_End\nFROM Award a\nLEFT JOIN Organization o ON a.Sponsor_Organization_ID = o.Organization_ID\nLEFT JOIN Project p ON a.Project_ID = p.Project_ID\nLEFT JOIN Transaction t ON a.Award_ID = t.Award_ID\nWHERE a.Award_Status = 'Active'\nGROUP BY a.Award_ID, a.Award_Number, a.Award_Title, a.Award_Status, a.Current_Total_Funded,\n         a.Original_Start_Date, a.Current_End_Date, o.Organization_Name, p.Project_Title",
+      "description": "Summary of active awards with sponsor information, funding, expenses, and available balance"
+    },
+    "vw_Active_Personnel_Roles": {
+      "sql": "SELECT\n    pers.Personnel_ID,\n    pers.First_Name,\n    pers.Last_Name,\n    pers.Primary_Email,\n    pers.Person_Type,\n    proj.Project_ID,\n    proj.Project_Title,\n    proj.Project_Status AS Project_Status,\n    av.Allowed_Value_Label AS Role,\n    pr.Is_Key_Personnel,\n    pr.Start_Date,\n    pr.End_Date,\n    pr.FTE_Percent,\n    a.Award_Number,\n    a.Award_ID,\n    a.Award_Status AS Award_Status\nFROM Personnel pers\nJOIN ProjectRole pr ON pers.Personnel_ID = pr.Personnel_ID\nJOIN Project proj ON pr.Project_ID = proj.Project_ID\nJOIN AllowedValues av ON pr.Role_Value_ID = av.Allowed_Value_ID\nLEFT JOIN Award a ON pr.Funding_Award_ID = a.Award_ID\nWHERE (pr.End_Date IS NULL OR pr.End_Date >= CURRENT_DATE)\n  AND proj.Project_Status IN ('Active','Planning')",
+      "description": "Current personnel roles on active projects with effort and award information"
+    },
+    "vw_Award_Financial_Summary": {
+      "sql": "SELECT\n    a.Award_ID,\n    a.Award_Number,\n    a.Award_Title,\n    a.Current_Total_Funded,\n    bp.Period_Number,\n    bp.Start_Date AS Period_Start,\n    bp.End_Date AS Period_End,\n    bp.Total_Costs AS Period_Budget,\n    COALESCE(SUM(CASE WHEN t.Transaction_Type = 'Expense' THEN t.Transaction_Amount ELSE 0 END), 0) AS Period_Expenses,\n    COALESCE(SUM(CASE WHEN t.Transaction_Type = 'Encumbrance' THEN t.Transaction_Amount ELSE 0 END), 0) AS Period_Encumbrances,\n    bp.Total_Costs -\n        COALESCE(SUM(CASE WHEN t.Transaction_Type IN ('Expense','Encumbrance') THEN t.Transaction_Amount ELSE 0 END), 0) AS Period_Available\nFROM Award a\nLEFT JOIN AwardBudgetPeriod bp ON a.Award_ID = bp.Award_ID\nLEFT JOIN Transaction t ON bp.AwardBudgetPeriod_ID = t.AwardBudgetPeriod_ID\nWHERE a.Award_Status = 'Active'\nGROUP BY a.Award_ID, a.Award_Number, a.Award_Title, a.Current_Total_Funded,\n         bp.Period_Number, bp.Start_Date, bp.End_Date, bp.Total_Costs",
+      "description": "Financial summary by award and budget period showing budgeted vs actual amounts"
+    },
+    "vw_Expiring_Awards": {
+      "sql": "SELECT\n    a.Award_ID,\n    a.Award_Number,\n    a.Award_Title,\n    a.Current_End_Date,\n    DATEDIFF(a.Current_End_Date, CURRENT_DATE) AS Days_Until_Expiration,\n    o.Organization_Name AS Sponsor_Name,\n    CONCAT(pers.First_Name, ' ', pers.Last_Name) AS PI_Name,\n    pers.Primary_Email AS PI_Email\nFROM Award a\nJOIN Organization o ON a.Sponsor_Organization_ID = o.Organization_ID\nLEFT JOIN ProjectRole pr ON a.Award_ID = pr.Funding_Award_ID\nLEFT JOIN AllowedValues av ON pr.Role_Value_ID = av.Allowed_Value_ID\nLEFT JOIN Personnel pers ON pr.Personnel_ID = pers.Personnel_ID\nWHERE a.Award_Status = 'Active'\n  AND a.Current_End_Date BETWEEN CURRENT_DATE AND DATE_ADD(CURRENT_DATE, INTERVAL 90 DAY)\n  AND av.Allowed_Value_Code = 'PI'",
+      "description": "Awards expiring within 90 days with sponsor and PI contact information"
+    },
+    "vw_Overdue_Deliverables": {
+      "sql": "SELECT\n    d.AwardDeliverable_ID,\n    d.Deliverable_Type,\n    d.Due_Date,\n    DATEDIFF(CURRENT_DATE, d.Due_Date) AS Days_Overdue,\n    a.Award_Number,\n    a.Award_Title AS Award_Title,\n    CONCAT(pers.First_Name, ' ', pers.Last_Name) AS Responsible_Person,\n    pers.Primary_Email\nFROM AwardDeliverable d\nJOIN Award a ON d.Award_ID = a.Award_ID\nLEFT JOIN Personnel pers ON d.Responsible_Personnel_ID = pers.Personnel_ID\nWHERE d.Deliverable_Status IN ('Pending','In Progress','Overdue')\n  AND d.Due_Date < CURRENT_DATE\nORDER BY d.Due_Date",
+      "description": "Deliverables past their due date with days overdue and responsible person"
+    },
+    "vw_ComplianceRequirement_Status": {
+      "sql": "SELECT\n    cr.ComplianceRequirement_ID,\n    cr.Requirement_Number,\n    cr.Requirement_Type,\n    cr.Requirement_Title,\n    cr.Requirement_Status,\n    cr.Initial_Approval_Date,\n    cr.Expiration_Date,\n    DATEDIFF(cr.Expiration_Date, CURRENT_DATE) AS Days_Until_Expiration,\n    CONCAT(pers.First_Name, ' ', pers.Last_Name) AS PI_Name,\n    pers.Primary_Email AS PI_Email,\n    proj.Project_Title\nFROM ComplianceRequirement cr\nJOIN Personnel pers ON cr.Principal_Investigator_ID = pers.Personnel_ID\nLEFT JOIN Project proj ON cr.Project_ID = proj.Project_ID\nWHERE cr.Requirement_Status IN ('Approved','Conditional Approval')\n  AND cr.Expiration_Date IS NOT NULL",
+      "description": "Active compliance requirements with expiration tracking and PI information"
+    },
+    "vw_Budget_Comparison": {
+      "sql": "SELECT\n    a.Award_ID,\n    a.Award_Number,\n    bp.Period_Number,\n    bc.Category_Name AS Budget_Category,\n    ab.Line_Item_Description,\n    pb.Total_Cost AS Proposed_Amount,\n    ab.Approved_Total_Cost AS Approved_Amount,\n    ab.Current_Total_Cost AS Current_Budget,\n    COALESCE(SUM(t.Transaction_Amount), 0) AS Actual_Spent,\n    ab.Current_Total_Cost - COALESCE(SUM(t.Transaction_Amount), 0) AS Remaining_Budget,\n    CASE\n        WHEN ab.Approved_Total_Cost IS NOT NULL AND pb.Total_Cost IS NOT NULL\n        THEN ((ab.Approved_Total_Cost - pb.Total_Cost) / pb.Total_Cost * 100)\n        ELSE NULL\n    END AS Percent_Change_From_Proposal\nFROM Award a\nJOIN AwardBudgetPeriod bp ON a.Award_ID = bp.Award_ID\nLEFT JOIN AwardBudget ab ON bp.AwardBudgetPeriod_ID = ab.AwardBudgetPeriod_ID\nLEFT JOIN BudgetCategory bc ON ab.BudgetCategory_ID = bc.BudgetCategory_ID\nLEFT JOIN Proposal p ON a.Proposal_ID = p.Proposal_ID\nLEFT JOIN ProposalBudget pb ON p.Proposal_ID = pb.Proposal_ID\n    AND bp.Period_Number = pb.Period_Number\n    AND ab.BudgetCategory_ID = pb.BudgetCategory_ID\n    AND (ab.Line_Item_Description = pb.Line_Item_Description\n         OR (ab.Line_Item_Description IS NULL AND pb.Line_Item_Description IS NULL))\nLEFT JOIN Transaction t ON ab.Award_ID = t.Award_ID\n    AND ab.AwardBudgetPeriod_ID = t.AwardBudgetPeriod_ID\nWHERE a.Award_Status = 'Active'\nGROUP BY a.Award_ID, a.Award_Number, bp.Period_Number, bc.Category_Name,\n         ab.Line_Item_Description, pb.Total_Cost, ab.Approved_Total_Cost, ab.Current_Total_Cost",
+      "description": "Proposed vs approved vs current vs actual spending by award, period, and category"
     }
   },
   "table_count": 29,
+  "view_count": 8,
   "relationship_count": 72
 }

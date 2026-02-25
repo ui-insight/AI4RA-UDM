@@ -1,11 +1,10 @@
-name: Regenerate schema JSON
+name: Regenerate dashboard data
 
 on:
   push:
     branches: [main]
     paths:
-      - 'udm_schema.sql'
-      - 'udm_data_dictionary_values.sql'
+      - 'udm_schema.json'
 
 jobs:
   regenerate:
@@ -20,17 +19,13 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Regenerate JSON files from SQL sources
-        run: |
-          python scripts/parse_schema.py
-          python scripts/parse_data_dictionary.py
-          python scripts/generate_unified_schema.py
-          cp udm_schema.json docs/data/udm_schema.json
+      - name: Generate dashboard files from udm_schema.json
+        run: python scripts/generate_dashboard_data.py
 
       - name: Commit updated files if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/data/ udm_schema.json
-          git diff --staged --quiet || git commit -m "Auto-regenerate schema JSON from SQL sources"
+          git add docs/data/
+          git diff --staged --quiet || git commit -m "Auto-regenerate dashboard data from udm_schema.json"
           git push
