@@ -358,6 +358,8 @@
 
     <!-- GoJS library for ERD visualization -->
     <script src="https://cdn.jsdelivr.net/npm/gojs@3/release/go.js"></script>
+    <!-- Mermaid for infrastructure diagram -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 </head>
 <body>
     <header>
@@ -372,6 +374,7 @@
             <button class="tab-button" onclick="switchTab('erd')">ERD Visualization</button>
             <button class="tab-button" onclick="switchTab('views')">Example Views</button>
             <button class="tab-button" onclick="switchTab('ontology')">Ontology & Design</button>
+            <button class="tab-button" onclick="switchTab('infrastructure')">Infrastructure</button>
         </div>
     </div>
 
@@ -678,6 +681,12 @@
                     loadERD();
                     window.erdLoaded = true;
                 }
+            }
+
+            // Re-render mermaid if switching to infrastructure tab
+            if (tabName === 'infrastructure' && !window.infrastructureLoaded) {
+                mermaid.run();
+                window.infrastructureLoaded = true;
             }
         }
 
@@ -1494,6 +1503,125 @@ SELECT * FROM DOLT_DIFF('2024-01-01', '2024-06-01', 'Award');
             </div>
         </div>
     </div>
+
+    <!-- Tab: Infrastructure -->
+    <div id="tab-infrastructure" class="tab-content">
+        <div class="container" style="max-width: 1200px;">
+            <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+                <h2 style="color: #2c3e50; margin-bottom: 1rem; font-size: 1.8rem;">Data Pipeline Architecture</h2>
+                <p style="color: #546e7a; margin-bottom: 2rem;">
+                    This diagram shows how data flows from institutional sources through the medallion architecture to the ReactFast application.
+                </p>
+
+                <div class="mermaid" style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+flowchart TB
+    subgraph ReactFast["ReactFast"]
+        subgraph PostAward["PostAward Module"]
+            API[FastAPI Backend]
+            UI[Subaward Page]
+            PDF[Populate Fillable PDF]
+        end
+    end
+
+    subgraph ProxyLayer["Proxy Layer - RBAC/FGAC"]
+        Proxy["Proxy Service<br/>─────────────<br/>• Verify JWT Signature<br/>• Authorize via Mapping<br/>• Rewrite Query<br/>• Forward to Dremio"]
+        Mapping["Mapping Table<br/>─────────────<br/>app_id | public_key<br/>platinum_view<br/>allowed_columns<br/>row_filter"]
+    end
+
+    subgraph Dremio["Dremio CE (Single Service User)"]
+        DC[DremioClient]
+        PV["Platinum.ReactFast.PostAward.*"]
+        Gold["Gold.UDM.* (UNION ALL)"]
+        SilverVERAS["Silver.VERAS.*"]
+        SilverBanner["Silver.Banner.*"]
+        SilverTDX["Silver.TDX.*"]
+    end
+
+    subgraph Bronze["Bronze Layer (MinIO)"]
+        BV_VERAS["MinIO.datalake.data.VERAS.*"]
+        BV_TDX["MinIO.datalake.data.TDX.*"]
+        BV_Banner["MinIO.datalake.data.Banner.*"]
+    end
+
+    subgraph Sources["Institutional Sources"]
+        VERAS[(VERAS Subaward)]
+        Banner[(Ellucian Banner API)]
+        TDX[(TDX App 72 - OSP Tickets)]
+    end
+
+    Airbyte[Airbyte]
+
+    VERAS -->|POST| Airbyte
+    TDX -->|POST| Airbyte
+    Banner -->|GET| Airbyte
+    Airbyte --> BV_VERAS
+    Airbyte --> BV_TDX
+    Airbyte --> BV_Banner
+
+    BV_VERAS --> SilverVERAS
+    BV_TDX --> SilverTDX
+    BV_Banner --> SilverBanner
+
+    SilverVERAS --> Gold
+    SilverTDX --> Gold
+    SilverBanner --> Gold
+    Gold --> PV
+    PV --> DC
+
+    DC -->|"Arrow Flight SQL<br/>(Service Account)"| Proxy
+    Mapping -.->|Configures| Proxy
+    API -->|"GET (Signed JWT)"| Proxy
+    Proxy --> API
+    API -->|JSON| UI
+    UI --> API
+    API --> PDF
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3 style="color: #2c3e50; margin-bottom: 1rem;">Data Flow</h3>
+                    <p style="color: #546e7a; margin-bottom: 1rem;">
+                        <strong>Sources → Bronze (Airbyte) → Silver → Gold → Platinum → Dremio CE → Proxy (JWT Auth) → Backend → Frontend → PDF</strong>
+                    </p>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3 style="color: #2c3e50; margin-bottom: 1rem;">Layer Responsibilities</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px; border-left: 4px solid #667eea;">
+                            <h4 style="color: #2c3e50; margin-bottom: 0.5rem;">Proxy Layer</h4>
+                            <p style="color: #546e7a; font-size: 0.9rem;">Authenticates apps via signed JWTs, authorizes queries against mapping table, enforces view/column/row restrictions (provides RBAC/FGAC for Dremio CE)</p>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px; border-left: 4px solid #764ba2;">
+                            <h4 style="color: #2c3e50; margin-bottom: 0.5rem;">Platinum</h4>
+                            <p style="color: #546e7a; font-size: 0.9rem;">App-specific views exposing only authorized data</p>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px; border-left: 4px solid #4A90E2;">
+                            <h4 style="color: #2c3e50; margin-bottom: 0.5rem;">Gold</h4>
+                            <p style="color: #546e7a; font-size: 0.9rem;">Union all sources into unified UDM tables</p>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px; border-left: 4px solid #7ED321;">
+                            <h4 style="color: #2c3e50; margin-bottom: 0.5rem;">Silver</h4>
+                            <p style="color: #546e7a; font-size: 0.9rem;">Standardize column names to UDM schema (per source)</p>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 6px; border-left: 4px solid #F5A623;">
+                            <h4 style="color: #2c3e50; margin-bottom: 0.5rem;">Bronze</h4>
+                            <p style="color: #546e7a; font-size: 0.9rem;">Raw data synced via Airbyte to MinIO (VERAS, TDX, Banner)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3 style="color: #2c3e50; margin-bottom: 1rem;">Data Access Patterns</h3>
+                    <p style="color: #546e7a;"><strong>VERAS/TDX/Banner:</strong> Batch sync via Airbyte → MinIO parquet files (Bronze)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize mermaid
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
 
 </body>
 </html>
