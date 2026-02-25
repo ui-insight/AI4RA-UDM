@@ -391,28 +391,6 @@ User_ID, Activity_Timestamp, Activity_Description
             <p><strong>Note:</strong> While domain-adjacent, this is structural because it standardizes budget categories across institutions rather than representing institution-specific data.</p>
         </div>
 
-        <!-- Dolt Integration -->
-        <div class="section">
-            <h2>Dolt Version Control Integration</h2>
-            <p>The UDM is designed to work with Dolt, a version-controlled SQL database.</p>
-
-            <h3>Design Implications</h3>
-            <ul class="convention-list">
-                <li><strong>No Date_Created/Date_Modified:</strong> Dolt's commit history provides complete audit trail</li>
-                <li><strong>No Is_Current_Version:</strong> Dolt handles versioning natively via branches and commits</li>
-                <li><strong>Branch-based workflows:</strong> Different versions of data can coexist in branches</li>
-                <li><strong>Temporal queries:</strong> Historical data accessible via <code>AS OF</code> queries</li>
-            </ul>
-
-            <div class="example">
--- Query data as of a specific date
-SELECT * FROM Award AS OF '2024-01-01';
-
--- Compare versions between dates
-SELECT * FROM DOLT_DIFF('2024-01-01', '2024-06-01', 'Award');
-            </div>
-        </div>
-
         <!-- Referential Integrity -->
         <div class="section">
             <h2>Referential Integrity</h2>
