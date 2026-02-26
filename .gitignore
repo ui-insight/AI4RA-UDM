@@ -1,3 +1,6 @@
+# Dependencies
+node_modules/
+
 # Dolt database directory
 AI4RA-UDM/
 dolt_db/
