@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import Header from './components/Header';
 import TabBar from './components/TabBar';
+import HomeTab from './components/Home/HomeTab';
 import DataDictionaryTab from './components/DataDictionary/DataDictionaryTab';
+import TablesTab from './components/Tables/TablesTab';
 import ERDTab from './components/ERD/ERDTab';
 import ExampleViewsTab from './components/ExampleViews/ExampleViewsTab';
 import OntologyTab from './components/Ontology/OntologyTab';
@@ -10,7 +12,7 @@ import { useSchemaData } from './hooks/useSchemaData';
 import type { TabName } from './types';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<TabName>('dictionary');
+  const [activeTab, setActiveTab] = useState<TabName>('home');
   const { dataDictionary, relationships, reverseRelationships, loading, error } = useSchemaData();
 
   if (error) {
@@ -28,6 +30,12 @@ export default function App() {
     <>
       <Header />
       <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
+      <div style={{ display: activeTab === 'home' ? 'block' : 'none' }}>
+        {dataDictionary && (
+          <HomeTab dataDictionary={dataDictionary} relationships={relationships} />
+        )}
+        {loading && <div style={{ textAlign: 'center', padding: '3rem', color: '#95a5a6' }}>Loading...</div>}
+      </div>
       <div style={{ display: activeTab === 'dictionary' ? 'block' : 'none' }}>
         {dataDictionary && (
           <DataDictionaryTab
@@ -36,7 +44,15 @@ export default function App() {
             reverseRelationships={reverseRelationships}
           />
         )}
-        {loading && <div style={{ textAlign: 'center', padding: '3rem', color: '#95a5a6' }}>Loading...</div>}
+      </div>
+      <div style={{ display: activeTab === 'tables' ? 'block' : 'none' }}>
+        {dataDictionary && (
+          <TablesTab
+            dataDictionary={dataDictionary}
+            relationships={relationships}
+            reverseRelationships={reverseRelationships}
+          />
+        )}
       </div>
       {activeTab === 'erd' && dataDictionary && (
         <ERDTab

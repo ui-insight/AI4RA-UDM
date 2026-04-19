@@ -31,4 +31,11 @@ export interface RelationshipsData {
 
 export type HighlightState = 'none' | 'selected' | 'parent' | 'child' | 'dim';
 
-export type TabName = 'dictionary' | 'erd' | 'views' | 'ontology' | 'infrastructure';
+export type TabName =
+  | 'home'
+  | 'dictionary'
+  | 'tables'
+  | 'erd'
+  | 'views'
+  | 'ontology'
+  | 'infrastructure';
