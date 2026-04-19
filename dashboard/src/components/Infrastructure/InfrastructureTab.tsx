@@ -8,15 +8,19 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import InfraNode from './InfraNode';
+import LabeledGroupNode from './LabeledGroupNode';
 
-const nodeTypes = { infra: InfraNode };
+const nodeTypes = { infra: InfraNode, labeledGroup: LabeledGroupNode };
 
+// Medallion palette aligned with the data-lakehouse shipyard docs.html palette:
+// bronze #d97706, silver #64748b, gold #ca8a04, platinum #7c3aed.
 const colors = {
-  sources: '#e74c3c',
-  bronze: '#F5A623',
-  silver: '#7ED321',
-  gold: '#4A90E2',
-  apps: '#764ba2',
+  sources: '#475569',
+  bronze: '#d97706',
+  silver: '#64748b',
+  gold: '#ca8a04',
+  platinum: '#7c3aed',
+  apps: '#0ea5e9',
   udm: '#667eea',
 };
 
@@ -33,51 +37,48 @@ function makeNode(id: string, label: string, sub: string, x: number, y: number, 
 function makeGroup(id: string, label: string, x: number, y: number, w: number, h: number, color: string): Node {
   return {
     id,
-    type: 'group',
-    data: { label },
+    type: 'labeledGroup',
+    data: { label, color },
     position: { x, y },
-    style: {
-      width: w,
-      height: h,
-      background: `${color}10`,
-      border: `1.5px dashed ${color}`,
-      borderRadius: 8,
-      fontSize: 12,
-      fontWeight: 700,
-      color: '#546e7a',
-    },
+    style: { width: w, height: h },
   };
 }
 
 function buildMedallionDiagram(): { nodes: Node[]; edges: Edge[] } {
-  const gw = 200;
+  const gw = 170;
   const gh = 280;
-  const gap = 40;
+  const gap = 30;
+  const colX = (i: number) => i * (gw + gap);
 
   const nodes: Node[] = [
-    makeGroup('g_sources', 'Sources', 0, 0, gw, gh, '#95a5a6'),
-    makeGroup('g_bronze', 'Bronze', gw + gap, 0, gw, gh, colors.bronze),
-    makeGroup('g_silver', 'Silver', 2 * (gw + gap), 0, gw, gh, colors.silver),
-    makeGroup('g_gold', 'Gold — UDM', 3 * (gw + gap), 0, gw, gh, colors.gold),
-    makeGroup('g_apps', 'Applications', 4 * (gw + gap), 0, gw, gh, colors.apps),
+    makeGroup('g_sources', 'Sources', colX(0), 0, gw, gh, colors.sources),
+    makeGroup('g_bronze', 'Bronze', colX(1), 0, gw, gh, colors.bronze),
+    makeGroup('g_silver', 'Silver', colX(2), 0, gw, gh, colors.silver),
+    makeGroup('g_gold', 'Gold — UDM', colX(3), 0, gw, gh, colors.gold),
+    makeGroup('g_platinum', 'Platinum', colX(4), 0, gw, gh, colors.platinum),
+    makeGroup('g_apps', 'Applications', colX(5), 0, gw, gh, colors.apps),
 
-    makeNode('s1', 'Grants System', '', 20, 40, colors.sources, 'g_sources'),
-    makeNode('s2', 'Finance / ERP', '', 20, 110, colors.sources, 'g_sources'),
-    makeNode('s3', 'HR System', '', 20, 180, colors.sources, 'g_sources'),
+    makeNode('s1', 'Grants System', '', 15, 40, colors.sources, 'g_sources'),
+    makeNode('s2', 'Finance / ERP', '', 15, 110, colors.sources, 'g_sources'),
+    makeNode('s3', 'HR System', '', 15, 180, colors.sources, 'g_sources'),
 
-    makeNode('b1', 'Raw Grants', '', 20, 40, colors.bronze, 'g_bronze'),
-    makeNode('b2', 'Raw Finance', '', 20, 110, colors.bronze, 'g_bronze'),
-    makeNode('b3', 'Raw HR', '', 20, 180, colors.bronze, 'g_bronze'),
+    makeNode('b1', 'Raw Grants', '', 15, 40, colors.bronze, 'g_bronze'),
+    makeNode('b2', 'Raw Finance', '', 15, 110, colors.bronze, 'g_bronze'),
+    makeNode('b3', 'Raw HR', '', 15, 180, colors.bronze, 'g_bronze'),
 
-    makeNode('sv1', 'Award, Proposal', 'mapped to UDM', 20, 40, colors.silver, 'g_silver'),
-    makeNode('sv2', 'Transaction, Fund', 'mapped to UDM', 20, 110, colors.silver, 'g_silver'),
-    makeNode('sv3', 'Personnel, Effort', 'mapped to UDM', 20, 180, colors.silver, 'g_silver'),
+    makeNode('sv1', 'Award, Proposal', 'mapped to UDM', 15, 40, colors.silver, 'g_silver'),
+    makeNode('sv2', 'Transaction, Fund', 'mapped to UDM', 15, 110, colors.silver, 'g_silver'),
+    makeNode('sv3', 'Personnel, Effort', 'mapped to UDM', 15, 180, colors.silver, 'g_silver'),
 
-    makeNode('gold', 'Unified UDM', 'UNION ALL', 20, 110, colors.gold, 'g_gold'),
+    makeNode('gold', 'Unified UDM', 'UNION ALL', 15, 110, colors.gold, 'g_gold'),
 
-    makeNode('a1', 'Dashboards', '', 20, 40, colors.apps, 'g_apps'),
-    makeNode('a2', 'Reports', '', 20, 110, colors.apps, 'g_apps'),
-    makeNode('a3', 'Analytics / AI', '', 20, 180, colors.apps, 'g_apps'),
+    makeNode('p1', 'Exec Dashboard View', 'joined / filtered', 15, 40, colors.platinum, 'g_platinum'),
+    makeNode('p2', 'PI Portal View', 'joined / filtered', 15, 110, colors.platinum, 'g_platinum'),
+    makeNode('p3', 'Compliance View', 'joined / filtered', 15, 180, colors.platinum, 'g_platinum'),
+
+    makeNode('a1', 'Dashboards', '', 15, 40, colors.apps, 'g_apps'),
+    makeNode('a2', 'Reports', '', 15, 110, colors.apps, 'g_apps'),
+    makeNode('a3', 'Analytics / AI', '', 15, 180, colors.apps, 'g_apps'),
   ];
 
   const edgeStyle = { stroke: '#95a5a6', strokeWidth: 2 };
@@ -93,9 +94,12 @@ function buildMedallionDiagram(): { nodes: Node[]; edges: Edge[] } {
     { id: 'e7', source: 'sv1', target: 'gold', style: edgeStyle, markerEnd: marker },
     { id: 'e8', source: 'sv2', target: 'gold', style: edgeStyle, markerEnd: marker },
     { id: 'e9', source: 'sv3', target: 'gold', style: edgeStyle, markerEnd: marker },
-    { id: 'e10', source: 'gold', target: 'a1', style: edgeStyle, markerEnd: marker },
-    { id: 'e11', source: 'gold', target: 'a2', style: edgeStyle, markerEnd: marker },
-    { id: 'e12', source: 'gold', target: 'a3', style: edgeStyle, markerEnd: marker },
+    { id: 'e10', source: 'gold', target: 'p1', style: edgeStyle, markerEnd: marker },
+    { id: 'e11', source: 'gold', target: 'p2', style: edgeStyle, markerEnd: marker },
+    { id: 'e12', source: 'gold', target: 'p3', style: edgeStyle, markerEnd: marker },
+    { id: 'e13', source: 'p1', target: 'a1', style: edgeStyle, markerEnd: marker },
+    { id: 'e14', source: 'p2', target: 'a2', style: edgeStyle, markerEnd: marker },
+    { id: 'e15', source: 'p3', target: 'a3', style: edgeStyle, markerEnd: marker },
   ];
 
   return { nodes, edges };
@@ -143,9 +147,11 @@ export default function InfrastructureTab() {
           Medallion Architecture
         </h3>
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
-          The most common pattern uses a medallion (Bronze/Silver/Gold) architecture. Institutional source
-          systems feed raw data into a Bronze layer. The Silver layer maps each source's fields to UDM column
-          names. The Gold layer unions Silver tables across sources into unified UDM tables that any application can query.
+          The most common pattern uses a medallion (Bronze/Silver/Gold/Platinum) architecture. Institutional
+          source systems feed raw data into a Bronze layer. The Silver layer maps each source's fields to UDM
+          column names. The Gold layer unions Silver tables across sources into unified UDM tables. The
+          Platinum layer provides application-specific views — joins, filters, and aggregations built on Gold —
+          that any application can query.
         </p>
 
         <div style={{ background: '#f8f9fa', borderRadius: 8, height: 340 }}>
@@ -183,13 +189,15 @@ export default function InfrastructureTab() {
 
         <div style={{ marginTop: '2rem' }}>
           <h3 style={{ color: '#2c3e50', marginBottom: '1rem', fontSize: '1.3rem' }}>Layer Responsibilities</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '1rem' }}>
             <LayerCard title="Bronze" color={colors.bronze}
               desc="Raw data extracted from source systems, preserved as-is for auditability. No transformations." />
             <LayerCard title="Silver" color={colors.silver}
               desc="Source-specific views that map local field names to UDM column names. One Silver schema per source system. This is where the UDM mapping happens." />
             <LayerCard title="Gold" color={colors.gold}
               desc="Unified UDM tables that combine Silver views across all sources via UNION ALL. Applications query Gold tables without knowing which source system the data came from." />
+            <LayerCard title="Platinum" color={colors.platinum}
+              desc="Application-specific views built on Gold (or Silver when a single definitive source exists). Joins, filters, and aggregations tailored to a specific dashboard, report, or downstream app." />
           </div>
         </div>
       </div>
@@ -237,13 +245,15 @@ export default function InfrastructureTab() {
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
           The UDM is technology-agnostic. Here are common choices for each layer:
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '1rem' }}>
           <LayerCard title="Ingestion" color={colors.bronze}
             desc="Airbyte, Fivetran, custom scripts, API connectors, flat file imports" />
           <LayerCard title="Storage" color={colors.silver}
             desc="MinIO/S3, PostgreSQL, MySQL, SQLite, Snowflake, BigQuery, Parquet files" />
           <LayerCard title="Query Engine" color={colors.gold}
             desc="Dremio, DuckDB, Trino, Spark SQL, native database SQL, MongoDB aggregation" />
+          <LayerCard title="App Views" color={colors.platinum}
+            desc="Platinum views tailored per app — SQL views, dbt models, materialized views, or semantic layers" />
           <LayerCard title="Applications" color={colors.apps}
             desc="Tableau, Power BI, custom dashboards, LLM integrations, REST APIs" />
         </div>
