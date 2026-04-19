@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+title: AI4RA Unified Data Model (UDM)
+message: >-
+  If you use this work, in whole or in part, please cite it as below.
+  Attribution is required by the license (GPL-3.0 with §7(b) additional
+  term; see LICENSE).
+type: dataset
+authors:
+  - family-names: Layman
+    given-names: Nathan
+repository-code: https://github.com/ui-insight/AI4RA-UDM
+url: https://ui-insight.github.io/AI4RA-UDM/
+identifiers:
+  - type: url
+    value: https://www.dolthub.com/repositories/n8layman/AI4RA-UDM
+    description: Canonical schema hosted on DoltHub
+abstract: >-
+  A canonical schema for research administration covering pre-award
+  proposal preparation, sponsor submission, post-award management,
+  financial accounting, personnel effort, compliance, and operational
+  systems. The UDM is a specification — institutions implement it in
+  whatever database technology fits their environment — and is published
+  as machine-readable JSON to support direct integration, ERD generation,
+  and schema-aware tooling.
+keywords:
+  - research administration
+  - data model
+  - schema
+  - grants management
+  - pre-award
+  - post-award
+  - medallion architecture
+  - lakehouse
+license: GPL-3.0-or-later
