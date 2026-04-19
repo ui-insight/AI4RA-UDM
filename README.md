@@ -21,16 +21,19 @@ The complete UDM is defined in a single file: [`udm_schema.json`](udm_schema.jso
 
 ### Domain Organization
 
-The model's 29 tables are organized across the major domains of research administration:
+The model's 40 tables are organized across the major domains of research administration:
 
 | Domain | Tables | Purpose |
 |--------|--------|---------|
 | **Reference** | Organization, AllowedValues, BudgetCategory | Shared lookup and reference data |
 | **Core** | Personnel, ContactDetails, Project | People, contact info, and research projects |
-| **Pre-Award** | RFA, Proposal, ProposalBudget | Funding opportunities and proposal development |
+| **Pre-Award** | RFA, RFARequirement, Proposal, ProposalBudget, ProposalChecklistItem | Funding opportunities, requirements tracking, proposal development, and per-proposal preparation checklists |
+| **Submission** | SubmissionProfile, SubmissionPackage, SubmissionAttachment, SubmissionAttempt, SubmissionEvent | Sponsor-system submission packaging, transmission, and audit trail |
 | **Post-Award** | Award, Modification, Terms, AwardBudgetPeriod, AwardBudget, Subaward, CostShare, AwardDeliverable | Grant/contract management after funding |
-| **Financial** | Fund, Account, FinanceCode, ActivityCode, Transaction, IndirectRate, Invoice | Accounting, transactions, and cost tracking |
+| **Financial** | Fund, Account, FinanceCode, Transaction, IndirectRate, Invoice | Accounting, transactions, and cost tracking |
 | **Personnel & Effort** | ProjectRole, Effort | Roles on projects and effort certification |
+| **Faculty Development** | ProjectCohort, CohortParticipation | Cohort programs, mentoring, and participant tracking |
+| **Operations** | ApplicationSystem, ServiceRequest | System catalog and service request tracking |
 | **Compliance** | ComplianceRequirement, ConflictOfInterest | IRB, IACUC, COI, and regulatory tracking |
 | **System** | Document, ActivityLog | Document management and audit trails |
 
@@ -95,9 +98,9 @@ The `udm_schema.json` structure:
       "sql": "SELECT ..."
     }
   },
-  "table_count": 29,
+  "table_count": 40,
   "view_count": 8,
-  "relationship_count": 72
+  "relationship_count": 100
 }
 ```
 
@@ -170,61 +173,82 @@ When `udm_schema.json` is updated on `main`, CI automatically regenerates the da
 graph TD
 
     Account-->Account
-    AllowedValues-->AllowedValues
-    Organization-->Award
-    Project-->Award
-    Proposal-->Award
-    RFA-->Award
+    Account-->Transaction
+    AllowedValues-->AwardDeliverable
+    AllowedValues-->ConflictOfInterest
+    AllowedValues-->ContactDetails
+    AllowedValues-->Document
+    AllowedValues-->FinanceCode
+    AllowedValues-->Fund
+    AllowedValues-->Modification
+    AllowedValues-->Project
+    AllowedValues-->ProjectRole
+    AllowedValues-->Transaction
+    ApplicationSystem-->ServiceRequest
     Award-->AwardBudget
-    AwardBudgetPeriod-->AwardBudget
     Award-->AwardBudgetPeriod
     Award-->AwardDeliverable
-    AwardBudgetPeriod-->AwardDeliverable
-    Personnel-->AwardDeliverable
-    Personnel-->ComplianceRequirement
-    Project-->ComplianceRequirement
     Award-->ConflictOfInterest
-    Personnel-->ConflictOfInterest
-    Project-->ConflictOfInterest
-    AllowedValues-->Contact
-    Personnel-->Contact
     Award-->CostShare
-    Organization-->CostShare
-    Personnel-->Document
-    Personnel-->Effort
-    ProjectRole-->Effort
     Award-->FinanceCode
+    Award-->Invoice
+    Award-->Modification
+    Award-->ProjectRole
+    Award-->ServiceRequest
+    Award-->Subaward
+    Award-->Terms
+    Award-->Transaction
+    AwardBudgetPeriod-->AwardBudget
+    AwardBudgetPeriod-->AwardDeliverable
+    AwardBudgetPeriod-->Invoice
+    AwardBudgetPeriod-->Transaction
+    BudgetCategory-->AwardBudget
+    BudgetCategory-->ProposalBudget
+    FinanceCode-->Transaction
+    Fund-->Transaction
+    IndirectRate-->ProposalBudget
+    Organization-->ApplicationSystem
+    Organization-->Award
+    Organization-->ContactDetails
+    Organization-->CostShare
     Organization-->FinanceCode
-    AllowedValues-->Fund
     Organization-->Fund
     Organization-->IndirectRate
-    Award-->Invoice
-    AwardBudgetPeriod-->Invoice
-    Personnel-->Modification
-    Award-->Modification
     Organization-->Organization
     Organization-->Personnel
     Organization-->Project
-    Project-->Project
-    Award-->ProjectRole
-    Personnel-->ProjectRole
-    Project-->ProjectRole
-    AllowedValues-->ProjectRole
-    Project-->Proposal
-    RFA-->Proposal
     Organization-->Proposal
-    Proposal-->ProposalBudget
     Organization-->RFA
-    Award-->Subaward
     Organization-->Subaward
-    Award-->Terms
-    Account-->Transaction
-    ActivityCode-->Transaction
-    Award-->Transaction
-    FinanceCode-->Transaction
-    Fund-->Transaction
-    AwardBudgetPeriod-->Transaction
+    Personnel-->AwardDeliverable
+    Personnel-->CohortParticipation
+    Personnel-->ComplianceRequirement
+    Personnel-->ConflictOfInterest
+    Personnel-->ContactDetails
+    Personnel-->Effort
+    Personnel-->Modification
+    Personnel-->ProjectRole
+    Personnel-->ServiceRequest
+    Personnel-->Subaward
     Personnel-->Transaction
+    Project-->Award
+    Project-->CohortParticipation
+    Project-->ComplianceRequirement
+    Project-->ConflictOfInterest
+    Project-->Project
+    Project-->ProjectCohort
+    Project-->ProjectRole
+    Project-->Proposal
     Project-->Transaction
+    ProjectCohort-->CohortParticipation
+    ProjectRole-->Effort
+    Proposal-->Award
+    Proposal-->CohortParticipation
+    Proposal-->Proposal
+    Proposal-->ProposalBudget
+    Proposal-->ServiceRequest
+    RFA-->Award
+    RFA-->Proposal
+    RFA-->RFARequirement
 ```
 <!-- ERD_END -->

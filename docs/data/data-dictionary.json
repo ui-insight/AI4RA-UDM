@@ -123,6 +123,12 @@
           "pii": true
         },
         {
+          "name": "Honorific",
+          "description": "Honorific or title prefix (Dr., Prof., Rev., Mr., Ms.)",
+          "synonyms": "Title, Prefix",
+          "pii": false
+        },
+        {
           "name": "First_Name",
           "description": "First name of individual",
           "synonyms": "Given Name, Forename",
@@ -133,6 +139,12 @@
           "description": "Last name of individual",
           "synonyms": "Surname, Family Name",
           "pii": true
+        },
+        {
+          "name": "Name_Suffix",
+          "description": "Name suffix (Jr., III, PhD, MD)",
+          "synonyms": "Suffix",
+          "pii": false
         },
         {
           "name": "Middle_Name",
@@ -377,6 +389,66 @@
           "description": "Catalog of Federal Domestic Assistance number",
           "synonyms": "CFDA, Assistance Listing Number",
           "pii": false
+        },
+        {
+          "name": "Submission_Deadline",
+          "description": "Primary submission deadline for the opportunity",
+          "synonyms": "Deadline, Due Date",
+          "pii": false
+        },
+        {
+          "name": "LOI_Deadline",
+          "description": "Letter of intent deadline",
+          "synonyms": "LOI Due Date",
+          "pii": false
+        },
+        {
+          "name": "Preproposal_Deadline",
+          "description": "Pre-proposal or preliminary deadline",
+          "synonyms": "Preliminary Deadline",
+          "pii": false
+        },
+        {
+          "name": "Announcement_Date",
+          "description": "Date the RFA was published",
+          "synonyms": "Published Date, Release Date",
+          "pii": false
+        },
+        {
+          "name": "Funding_Floor",
+          "description": "Minimum award amount",
+          "synonyms": "Min Award, Floor",
+          "pii": false
+        },
+        {
+          "name": "Funding_Ceiling",
+          "description": "Maximum award amount per year",
+          "synonyms": "Max Award, Ceiling",
+          "pii": false
+        },
+        {
+          "name": "Expected_Awards",
+          "description": "Number of awards expected to be made",
+          "synonyms": "Award Count",
+          "pii": false
+        },
+        {
+          "name": "Max_Duration_Months",
+          "description": "Maximum project duration in months",
+          "synonyms": "Duration, Project Length",
+          "pii": false
+        },
+        {
+          "name": "Submission_Method",
+          "description": "Sponsor portal or mechanism used for submission (Research.gov, eRA Commons, Grants.gov, etc.)",
+          "synonyms": "Portal, Submission System",
+          "pii": false
+        },
+        {
+          "name": "RFA_Status",
+          "description": "Lifecycle status of the opportunity",
+          "synonyms": "Status",
+          "pii": false
         }
       ]
     },
@@ -509,6 +581,12 @@
           "name": "PAF_Routing_Status",
           "description": "Proposal approval form routing status",
           "synonyms": "Routing Status, Workflow Status",
+          "pii": false
+        },
+        {
+          "name": "Risk_Level",
+          "description": "Risk assessment level (Low, Medium, High)",
+          "synonyms": "Risk",
           "pii": false
         }
       ]
@@ -703,6 +781,12 @@
           "name": "Flow_Through_Indicator",
           "description": "Flag indicating if this is a flow-through award",
           "synonyms": "Flow Through, Pass Through",
+          "pii": false
+        },
+        {
+          "name": "Risk_Level",
+          "description": "Risk assessment level (Low, Medium, High)",
+          "synonyms": "Risk",
           "pii": false
         }
       ]
@@ -1089,10 +1173,10 @@
           "pii": false
         },
         {
-          "name": "PI_Name",
-          "description": "Name of principal investigator at subrecipient institution",
-          "synonyms": "Subrecipient PI",
-          "pii": true
+          "name": "PI_Personnel_ID",
+          "description": "Principal investigator at subrecipient institution",
+          "synonyms": "Subrecipient PI, Sub PI ID",
+          "pii": false
         },
         {
           "name": "Monitoring_Plan",
@@ -2038,7 +2122,762 @@
           "pii": false
         }
       ]
+    },
+    "ApplicationSystem": {
+      "name": "ApplicationSystem",
+      "description": "Catalog of operational systems, portals, and tools used in research administration workflows",
+      "synonyms": "System, Application, Platform, Tool",
+      "columns": [
+        {
+          "name": "ApplicationSystem_ID",
+          "description": "Primary key for application system",
+          "synonyms": "System ID",
+          "pii": false
+        },
+        {
+          "name": "System_Name",
+          "description": "Name of the application or system",
+          "synonyms": "Name, App Name",
+          "pii": false
+        },
+        {
+          "name": "System_Type",
+          "description": "Type of system (Research Admin, ERP, Sponsor Portal, Ticketing, Reference Tool, Reporting, Other)",
+          "synonyms": "Type",
+          "pii": false
+        },
+        {
+          "name": "Vendor_Name",
+          "description": "Vendor or provider of the system",
+          "synonyms": "Vendor, Provider",
+          "pii": false
+        },
+        {
+          "name": "Owning_Organization_ID",
+          "description": "Organization that owns or administers this system",
+          "synonyms": "Owner Org",
+          "pii": false
+        },
+        {
+          "name": "Primary_URL",
+          "description": "Primary URL or endpoint for the system",
+          "synonyms": "URL, Link",
+          "pii": false
+        },
+        {
+          "name": "Description",
+          "description": "Description of the system and its role in research administration",
+          "synonyms": "Details",
+          "pii": false
+        },
+        {
+          "name": "Is_Active",
+          "description": "Whether the system is currently in use",
+          "synonyms": "Active",
+          "pii": false
+        }
+      ]
+    },
+    "ServiceRequest": {
+      "name": "ServiceRequest",
+      "description": "Service requests and tickets from institutional ticketing systems (TDX, ServiceNow, Jira) related to research administration operations",
+      "synonyms": "Ticket, Work Request, Service Ticket",
+      "columns": [
+        {
+          "name": "ServiceRequest_ID",
+          "description": "Primary key for service request",
+          "synonyms": "Request ID, Ticket ID",
+          "pii": false
+        },
+        {
+          "name": "ServiceRequest_Title",
+          "description": "Title or subject of the service request",
+          "synonyms": "Title, Subject",
+          "pii": false
+        },
+        {
+          "name": "ServiceRequest_Description",
+          "description": "Detailed description of the request",
+          "synonyms": "Description, Details",
+          "pii": false
+        },
+        {
+          "name": "Request_Type",
+          "description": "Type of request (e.g., Subaward Request, Budget Transfer, Account Setup)",
+          "synonyms": "Type, Category",
+          "pii": false
+        },
+        {
+          "name": "Request_Status",
+          "description": "Current status of the request",
+          "synonyms": "Status",
+          "pii": false
+        },
+        {
+          "name": "Request_Priority",
+          "description": "Priority level of the request",
+          "synonyms": "Priority",
+          "pii": false
+        },
+        {
+          "name": "Requestor_Personnel_ID",
+          "description": "Person who submitted the request",
+          "synonyms": "Requestor, Submitted By",
+          "pii": false
+        },
+        {
+          "name": "Assigned_Personnel_ID",
+          "description": "Person assigned to handle the request",
+          "synonyms": "Assignee, Responsible Person",
+          "pii": false
+        },
+        {
+          "name": "Assigned_Group",
+          "description": "Team or group responsible for the request",
+          "synonyms": "Team, Group",
+          "pii": false
+        },
+        {
+          "name": "ApplicationSystem_ID",
+          "description": "System where the request originated or is tracked",
+          "synonyms": "Source System",
+          "pii": false
+        },
+        {
+          "name": "Related_Award_ID",
+          "description": "Award related to this request, if applicable",
+          "synonyms": "Award",
+          "pii": false
+        },
+        {
+          "name": "Related_Proposal_ID",
+          "description": "Proposal related to this request, if applicable",
+          "synonyms": "Proposal",
+          "pii": false
+        },
+        {
+          "name": "Created_Date",
+          "description": "Date and time the request was created",
+          "synonyms": "Created, Opened",
+          "pii": false
+        },
+        {
+          "name": "Resolved_Date",
+          "description": "Date and time the request was resolved",
+          "synonyms": "Resolved, Completed",
+          "pii": false
+        },
+        {
+          "name": "Modified_Date",
+          "description": "Date and time the request was last modified",
+          "synonyms": "Updated, Last Modified",
+          "pii": false
+        }
+      ]
+    },
+    "RFARequirement": {
+      "name": "RFARequirement",
+      "description": "Specific requirements extracted from funding opportunity announcements (FOA/RFA) for compliance tracking during proposal development and post-award management",
+      "synonyms": "FOA Requirement, Solicitation Requirement",
+      "columns": [
+        {
+          "name": "RFARequirement_ID",
+          "description": "Primary key for RFA requirement",
+          "synonyms": "Requirement ID",
+          "pii": false
+        },
+        {
+          "name": "RFA_ID",
+          "description": "Funding opportunity this requirement belongs to",
+          "synonyms": "RFA, Opportunity",
+          "pii": false
+        },
+        {
+          "name": "Requirement_Text",
+          "description": "Text of the specific requirement from the funding announcement",
+          "synonyms": "Requirement, Text",
+          "pii": false
+        },
+        {
+          "name": "Requirement_Category",
+          "description": "Category of requirement. Expanded vocabulary covers documents, formatting, eligibility, review criteria, budget constraints, submission mechanics, deadlines, compliance, and solicitation-specific deviations from the sponsor's parent guide.",
+          "synonyms": "Category, Type",
+          "pii": false
+        },
+        {
+          "name": "Page_Reference",
+          "description": "Page number or section reference in the FOA document",
+          "synonyms": "Page, Section",
+          "pii": false
+        },
+        {
+          "name": "Is_Mandatory",
+          "description": "Whether this requirement is mandatory or recommended",
+          "synonyms": "Mandatory, Required",
+          "pii": false
+        },
+        {
+          "name": "Compliance_Status",
+          "description": "Legacy per-proposal compliance status. New integrations should track per-proposal state in ProposalChecklistItem; this field is retained for backwards compatibility with earlier UDM consumers.",
+          "synonyms": "Status",
+          "pii": false
+        },
+        {
+          "name": "Notes",
+          "description": "Legacy notes on compliance with this requirement. New integrations should use ProposalChecklistItem.Notes for per-proposal commentary.",
+          "synonyms": "Comments",
+          "pii": false
+        },
+        {
+          "name": "Requirement_Code",
+          "description": "Machine-readable short code identifying the requirement within its category",
+          "synonyms": "Code",
+          "pii": false
+        },
+        {
+          "name": "Format_Spec",
+          "description": "Formatting specification for document or formatting requirements",
+          "synonyms": "Formatting, Format Details",
+          "pii": false
+        },
+        {
+          "name": "Sort_Order",
+          "description": "Display order within category",
+          "synonyms": "Order",
+          "pii": false
+        },
+        {
+          "name": "Source_Section",
+          "description": "Origin section in the source document, or structured vocabulary (sponsor_default, rfa_specific) for AI-generated document requirements",
+          "synonyms": "Source, Origin",
+          "pii": false
+        },
+        {
+          "name": "Structured_Rule_Type",
+          "description": "Normalized sponsor-eligibility rule type for machine-checkable ELIGIBILITY requirements (e.g., degree_required, early_career)",
+          "synonyms": "Rule Type",
+          "pii": false
+        },
+        {
+          "name": "Structured_Rule_Value",
+          "description": "Parameter value paired with Structured_Rule_Type (e.g., PhD, 1, true, Research.gov)",
+          "synonyms": "Rule Value",
+          "pii": false
+        }
+      ]
+    },
+    "ProjectCohort": {
+      "name": "ProjectCohort",
+      "description": "Cohorts or tracks within faculty development and research support programs",
+      "synonyms": "Program Cohort, Track, Program Group",
+      "columns": [
+        {
+          "name": "ProjectCohort_ID",
+          "description": "Primary key for project cohort",
+          "synonyms": "Cohort ID",
+          "pii": false
+        },
+        {
+          "name": "Project_ID",
+          "description": "Program or project this cohort belongs to",
+          "synonyms": "Program, Project",
+          "pii": false
+        },
+        {
+          "name": "Cohort_Name",
+          "description": "Name of the cohort or track",
+          "synonyms": "Name, Track Name",
+          "pii": false
+        },
+        {
+          "name": "Cohort_Type",
+          "description": "Type of cohort (e.g., Grant Writing, CAREER, Mentoring, Seed Competition)",
+          "synonyms": "Type",
+          "pii": false
+        },
+        {
+          "name": "Cohort_Status",
+          "description": "Current status of the cohort",
+          "synonyms": "Status",
+          "pii": false
+        },
+        {
+          "name": "Start_Date",
+          "description": "Cohort start date",
+          "synonyms": "Begin Date",
+          "pii": false
+        },
+        {
+          "name": "End_Date",
+          "description": "Cohort end date",
+          "synonyms": "End Date",
+          "pii": false
+        },
+        {
+          "name": "Description",
+          "description": "Description of the cohort program and objectives",
+          "synonyms": "Details",
+          "pii": false
+        }
+      ]
+    },
+    "CohortParticipation": {
+      "name": "CohortParticipation",
+      "description": "Enrollment of personnel in faculty development cohorts with coach assignments and related proposal/project tracking",
+      "synonyms": "Cohort Enrollment, Program Participation",
+      "columns": [
+        {
+          "name": "CohortParticipation_ID",
+          "description": "Primary key for cohort participation record",
+          "synonyms": "Participation ID",
+          "pii": false
+        },
+        {
+          "name": "ProjectCohort_ID",
+          "description": "Cohort the participant is enrolled in",
+          "synonyms": "Cohort",
+          "pii": false
+        },
+        {
+          "name": "Personnel_ID",
+          "description": "Participant in the cohort",
+          "synonyms": "Participant, Person",
+          "pii": false
+        },
+        {
+          "name": "Related_Proposal_ID",
+          "description": "Proposal being developed as part of this program",
+          "synonyms": "Target Proposal",
+          "pii": false
+        },
+        {
+          "name": "Related_Project_ID",
+          "description": "Project being developed as part of this program",
+          "synonyms": "Target Project",
+          "pii": false
+        },
+        {
+          "name": "Coach_Personnel_ID",
+          "description": "Coach, mentor, or partner assigned to this participant",
+          "synonyms": "Coach, Mentor, Partner",
+          "pii": false
+        },
+        {
+          "name": "Participation_Status",
+          "description": "Current participation status",
+          "synonyms": "Status",
+          "pii": false
+        },
+        {
+          "name": "Joined_Date",
+          "description": "Date participant joined the cohort",
+          "synonyms": "Enrollment Date, Start Date",
+          "pii": false
+        },
+        {
+          "name": "Completed_Date",
+          "description": "Date participant completed or left the cohort",
+          "synonyms": "Completion Date, End Date",
+          "pii": false
+        },
+        {
+          "name": "Comments",
+          "description": "Notes about this participant's involvement",
+          "synonyms": "Notes",
+          "pii": false
+        }
+      ]
+    },
+    "ProposalChecklistItem": {
+      "name": "ProposalChecklistItem",
+      "description": "Per-proposal checklist tracking preparation progress against RFA requirements and internal review tasks. Separates per-proposal state (status, assignee, completion, notes, document link) from the RFA-level template in RFARequirement so that multiple proposals can target the same opportunity with independent checklists.",
+      "synonyms": "Proposal Checklist, Preparation Checklist, Review Tasks",
+      "columns": [
+        {
+          "name": "ChecklistItem_ID",
+          "description": "Primary key for checklist item",
+          "synonyms": "Checklist ID",
+          "pii": false
+        },
+        {
+          "name": "Proposal_ID",
+          "description": "Proposal this checklist item belongs to",
+          "synonyms": "Proposal",
+          "pii": false
+        },
+        {
+          "name": "RFARequirement_ID",
+          "description": "Source requirement on the associated RFA (null for custom items or internal review tasks)",
+          "synonyms": "Source Requirement",
+          "pii": false
+        },
+        {
+          "name": "Requirement_Category",
+          "description": "Category of this checklist item (copied from source requirement, or a workflow namespace such as budget_review / compliance_review)",
+          "synonyms": "Category",
+          "pii": false
+        },
+        {
+          "name": "Requirement_Code",
+          "description": "Machine-readable code copied from source requirement",
+          "synonyms": "Code",
+          "pii": false
+        },
+        {
+          "name": "Label",
+          "description": "Display label for the checklist item",
+          "synonyms": "Name, Title",
+          "pii": false
+        },
+        {
+          "name": "Description",
+          "description": "Detailed description or reviewer guidance",
+          "synonyms": "Details",
+          "pii": false
+        },
+        {
+          "name": "Page_Limit",
+          "description": "Page limit copied from source requirement",
+          "synonyms": "Pages",
+          "pii": false
+        },
+        {
+          "name": "Format_Spec",
+          "description": "Formatting specification copied from source requirement",
+          "synonyms": "Format",
+          "pii": false
+        },
+        {
+          "name": "Is_Required",
+          "description": "Whether the item is mandatory or optional",
+          "synonyms": "Required, Mandatory",
+          "pii": false
+        },
+        {
+          "name": "Sort_Order",
+          "description": "Display order",
+          "synonyms": "Order",
+          "pii": false
+        },
+        {
+          "name": "Status",
+          "description": "Current completion status",
+          "synonyms": "Progress",
+          "pii": false
+        },
+        {
+          "name": "Assignee_Personnel_ID",
+          "description": "Person assigned to complete this item",
+          "synonyms": "Assignee, Owner",
+          "pii": false
+        },
+        {
+          "name": "Notes",
+          "description": "Team notes or reviewer comments on this item",
+          "synonyms": "Comments",
+          "pii": false
+        },
+        {
+          "name": "Completed_Date",
+          "description": "Date the item was marked complete",
+          "synonyms": "Done Date",
+          "pii": false
+        },
+        {
+          "name": "Document_ID",
+          "description": "Document that fulfills this checklist item",
+          "synonyms": "Attachment",
+          "pii": false
+        }
+      ]
+    },
+    "SubmissionProfile": {
+      "name": "SubmissionProfile",
+      "description": "Institution/sponsor submission system configuration. One profile per organization/system/environment combination, referencing credentials by external secret-store path rather than storing them.",
+      "synonyms": "Submission Configuration, Sponsor Profile",
+      "columns": [
+        {
+          "name": "Submission_Profile_ID",
+          "description": "Primary key (UUID) for the submission profile",
+          "synonyms": "Profile ID",
+          "pii": false
+        },
+        {
+          "name": "Profile_Name",
+          "description": "Human-readable label for the profile",
+          "synonyms": "Name",
+          "pii": false
+        },
+        {
+          "name": "Submission_System",
+          "description": "Sponsor submission system identifier",
+          "synonyms": "System",
+          "pii": false
+        },
+        {
+          "name": "Environment",
+          "description": "Submission environment",
+          "synonyms": "Env",
+          "pii": false
+        },
+        {
+          "name": "Credential_Reference",
+          "description": "Vault path or label for credentials (never credentials themselves)",
+          "synonyms": "Credential Path",
+          "pii": true
+        },
+        {
+          "name": "Organization_ID",
+          "description": "Institution the profile belongs to",
+          "synonyms": "Institution",
+          "pii": false
+        },
+        {
+          "name": "Is_Active",
+          "description": "Whether this profile is available for new submissions",
+          "synonyms": "Active",
+          "pii": false
+        },
+        {
+          "name": "Description",
+          "description": "Free-text description of the profile",
+          "synonyms": "Notes",
+          "pii": false
+        }
+      ]
+    },
+    "SubmissionPackage": {
+      "name": "SubmissionPackage",
+      "description": "Immutable point-in-time snapshot of the documents and metadata assembled for submission to a sponsor. Once an attempt references a package, the package and its attachments should not be modified.",
+      "synonyms": "Submission Snapshot, Proposal Package",
+      "columns": [
+        {
+          "name": "Submission_Package_ID",
+          "description": "Primary key for submission package",
+          "synonyms": "Package ID",
+          "pii": false
+        },
+        {
+          "name": "Proposal_ID",
+          "description": "Proposal this package was assembled from",
+          "synonyms": "Proposal",
+          "pii": false
+        },
+        {
+          "name": "Package_Version",
+          "description": "Version number within the proposal",
+          "synonyms": "Version",
+          "pii": false
+        },
+        {
+          "name": "Assembly_Status",
+          "description": "Current status of the package",
+          "synonyms": "Status",
+          "pii": false
+        },
+        {
+          "name": "Preflight_Results",
+          "description": "JSON blob storing validation and preflight check results",
+          "synonyms": "Validation",
+          "pii": false
+        },
+        {
+          "name": "Assembled_At",
+          "description": "Timestamp when the package was assembled",
+          "synonyms": "Assembly Time",
+          "pii": false
+        },
+        {
+          "name": "Package_Hash",
+          "description": "SHA-256 hash of the entire package for integrity verification",
+          "synonyms": "Hash, Checksum",
+          "pii": false
+        },
+        {
+          "name": "Assembled_By_User_ID",
+          "description": "User who assembled the package",
+          "synonyms": "Assembler",
+          "pii": false
+        }
+      ]
+    },
+    "SubmissionAttachment": {
+      "name": "SubmissionAttachment",
+      "description": "Package manifest entry linking a submission package to a document. Captures the document's file hash at packaging time so submission integrity can be verified later even if the source document is updated.",
+      "synonyms": "Package Manifest Entry, Submission Document",
+      "columns": [
+        {
+          "name": "Submission_Attachment_ID",
+          "description": "Primary key for submission attachment",
+          "synonyms": "Attachment ID",
+          "pii": false
+        },
+        {
+          "name": "Submission_Package_ID",
+          "description": "Package this attachment belongs to",
+          "synonyms": "Package",
+          "pii": false
+        },
+        {
+          "name": "Document_ID",
+          "description": "Source document record (RESTRICT delete \u2014 submitted documents cannot be removed)",
+          "synonyms": "Document",
+          "pii": false
+        },
+        {
+          "name": "Sponsor_Document_Type",
+          "description": "Sponsor-side document type code",
+          "synonyms": "Sponsor Type",
+          "pii": false
+        },
+        {
+          "name": "File_Hash_At_Packaging",
+          "description": "SHA-256 hash of the document file captured at packaging time",
+          "synonyms": "Hash, Checksum",
+          "pii": false
+        },
+        {
+          "name": "Sort_Order",
+          "description": "Display or submission order within the package",
+          "synonyms": "Order",
+          "pii": false
+        }
+      ]
+    },
+    "SubmissionAttempt": {
+      "name": "SubmissionAttempt",
+      "description": "Record of each outbound transmission of a submission package to an external sponsor system. Multiple attempts may reference the same package (retry after error, resubmit to a different environment). Follows a defined status state machine: submitting -> submitted -> received -> validated -> accepted/rejected/error.",
+      "synonyms": "Submission Transmission, Outbound Attempt",
+      "columns": [
+        {
+          "name": "Submission_Attempt_ID",
+          "description": "Primary key for submission attempt",
+          "synonyms": "Attempt ID",
+          "pii": false
+        },
+        {
+          "name": "Submission_Package_ID",
+          "description": "Package transmitted by this attempt",
+          "synonyms": "Package",
+          "pii": false
+        },
+        {
+          "name": "Submission_Profile_ID",
+          "description": "Profile used for this attempt (SET NULL on profile deletion)",
+          "synonyms": "Profile",
+          "pii": false
+        },
+        {
+          "name": "Submission_System",
+          "description": "Sponsor system used (denormalized from profile at attempt creation for historical accuracy)",
+          "synonyms": "System",
+          "pii": false
+        },
+        {
+          "name": "Environment",
+          "description": "Submission environment (denormalized from profile at attempt creation)",
+          "synonyms": "Env",
+          "pii": false
+        },
+        {
+          "name": "Status",
+          "description": "Current status in the attempt lifecycle",
+          "synonyms": "Status",
+          "pii": false
+        },
+        {
+          "name": "External_Tracking_Number",
+          "description": "Sponsor-assigned tracking identifier (e.g., Grants.gov tracking number)",
+          "synonyms": "Tracking Number",
+          "pii": false
+        },
+        {
+          "name": "Submitted_At",
+          "description": "Timestamp when the attempt was initiated",
+          "synonyms": "Submission Time",
+          "pii": false
+        },
+        {
+          "name": "Response_Data",
+          "description": "JSON blob storing raw sponsor response data",
+          "synonyms": "Response",
+          "pii": false
+        },
+        {
+          "name": "Error_Detail",
+          "description": "Error message or diagnostic detail for failed attempts",
+          "synonyms": "Error",
+          "pii": false
+        },
+        {
+          "name": "Submitted_By_User_ID",
+          "description": "User who initiated the attempt",
+          "synonyms": "Submitter",
+          "pii": false
+        }
+      ]
+    },
+    "SubmissionEvent": {
+      "name": "SubmissionEvent",
+      "description": "Granular audit events for a submission attempt. Each event captures one discrete occurrence in the attempt lifecycle: status transitions, agency feedback, operator notes, validation results, or errors.",
+      "synonyms": "Submission Audit Event, Attempt Event",
+      "columns": [
+        {
+          "name": "Submission_Event_ID",
+          "description": "Primary key for submission event",
+          "synonyms": "Event ID",
+          "pii": false
+        },
+        {
+          "name": "Submission_Attempt_ID",
+          "description": "Attempt this event belongs to",
+          "synonyms": "Attempt",
+          "pii": false
+        },
+        {
+          "name": "Event_Type",
+          "description": "Type of event",
+          "synonyms": "Type",
+          "pii": false
+        },
+        {
+          "name": "Event_Timestamp",
+          "description": "When the event occurred",
+          "synonyms": "Timestamp",
+          "pii": false
+        },
+        {
+          "name": "Previous_Status",
+          "description": "Status before a status_change event",
+          "synonyms": "From Status",
+          "pii": false
+        },
+        {
+          "name": "New_Status",
+          "description": "Status after a status_change event",
+          "synonyms": "To Status",
+          "pii": false
+        },
+        {
+          "name": "External_Data",
+          "description": "JSON blob for agency-provided data or validation details",
+          "synonyms": "Agency Data",
+          "pii": false
+        },
+        {
+          "name": "Description",
+          "description": "Human-readable description of the event",
+          "synonyms": "Notes",
+          "pii": false
+        },
+        {
+          "name": "User_ID",
+          "description": "User associated with the event (operator or reviewer)",
+          "synonyms": "User",
+          "pii": false
+        }
+      ]
     }
   },
-  "table_count": 29
+  "table_count": 40
 }
