@@ -1,6 +1,16 @@
 # UDM Ontology
 
-This document describes the structure, conventions, and purpose of every entity in the AI4RA Unified Data Model.
+This document describes the structure, conventions, and purpose of every entity in the AI4RA Unified Data Model. The UDM contains **40 tables** organized into 10 domains, plus **8 reference views**.
+
+## Scope
+
+The UDM models **research administration business data** — the entities, relationships, and attributes that research offices work with daily. It deliberately does **not** model:
+
+- **ETL or data pipelines** — how data gets into the UDM is an implementation concern, not a schema concern. See the [lakehouse](https://github.com/ui-insight/lakehouse) project for adapter patterns.
+- **Business process definitions** — workflow steps, approval routing, and process templates belong in process management tools, not in the data model. See the [ProcessMapping](https://github.com/ui-insight/ProcessMapping) project.
+- **Application-specific operational state** — ticketing system internals, user sessions, and UI state are outside scope. The UDM captures the *business data* that flows through these systems (e.g., ServiceRequest), not the systems themselves.
+
+The guiding principle: if a concept is something a research administrator would describe as "our data," it belongs in the UDM. If it's something an IT team would describe as "our infrastructure" or "our workflow engine," it doesn't.
 
 ## Naming Conventions
 
@@ -41,6 +51,10 @@ Prime_Sponsor_Organization_ID  -- the ultimate funding source (pass-through)
 Sponsor_Organization_ID        -- the funding sponsor
 Submitting_Organization_ID     -- the unit preparing the proposal
 Administering_Organization_ID  -- the unit managing finances
+
+-- CohortParticipation has two Personnel references:
+Personnel_ID                   -- the participant
+Coach_Personnel_ID             -- the assigned coach or mentor
 ```
 
 ### Standard Suffixes
@@ -58,6 +72,9 @@ Administering_Organization_ID  -- the unit managing finances
 | `_Code` | Short identifier | `Fund_Code`, `Account_Code` |
 | `_Description` | Free-text description | `Project_Description`, `Activity_Description` |
 | `Is_` | Boolean flag (prefix) | `Is_Active`, `Is_Primary`, `Is_Key_Personnel` |
+| `_Level` | Assessment tier | `Risk_Level` |
+| `_Text` | Long-form content | `Requirement_Text` |
+| `_URL` | Web address | `Primary_URL` |
 
 ## Design Patterns
 
@@ -67,9 +84,9 @@ The UDM uses two approaches for controlling enumerated values. Understanding whe
 
 **AllowedValues table** — for values that vary by institution. Institutions populate this table with their own codes, labels, and descriptions. The schema defines *which fields* use AllowedValues (via a foreign key to the AllowedValues table), but the actual values are institution-specific.
 
-Used by 10 fields: contact types, project roles, fund types, transaction types, modification event types, deliverable types, project types, finance code purposes, COI relationship types, and document types.
+Used by 12 fields: contact types, project roles, project types, fund types, transaction types, modification event types, deliverable types, finance code purposes, COI relationship types, document types, indirect rate types, and indirect rate base types.
 
-**CHECK constraints** — for values that are universal standards. These are hardcoded in the schema because they should be consistent everywhere: GAAP account types, federal rate structures, lifecycle status workflows, compliance requirement types.
+**CHECK constraints** — for values that are universal standards. These are hardcoded in the schema because they should be consistent everywhere: GAAP account types, lifecycle status workflows, risk levels, compliance requirement types, request priorities.
 
 See [allowedvalues.md](allowedvalues.md) for the complete list of which fields use which approach and why.
 
@@ -88,6 +105,7 @@ Many-to-many relationships use bridge tables that carry their own attributes:
 
 - `ProjectRole` bridges Personnel and Project, adding role type, FTE%, dates, and key personnel flag
 - `Effort` bridges ProjectRole and time periods, adding certification data
+- `CohortParticipation` bridges Personnel and ProjectCohort, adding coach assignment, related proposal/project, and participation status
 
 ### Referential Integrity
 
@@ -121,7 +139,7 @@ Institutional entities that participate in research funding. A single table repr
 
 ### Personnel
 
-Individuals involved in research: faculty, staff, students, postdocs, and external collaborators. Stores identifying information (name, email, ORCID) and links to a home department via `Department_Organization_ID`.
+Individuals involved in research: faculty, staff, students, postdocs, and external collaborators. Stores identifying information (honorific, name with optional suffix, email, ORCID) and links to a home department via `Department_Organization_ID`.
 
 PII-sensitive fields: `First_Name`, `Last_Name`, `Middle_Name`, `Primary_Email`, `ORCID`.
 
@@ -139,17 +157,49 @@ Research or training projects that may span multiple funding sources. A project 
 
 ### RFA
 
-Request for Applications, also known as funding opportunities, program announcements, or solicitations. Captures the sponsor, deadlines, funding amounts, and eligibility criteria. Links proposals back to the opportunity they respond to.
+Request for Applications, also known as funding opportunities, program announcements, or solicitations. Captures the sponsor, identifiers, deadlines (submission, LOI, pre-proposal, announcement), funding range (floor/ceiling), expected number of awards, maximum duration, submission portal, and lifecycle status (Active/Closed/Superseded/Cancelled). Links proposals back to the opportunity they respond to.
+
+### RFARequirement
+
+Specific requirements extracted from funding opportunity announcements. Each requirement belongs to an RFA and captures the requirement text, category (expanded vocabulary covering Eligibility, Budget, Format, Compliance, Reporting, Personnel, Document, Review_Criterion, Submission, Deadline, Special_Condition, PAPPG_Deviation, Other), page/section reference, formatting specification, and machine-checkable eligibility rule fields (`Structured_Rule_Type`, `Structured_Rule_Value`) for automated review. Used as a template — per-proposal completion state is tracked in `ProposalChecklistItem`.
 
 ### Proposal
 
 A formal request for funding submitted to a sponsor. Tracks the full proposal lifecycle from drafting through submission to decision. Links to the project it supports, the RFA it responds to (if any), and three distinct Organization roles: sponsor (who funds it), submitting organization (who prepares it), and administering organization (who manages the finances).
 
-Includes both internal approval workflow (`Internal_Approval_Status`) and external decision tracking (`Decision_Status`).
+Includes both internal approval workflow (`Internal_Approval_Status`), external decision tracking (`Decision_Status`), and risk assessment (`Risk_Level`).
 
 ### ProposalBudget
 
 Detailed budget line items for proposals, organized by budget period and category. Supports versioning via `Version_Number` for budget revisions during negotiation. Each line item links to a BudgetCategory and can reference an IndirectRate for F&A calculations.
+
+### ProposalChecklistItem
+
+Per-proposal checklist tracking preparation progress against RFA requirements and internal review tasks. Each item can originate from an `RFARequirement` (generating a typed task with a page limit, format spec, and requirement code) or be authored as a custom item — including internal review workflows such as `budget_review` or `compliance_review` tasks. Captures per-proposal state that the template cannot: `Status`, `Assignee_Personnel_ID`, `Notes`, `Completed_Date`, and a `Document_ID` linking the fulfilling attachment. Separating the template (RFARequirement) from per-proposal state (ProposalChecklistItem) lets multiple proposals respond to the same RFA with independent checklists.
+
+---
+
+## Submission
+
+### SubmissionProfile
+
+Institution/sponsor submission system configuration. One profile per organization/system/environment combination (e.g., "UI Grants.gov Production"). References credentials by external secret-store path rather than storing them directly. Controlled vocabularies: `Submission_System` (grants_gov, research_gov, era_commons, nspires, manual, other), `Environment` (training, production).
+
+### SubmissionPackage
+
+Immutable point-in-time snapshot of the documents and metadata assembled for submission to a sponsor. Versioned per proposal (`Package_Version`). Once an attempt references a package, the package and its attachments should not be modified. `Package_Hash` is a SHA-256 of the assembled package for integrity verification.
+
+### SubmissionAttachment
+
+Package manifest entry linking a submission package to a source document record. Captures `File_Hash_At_Packaging` (SHA-256 of the file at packaging time) so submission integrity can be verified later even if the source `Document` is subsequently updated. Source documents should use RESTRICT delete semantics to prevent accidental removal of submitted content.
+
+### SubmissionAttempt
+
+Record of each outbound transmission of a submission package to an external sponsor system. Multiple attempts may reference the same package (retry after error, resubmit to a different environment). `Submission_System` and `Environment` are denormalized from the profile at attempt creation time to preserve historical accuracy if the profile is later modified. Follows a defined status state machine: `submitting → submitted → received → validated → accepted/rejected/error`.
+
+### SubmissionEvent
+
+Granular audit events for a submission attempt. Each event captures one discrete occurrence: status transitions (`status_change`), sponsor feedback (`agency_note`), operator actions, errors, or validation results. Provides the fine-grained audit trail required for federal compliance reporting.
 
 ---
 
@@ -157,7 +207,7 @@ Detailed budget line items for proposals, organized by budget period and categor
 
 ### Award
 
-The central entity of post-award management. Represents funded grants, contracts, and cooperative agreements. Links to its originating proposal, project, sponsor, and (for pass-through funding) prime sponsor. Tracks the full funding amount, current balance, and award lifecycle dates.
+The central entity of post-award management. Represents funded grants, contracts, and cooperative agreements. Links to its originating proposal, project, sponsor, and (for pass-through funding) prime sponsor. Tracks the full funding amount, current balance, award lifecycle dates, and risk assessment level.
 
 Status workflow: Pending → Active → Closed/Suspended/Terminated.
 
@@ -179,7 +229,7 @@ Detailed budget line items within a budget period, organized by BudgetCategory. 
 
 ### Subaward
 
-Subawards issued to other institutions under a prime award. Tracks the subrecipient organization, funding amounts, dates, risk level, and monitoring requirements. Links to the parent award via `Prime_Award_ID`.
+Subawards issued to other institutions under a prime award. Tracks the subrecipient organization, funding amounts, dates, risk level, and monitoring requirements. Links to the parent award via `Prime_Award_ID` and the subrecipient PI via `PI_Personnel_ID` (a proper foreign key to Personnel, not a denormalized name string).
 
 ### CostShare
 
@@ -207,13 +257,9 @@ Award-specific finance codes that link awards to institutional accounting string
 
 Also known as: FOAP (Fund-Organization-Account-Program), account strings, or financial codes, depending on the institution.
 
-### ActivityCode
-
-Activity classification codes used to categorize spending by purpose or function (e.g., instruction, research, public service). These are institutional codes that may align with NACUBO functional classifications.
-
 ### Transaction
 
-Individual financial transactions charged to awards: expenses, encumbrances, revenues, transfers. Each transaction links to multiple financial dimensions — fund, account, finance code, activity code, award, project, and budget period. This multi-dimensional linking enables reporting across any combination of financial attributes.
+Individual financial transactions charged to awards: expenses, encumbrances, revenues, transfers. Each transaction links to multiple financial dimensions — fund, account, finance code, award, project, and budget period. This multi-dimensional linking enables reporting across any combination of financial attributes.
 
 ### IndirectRate
 
@@ -236,6 +282,34 @@ This is a bridge table — it connects Personnel, Project, and Award while carry
 ### Effort
 
 Effort certification and tracking. Each record captures the percentage of time a person spent on a project role during a specific period, along with certification details (method, certifier, date). Supports federal effort reporting requirements (OMB Uniform Guidance).
+
+---
+
+## Faculty Development
+
+### ProjectCohort
+
+Cohorts or tracks within faculty development and research support programs. A cohort belongs to a Project (the parent program) and has a name, type (Grant Writing, CAREER, Mentoring, Seed Competition, Boot Camp), status, and date range. Used to organize participants into structured groups within larger research development initiatives.
+
+### CohortParticipation
+
+Enrollment of personnel in faculty development cohorts. Each record links a participant to a cohort and optionally tracks a related proposal or project being developed as part of the program, a coach/mentor assignment, participation status, and enrollment dates. This is a bridge table connecting Personnel, ProjectCohort, Proposal, and Project.
+
+---
+
+## Operations
+
+### ApplicationSystem
+
+Catalog of operational systems, portals, and tools used in research administration workflows. Each record identifies a system by name, type (Research Admin, ERP, Sponsor Portal, Ticketing, Reference Tool, Reporting), vendor, owning organization, and URL. Provides the reference data that ServiceRequest links to.
+
+**Why it exists**: Research offices use many systems — grants management, finance, HR, sponsor portals, ticketing. This table provides a shared vocabulary for referring to systems across service requests, documentation, and integration planning.
+
+### ServiceRequest
+
+Service requests and tickets from institutional ticketing systems (TDX, ServiceNow, Jira) related to research administration operations. Each request has a title, description, type, status, priority, and links to the requestor and assignee (both via Personnel FKs). Optionally links to a related Award, Proposal, or ApplicationSystem.
+
+**Why it exists**: Research offices handle a high volume of service requests. Capturing these in the UDM (rather than leaving them siloed in ticketing systems) enables analysis of workload patterns, response times, and which awards or proposals generate the most operational overhead.
 
 ---
 

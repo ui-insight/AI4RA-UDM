@@ -179,6 +179,15 @@
           "synonyms": "ORCID iD",
           "pii": true
         },
+        "Honorific": {
+          "type": "VARCHAR(20)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Honorific or title prefix (Dr., Prof., Rev., Mr., Ms.)",
+          "synonyms": "Title, Prefix"
+        },
         "First_Name": {
           "type": "VARCHAR(100)",
           "primary_key": false,
@@ -198,6 +207,15 @@
           "description": "Last name of individual",
           "synonyms": "Surname, Family Name",
           "pii": true
+        },
+        "Name_Suffix": {
+          "type": "VARCHAR(20)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Name suffix (Jr., III, PhD, MD)",
+          "synonyms": "Suffix"
         },
         "Middle_Name": {
           "type": "VARCHAR(100)",
@@ -617,6 +635,103 @@
           "auto_increment": false,
           "description": "Catalog of Federal Domestic Assistance number",
           "synonyms": "CFDA, Assistance Listing Number"
+        },
+        "Submission_Deadline": {
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Primary submission deadline for the opportunity",
+          "synonyms": "Deadline, Due Date"
+        },
+        "LOI_Deadline": {
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Letter of intent deadline",
+          "synonyms": "LOI Due Date"
+        },
+        "Preproposal_Deadline": {
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Pre-proposal or preliminary deadline",
+          "synonyms": "Preliminary Deadline"
+        },
+        "Announcement_Date": {
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Date the RFA was published",
+          "synonyms": "Published Date, Release Date"
+        },
+        "Funding_Floor": {
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Minimum award amount",
+          "synonyms": "Min Award, Floor"
+        },
+        "Funding_Ceiling": {
+          "type": "DECIMAL(18,2)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Maximum award amount per year",
+          "synonyms": "Max Award, Ceiling"
+        },
+        "Expected_Awards": {
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Number of awards expected to be made",
+          "synonyms": "Award Count"
+        },
+        "Max_Duration_Months": {
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Maximum project duration in months",
+          "synonyms": "Duration, Project Length"
+        },
+        "Submission_Method": {
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Sponsor portal or mechanism used for submission (Research.gov, eRA Commons, Grants.gov, etc.)",
+          "synonyms": "Portal, Submission System"
+        },
+        "RFA_Status": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "Active",
+            "Closed",
+            "Superseded",
+            "Cancelled"
+          ],
+          "default": "Active",
+          "description": "Lifecycle status of the opportunity",
+          "synonyms": "Status"
         }
       },
       "description": "Represents Request for Applications or funding announcements",
@@ -854,6 +969,20 @@
           "auto_increment": false,
           "description": "Proposal approval form routing status",
           "synonyms": "Routing Status, Workflow Status"
+        },
+        "Risk_Level": {
+          "type": "VARCHAR(20)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "Low",
+            "Medium",
+            "High"
+          ],
+          "description": "Risk assessment level (Low, Medium, High)",
+          "synonyms": "Risk"
         }
       },
       "description": "Represents submitted proposals for projects"
@@ -1184,6 +1313,20 @@
           "default": false,
           "description": "Flag indicating if this is a flow-through award",
           "synonyms": "Flow Through, Pass Through"
+        },
+        "Risk_Level": {
+          "type": "VARCHAR(20)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "Low",
+            "Medium",
+            "High"
+          ],
+          "description": "Risk assessment level (Low, Medium, High)",
+          "synonyms": "Risk"
         }
       },
       "description": "Represents awarded funding for projects"
@@ -1833,15 +1976,18 @@
           "description": "Statement of work for subrecipient",
           "synonyms": "SOW, Scope of Work"
         },
-        "PI_Name": {
-          "type": "VARCHAR(255)",
+        "PI_Personnel_ID": {
+          "type": "VARCHAR(50)",
           "primary_key": false,
           "required": false,
           "unique": false,
           "auto_increment": false,
-          "description": "Name of principal investigator at subrecipient institution",
-          "synonyms": "Subrecipient PI",
-          "pii": true
+          "references": {
+            "table": "Personnel",
+            "column": "Personnel_ID"
+          },
+          "description": "Principal investigator at subrecipient institution",
+          "synonyms": "Subrecipient PI, Sub PI ID"
         },
         "Monitoring_Plan": {
           "type": "TEXT",
@@ -3476,6 +3622,1343 @@
       },
       "description": "Audit trail of all data changes and user actions in the system",
       "synonyms": "Audit Log, Change Log, History"
+    },
+    "ApplicationSystem": {
+      "columns": {
+        "ApplicationSystem_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Primary key for application system",
+          "synonyms": "System ID"
+        },
+        "System_Name": {
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Name of the application or system",
+          "synonyms": "Name, App Name"
+        },
+        "System_Type": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "Research Admin",
+            "ERP",
+            "Sponsor Portal",
+            "Ticketing",
+            "Reference Tool",
+            "Reporting",
+            "Other"
+          ],
+          "description": "Type of system (Research Admin, ERP, Sponsor Portal, Ticketing, Reference Tool, Reporting, Other)",
+          "synonyms": "Type"
+        },
+        "Vendor_Name": {
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Vendor or provider of the system",
+          "synonyms": "Vendor, Provider"
+        },
+        "Owning_Organization_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Organization",
+            "column": "Organization_ID"
+          },
+          "description": "Organization that owns or administers this system",
+          "synonyms": "Owner Org"
+        },
+        "Primary_URL": {
+          "type": "VARCHAR(500)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Primary URL or endpoint for the system",
+          "synonyms": "URL, Link"
+        },
+        "Description": {
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Description of the system and its role in research administration",
+          "synonyms": "Details"
+        },
+        "Is_Active": {
+          "type": "BOOLEAN",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "default": true,
+          "description": "Whether the system is currently in use",
+          "synonyms": "Active"
+        }
+      },
+      "description": "Catalog of operational systems, portals, and tools used in research administration workflows",
+      "synonyms": "System, Application, Platform, Tool"
+    },
+    "ServiceRequest": {
+      "columns": {
+        "ServiceRequest_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Primary key for service request",
+          "synonyms": "Request ID, Ticket ID"
+        },
+        "ServiceRequest_Title": {
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Title or subject of the service request",
+          "synonyms": "Title, Subject"
+        },
+        "ServiceRequest_Description": {
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Detailed description of the request",
+          "synonyms": "Description, Details"
+        },
+        "Request_Type": {
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Type of request (e.g., Subaward Request, Budget Transfer, Account Setup)",
+          "synonyms": "Type, Category"
+        },
+        "Request_Status": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "New",
+            "In Progress",
+            "Pending",
+            "Resolved",
+            "Closed",
+            "Cancelled"
+          ],
+          "description": "Current status of the request",
+          "synonyms": "Status"
+        },
+        "Request_Priority": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "Low",
+            "Normal",
+            "High",
+            "Urgent",
+            "Critical"
+          ],
+          "description": "Priority level of the request",
+          "synonyms": "Priority"
+        },
+        "Requestor_Personnel_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Personnel",
+            "column": "Personnel_ID"
+          },
+          "description": "Person who submitted the request",
+          "synonyms": "Requestor, Submitted By"
+        },
+        "Assigned_Personnel_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Personnel",
+            "column": "Personnel_ID"
+          },
+          "description": "Person assigned to handle the request",
+          "synonyms": "Assignee, Responsible Person"
+        },
+        "Assigned_Group": {
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Team or group responsible for the request",
+          "synonyms": "Team, Group"
+        },
+        "ApplicationSystem_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "ApplicationSystem",
+            "column": "ApplicationSystem_ID"
+          },
+          "description": "System where the request originated or is tracked",
+          "synonyms": "Source System"
+        },
+        "Related_Award_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Award",
+            "column": "Award_ID"
+          },
+          "description": "Award related to this request, if applicable",
+          "synonyms": "Award"
+        },
+        "Related_Proposal_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Proposal",
+            "column": "Proposal_ID"
+          },
+          "description": "Proposal related to this request, if applicable",
+          "synonyms": "Proposal"
+        },
+        "Created_Date": {
+          "type": "TIMESTAMP",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Date and time the request was created",
+          "synonyms": "Created, Opened"
+        },
+        "Resolved_Date": {
+          "type": "TIMESTAMP",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Date and time the request was resolved",
+          "synonyms": "Resolved, Completed"
+        },
+        "Modified_Date": {
+          "type": "TIMESTAMP",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Date and time the request was last modified",
+          "synonyms": "Updated, Last Modified"
+        }
+      },
+      "description": "Service requests and tickets from institutional ticketing systems (TDX, ServiceNow, Jira) related to research administration operations",
+      "synonyms": "Ticket, Work Request, Service Ticket"
+    },
+    "RFARequirement": {
+      "columns": {
+        "RFARequirement_ID": {
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true,
+          "description": "Primary key for RFA requirement",
+          "synonyms": "Requirement ID"
+        },
+        "RFA_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "RFA",
+            "column": "RFA_ID"
+          },
+          "description": "Funding opportunity this requirement belongs to",
+          "synonyms": "RFA, Opportunity"
+        },
+        "Requirement_Text": {
+          "type": "TEXT",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Text of the specific requirement from the funding announcement",
+          "synonyms": "Requirement, Text"
+        },
+        "Requirement_Category": {
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "Eligibility",
+            "Budget",
+            "Format",
+            "Compliance",
+            "Reporting",
+            "Personnel",
+            "Document",
+            "Review_Criterion",
+            "Submission",
+            "Deadline",
+            "Special_Condition",
+            "PAPPG_Deviation",
+            "Other"
+          ],
+          "description": "Category of requirement. Expanded vocabulary covers documents, formatting, eligibility, review criteria, budget constraints, submission mechanics, deadlines, compliance, and solicitation-specific deviations from the sponsor's parent guide.",
+          "synonyms": "Category, Type"
+        },
+        "Page_Reference": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Page number or section reference in the FOA document",
+          "synonyms": "Page, Section"
+        },
+        "Is_Mandatory": {
+          "type": "BOOLEAN",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "default": true,
+          "description": "Whether this requirement is mandatory or recommended",
+          "synonyms": "Mandatory, Required"
+        },
+        "Compliance_Status": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "Not Started",
+            "In Progress",
+            "Met",
+            "Not Applicable",
+            "Waived"
+          ],
+          "default": "Not Started",
+          "description": "Legacy per-proposal compliance status. New integrations should track per-proposal state in ProposalChecklistItem; this field is retained for backwards compatibility with earlier UDM consumers.",
+          "synonyms": "Status"
+        },
+        "Notes": {
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Legacy notes on compliance with this requirement. New integrations should use ProposalChecklistItem.Notes for per-proposal commentary.",
+          "synonyms": "Comments"
+        },
+        "Requirement_Code": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Machine-readable short code identifying the requirement within its category",
+          "synonyms": "Code"
+        },
+        "Format_Spec": {
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Formatting specification for document or formatting requirements",
+          "synonyms": "Formatting, Format Details"
+        },
+        "Sort_Order": {
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "default": 0,
+          "description": "Display order within category",
+          "synonyms": "Order"
+        },
+        "Source_Section": {
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Origin section in the source document, or structured vocabulary (sponsor_default, rfa_specific) for AI-generated document requirements",
+          "synonyms": "Source, Origin"
+        },
+        "Structured_Rule_Type": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Normalized sponsor-eligibility rule type for machine-checkable ELIGIBILITY requirements (e.g., degree_required, early_career)",
+          "synonyms": "Rule Type"
+        },
+        "Structured_Rule_Value": {
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Parameter value paired with Structured_Rule_Type (e.g., PhD, 1, true, Research.gov)",
+          "synonyms": "Rule Value"
+        }
+      },
+      "description": "Specific requirements extracted from funding opportunity announcements (FOA/RFA) for compliance tracking during proposal development and post-award management",
+      "synonyms": "FOA Requirement, Solicitation Requirement"
+    },
+    "ProjectCohort": {
+      "columns": {
+        "ProjectCohort_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Primary key for project cohort",
+          "synonyms": "Cohort ID"
+        },
+        "Project_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Project",
+            "column": "Project_ID"
+          },
+          "description": "Program or project this cohort belongs to",
+          "synonyms": "Program, Project"
+        },
+        "Cohort_Name": {
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Name of the cohort or track",
+          "synonyms": "Name, Track Name"
+        },
+        "Cohort_Type": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "Grant Writing",
+            "CAREER",
+            "Mentoring",
+            "Seed Competition",
+            "Boot Camp",
+            "Other"
+          ],
+          "description": "Type of cohort (e.g., Grant Writing, CAREER, Mentoring, Seed Competition)",
+          "synonyms": "Type"
+        },
+        "Cohort_Status": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "Planning",
+            "Active",
+            "Completed",
+            "Cancelled"
+          ],
+          "default": "Planning",
+          "description": "Current status of the cohort",
+          "synonyms": "Status"
+        },
+        "Start_Date": {
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Cohort start date",
+          "synonyms": "Begin Date"
+        },
+        "End_Date": {
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Cohort end date",
+          "synonyms": "End Date"
+        },
+        "Description": {
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Description of the cohort program and objectives",
+          "synonyms": "Details"
+        }
+      },
+      "description": "Cohorts or tracks within faculty development and research support programs",
+      "synonyms": "Program Cohort, Track, Program Group"
+    },
+    "CohortParticipation": {
+      "columns": {
+        "CohortParticipation_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Primary key for cohort participation record",
+          "synonyms": "Participation ID"
+        },
+        "ProjectCohort_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "ProjectCohort",
+            "column": "ProjectCohort_ID"
+          },
+          "description": "Cohort the participant is enrolled in",
+          "synonyms": "Cohort"
+        },
+        "Personnel_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Personnel",
+            "column": "Personnel_ID"
+          },
+          "description": "Participant in the cohort",
+          "synonyms": "Participant, Person"
+        },
+        "Related_Proposal_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Proposal",
+            "column": "Proposal_ID"
+          },
+          "description": "Proposal being developed as part of this program",
+          "synonyms": "Target Proposal"
+        },
+        "Related_Project_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Project",
+            "column": "Project_ID"
+          },
+          "description": "Project being developed as part of this program",
+          "synonyms": "Target Project"
+        },
+        "Coach_Personnel_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Personnel",
+            "column": "Personnel_ID"
+          },
+          "description": "Coach, mentor, or partner assigned to this participant",
+          "synonyms": "Coach, Mentor, Partner"
+        },
+        "Participation_Status": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "Enrolled",
+            "Active",
+            "Completed",
+            "Withdrawn",
+            "Deferred"
+          ],
+          "default": "Enrolled",
+          "description": "Current participation status",
+          "synonyms": "Status"
+        },
+        "Joined_Date": {
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Date participant joined the cohort",
+          "synonyms": "Enrollment Date, Start Date"
+        },
+        "Completed_Date": {
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Date participant completed or left the cohort",
+          "synonyms": "Completion Date, End Date"
+        },
+        "Comments": {
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Notes about this participant's involvement",
+          "synonyms": "Notes"
+        }
+      },
+      "description": "Enrollment of personnel in faculty development cohorts with coach assignments and related proposal/project tracking",
+      "synonyms": "Cohort Enrollment, Program Participation"
+    },
+    "ProposalChecklistItem": {
+      "columns": {
+        "ChecklistItem_ID": {
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true,
+          "description": "Primary key for checklist item",
+          "synonyms": "Checklist ID"
+        },
+        "Proposal_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Proposal",
+            "column": "Proposal_ID"
+          },
+          "description": "Proposal this checklist item belongs to",
+          "synonyms": "Proposal"
+        },
+        "RFARequirement_ID": {
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "RFARequirement",
+            "column": "RFARequirement_ID"
+          },
+          "description": "Source requirement on the associated RFA (null for custom items or internal review tasks)",
+          "synonyms": "Source Requirement"
+        },
+        "Requirement_Category": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Category of this checklist item (copied from source requirement, or a workflow namespace such as budget_review / compliance_review)",
+          "synonyms": "Category"
+        },
+        "Requirement_Code": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Machine-readable code copied from source requirement",
+          "synonyms": "Code"
+        },
+        "Label": {
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Display label for the checklist item",
+          "synonyms": "Name, Title"
+        },
+        "Description": {
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Detailed description or reviewer guidance",
+          "synonyms": "Details"
+        },
+        "Page_Limit": {
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Page limit copied from source requirement",
+          "synonyms": "Pages"
+        },
+        "Format_Spec": {
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Formatting specification copied from source requirement",
+          "synonyms": "Format"
+        },
+        "Is_Required": {
+          "type": "BOOLEAN",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "default": true,
+          "description": "Whether the item is mandatory or optional",
+          "synonyms": "Required, Mandatory"
+        },
+        "Sort_Order": {
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "default": 0,
+          "description": "Display order",
+          "synonyms": "Order"
+        },
+        "Status": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "Not Started",
+            "In Progress",
+            "Complete",
+            "Not Applicable"
+          ],
+          "default": "Not Started",
+          "description": "Current completion status",
+          "synonyms": "Progress"
+        },
+        "Assignee_Personnel_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Personnel",
+            "column": "Personnel_ID"
+          },
+          "description": "Person assigned to complete this item",
+          "synonyms": "Assignee, Owner"
+        },
+        "Notes": {
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Team notes or reviewer comments on this item",
+          "synonyms": "Comments"
+        },
+        "Completed_Date": {
+          "type": "DATE",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Date the item was marked complete",
+          "synonyms": "Done Date"
+        },
+        "Document_ID": {
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Document",
+            "column": "Document_ID"
+          },
+          "description": "Document that fulfills this checklist item",
+          "synonyms": "Attachment"
+        }
+      },
+      "description": "Per-proposal checklist tracking preparation progress against RFA requirements and internal review tasks. Separates per-proposal state (status, assignee, completion, notes, document link) from the RFA-level template in RFARequirement so that multiple proposals can target the same opportunity with independent checklists.",
+      "synonyms": "Proposal Checklist, Preparation Checklist, Review Tasks"
+    },
+    "SubmissionProfile": {
+      "columns": {
+        "Submission_Profile_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": true,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Primary key (UUID) for the submission profile",
+          "synonyms": "Profile ID"
+        },
+        "Profile_Name": {
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Human-readable label for the profile",
+          "synonyms": "Name"
+        },
+        "Submission_System": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "grants_gov",
+            "research_gov",
+            "era_commons",
+            "nspires",
+            "manual",
+            "other"
+          ],
+          "description": "Sponsor submission system identifier",
+          "synonyms": "System"
+        },
+        "Environment": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "training",
+            "production"
+          ],
+          "default": "training",
+          "description": "Submission environment",
+          "synonyms": "Env"
+        },
+        "Credential_Reference": {
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Vault path or label for credentials (never credentials themselves)",
+          "synonyms": "Credential Path",
+          "pii": true
+        },
+        "Organization_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Organization",
+            "column": "Organization_ID"
+          },
+          "description": "Institution the profile belongs to",
+          "synonyms": "Institution"
+        },
+        "Is_Active": {
+          "type": "BOOLEAN",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "default": true,
+          "description": "Whether this profile is available for new submissions",
+          "synonyms": "Active"
+        },
+        "Description": {
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Free-text description of the profile",
+          "synonyms": "Notes"
+        }
+      },
+      "description": "Institution/sponsor submission system configuration. One profile per organization/system/environment combination, referencing credentials by external secret-store path rather than storing them.",
+      "synonyms": "Submission Configuration, Sponsor Profile"
+    },
+    "SubmissionPackage": {
+      "columns": {
+        "Submission_Package_ID": {
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true,
+          "description": "Primary key for submission package",
+          "synonyms": "Package ID"
+        },
+        "Proposal_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Proposal",
+            "column": "Proposal_ID"
+          },
+          "description": "Proposal this package was assembled from",
+          "synonyms": "Proposal"
+        },
+        "Package_Version": {
+          "type": "INT",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "default": 1,
+          "description": "Version number within the proposal",
+          "synonyms": "Version"
+        },
+        "Assembly_Status": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "pending",
+            "assembled",
+            "validated",
+            "failed"
+          ],
+          "default": "pending",
+          "description": "Current status of the package",
+          "synonyms": "Status"
+        },
+        "Preflight_Results": {
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "JSON blob storing validation and preflight check results",
+          "synonyms": "Validation"
+        },
+        "Assembled_At": {
+          "type": "TIMESTAMP",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Timestamp when the package was assembled",
+          "synonyms": "Assembly Time"
+        },
+        "Package_Hash": {
+          "type": "VARCHAR(128)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "SHA-256 hash of the entire package for integrity verification",
+          "synonyms": "Hash, Checksum"
+        },
+        "Assembled_By_User_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Personnel",
+            "column": "Personnel_ID"
+          },
+          "description": "User who assembled the package",
+          "synonyms": "Assembler"
+        }
+      },
+      "description": "Immutable point-in-time snapshot of the documents and metadata assembled for submission to a sponsor. Once an attempt references a package, the package and its attachments should not be modified.",
+      "synonyms": "Submission Snapshot, Proposal Package"
+    },
+    "SubmissionAttachment": {
+      "columns": {
+        "Submission_Attachment_ID": {
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true,
+          "description": "Primary key for submission attachment",
+          "synonyms": "Attachment ID"
+        },
+        "Submission_Package_ID": {
+          "type": "INT",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "SubmissionPackage",
+            "column": "Submission_Package_ID"
+          },
+          "description": "Package this attachment belongs to",
+          "synonyms": "Package"
+        },
+        "Document_ID": {
+          "type": "INT",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Document",
+            "column": "Document_ID"
+          },
+          "description": "Source document record (RESTRICT delete \u2014 submitted documents cannot be removed)",
+          "synonyms": "Document"
+        },
+        "Sponsor_Document_Type": {
+          "type": "VARCHAR(100)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "project_narrative",
+            "budget_narrative",
+            "biographical_sketch",
+            "current_pending",
+            "facilities_equipment",
+            "data_management_plan",
+            "letter_of_support",
+            "subaward_budget",
+            "other_attachment"
+          ],
+          "description": "Sponsor-side document type code",
+          "synonyms": "Sponsor Type"
+        },
+        "File_Hash_At_Packaging": {
+          "type": "VARCHAR(128)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "description": "SHA-256 hash of the document file captured at packaging time",
+          "synonyms": "Hash, Checksum"
+        },
+        "Sort_Order": {
+          "type": "INT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "default": 0,
+          "description": "Display or submission order within the package",
+          "synonyms": "Order"
+        }
+      },
+      "description": "Package manifest entry linking a submission package to a document. Captures the document's file hash at packaging time so submission integrity can be verified later even if the source document is updated.",
+      "synonyms": "Package Manifest Entry, Submission Document"
+    },
+    "SubmissionAttempt": {
+      "columns": {
+        "Submission_Attempt_ID": {
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true,
+          "description": "Primary key for submission attempt",
+          "synonyms": "Attempt ID"
+        },
+        "Submission_Package_ID": {
+          "type": "INT",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "SubmissionPackage",
+            "column": "Submission_Package_ID"
+          },
+          "description": "Package transmitted by this attempt",
+          "synonyms": "Package"
+        },
+        "Submission_Profile_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "SubmissionProfile",
+            "column": "Submission_Profile_ID"
+          },
+          "description": "Profile used for this attempt (SET NULL on profile deletion)",
+          "synonyms": "Profile"
+        },
+        "Submission_System": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "grants_gov",
+            "research_gov",
+            "era_commons",
+            "nspires",
+            "manual",
+            "other"
+          ],
+          "description": "Sponsor system used (denormalized from profile at attempt creation for historical accuracy)",
+          "synonyms": "System"
+        },
+        "Environment": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "training",
+            "production"
+          ],
+          "description": "Submission environment (denormalized from profile at attempt creation)",
+          "synonyms": "Env"
+        },
+        "Status": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "submitting",
+            "submitted",
+            "received",
+            "validated",
+            "rejected",
+            "accepted",
+            "error"
+          ],
+          "default": "submitting",
+          "description": "Current status in the attempt lifecycle",
+          "synonyms": "Status"
+        },
+        "External_Tracking_Number": {
+          "type": "VARCHAR(255)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Sponsor-assigned tracking identifier (e.g., Grants.gov tracking number)",
+          "synonyms": "Tracking Number"
+        },
+        "Submitted_At": {
+          "type": "TIMESTAMP",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Timestamp when the attempt was initiated",
+          "synonyms": "Submission Time"
+        },
+        "Response_Data": {
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "JSON blob storing raw sponsor response data",
+          "synonyms": "Response"
+        },
+        "Error_Detail": {
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Error message or diagnostic detail for failed attempts",
+          "synonyms": "Error"
+        },
+        "Submitted_By_User_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Personnel",
+            "column": "Personnel_ID"
+          },
+          "description": "User who initiated the attempt",
+          "synonyms": "Submitter"
+        }
+      },
+      "description": "Record of each outbound transmission of a submission package to an external sponsor system. Multiple attempts may reference the same package (retry after error, resubmit to a different environment). Follows a defined status state machine: submitting -> submitted -> received -> validated -> accepted/rejected/error.",
+      "synonyms": "Submission Transmission, Outbound Attempt"
+    },
+    "SubmissionEvent": {
+      "columns": {
+        "Submission_Event_ID": {
+          "type": "INT",
+          "primary_key": true,
+          "required": false,
+          "unique": false,
+          "auto_increment": true,
+          "description": "Primary key for submission event",
+          "synonyms": "Event ID"
+        },
+        "Submission_Attempt_ID": {
+          "type": "INT",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "SubmissionAttempt",
+            "column": "Submission_Attempt_ID"
+          },
+          "description": "Attempt this event belongs to",
+          "synonyms": "Attempt"
+        },
+        "Event_Type": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "allowed_values": [
+            "status_change",
+            "agency_note",
+            "operator_action",
+            "error",
+            "validation_result"
+          ],
+          "description": "Type of event",
+          "synonyms": "Type"
+        },
+        "Event_Timestamp": {
+          "type": "TIMESTAMP",
+          "primary_key": false,
+          "required": true,
+          "unique": false,
+          "auto_increment": false,
+          "description": "When the event occurred",
+          "synonyms": "Timestamp"
+        },
+        "Previous_Status": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Status before a status_change event",
+          "synonyms": "From Status"
+        },
+        "New_Status": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Status after a status_change event",
+          "synonyms": "To Status"
+        },
+        "External_Data": {
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "JSON blob for agency-provided data or validation details",
+          "synonyms": "Agency Data"
+        },
+        "Description": {
+          "type": "TEXT",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "description": "Human-readable description of the event",
+          "synonyms": "Notes"
+        },
+        "User_ID": {
+          "type": "VARCHAR(50)",
+          "primary_key": false,
+          "required": false,
+          "unique": false,
+          "auto_increment": false,
+          "references": {
+            "table": "Personnel",
+            "column": "Personnel_ID"
+          },
+          "description": "User associated with the event (operator or reviewer)",
+          "synonyms": "User"
+        }
+      },
+      "description": "Granular audit events for a submission attempt. Each event captures one discrete occurrence in the attempt lifecycle: status transitions, agency feedback, operator notes, validation results, or errors.",
+      "synonyms": "Submission Audit Event, Attempt Event"
     }
   },
   "views": {
@@ -3512,7 +4995,7 @@
       "description": "Proposed vs approved vs current vs actual spending by award, period, and category"
     }
   },
-  "table_count": 29,
+  "table_count": 40,
   "view_count": 8,
-  "relationship_count": 72
+  "relationship_count": 100
 }

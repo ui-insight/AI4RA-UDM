@@ -211,6 +211,12 @@
       "to_column": "Organization_ID"
     },
     {
+      "from_table": "Subaward",
+      "from_column": "PI_Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
       "from_table": "CostShare",
       "from_column": "Award_ID",
       "to_table": "Award",
@@ -431,7 +437,169 @@
       "from_column": "Document_Type_Value_ID",
       "to_table": "AllowedValues",
       "to_column": "Allowed_Value_ID"
+    },
+    {
+      "from_table": "ApplicationSystem",
+      "from_column": "Owning_Organization_ID",
+      "to_table": "Organization",
+      "to_column": "Organization_ID"
+    },
+    {
+      "from_table": "ServiceRequest",
+      "from_column": "Requestor_Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "ServiceRequest",
+      "from_column": "Assigned_Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "ServiceRequest",
+      "from_column": "ApplicationSystem_ID",
+      "to_table": "ApplicationSystem",
+      "to_column": "ApplicationSystem_ID"
+    },
+    {
+      "from_table": "ServiceRequest",
+      "from_column": "Related_Award_ID",
+      "to_table": "Award",
+      "to_column": "Award_ID"
+    },
+    {
+      "from_table": "ServiceRequest",
+      "from_column": "Related_Proposal_ID",
+      "to_table": "Proposal",
+      "to_column": "Proposal_ID"
+    },
+    {
+      "from_table": "RFARequirement",
+      "from_column": "RFA_ID",
+      "to_table": "RFA",
+      "to_column": "RFA_ID"
+    },
+    {
+      "from_table": "ProjectCohort",
+      "from_column": "Project_ID",
+      "to_table": "Project",
+      "to_column": "Project_ID"
+    },
+    {
+      "from_table": "CohortParticipation",
+      "from_column": "ProjectCohort_ID",
+      "to_table": "ProjectCohort",
+      "to_column": "ProjectCohort_ID"
+    },
+    {
+      "from_table": "CohortParticipation",
+      "from_column": "Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "CohortParticipation",
+      "from_column": "Related_Proposal_ID",
+      "to_table": "Proposal",
+      "to_column": "Proposal_ID"
+    },
+    {
+      "from_table": "CohortParticipation",
+      "from_column": "Related_Project_ID",
+      "to_table": "Project",
+      "to_column": "Project_ID"
+    },
+    {
+      "from_table": "CohortParticipation",
+      "from_column": "Coach_Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "ProposalChecklistItem",
+      "from_column": "Proposal_ID",
+      "to_table": "Proposal",
+      "to_column": "Proposal_ID"
+    },
+    {
+      "from_table": "ProposalChecklistItem",
+      "from_column": "RFARequirement_ID",
+      "to_table": "RFARequirement",
+      "to_column": "RFARequirement_ID"
+    },
+    {
+      "from_table": "ProposalChecklistItem",
+      "from_column": "Assignee_Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "ProposalChecklistItem",
+      "from_column": "Document_ID",
+      "to_table": "Document",
+      "to_column": "Document_ID"
+    },
+    {
+      "from_table": "SubmissionProfile",
+      "from_column": "Organization_ID",
+      "to_table": "Organization",
+      "to_column": "Organization_ID"
+    },
+    {
+      "from_table": "SubmissionPackage",
+      "from_column": "Proposal_ID",
+      "to_table": "Proposal",
+      "to_column": "Proposal_ID"
+    },
+    {
+      "from_table": "SubmissionPackage",
+      "from_column": "Assembled_By_User_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "SubmissionAttachment",
+      "from_column": "Submission_Package_ID",
+      "to_table": "SubmissionPackage",
+      "to_column": "Submission_Package_ID"
+    },
+    {
+      "from_table": "SubmissionAttachment",
+      "from_column": "Document_ID",
+      "to_table": "Document",
+      "to_column": "Document_ID"
+    },
+    {
+      "from_table": "SubmissionAttempt",
+      "from_column": "Submission_Package_ID",
+      "to_table": "SubmissionPackage",
+      "to_column": "Submission_Package_ID"
+    },
+    {
+      "from_table": "SubmissionAttempt",
+      "from_column": "Submission_Profile_ID",
+      "to_table": "SubmissionProfile",
+      "to_column": "Submission_Profile_ID"
+    },
+    {
+      "from_table": "SubmissionAttempt",
+      "from_column": "Submitted_By_User_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "SubmissionEvent",
+      "from_column": "Submission_Attempt_ID",
+      "to_table": "SubmissionAttempt",
+      "to_column": "Submission_Attempt_ID"
+    },
+    {
+      "from_table": "SubmissionEvent",
+      "from_column": "User_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
     }
   ],
-  "relationship_count": 72
+  "relationship_count": 100
 }
