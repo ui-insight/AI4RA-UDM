@@ -3,7 +3,7 @@ import type { TabName } from '../types';
 const tabs: { id: TabName; label: string }[] = [
   { id: 'home', label: 'Home' },
   { id: 'dictionary', label: 'Data Dictionary' },
-  { id: 'tables', label: 'Tables' },
+  { id: 'tables', label: 'Explorer' },
   { id: 'erd', label: 'ERD Visualization' },
   { id: 'views', label: 'Example Views' },
   { id: 'ontology', label: 'Ontology & Design' },

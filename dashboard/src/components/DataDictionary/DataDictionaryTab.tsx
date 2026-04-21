@@ -71,7 +71,7 @@ export default function DataDictionaryTab({
           One row per UDM table, grouped by domain. Columns show the number of fields, a description,
           and the foreign-key neighbourhoods (parents are tables referenced by this table; children
           reference back into it). For column-level detail and breadcrumb navigation, use the{' '}
-          <strong>Tables</strong> tab.
+          <strong>Explorer</strong> tab.
         </p>
 
         <div style={{ overflowX: 'auto' }}>

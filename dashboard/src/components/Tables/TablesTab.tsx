@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import type { DataDictionary, Relationship } from '../../types';
+import { domainGroups, getDomain } from '../../data/domains';
 
 interface Props {
   dataDictionary: DataDictionary;
@@ -7,14 +8,8 @@ interface Props {
   reverseRelationships: Record<string, string[]>;
 }
 
-const entryPoints = [
-  { name: 'Organization', desc: 'Institutional entities including sponsors, departments, and subrecipients', color: '#4A90E2' },
-  { name: 'Project', desc: 'Research and training projects (navigate to Awards, Proposals)', color: '#BD10E0' },
-  { name: 'Personnel', desc: 'Individuals involved in projects and awards', color: '#F5A623' },
-  { name: 'Transaction', desc: 'Financial transactions, funds, accounts, and invoicing', color: '#7ED321' },
-];
-
 export default function TablesTab({ dataDictionary, relationships, reverseRelationships }: Props) {
+  const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
   const [history, setHistory] = useState<string[]>([]);
 
   const currentTable = history.length > 0 ? history[history.length - 1] : null;
@@ -32,6 +27,12 @@ export default function TablesTab({ dataDictionary, relationships, reverseRelati
 
   const showHome = useCallback(() => {
     setHistory([]);
+    setSelectedDomain(null);
+  }, []);
+
+  const showDomain = useCallback((domainName: string) => {
+    setSelectedDomain(domainName);
+    setHistory([]);
   }, []);
 
   const getForeignKeyTarget = useCallback((tableName: string, fieldName: string) => {
@@ -41,11 +42,13 @@ export default function TablesTab({ dataDictionary, relationships, reverseRelati
 
   const table = currentTable ? dataDictionary.tables[currentTable] : null;
   const childTables = currentTable ? (reverseRelationships[currentTable] || []) : [];
+  const activeDomain = selectedDomain ? domainGroups.find(d => d.name === selectedDomain) : null;
+  const showBreadcrumb = selectedDomain !== null || history.length > 0;
 
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2rem' }}>
       {/* Breadcrumb */}
-      {history.length > 0 && (
+      {showBreadcrumb && (
         <div style={{
           background: 'white', padding: '1rem 1.5rem', borderRadius: 8,
           marginBottom: '1.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
@@ -53,8 +56,21 @@ export default function TablesTab({ dataDictionary, relationships, reverseRelati
         }}>
           <a href="#" onClick={e => { e.preventDefault(); showHome(); }}
             style={{ color: '#667eea', textDecoration: 'none', fontWeight: 500 }}>
-            Home
+            Themes
           </a>
+          {selectedDomain && (
+            <>
+              <span style={{ color: '#95a5a6', userSelect: 'none' }}>&rsaquo;</span>
+              {history.length > 0 ? (
+                <a href="#" onClick={e => { e.preventDefault(); setHistory([]); }}
+                  style={{ color: '#667eea', textDecoration: 'none', fontWeight: 500 }}>
+                  {selectedDomain}
+                </a>
+              ) : (
+                <span style={{ color: '#2c3e50', fontWeight: 600 }}>{selectedDomain}</span>
+              )}
+            </>
+          )}
           {history.map((t, i) => (
             <span key={i} style={{ display: 'contents' }}>
               <span style={{ color: '#95a5a6', userSelect: 'none' }}>&rsaquo;</span>
@@ -71,60 +87,127 @@ export default function TablesTab({ dataDictionary, relationships, reverseRelati
         </div>
       )}
 
-      {/* Home View */}
-      {!currentTable && (
+      {/* Themes Landing */}
+      {!selectedDomain && !currentTable && (
         <div style={{
           background: 'white', padding: '2rem', borderRadius: 8,
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         }}>
-          <h2 style={{ color: '#2c3e50', marginBottom: '1rem', fontSize: '1.5rem' }}>Getting Started</h2>
-          <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
-            The Universal Data Model (UDM) provides a standardized structure for research administration data.
-            This interactive browser helps you explore table definitions and understand relationships between entities.
+          <h2 style={{ color: '#2c3e50', marginBottom: '0.5rem', fontSize: '1.5rem' }}>Explore by Theme</h2>
+          <p style={{ color: '#546e7a', marginBottom: '1.5rem' }}>
+            The UDM groups tables into {domainGroups.length} themes covering the research-administration
+            lifecycle. Pick a theme to see its tables, then drill into a table to see its columns and
+            foreign keys. Use the breadcrumb to navigate back.
           </p>
-          <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
-            <strong style={{ color: '#2c3e50' }}>How to use:</strong> Click on a table below to see its fields and descriptions.
-            You can navigate in two ways:
-          </p>
-          <ul style={{ marginLeft: '2rem', marginBottom: '1rem' }}>
-            <li style={{ color: '#546e7a', marginBottom: '0.25rem' }}>
-              <strong>Navigate up (to parents):</strong> Click foreign key fields
-              (shown in <span style={{ color: '#667eea', textDecoration: 'underline', textDecorationStyle: 'dotted' }}>blue with dotted underline</span>)
-              to view referenced tables
-            </li>
-            <li style={{ color: '#546e7a' }}>
-              <strong>Navigate down (to children):</strong> Click related table cards below the field list
-              to view tables that reference the current table
-            </li>
-          </ul>
-          <p style={{ color: '#546e7a' }}>Use the breadcrumb trail above to navigate back through your path.</p>
 
-          <h3 style={{ marginTop: '2rem', marginBottom: '1rem', color: '#2c3e50' }}>Entry Points</h3>
           <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem',
+            display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem',
           }}>
-            {entryPoints.map(ep => (
+            {domainGroups.map(d => (
               <div
-                key={ep.name}
-                onClick={() => showTable(ep.name)}
+                key={d.name}
+                onClick={() => showDomain(d.name)}
                 style={{
-                  background: 'white', padding: '1.5rem', borderRadius: 8,
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)', cursor: 'pointer',
-                  transition: 'all 0.3s ease', borderLeft: `4px solid ${ep.color}`,
+                  background: 'white', padding: '1.25rem 1.5rem', borderRadius: 8,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.08)', cursor: 'pointer',
+                  transition: 'all 0.2s ease', borderLeft: `4px solid ${d.color}`,
                 }}
                 onMouseEnter={e => {
-                  (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-4px)';
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                  (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 14px rgba(0,0,0,0.12)';
                 }}
                 onMouseLeave={e => {
                   (e.currentTarget as HTMLDivElement).style.transform = '';
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                  (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
                 }}
               >
-                <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', color: '#2c3e50' }}>{ep.name}</h3>
-                <p style={{ color: '#546e7a', fontSize: '0.9rem' }}>{ep.desc}</p>
+                <div style={{
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+                  marginBottom: '0.35rem',
+                }}>
+                  <h3 style={{ fontSize: '1.1rem', color: '#2c3e50', margin: 0 }}>{d.name}</h3>
+                  <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{d.tables.length} tables</span>
+                </div>
+                <div style={{ fontSize: '0.85rem', color: '#546e7a', lineHeight: 1.4 }}>
+                  {d.tables.join(', ')}
+                </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Theme Detail — tables within the selected domain */}
+      {activeDomain && !currentTable && (
+        <div style={{
+          background: 'white', padding: '2rem', borderRadius: 8,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        }}>
+          <div style={{
+            display: 'inline-block', padding: '0.2rem 0.7rem', borderRadius: 999,
+            fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.75rem',
+            background: `${activeDomain.color}18`,
+            color: activeDomain.color,
+            border: `1px solid ${activeDomain.color}40`,
+          }}>
+            {activeDomain.name}
+          </div>
+          <h2 style={{ color: '#2c3e50', marginBottom: '0.5rem', fontSize: '1.5rem' }}>
+            {activeDomain.tables.length} {activeDomain.tables.length === 1 ? 'table' : 'tables'} in this theme
+          </h2>
+          <p style={{ color: '#546e7a', marginBottom: '1.5rem' }}>
+            Pick a table to see its column definitions and follow foreign-key relationships into
+            neighbouring tables (in this or any other theme).
+          </p>
+
+          <div style={{
+            display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem',
+          }}>
+            {activeDomain.tables.map(tableName => {
+              const t = dataDictionary.tables[tableName];
+              if (!t) return null;
+              return (
+                <div
+                  key={tableName}
+                  onClick={() => showTable(tableName)}
+                  style={{
+                    background: 'white', padding: '1rem 1.25rem', borderRadius: 8,
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.06)', cursor: 'pointer',
+                    transition: 'all 0.2s ease', border: '1px solid #e9ecef',
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLDivElement).style.borderColor = activeDomain.color;
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 10px rgba(0,0,0,0.08)';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLDivElement).style.borderColor = '#e9ecef';
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 2px 6px rgba(0,0,0,0.06)';
+                  }}
+                >
+                  <div style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+                    marginBottom: '0.3rem',
+                  }}>
+                    <h3 style={{
+                      fontSize: '1rem', color: '#2c3e50', margin: 0,
+                      fontFamily: "'Monaco', 'Courier New', monospace",
+                    }}>
+                      {tableName}
+                    </h3>
+                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                      {t.columns.length} fields
+                    </span>
+                  </div>
+                  <p style={{
+                    color: '#546e7a', fontSize: '0.85rem', lineHeight: 1.45, margin: 0,
+                    display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 3,
+                    overflow: 'hidden',
+                  }}>
+                    {t.description || 'No description'}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -136,7 +219,22 @@ export default function TablesTab({ dataDictionary, relationships, reverseRelati
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             color: 'white', padding: '1.5rem 2rem',
           }}>
-            <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>{table.name}</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+              <h2 style={{ fontSize: '1.5rem', margin: 0 }}>{table.name}</h2>
+              {(() => {
+                const dom = getDomain(table.name);
+                return dom ? (
+                  <span style={{
+                    padding: '0.15rem 0.6rem', borderRadius: 999,
+                    fontSize: '0.75rem', fontWeight: 600,
+                    background: 'rgba(255,255,255,0.2)', color: 'white',
+                    border: '1px solid rgba(255,255,255,0.35)',
+                  }}>
+                    {dom.name}
+                  </span>
+                ) : null;
+              })()}
+            </div>
             <div style={{ opacity: 0.9, fontSize: '0.95rem' }}>{table.description}</div>
           </div>
 

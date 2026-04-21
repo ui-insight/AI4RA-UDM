@@ -99,7 +99,7 @@ export default function HomeTab({ dataDictionary, relationships }: Props) {
             desc="Summary table of every entity with field counts, descriptions, parents, children, and domain."
           />
           <NavCard
-            title="Tables"
+            title="Explorer"
             desc="Drill down into individual tables column-by-column. Navigate foreign keys with a breadcrumb trail."
           />
           <NavCard
