@@ -157,6 +157,26 @@ Institutions are expected to:
 2. **Populate** the AllowedValues table with their institution-specific lookup values
 3. **Adapt** views to their reporting needs
 
+### Crosswalks
+
+A **crosswalk** is a declarative mapping between a source system's vocabulary and the UDM's — one row per source field, listing the target UDM column, any value-translation rules, and transformation notes. Crosswalks are the concrete artifact that operationalizes step 1 above.
+
+| Source Column | UDM Column | Value Translation |
+|---------------|------------|-------------------|
+| `grantNumber` | `Award.Award_ID` | direct |
+| `pi_email` | `ContactDetails.Contact_Value` (with `Contact_Type = "Email"`) | pivot |
+| `STATUS_CD = 'A'` | `Award.Award_Status = 'Active'` | enum lookup |
+| `proj_start` (MM/DD/YYYY) | `Proposal.Proposed_Start_Date` | parse to DATE |
+
+The UDM supports crosswalk authoring in two places:
+
+- **`synonyms`** on every table and column — lists alternate names (e.g., `Award` ↔ `Grant, Contract, Agreement`) so matchers can identify equivalent concepts without a hand-built dictionary.
+- **`description`** — plain-language column purpose that ML or LLM matchers can use alongside the column name to disambiguate near-duplicates.
+
+In a medallion lakehouse, the crosswalk *is* the Silver layer: each source gets its own Silver schema that renames/pivots/coerces its raw Bronze data into UDM-shaped columns. The Gold layer then unions the Silver views across sources.
+
+See the [Infrastructure tab](https://ui-insight.github.io/AI4RA-UDM/) for diagrams of both the Silver crosswalk layer and the surrounding medallion architecture.
+
 ## Contributing
 
 The UDM improves through community input. There are several ways to participate:

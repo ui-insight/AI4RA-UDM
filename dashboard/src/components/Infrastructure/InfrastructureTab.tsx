@@ -193,13 +193,116 @@ export default function InfrastructureTab() {
             <LayerCard title="Bronze" color={colors.bronze}
               desc="Raw data extracted from source systems, preserved as-is for auditability. No transformations." />
             <LayerCard title="Silver" color={colors.silver}
-              desc="Source-specific views that map local field names to UDM column names. One Silver schema per source system. This is where the UDM mapping happens." />
+              desc="Source-specific views that map local field names to UDM column names. One Silver schema per source system. This is where the UDM crosswalk lives." />
             <LayerCard title="Gold" color={colors.gold}
               desc="Unified UDM tables that combine Silver views across all sources via UNION ALL. Applications query Gold tables without knowing which source system the data came from." />
             <LayerCard title="Platinum" color={colors.platinum}
               desc="Application-specific views built on Gold (or Silver when a single definitive source exists). Joins, filters, and aggregations tailored to a specific dashboard, report, or downstream app." />
           </div>
         </div>
+      </div>
+
+      <div style={{
+        background: 'white', padding: '2rem', borderRadius: 8,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)', marginBottom: '2rem',
+      }}>
+        <h3 style={{ color: '#2c3e50', marginBottom: '1rem', fontSize: '1.3rem' }}>
+          Crosswalks: Mapping Source Fields to the UDM
+        </h3>
+        <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
+          A <strong>crosswalk</strong> is a declarative mapping between a source system's vocabulary and the
+          UDM's — one row per source field listing the target UDM column, any value translation, and
+          transformation notes. In a medallion architecture the crosswalk <em>is</em> the Silver layer.
+        </p>
+
+        <div style={{ overflowX: 'auto', marginBottom: '1rem' }}>
+          <table style={{
+            width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem',
+          }}>
+            <thead>
+              <tr style={{ background: '#f1f5f9', textAlign: 'left', color: '#334155' }}>
+                <th style={{ padding: '0.6rem 0.75rem', borderBottom: '2px solid #cbd5e1' }}>Source Column</th>
+                <th style={{ padding: '0.6rem 0.75rem', borderBottom: '2px solid #cbd5e1' }}>UDM Target</th>
+                <th style={{ padding: '0.6rem 0.75rem', borderBottom: '2px solid #cbd5e1' }}>Transformation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <CrosswalkRow src="grantNumber" tgt="Award.Award_ID" note="direct" />
+              <CrosswalkRow src="pi_email" tgt={'ContactDetails.Contact_Value\u00A0(Contact_Type=Email)'} note="pivot to ContactDetails row" />
+              <CrosswalkRow src="STATUS_CD = 'A'" tgt="Award.Award_Status = 'Active'" note="value lookup via AllowedValues" />
+              <CrosswalkRow src="proj_start (MM/DD/YYYY)" tgt="Proposal.Proposed_Start_Date" note="parse to DATE" />
+              <CrosswalkRow src="FOA_NUM" tgt="RFA.RFA_Number" note="synonym match" />
+            </tbody>
+          </table>
+        </div>
+
+        <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
+          The UDM supports crosswalk authoring with two first-class fields on every table and column:
+        </p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
+          <LayerCard title="synonyms" color={colors.silver}
+            desc={'Alternate names on every entity — e.g., Award ↔ "Grant, Contract, Agreement". Matchers and LLMs use these to identify equivalent concepts without a hand-built dictionary.'} />
+          <LayerCard title="description" color={colors.silver}
+            desc="Plain-language column purpose. Combined with the column name, gives LLM/ML matchers enough semantic context to disambiguate near-duplicates like Sponsor vs. Submitting vs. Administering Organization." />
+        </div>
+
+        <div style={{
+          marginTop: '1.25rem', padding: '0.85rem 1rem', borderRadius: 6,
+          background: '#eef2ff', border: '1px solid #c7d2fe', color: '#3730a3', fontSize: '0.9rem',
+        }}>
+          <strong>In progress:</strong> AI-assisted / dynamic crosswalk generation — using the{' '}
+          <code>synonyms</code> and <code>description</code> fields plus table context to auto-propose
+          mappings from a source schema to UDM columns, with confidence scores and human review. See{' '}
+          <a href="https://github.com/ui-insight/AI4RA-UDM/issues/33" style={{ color: '#4f46e5' }}>
+            issue #33
+          </a>.
+        </div>
+      </div>
+
+      <div style={{
+        background: 'white', padding: '2rem', borderRadius: 8,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)', marginBottom: '2rem',
+      }}>
+        <h3 style={{ color: '#2c3e50', marginBottom: '0.5rem', fontSize: '1.3rem' }}>
+          Integration Vocabulary
+        </h3>
+        <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
+          Terms that come up repeatedly in data-integration conversations. This glossary lives alongside
+          the UDM but isn't part of it — the UDM defines <em>what</em> the canonical schema looks like;
+          this vocabulary names the <em>activities and artifacts</em> around mapping other systems to it.
+        </p>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+            <thead>
+              <tr style={{ background: '#f1f5f9', textAlign: 'left', color: '#334155' }}>
+                <th style={{ padding: '0.6rem 0.75rem', borderBottom: '2px solid #cbd5e1', width: 180 }}>Term</th>
+                <th style={{ padding: '0.6rem 0.75rem', borderBottom: '2px solid #cbd5e1' }}>Definition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <VocabRow
+                term="Crosswalk"
+                def="A declarative per-field mapping between a source system's vocabulary and the UDM's, including value translations and transformation notes. In a medallion lakehouse, the crosswalk is the Silver layer."
+              />
+              <VocabRow
+                term="Schema mapping"
+                def="The broader design process of deciding how one schema corresponds to another. Crosswalks are the artifacts that record those mapping decisions."
+              />
+              <VocabRow
+                term="Lookup table"
+                def={'Static reference data providing code\u2192label or code\u2192definition translations within a single system (e.g., state code \u2192 state name). A crosswalk is specifically about bridging different systems\u2019 conventions, which is why lookup tables are a related-but-distinct concept.'}
+              />
+              <VocabRow
+                term="ETL code"
+                def="The executable expression of a crosswalk — the pipeline code (SQL views, dbt models, Python jobs) that physically extracts from the source, transforms per the crosswalk rules, and loads into the UDM-shaped target. The crosswalk itself stays declarative so analysts can read and edit it without touching pipelines."
+              />
+            </tbody>
+          </table>
+        </div>
+        <p style={{ color: '#94a3b8', fontSize: '0.8rem', marginTop: '1rem' }}>
+          Open a PR or issue to add a term.
+        </p>
       </div>
 
       <div style={{
@@ -304,5 +407,48 @@ function LayerCard({ title, color, desc }: { title: string; color: string; desc:
       <h4 style={{ color: '#2c3e50', marginBottom: '0.5rem' }}>{title}</h4>
       <p style={{ color: '#546e7a', fontSize: '0.9rem' }}>{desc}</p>
     </div>
+  );
+}
+
+function VocabRow({ term, def }: { term: string; def: string }) {
+  return (
+    <tr>
+      <td style={{
+        padding: '0.6rem 0.75rem', borderBottom: '1px solid #e9ecef', verticalAlign: 'top',
+        fontWeight: 600, color: '#2c3e50',
+      }}>
+        {term}
+      </td>
+      <td style={{
+        padding: '0.6rem 0.75rem', borderBottom: '1px solid #e9ecef', verticalAlign: 'top',
+        color: '#475569', lineHeight: 1.5,
+      }}>
+        {def}
+      </td>
+    </tr>
+  );
+}
+
+function CrosswalkRow({ src, tgt, note }: { src: string; tgt: string; note: string }) {
+  const cell: React.CSSProperties = {
+    padding: '0.55rem 0.75rem',
+    borderBottom: '1px solid #e9ecef',
+    verticalAlign: 'top',
+    color: '#475569',
+  };
+  const codeStyle: React.CSSProperties = {
+    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+    fontSize: '0.82rem',
+    background: '#f1f5f9',
+    padding: '0.1rem 0.35rem',
+    borderRadius: 3,
+    color: '#1e293b',
+  };
+  return (
+    <tr>
+      <td style={cell}><span style={codeStyle}>{src}</span></td>
+      <td style={cell}><span style={codeStyle}>{tgt}</span></td>
+      <td style={{ ...cell, color: '#64748b', fontSize: '0.85rem' }}>{note}</td>
+    </tr>
   );
 }
