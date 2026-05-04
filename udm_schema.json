@@ -1,6 +1,7 @@
 {
   "tables": {
     "AllowedValues": {
+      "theme": "reference",
       "columns": {
         "Allowed_Value_ID": {
           "type": "INT",
@@ -52,6 +53,7 @@
       "synonyms": "ValueList, LookupTable"
     },
     "BudgetCategory": {
+      "theme": "finance",
       "columns": {
         "BudgetCategory_ID": {
           "type": "INT",
@@ -94,6 +96,7 @@
       "synonyms": "Budget Categories, Cost Categories"
     },
     "Organization": {
+      "theme": "organization",
       "columns": {
         "Organization_ID": {
           "type": "VARCHAR(50)",
@@ -159,6 +162,7 @@
       "synonyms": "Org, Institution, Entity"
     },
     "Personnel": {
+      "theme": "personnel",
       "columns": {
         "Personnel_ID": {
           "type": "VARCHAR(50)",
@@ -282,6 +286,7 @@
       "synonyms": "Person, Employee"
     },
     "ContactDetails": {
+      "theme": "organization",
       "columns": {
         "ContactDetails_ID": {
           "type": "INT",
@@ -346,6 +351,7 @@
       "synonyms": "Contact, ContactInfo"
     },
     "IndirectRate": {
+      "theme": "organization",
       "columns": {
         "IndirectRate_ID": {
           "type": "INT",
@@ -444,6 +450,7 @@
       "synonyms": "F&A Rates, Overhead Rates, IDC Rates, NICRA"
     },
     "Project": {
+      "theme": "projects",
       "columns": {
         "Project_ID": {
           "type": "VARCHAR(50)",
@@ -559,6 +566,7 @@
       "description": "Represents research or training projects"
     },
     "RFA": {
+      "theme": "proposals",
       "columns": {
         "RFA_ID": {
           "type": "VARCHAR(50)",
@@ -738,6 +746,7 @@
       "synonyms": "Funding Opportunity"
     },
     "Proposal": {
+      "theme": "proposals",
       "columns": {
         "Proposal_ID": {
           "type": "VARCHAR(50)",
@@ -988,6 +997,7 @@
       "description": "Represents submitted proposals for projects"
     },
     "ProposalBudget": {
+      "theme": "proposals",
       "columns": {
         "ProposalBudget_ID": {
           "type": "INT",
@@ -1130,6 +1140,7 @@
       "synonyms": "Proposal Budget Lines"
     },
     "Award": {
+      "theme": "awards",
       "columns": {
         "Award_ID": {
           "type": "VARCHAR(50)",
@@ -1332,6 +1343,7 @@
       "description": "Represents awarded funding for projects"
     },
     "Modification": {
+      "theme": "awards",
       "columns": {
         "Modification_ID": {
           "type": "VARCHAR(50)",
@@ -1509,6 +1521,7 @@
       "synonyms": "Award Amendments, Changes, Revisions"
     },
     "Terms": {
+      "theme": "awards",
       "columns": {
         "AwardTerms_ID": {
           "type": "INT",
@@ -1635,6 +1648,7 @@
       "synonyms": "Award Terms, Conditions, Requirements"
     },
     "AwardBudgetPeriod": {
+      "theme": "awards",
       "columns": {
         "AwardBudgetPeriod_ID": {
           "type": "INT",
@@ -1746,6 +1760,7 @@
       "synonyms": "Award Periods, Budget Years"
     },
     "AwardBudget": {
+      "theme": "awards",
       "columns": {
         "Award_Budget_ID": {
           "type": "INT",
@@ -1878,6 +1893,7 @@
       "synonyms": "Award Budget Lines"
     },
     "Subaward": {
+      "theme": "awards/subawards",
       "columns": {
         "Subaward_ID": {
           "type": "VARCHAR(50)",
@@ -2016,6 +2032,7 @@
       "description": "Represents subawards issued under prime awards"
     },
     "CostShare": {
+      "theme": "awards",
       "columns": {
         "CostShare_ID": {
           "type": "INT",
@@ -2135,6 +2152,7 @@
       "synonyms": "Cost Sharing, Matching Funds"
     },
     "Invoice": {
+      "theme": "finance",
       "columns": {
         "Invoice_ID": {
           "type": "VARCHAR(50)",
@@ -2296,6 +2314,7 @@
       "synonyms": "Billing, Invoices, Payment Requests"
     },
     "AwardDeliverable": {
+      "theme": "awards",
       "columns": {
         "AwardDeliverable_ID": {
           "type": "INT",
@@ -2439,6 +2458,7 @@
       "synonyms": "Reports, Deliverables, Milestones"
     },
     "ProjectRole": {
+      "theme": "projects",
       "columns": {
         "ProjectRole_ID": {
           "type": "INT",
@@ -2552,6 +2572,7 @@
       "synonyms": "Project Team, Personnel Assignments, Roles"
     },
     "Fund": {
+      "theme": "finance",
       "columns": {
         "Fund_Code": {
           "type": "VARCHAR(20)",
@@ -2602,6 +2623,7 @@
       "synonyms": "Funds, Fund Codes"
     },
     "Account": {
+      "theme": "finance",
       "columns": {
         "Account_Code": {
           "type": "VARCHAR(20)",
@@ -2664,6 +2686,7 @@
       "synonyms": "GL Accounts, Account Codes"
     },
     "FinanceCode": {
+      "theme": "finance",
       "columns": {
         "Finance_Code": {
           "type": "VARCHAR(20)",
@@ -2727,6 +2750,7 @@
       "synonyms": "Financial Codes, Account Strings, FOAP"
     },
     "Transaction": {
+      "theme": "finance",
       "columns": {
         "Transaction_ID": {
           "type": "VARCHAR(50)",
@@ -2937,6 +2961,7 @@
       "synonyms": "Expenses, Charges, Ledger Entries"
     },
     "Effort": {
+      "theme": "projects",
       "columns": {
         "Effort_ID": {
           "type": "INT",
@@ -3091,6 +3116,7 @@
       "synonyms": "Effort Reporting, Time Allocation, PAR"
     },
     "ComplianceRequirement": {
+      "theme": "compliance",
       "columns": {
         "ComplianceRequirement_ID": {
           "type": "VARCHAR(50)",
@@ -3246,6 +3272,7 @@
       "synonyms": "IRB, IACUC, Compliance, Ethics Approvals"
     },
     "ConflictOfInterest": {
+      "theme": "compliance",
       "columns": {
         "ConflictOfInterest_ID": {
           "type": "INT",
@@ -3398,6 +3425,7 @@
       "synonyms": "COI, Disclosures"
     },
     "Document": {
+      "theme": "documents",
       "columns": {
         "Document_ID": {
           "type": "INT",
@@ -3520,6 +3548,7 @@
       "synonyms": "Files, Attachments, Documents"
     },
     "ActivityLog": {
+      "theme": "documents",
       "columns": {
         "Activity_ID": {
           "type": "INT",
@@ -3624,6 +3653,7 @@
       "synonyms": "Audit Log, Change Log, History"
     },
     "ApplicationSystem": {
+      "theme": "systems",
       "columns": {
         "ApplicationSystem_ID": {
           "type": "VARCHAR(50)",
@@ -3716,6 +3746,7 @@
       "synonyms": "System, Application, Platform, Tool"
     },
     "ServiceRequest": {
+      "theme": "systems",
       "columns": {
         "ServiceRequest_ID": {
           "type": "VARCHAR(50)",
@@ -3892,6 +3923,7 @@
       "synonyms": "Ticket, Work Request, Service Ticket"
     },
     "RFARequirement": {
+      "theme": "proposals",
       "columns": {
         "RFARequirement_ID": {
           "type": "INT",
@@ -4053,6 +4085,7 @@
       "synonyms": "FOA Requirement, Solicitation Requirement"
     },
     "ProjectCohort": {
+      "theme": "projects",
       "columns": {
         "ProjectCohort_ID": {
           "type": "VARCHAR(50)",
@@ -4150,6 +4183,7 @@
       "synonyms": "Program Cohort, Track, Program Group"
     },
     "CohortParticipation": {
+      "theme": "projects",
       "columns": {
         "CohortParticipation_ID": {
           "type": "VARCHAR(50)",
@@ -4274,6 +4308,7 @@
       "synonyms": "Cohort Enrollment, Program Participation"
     },
     "ProposalChecklistItem": {
+      "theme": "proposals",
       "columns": {
         "ChecklistItem_ID": {
           "type": "INT",
@@ -4449,6 +4484,7 @@
       "synonyms": "Proposal Checklist, Preparation Checklist, Review Tasks"
     },
     "SubmissionProfile": {
+      "theme": "proposals/submissions",
       "columns": {
         "Submission_Profile_ID": {
           "type": "VARCHAR(50)",
@@ -4546,6 +4582,7 @@
       "synonyms": "Submission Configuration, Sponsor Profile"
     },
     "SubmissionPackage": {
+      "theme": "proposals/submissions",
       "columns": {
         "Submission_Package_ID": {
           "type": "INT",
@@ -4640,6 +4677,7 @@
       "synonyms": "Submission Snapshot, Proposal Package"
     },
     "SubmissionAttachment": {
+      "theme": "proposals/submissions",
       "columns": {
         "Submission_Attachment_ID": {
           "type": "INT",
@@ -4720,6 +4758,7 @@
       "synonyms": "Package Manifest Entry, Submission Document"
     },
     "SubmissionAttempt": {
+      "theme": "proposals/submissions",
       "columns": {
         "Submission_Attempt_ID": {
           "type": "INT",
@@ -4859,6 +4898,7 @@
       "synonyms": "Submission Transmission, Outbound Attempt"
     },
     "SubmissionEvent": {
+      "theme": "proposals/submissions",
       "columns": {
         "Submission_Event_ID": {
           "type": "INT",
