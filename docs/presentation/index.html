@@ -14,23 +14,27 @@
     <link rel="stylesheet" href="slides.css" />
     <style>
       /* Global font bump for readability — overrides REACH's shared slides.css */
-      .reveal h1 { font-size: 3.4rem; }
-      .reveal h2 { font-size: 2.6rem; }
-      .reveal h3 { font-size: 1.45rem; }
-      .reveal p, .reveal li { font-size: 1.45rem; line-height: 1.45; }
-      .slide-kicker { font-size: 1rem; }
-      .slide-lede { font-size: 1.5rem; max-width: 44rem; }
-      .slide-callout { font-size: 1.2rem; }
-      .slide-card h3 { font-size: 1.35rem; }
-      .slide-card p, .slide-card li { font-size: 1.15rem; line-height: 1.45; }
-      .slide-note { font-size: 1.05rem !important; }
-      .udm-domain-card h4 { font-size: 1rem; }
-      .udm-domain-card .udm-domain-tables { font-size: 0.85rem; }
-      .udm-domain-card .udm-domain-count { font-size: 0.7rem; }
-      .udm-stat strong { font-size: 2.8rem; }
-      .udm-stat span { font-size: 0.85rem; }
-      .udm-naming-table { font-size: 1rem; }
-      .udm-naming-table code { font-size: 0.95rem; }
+      .reveal h1 { font-size: 4.6rem; }
+      .reveal h2 { font-size: 3.1rem; }
+      .reveal h3 { font-size: 1.7rem; }
+      .reveal p, .reveal li { font-size: 1.75rem; line-height: 1.45; }
+      .slide-kicker { font-size: 1.2rem; }
+      .slide-lede { font-size: 1.85rem; max-width: 48rem; }
+      .slide-callout { font-size: 1.45rem; }
+      .slide-card h3 { font-size: 1.55rem; }
+      .slide-card p, .slide-card li { font-size: 1.35rem; line-height: 1.45; }
+      .slide-note { font-size: 1.2rem !important; }
+      .udm-domain-card h4 { font-size: 1.15rem; }
+      .udm-domain-card .udm-domain-tables { font-size: 0.95rem; }
+      .udm-domain-card .udm-domain-count { font-size: 0.78rem; }
+      .udm-stat strong { font-size: 3.2rem; }
+      .udm-stat span { font-size: 1rem; }
+      .udm-naming-table { font-size: 1.2rem; }
+      .udm-naming-table code { font-size: 1.1rem; }
+
+      /* Title-slide specific bumps — most-seen slide */
+      .title-slide h1 { font-size: 5.5rem; }
+      .title-slide .slide-lede { font-size: 2.1rem; max-width: 52rem; }
 
       /* UDM-specific extensions */
       .reveal .preview-flow {
@@ -335,21 +339,18 @@
 
         <!-- 1. TITLE -->
         <section class="title-slide" data-background-color="#f1b300">
+          <div style="position: absolute; top: 1.4rem; right: 1.4rem; display: flex; flex-direction: column; align-items: center; gap: 0.35rem; z-index: 10;">
+            <img src="img/follow-along-qr.png" alt="QR code for the follow-along URL" style="width: 10rem; height: 10rem; border-radius: 0.5rem; background: #fff; padding: 0.4rem;" />
+            <a href="https://bit.ly/4nWdn3Y" style="color: var(--ink); font-weight: 800; text-decoration: none; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1.05rem; border-bottom: 3px solid rgba(25, 25, 25, 0.55);">
+              bit.ly/4nWdn3Y
+            </a>
+          </div>
           <p class="slide-kicker slide-kicker-dark">AI4RA Workshop</p>
           <h1>The Unified Data Model</h1>
           <p class="slide-lede slide-dark">
             A common schema for research administration data &mdash;
             what it is, why it matters, and the design choices behind it.
           </p>
-          <div style="margin-top: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
-            <p class="slide-lede slide-dark" style="margin: 0; font-size: 1.3rem;">
-              Follow along at
-              <a href="https://bit.ly/4nWdn3Y" style="color: var(--ink); font-weight: 800; text-decoration: none; border-bottom: 3px solid rgba(25, 25, 25, 0.6); font-family: ui-monospace, SFMono-Regular, Menlo, monospace;">
-                bit.ly/4nWdn3Y
-              </a>
-            </p>
-            <img src="img/follow-along-qr.png" alt="QR code for the follow-along URL" style="width: 9rem; height: 9rem; border-radius: 0.5rem; background: #fff; padding: 0.4rem;" />
-          </div>
         </section>
 
         <!-- 2. MODULE PREVIEW -->
