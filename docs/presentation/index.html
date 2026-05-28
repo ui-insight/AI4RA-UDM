@@ -318,6 +318,12 @@
             A common schema for research administration data &mdash;
             what it is, why it matters, and the design choices behind it.
           </p>
+          <p class="slide-lede slide-dark" style="margin-top: 1.5rem; font-size: 0.85rem;">
+            Follow along at
+            <a href="https://ui-insight.github.io/AI4RA-UDM/presentation/" style="color: var(--ink); font-weight: 800; text-decoration: none; border-bottom: 2px solid rgba(25, 25, 25, 0.5);">
+              ui-insight.github.io/AI4RA-UDM/presentation
+            </a>
+          </p>
         </section>
 
         <!-- 2. MODULE PREVIEW -->
@@ -432,30 +438,6 @@
           <a class="poll-shortlink-big" href="https://bit.ly/4u37OCb" target="_blank" rel="noopener">bit.ly/4u37OCb</a>
         </section>
 
-        <!-- 5. WHY IT MATTERS -->
-        <section>
-          <p class="slide-kicker">Part 1 &middot; What is a data model?</p>
-          <h2>Why does a shared model matter?</h2>
-          <div class="pillar-grid">
-            <article class="slide-card">
-              <h3>Same vocabulary</h3>
-              <p>Everyone means the same thing by "Award," "Proposal," "Effort." Conversations and queries align.</p>
-            </article>
-            <article class="slide-card">
-              <h3>Predictable joins</h3>
-              <p>If you know one table's keys, you know how to connect it to anything else.</p>
-            </article>
-            <article class="slide-card">
-              <h3>Tools transfer</h3>
-              <p>Dashboards, reports, and AI agents built against the model run anywhere the model is adopted.</p>
-            </article>
-            <article class="slide-card">
-              <h3>Schemas as documentation</h3>
-              <p>The model itself encodes the rules &mdash; types, constraints, allowed values, relationships.</p>
-            </article>
-          </div>
-        </section>
-
         <!-- ═══════════════════════════════════════════
              SECTION 2 — WHY RESEARCH ADMIN NEEDS ONE
              ═══════════════════════════════════════════ -->
@@ -523,26 +505,16 @@
              SECTION 3 — TOUR OF THE UDM
              ═══════════════════════════════════════════ -->
 
-        <!-- 9. AT A GLANCE -->
+        <!-- 9. DOMAIN MAP (with stats banner) -->
         <section>
           <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
-          <h2>The UDM at a glance</h2>
-          <div class="udm-stat-row">
+          <h2>Organized by domain</h2>
+          <div class="udm-stat-row" style="margin: 0.2rem 0 0.6rem;">
             <div class="udm-stat"><strong>40</strong><span>Tables</span></div>
             <div class="udm-stat"><strong>10</strong><span>Domains</span></div>
             <div class="udm-stat"><strong>8</strong><span>Reference Views</span></div>
             <div class="udm-stat"><strong>1</strong><span>Source of Truth</span></div>
           </div>
-          <p class="slide-note">
-            Everything &mdash; tables, columns, constraints, descriptions, synonyms, PII flags &mdash;
-            lives in a single <code>udm_schema.json</code>. Dashboard, docs, and APIs derive from it.
-          </p>
-        </section>
-
-        <!-- 10. DOMAIN MAP -->
-        <section>
-          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
-          <h2>Organized by domain</h2>
           <div class="udm-domain-grid">
             <article class="udm-domain-card">
               <span class="udm-domain-count">Reference</span>
@@ -742,20 +714,14 @@ JOIN Award a USING (Award_ID)
              SECTION 4 — ONTOLOGY & NAMING
              ═══════════════════════════════════════════ -->
 
-        <!-- 13. ONTOLOGY INTRO -->
+        <!-- 13. NAMING CONVENTIONS -->
         <section>
           <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
           <h2>Predictable names, predictable joins</h2>
-          <p class="slide-lede">
-            The naming conventions are deliberately mechanical &mdash;
+          <p class="slide-lede" style="font-size: 1rem; margin-bottom: 0.4rem;">
+            The conventions are deliberately mechanical &mdash;
             once you know the rules, you can guess the schema before reading it.
           </p>
-        </section>
-
-        <!-- 14. NAMING CONVENTIONS -->
-        <section>
-          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
-          <h2>Naming conventions</h2>
           <table class="udm-naming-table">
             <thead>
               <tr><th>Element</th><th>Convention</th><th>Examples</th></tr>
@@ -788,73 +754,28 @@ JOIN Award a USING (Award_ID)
           <p class="slide-note">A generic <code>Organization_ID</code> would lose the meaning that joins are built on.</p>
         </section>
 
-        <!-- 16. SUFFIXES -->
-        <section>
-          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
-          <h2>Standard suffixes carry meaning</h2>
-          <div class="slide-badges" style="justify-content: center;">
-            <span class="slide-badge"><code>_ID</code></span>
-            <span class="slide-badge"><code>_Date</code></span>
-            <span class="slide-badge"><code>_Status</code></span>
-            <span class="slide-badge"><code>_Type</code></span>
-            <span class="slide-badge"><code>_Amount</code></span>
-            <span class="slide-badge"><code>_Percent</code></span>
-            <span class="slide-badge"><code>_Number</code></span>
-            <span class="slide-badge"><code>_Name</code></span>
-            <span class="slide-badge"><code>_Code</code></span>
-            <span class="slide-badge"><code>_Description</code></span>
-            <span class="slide-badge"><code>_URL</code></span>
-            <span class="slide-badge"><code>_Level</code></span>
-            <span class="slide-badge"><code>_Text</code></span>
-          </div>
-          <p class="slide-note">If a column name tells you nothing about its type or role, it's not following the ontology.</p>
-        </section>
-
         <!-- ═══════════════════════════════════════════
              SECTION 5 — DESIGN CHOICES
              ═══════════════════════════════════════════ -->
 
-        <!-- 17. ALLOWEDVALUES VS CHECK -->
+        <!-- 17. ALLOWEDVALUES VS CHECK (merged) -->
         <section>
           <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
           <h2>AllowedValues vs CHECK constraints</h2>
-          <p class="slide-lede">The model uses two ways to control enumerated values. Which one depends on whether the value is institution-specific.</p>
+          <p class="slide-lede" style="font-size: 1rem; margin-bottom: 0.4rem;">
+            Two ways to control enumerated values. Which one depends on whether the value is institution-specific or a universal standard.
+          </p>
           <div class="udm-compare-grid">
             <article class="slide-card">
               <h3>AllowedValues table</h3>
-              <p><strong>For values that vary by institution.</strong></p>
-              <p>Contact types, project roles, fund types, deliverable types. Institutions populate the lookup themselves.</p>
-              <p style="font-size: 0.72rem; color: var(--muted);">Used by <strong>12 fields</strong> across the model.</p>
+              <p style="font-size:0.85rem;"><strong>For values that vary by institution.</strong> Contact types, project roles, fund types, deliverable types. Institutions populate the lookup themselves.</p>
+              <p style="font-size:0.78rem; margin-top:0.45rem; color:var(--ink);"><strong>Use when:</strong> institutions need different values, business users should extend without schema changes, values need metadata.</p>
+              <p style="font-size:0.7rem; color: var(--muted); margin-top:0.4rem;">Used by <strong>12 fields</strong> across the model.</p>
             </article>
             <article class="slide-card accent">
               <h3>CHECK constraint</h3>
-              <p><strong>For universal standards.</strong></p>
-              <p>GAAP account types, federal indirect rate structures, status workflows. Hardcoded because they should be consistent everywhere.</p>
-              <p style="font-size: 0.72rem; color: var(--muted);">Used for lifecycle states, GAAP categories, and federal compliance taxonomies.</p>
-            </article>
-          </div>
-        </section>
-
-        <!-- 18. THE TEST -->
-        <section>
-          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
-          <h2>When to pick which</h2>
-          <div class="udm-compare-grid">
-            <article class="slide-card">
-              <h3>Use AllowedValues when&hellip;</h3>
-              <ul>
-                <li>Institutions need different values</li>
-                <li>Business users should extend without schema changes</li>
-                <li>The values need metadata (labels, descriptions)</li>
-              </ul>
-            </article>
-            <article class="slide-card accent">
-              <h3>Use CHECK when&hellip;</h3>
-              <ul>
-                <li>Defined by external standards (GAAP, federal rules)</li>
-                <li>Must remain consistent across deployments</li>
-                <li>Schema-level documentation is valuable</li>
-              </ul>
+              <p style="font-size:0.85rem;"><strong>For universal standards.</strong> GAAP account types, federal indirect rate structures, status workflows. Hardcoded because they should be consistent everywhere.</p>
+              <p style="font-size:0.78rem; margin-top:0.45rem; color:var(--ink);"><strong>Use when:</strong> defined by external standards (GAAP, federal rules), must remain consistent across deployments, schema-level documentation is valuable.</p>
             </article>
           </div>
         </section>
@@ -865,42 +786,17 @@ JOIN Award a USING (Award_ID)
           <h2>Other foundational patterns</h2>
           <ul class="udm-pattern-list">
             <li>
-              <strong>Self-referencing hierarchies</strong>
-              Organizations and Projects use <code>Parent_*_ID</code> to model nested structures &mdash; a department inside a college, a subproject inside a program.
+              <strong>One Organization table, many roles</strong>
+              Sponsors, departments, subrecipients, vendors &mdash; the same table, distinguished by <code>Organization_Type</code> and role-named foreign keys. Same award can name NIH as sponsor and Idaho as administering org without inventing new tables.
             </li>
             <li>
-              <strong>Bridge tables with attributes</strong>
-              <code>ProjectRole</code>, <code>Effort</code>, <code>CohortParticipation</code> &mdash; many-to-many relationships that carry their own fields.
-            </li>
-            <li>
-              <strong>One Organization table for all roles</strong>
-              Sponsors, departments, subrecipients, vendors &mdash; same table, distinguished by <code>Organization_Type</code> and role-named foreign keys.
-            </li>
-            <li>
-              <strong>Polymorphic document attachment</strong>
-              The <code>Document</code> table links to any entity via <code>Related_Entity_Type</code> + <code>Related_Entity_ID</code>.
+              <strong>Bridge tables that carry attributes</strong>
+              <code>ProjectRole</code>, <code>Effort</code>, <code>CohortParticipation</code> &mdash; many-to-many relationships that hold their own data (role, FTE%, dates, key-personnel flag). The relationship is itself a first-class object.
             </li>
           </ul>
         </section>
 
-        <!-- 20. REFERENTIAL INTEGRITY -->
-        <section>
-          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
-          <h2>Referential integrity by default</h2>
-          <div class="udm-compare-grid">
-            <article class="slide-card">
-              <h3>ON DELETE RESTRICT</h3>
-              <p>You can't delete a sponsor while its awards still reference it. Reflects the interconnected nature of research admin data &mdash; deletion is rare and intentional.</p>
-            </article>
-            <article class="slide-card">
-              <h3>ON UPDATE CASCADE</h3>
-              <p>Key renames propagate through the model. Useful when an institution restructures identifiers.</p>
-            </article>
-          </div>
-          <p class="slide-note">Nullable foreign keys mark optional relationships &mdash; e.g. <code>Award.Proposal_ID</code> is nullable because not every award originates from a formal proposal.</p>
-        </section>
-
-        <!-- 21. SINGLE SOURCE OF TRUTH -->
+        <!-- 19. SINGLE SOURCE OF TRUTH -->
         <section>
           <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
           <h2>One source of truth: <code>udm_schema.json</code></h2>
@@ -923,6 +819,34 @@ JOIN Award a USING (Award_ID)
           </p>
           <p class="slide-note" style="font-size:0.78rem !important; margin-top:0.4rem;">
             Open an issue or pull request &mdash; we want your suggestions on the schema.
+          </p>
+        </section>
+
+        <!-- 21b. LAKEHOUSE DEMO -->
+        <section style="text-align:left;">
+          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
+          <h2 style="text-align:left;">Try it live</h2>
+          <p class="slide-lede" style="margin-left:0; text-align:left; font-size:0.95rem;">
+            A public-facing demo of the data lakehouse &mdash; an implementation that consumes the UDM
+            schema and serves UDM-shaped data via SQL, dashboards, and APIs. Poke around: browse tables,
+            run queries, see the model running.
+          </p>
+          <div class="slide-callout" style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:1.25rem; align-items:center; padding:0.9rem 1.2rem; margin-top: 0.8rem;">
+            <div>
+              <p class="slide-label" style="margin-bottom:0.25rem;">Site</p>
+              <a href="https://lakehouse.insight.uidaho.edu" target="_blank" rel="noopener" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:1.05rem; font-weight:700; color:var(--ink); text-decoration:none; border-bottom:2px solid var(--gold);">lakehouse.insight.uidaho.edu</a>
+            </div>
+            <div>
+              <p class="slide-label" style="margin-bottom:0.25rem;">Username</p>
+              <code style="font-size:0.95rem;">admiral</code>
+            </div>
+            <div>
+              <p class="slide-label" style="margin-bottom:0.25rem;">Password</p>
+              <code style="font-size:0.95rem;">iceberg-icecream</code>
+            </div>
+          </div>
+          <p class="slide-note" style="font-size:0.78rem !important; margin-top:0.6rem;">
+            Shared demo credentials &mdash; please don't use this for institutional data.
           </p>
         </section>
 
