@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f1b300" />
+    <title>The AI4RA Unified Data Model | Presentation</title>
+    <meta
+      name="description"
+      content="A 45-minute presentation introducing the AI4RA Unified Data Model: what a data model is, why it matters, and the ontology and design choices behind the UDM."
+    />
+    <link rel="stylesheet" href="reveal/dist/reveal.css" />
+    <link rel="stylesheet" href="reveal/dist/theme/white.css" />
+    <link rel="stylesheet" href="slides.css" />
+    <style>
+      /* UDM-specific extensions */
+      .reveal .preview-flow {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        max-width: 52rem;
+        gap: 0.55rem;
+      }
+      .reveal .preview-step {
+        min-height: 4.2rem;
+        padding: 0.55rem 0.75rem;
+      }
+
+      .udm-domain-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.5rem;
+        margin-top: 0.6rem;
+      }
+      .udm-domain-card {
+        padding: 0.55rem 0.7rem;
+        border-radius: 0.55rem;
+        background: rgba(241, 179, 0, 0.1);
+        border: 1px solid rgba(241, 179, 0, 0.3);
+        text-align: left;
+      }
+      .udm-domain-card h4 {
+        margin: 0 0 0.2rem;
+        font-size: 0.78rem;
+        color: var(--ink);
+        font-weight: 800;
+        letter-spacing: 0.02em;
+      }
+      .udm-domain-card .udm-domain-tables {
+        margin: 0;
+        font-size: 0.62rem;
+        color: var(--muted);
+        line-height: 1.3;
+      }
+      .udm-domain-card .udm-domain-count {
+        display: inline-block;
+        font-size: 0.55rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #9a7300;
+        margin-bottom: 0.2rem;
+      }
+
+      .udm-naming-table {
+        margin: 0.5rem auto 0;
+        border-collapse: collapse;
+        font-size: 0.78rem;
+        max-width: 38rem;
+        width: 100%;
+      }
+      .udm-naming-table th,
+      .udm-naming-table td {
+        padding: 0.35rem 0.6rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(25, 25, 25, 0.1);
+      }
+      .udm-naming-table th {
+        color: #9a7300;
+        font-size: 0.62rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-weight: 800;
+      }
+      .udm-naming-table code {
+        font-size: 0.72rem;
+        background: rgba(25, 25, 25, 0.06);
+        padding: 0.1rem 0.35rem;
+        border-radius: 3px;
+        color: var(--ink);
+      }
+
+      .udm-compare-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.85rem;
+        margin-top: 0.7rem;
+        text-align: left;
+      }
+      .udm-compare-grid .slide-card h3 {
+        margin-bottom: 0.4rem;
+      }
+      .udm-compare-grid code {
+        font-size: 0.72rem;
+        background: rgba(25, 25, 25, 0.06);
+        padding: 0.05rem 0.3rem;
+        border-radius: 3px;
+      }
+
+      .udm-pattern-list {
+        margin-top: 0.6rem;
+        list-style: none;
+        padding: 0;
+        max-width: 42rem;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: left;
+      }
+      .udm-pattern-list li {
+        padding: 0.5rem 0.75rem;
+        margin-bottom: 0.45rem;
+        border-radius: 0.55rem;
+        background: rgba(25, 25, 25, 0.04);
+        border-left: 4px solid var(--gold);
+        font-size: 0.85rem;
+      }
+      .udm-pattern-list li strong {
+        color: var(--ink);
+        display: block;
+        margin-bottom: 0.15rem;
+      }
+      .udm-pattern-list li code {
+        font-size: 0.7rem;
+        background: rgba(25, 25, 25, 0.07);
+        padding: 0.05rem 0.3rem;
+        border-radius: 3px;
+      }
+
+      .udm-stat-row {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin: 0.8rem 0 0.4rem;
+        flex-wrap: wrap;
+      }
+      .udm-stat {
+        text-align: center;
+      }
+      .udm-stat strong {
+        display: block;
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--gold);
+        line-height: 1;
+      }
+      .udm-stat span {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      .udm-fk-example {
+        display: block;
+        text-align: left;
+        max-width: 36rem;
+        margin: 0.7rem auto 0;
+        padding: 0.7rem 0.9rem;
+        border-radius: 0.55rem;
+        background: rgba(25, 25, 25, 0.05);
+        border: 1px solid rgba(25, 25, 25, 0.1);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.78rem;
+        line-height: 1.55;
+      }
+      .udm-fk-example .fk-comment {
+        color: #9a7300;
+        font-style: italic;
+      }
+      .udm-fk-example .fk-name {
+        color: #2563eb;
+      }
+
+      .udm-back-link {
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 20;
+      }
+      .udm-back-link a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 2.5rem;
+        padding: 0.65rem 1rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.94);
+        color: var(--ink);
+        text-decoration: none;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 0.95rem;
+        border: 1px solid rgba(25, 25, 25, 0.14);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      }
+      .udm-back-link a:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+      }
+
+      .udm-three-col {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.7rem;
+        margin-top: 0.7rem;
+      }
+
+      .udm-link-card {
+        display: block;
+        padding: 0.85rem 1rem;
+        border-radius: 0.85rem;
+        background: rgba(241, 179, 0, 0.1);
+        border: 1px solid rgba(241, 179, 0, 0.3);
+        text-align: left;
+        text-decoration: none;
+        color: var(--ink);
+        transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      }
+      .udm-link-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(25, 25, 25, 0.12);
+        border-color: var(--gold);
+      }
+      .udm-link-card h3 {
+        margin: 0 0 0.3rem;
+        font-size: 0.95rem;
+      }
+      .udm-link-card p {
+        margin: 0;
+        font-size: 0.75rem;
+        color: var(--muted);
+      }
+
+      .slido-slide {
+        text-align: center;
+      }
+      .slido-slide img.slido-qr {
+        width: 22rem;
+        max-width: 60vh;
+        height: auto;
+        border-radius: 0.75rem;
+        margin: 0.6rem auto 0.4rem;
+        display: block;
+      }
+      .slido-url {
+        display: inline-block;
+        margin-top: 0.4rem;
+        padding: 0.5rem 1.1rem;
+        border-radius: 999px;
+        background: rgba(25, 25, 25, 0.06);
+        border: 1px solid rgba(25, 25, 25, 0.12);
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: var(--ink);
+        letter-spacing: 0.01em;
+      }
+
+      .poll-slide .poll-meta {
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #9a7300;
+        margin: 0 0 0.6rem;
+      }
+      .poll-slide h2 {
+        max-width: 44rem;
+        margin: 0 auto 0.8rem;
+      }
+      .poll-slide img.poll-qr {
+        width: 18rem;
+        max-width: 50vh;
+        height: auto;
+        border-radius: 0.6rem;
+        margin: 0.4rem auto 0.5rem;
+        display: block;
+      }
+      .poll-slide a.poll-shortlink-big {
+        display: inline-block;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--ink);
+        text-decoration: none;
+        border-bottom: 2px solid var(--gold);
+      }
+      .poll-slide a.poll-shortlink-big:hover {
+        color: var(--gold);
+      }
+    </style>
+  </head>
+  <body class="slides-page">
+    <div class="udm-back-link">
+      <a href="../">&larr; Back to Dashboard</a>
+    </div>
+
+
+    <div class="reveal">
+      <div class="slides">
+
+        <!-- ═══════════════════════════════════════════
+             OPENING
+             ═══════════════════════════════════════════ -->
+
+        <!-- 1. TITLE -->
+        <section class="title-slide" data-background-color="#f1b300">
+          <p class="slide-kicker slide-kicker-dark">AI4RA Workshop</p>
+          <h1>The Unified Data Model</h1>
+          <p class="slide-lede slide-dark">
+            A common schema for research administration data &mdash;
+            what it is, why it matters, and the design choices behind it.
+          </p>
+        </section>
+
+        <!-- 2. MODULE PREVIEW -->
+        <section>
+          <p class="slide-kicker">45-minute overview</p>
+          <h2>What we'll cover</h2>
+          <div class="preview-flow" role="list" aria-label="Presentation flow">
+            <article class="preview-step" role="listitem">
+              <p class="preview-icon" aria-hidden="true">&#x1F4D0;</p>
+              <div class="preview-content">
+                <p class="preview-part-number">Part 1</p>
+                <h6 class="preview-part-title">What is a data model?</h6>
+              </div>
+              <p class="preview-time">5 min</p>
+            </article>
+            <article class="preview-step" role="listitem">
+              <p class="preview-icon" aria-hidden="true">&#x1F3DB;&#xFE0F;</p>
+              <div class="preview-content">
+                <p class="preview-part-number">Part 2</p>
+                <h6 class="preview-part-title">Why research admin needs one</h6>
+              </div>
+              <p class="preview-time">5 min</p>
+            </article>
+            <article class="preview-step" role="listitem">
+              <p class="preview-icon" aria-hidden="true">&#x1F5FA;&#xFE0F;</p>
+              <div class="preview-content">
+                <p class="preview-part-number">Part 3</p>
+                <h6 class="preview-part-title">Tour of the UDM</h6>
+              </div>
+              <p class="preview-time">27 min</p>
+            </article>
+            <article class="preview-step" role="listitem">
+              <p class="preview-icon" aria-hidden="true">&#x1F4AC;</p>
+              <div class="preview-content">
+                <p class="preview-part-number">Part 4</p>
+                <h6 class="preview-part-title">Open discussion</h6>
+              </div>
+              <p class="preview-time">8 min</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- 2b. SLIDO JOIN -->
+        <section class="slido-slide">
+          <p class="slide-kicker">Join the conversation</p>
+          <h2>We want your feedback</h2>
+          <p class="slide-lede">
+            Pull out your phone and scan in &mdash; we'll come back to Slido throughout the talk
+            for word clouds, polls, and open feedback on what the UDM is missing.
+          </p>
+          <img class="slido-qr" src="img/slido-qr.png" alt="Slido QR code linking to the live event" />
+          <a class="slido-url" href="https://bit.ly/4u37OCb" target="_blank" rel="noopener">bit.ly/4u37OCb</a>
+        </section>
+
+        <!-- ═══════════════════════════════════════════
+             SECTION 1 — WHAT IS A DATA MODEL?
+             ═══════════════════════════════════════════ -->
+
+        <!-- 3. DEFINITION -->
+        <section>
+          <p class="slide-kicker">Part 1 &middot; What is a data model?</p>
+          <h2>A data model is a shared agreement</h2>
+          <p class="slide-lede">
+            About what entities exist, how they relate, and how they're described &mdash;
+            <strong>before</strong> any of it gets implemented in a particular database.
+          </p>
+          <div class="slide-callout">
+            A data model defines <em>what</em> the data is &mdash;
+            the things you track every day: proposals, awards, personnel, budgets.
+            Which system stores them, how they move between systems, and what reports they feed
+            are <em>separate</em> decisions.
+          </div>
+        </section>
+
+        <!-- 4. THREE LAYERS -->
+        <section>
+          <p class="slide-kicker">Part 1 &middot; What is a data model?</p>
+          <h2>Three layers of abstraction</h2>
+          <div class="udm-three-col">
+            <article class="slide-card">
+              <span class="slide-label">Conceptual</span>
+              <h3>What things exist</h3>
+              <p>People, projects, awards, organizations. Spoken in the language of the domain &mdash; no technical detail.</p>
+            </article>
+            <article class="slide-card">
+              <span class="slide-label">Logical</span>
+              <h3>How they relate</h3>
+              <p>Entities become tables, attributes become columns, relationships become foreign keys. Still database-agnostic.</p>
+            </article>
+            <article class="slide-card">
+              <span class="slide-label">Physical</span>
+              <h3>How it's stored</h3>
+              <p>Indexes, partitioning, vendor-specific types. Different for Postgres, SQL Server, Snowflake.</p>
+            </article>
+          </div>
+          <div class="slide-callout">
+            The UDM is a <strong>logical</strong> model &mdash; institutions handle the physical layer themselves.
+            But the <strong>conceptual</strong> and <strong>logical</strong> layers are where
+            we need <em>your</em> feedback:
+            <ul style="margin: 0.5rem 0 0; font-size: 0.95rem;">
+              <li>What should a data model for research administration include?</li>
+              <li>How should it be structured to make the data easy to access and use?</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- POLL 1 -->
+        <section class="poll-slide" style="text-align:center;">
+          <p class="poll-meta">Live poll &middot; Poll 1 &middot; Word cloud</p>
+          <h2>What should a data model for research administration include?</h2>
+          <img class="poll-qr" src="img/slido-qr.png" alt="Slido QR code" />
+          <a class="poll-shortlink-big" href="https://bit.ly/4u37OCb" target="_blank" rel="noopener">bit.ly/4u37OCb</a>
+        </section>
+
+        <!-- 5. WHY IT MATTERS -->
+        <section>
+          <p class="slide-kicker">Part 1 &middot; What is a data model?</p>
+          <h2>Why does a shared model matter?</h2>
+          <div class="pillar-grid">
+            <article class="slide-card">
+              <h3>Same vocabulary</h3>
+              <p>Everyone means the same thing by "Award," "Proposal," "Effort." Conversations and queries align.</p>
+            </article>
+            <article class="slide-card">
+              <h3>Predictable joins</h3>
+              <p>If you know one table's keys, you know how to connect it to anything else.</p>
+            </article>
+            <article class="slide-card">
+              <h3>Tools transfer</h3>
+              <p>Dashboards, reports, and AI agents built against the model run anywhere the model is adopted.</p>
+            </article>
+            <article class="slide-card">
+              <h3>Schemas as documentation</h3>
+              <p>The model itself encodes the rules &mdash; types, constraints, allowed values, relationships.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════
+             SECTION 2 — WHY RESEARCH ADMIN NEEDS ONE
+             ═══════════════════════════════════════════ -->
+
+        <!-- 6. THE FRAGMENTATION PROBLEM -->
+        <section>
+          <p class="slide-kicker">Part 2 &middot; Why research admin needs one</p>
+          <h2>Research admin data is fragmented</h2>
+          <div class="before-after-flow">
+            <article class="slide-card before-after-card">
+              <p class="before-after-label">Today</p>
+              <p>Proprietary systems, inconsistent names, siloed definitions. Cayuse calls it one thing, Workday another, finance a third.</p>
+            </article>
+            <span class="before-after-arrow" aria-hidden="true">&rarr;</span>
+            <article class="slide-card before-after-card true-principle-card">
+              <p class="before-after-label">With a UDM</p>
+              <p>One shared schema. Local data maps in; reports, analytics, and AI agents run on common ground.</p>
+            </article>
+          </div>
+          <p class="slide-note">The UDM is a <strong>specification</strong>, not a database &mdash; each institution implements it in whatever database technology they already use.</p>
+        </section>
+
+        <!-- POLL 2 -->
+        <section class="poll-slide" style="text-align:center;">
+          <p class="poll-meta">Live poll &middot; Poll 2 &middot; Open text</p>
+          <h2>Describe a problem you've hit because data was hard to find, hard to access, or hard to understand.</h2>
+          <img class="poll-qr" src="img/slido-qr.png" alt="Slido QR code" />
+          <a class="poll-shortlink-big" href="https://bit.ly/4u37OCb" target="_blank" rel="noopener">bit.ly/4u37OCb</a>
+        </section>
+
+        <!-- 7. FAIR PRINCIPLES -->
+        <section>
+          <p class="slide-kicker">Part 2 &middot; Why research admin needs one</p>
+          <h2>FAIR principles, applied to admin data</h2>
+          <div class="pillar-grid">
+            <article class="slide-card" style="padding:0.4rem 0.8rem;"><img src="img/logos/FAIR_F.png" alt="Findable" style="width:4.5rem; margin:0.4rem 0 -1rem;" /><p>Persistent identifiers (<code>Award_ID</code>, <code>Personnel_ID</code>) and searchable metadata.</p></article>
+            <article class="slide-card" style="padding:0.4rem 0.8rem;"><img src="img/logos/FAIR_A.png" alt="Accessible" style="width:4.5rem; margin:0.4rem 0 -1rem;" /><p>Clear retrieval pathways with PII-flagged fields and governed permissions.</p></article>
+            <article class="slide-card" style="padding:0.4rem 0.8rem;"><img src="img/logos/FAIR_I.png" alt="Interoperable" style="width:4.5rem; margin:0.4rem 0 -1rem;" /><p>Shared vocabulary across institutions and systems via the schema specification.</p></article>
+            <article class="slide-card" style="padding:0.4rem 0.8rem;"><img src="img/logos/FAIR_R.png" alt="Reusable" style="width:4.5rem; margin:0.4rem 0 -1rem;" /><p>Documented provenance, descriptions, synonyms, and usage context on every field.</p></article>
+          </div>
+          <p class="slide-note">
+            FAIR source: Wilkinson, M. D., et al. (2016).
+            &ldquo;The FAIR Guiding Principles for scientific data management and stewardship.&rdquo;
+            <em>Scientific Data</em>, 3, 160018.
+            Graphic: <a href="https://cloud-span.york.ac.uk/blogs/what_is_fair_may22/" target="_blank" rel="noopener">Cloud-SPAN</a>.
+          </p>
+        </section>
+
+        <!-- 8. WHAT THE UDM DOES NOT MODEL -->
+        <section>
+          <p class="slide-kicker">Part 2 &middot; Why research admin needs one</p>
+          <h2>What the UDM does <em>not</em> model</h2>
+          <ul style="max-width: 42rem;">
+            <li><strong>Data movement</strong> &mdash; how data gets from your source systems into the UDM is a separate technical job. The model just defines the destination.</li>
+            <li><strong>Business processes</strong> &mdash; workflow, routing, approvals belong in process tools.</li>
+            <li><strong>Application internals</strong> &mdash; UI state, sessions, ticketing system internals.</li>
+          </ul>
+          <div class="slide-callout">
+            The test: <em>"Is this something a research administrator would describe as 'our data'?"</em>
+            If yes, it belongs. If it's infrastructure or workflow engines, it doesn't.
+          </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════
+             SECTION 3 — TOUR OF THE UDM
+             ═══════════════════════════════════════════ -->
+
+        <!-- 9. AT A GLANCE -->
+        <section>
+          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
+          <h2>The UDM at a glance</h2>
+          <div class="udm-stat-row">
+            <div class="udm-stat"><strong>40</strong><span>Tables</span></div>
+            <div class="udm-stat"><strong>10</strong><span>Domains</span></div>
+            <div class="udm-stat"><strong>8</strong><span>Reference Views</span></div>
+            <div class="udm-stat"><strong>1</strong><span>Source of Truth</span></div>
+          </div>
+          <p class="slide-note">
+            Everything &mdash; tables, columns, constraints, descriptions, synonyms, PII flags &mdash;
+            lives in a single <code>udm_schema.json</code>. Dashboard, docs, and APIs derive from it.
+          </p>
+        </section>
+
+        <!-- 10. DOMAIN MAP -->
+        <section>
+          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
+          <h2>Organized by domain</h2>
+          <div class="udm-domain-grid">
+            <article class="udm-domain-card">
+              <span class="udm-domain-count">Reference</span>
+              <h4>Shared lookups</h4>
+              <p class="udm-domain-tables">Organization, AllowedValues, BudgetCategory</p>
+            </article>
+            <article class="udm-domain-card">
+              <span class="udm-domain-count">Core</span>
+              <h4>People &amp; projects</h4>
+              <p class="udm-domain-tables">Personnel, ContactDetails, Project</p>
+            </article>
+            <article class="udm-domain-card">
+              <span class="udm-domain-count">Pre-Award</span>
+              <h4>Opportunities &amp; proposals</h4>
+              <p class="udm-domain-tables">RFA, Proposal, ProposalBudget, ChecklistItem</p>
+            </article>
+            <article class="udm-domain-card">
+              <span class="udm-domain-count">Submission</span>
+              <h4>Packaging &amp; transmission</h4>
+              <p class="udm-domain-tables">SubmissionPackage, Attempt, Event</p>
+            </article>
+            <article class="udm-domain-card">
+              <span class="udm-domain-count">Post-Award</span>
+              <h4>Funded work</h4>
+              <p class="udm-domain-tables">Award, Modification, Terms, Subaward, Deliverable</p>
+            </article>
+            <article class="udm-domain-card">
+              <span class="udm-domain-count">Financial</span>
+              <h4>Accounting &amp; transactions</h4>
+              <p class="udm-domain-tables">Fund, Account, FinanceCode, Transaction, Invoice</p>
+            </article>
+            <article class="udm-domain-card">
+              <span class="udm-domain-count">Effort</span>
+              <h4>Roles &amp; certification</h4>
+              <p class="udm-domain-tables">ProjectRole, Effort</p>
+            </article>
+            <article class="udm-domain-card">
+              <span class="udm-domain-count">Compliance</span>
+              <h4>Regulatory tracking</h4>
+              <p class="udm-domain-tables">ComplianceRequirement, ConflictOfInterest</p>
+            </article>
+            <article class="udm-domain-card">
+              <span class="udm-domain-count">System</span>
+              <h4>Audit &amp; documents</h4>
+              <p class="udm-domain-tables">Document, ActivityLog</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- POLL 4 -->
+        <section class="poll-slide" style="text-align:center;">
+          <p class="poll-meta">Live poll &middot; Poll 4 &middot; Open text</p>
+          <h2>Describe one thing your office tracks that you can't immediately place into one of our UDM domains.</h2>
+          <img class="poll-qr" src="img/slido-qr.png" alt="Slido QR code" />
+          <a class="poll-shortlink-big" href="https://bit.ly/4u37OCb" target="_blank" rel="noopener">bit.ly/4u37OCb</a>
+        </section>
+
+        <!-- 11. CENTRAL ENTITIES -->
+        <section>
+          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
+          <h2>The entities everything orbits</h2>
+          <div class="udm-three-col">
+            <article class="slide-card">
+              <h3>Project</h3>
+              <p>The research effort. May span multiple proposals and multiple awards. Supports parent/child hierarchies.</p>
+            </article>
+            <article class="slide-card">
+              <h3>Proposal</h3>
+              <p>A formal request for funding. Links a Project to an RFA and to three Organization roles.</p>
+            </article>
+            <article class="slide-card">
+              <h3>Award</h3>
+              <p>Funded grants and contracts. The center of post-award management &mdash; budget periods, modifications, deliverables.</p>
+            </article>
+          </div>
+          <p class="slide-note">Pattern: <strong>Project &gt; Proposal &gt; Award</strong> &mdash; one project can yield many proposals, each proposal at most one award.</p>
+        </section>
+
+        <!-- 12. AN EXEMPLAR, BY DESIGN -->
+        <section style="text-align:left;">
+          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
+          <h2 style="text-align:left;">An exemplar, by design</h2>
+          <p class="slide-lede" style="margin-left:0; text-align:left;">
+            The UDM is not a product. It is an <em>exemplar</em> &mdash; a starting point an
+            institution can adopt as-is or adapt to local realities.
+          </p>
+          <div class="udm-compare-grid">
+            <article class="slide-card">
+              <h3>Designed for adoption</h3>
+              <ul>
+                <li>Open-source, modular, FAIR-aligned.</li>
+                <li>Built iteratively with partner institutions &mdash; not imposed by a vendor.</li>
+                <li>Ships with documentation: data dictionaries, ER diagrams, synonyms, PII flags.</li>
+              </ul>
+            </article>
+            <article class="slide-card accent">
+              <h3>Built for the institutions that need it most</h3>
+              <p style="font-size: 0.85rem;">
+                Emerging research institutions, minority-serving institutions, and primarily undergraduate institutions
+                face the worst data silos and the thinnest infrastructure budgets. The UDM is designed to bridge the
+                <strong>Innovation Valley of Death</strong> &mdash; turning a shared standard into practical leverage
+                where leverage is hardest to come by.
+              </p>
+            </article>
+          </div>
+          <p class="slide-note" style="font-size:0.78rem !important;">Activity 1.1 of the AI4RA framework (NSF-funded). The rest of this tour shows what becomes possible when an institution shapes its data to the UDM.</p>
+        </section>
+
+        <!-- 13. EIGHT QUESTIONS THE UDM MAKES EASY -->
+        <section style="text-align:left;">
+          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
+          <h2 style="text-align:left;">Eight questions the UDM makes easy</h2>
+          <p class="slide-lede" style="margin-left:0; text-align:left; font-size:0.95rem;">
+            When the data is UDM-shaped, the same SQL works at any institution that maps to the schema.
+            These eight illustrate what becomes trivial once the schema is shared.
+          </p>
+          <table class="udm-naming-table" style="margin: 0.4rem 0 0; max-width: 100%;">
+            <tbody>
+              <tr><td style="width:30%; color:#9a7300; font-weight:800; font-size:0.6rem; text-transform:uppercase; letter-spacing:0.08em;">Post-Award</td><td><code>vw_Active_Awards</code></td><td><em>&ldquo;What is currently funded?&rdquo;</em></td></tr>
+              <tr><td></td><td><code>vw_Expiring_Awards</code></td><td><em>&ldquo;What runs out in 90 days?&rdquo;</em></td></tr>
+              <tr><td></td><td><code>vw_Award_Financial_Summary</code></td><td><em>&ldquo;Where does this award stand?&rdquo;</em></td></tr>
+              <tr><td style="color:#9a7300; font-weight:800; font-size:0.6rem; text-transform:uppercase; letter-spacing:0.08em;">Financial</td><td><code>vw_Budget_Comparison</code></td><td><em>&ldquo;How is spend tracking against budget?&rdquo;</em></td></tr>
+              <tr><td style="color:#9a7300; font-weight:800; font-size:0.6rem; text-transform:uppercase; letter-spacing:0.08em;">Effort &amp; Project</td><td><code>vw_Active_Personnel_Roles</code></td><td><em>&ldquo;Who is working on what right now?&rdquo;</em></td></tr>
+              <tr><td></td><td><code>vw_Overdue_Deliverables</code></td><td><em>&ldquo;What is late?&rdquo;</em></td></tr>
+              <tr><td style="color:#9a7300; font-weight:800; font-size:0.6rem; text-transform:uppercase; letter-spacing:0.08em;">Core</td><td><code>vw_All_ContactDetails</code></td><td><em>&ldquo;How do I reach this person?&rdquo;</em></td></tr>
+              <tr><td style="color:#9a7300; font-weight:800; font-size:0.6rem; text-transform:uppercase; letter-spacing:0.08em;">Compliance</td><td><code>vw_ComplianceRequirement_Status</code></td><td><em>&ldquo;What approvals are still pending?&rdquo;</em></td></tr>
+            </tbody>
+          </table>
+          <p class="slide-note" style="font-size:0.72rem !important;">Each view is a JOIN across a small set of UDM tables. The schema is the contract; these views are proof. Adopt as-is, adapt, or build your own.</p>
+        </section>
+
+        <!-- 14. PORTABLE DASHBOARDS -->
+        <section style="text-align:left;">
+          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
+          <h2 style="text-align:left;">Your dashboards are now portable</h2>
+          <p class="slide-lede" style="margin-left:0; text-align:left; font-size:0.95rem;">
+            Without the UDM, every institution rebuilds the same answers against their own data shapes.
+            With the UDM, the work ships.
+          </p>
+          <div class="before-after-flow">
+            <article class="slide-card before-after-card">
+              <p class="before-after-label">Without the UDM</p>
+              <p style="font-size:0.82rem;">Idaho writes effort certification SQL against Banner. Washington rebuilds it against PeopleSoft. Colorado rebuilds it against their custom ERA.</p>
+              <p style="font-size:0.82rem; margin-top:0.5rem;"><strong>Three institutions. Three solutions. Zero shared work.</strong></p>
+            </article>
+            <span class="before-after-arrow" aria-hidden="true">&rarr;</span>
+            <article class="slide-card before-after-card true-principle-card">
+              <p class="before-after-label">With the UDM</p>
+              <p style="font-size:0.82rem;">Idaho writes the SQL against UDM <code>Effort</code> + <code>Personnel</code> + <code>Project</code>. Washington and Colorado run the same SQL, unchanged.</p>
+              <p style="font-size:0.82rem; margin-top:0.5rem;"><strong>One solution. Thirty institutions reuse it.</strong></p>
+            </article>
+          </div>
+          <p class="slide-note" style="font-size:0.72rem !important;">
+            The schema is a <em>lingua franca</em> for research administration. Compliance dashboards, budget templates,
+            effort queries, and training materials become FAIR community deliverables &mdash; not institutional re-inventions.
+          </p>
+        </section>
+
+        <!-- 15. TRANSPARENT QUERIES -->
+        <section style="text-align:left;">
+          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
+          <h2 style="text-align:left;">Your queries explain themselves</h2>
+          <p class="slide-lede" style="margin-left:0; text-align:left; font-size:0.95rem;">
+            Beyond portability, UDM-shaped data is <em>transparent</em>. Every column says what it means.
+            Every relationship is documented. The ontology does the explaining so the query doesn't have to.
+          </p>
+          <div class="before-after-flow">
+            <article class="slide-card before-after-card">
+              <p class="before-after-label">Cryptic source schema</p>
+              <pre style="margin:0; font-size:0.7rem; line-height:1.4; background:rgba(25,25,25,0.04); padding:0.5rem; border-radius:0.4rem; overflow:hidden;"><code>SELECT P.PER_FNM, P.PER_LNM,
+       A.AW_TIT, A.FOA_AMT
+FROM PER_MST P
+JOIN AWA_PER AP
+  ON P.PER_PK = AP.AP_PER
+...</code></pre>
+              <p style="font-size:0.72rem; margin-top:0.4rem;">&ldquo;What does <code>FOA_AMT</code> mean? How is it different from <code>EST_AMT</code>?&rdquo;</p>
+            </article>
+            <span class="before-after-arrow" aria-hidden="true">&rarr;</span>
+            <article class="slide-card before-after-card true-principle-card">
+              <p class="before-after-label">UDM-shaped query</p>
+              <pre style="margin:0; font-size:0.7rem; line-height:1.4; background:rgba(25,25,25,0.04); padding:0.5rem; border-radius:0.4rem; overflow:hidden;"><code>SELECT p.Full_Name,
+       a.Award_Title,
+       a.Funds_Obligated_Amount
+FROM Personnel p
+JOIN Award a USING (Award_ID)
+...</code></pre>
+              <p style="font-size:0.72rem; margin-top:0.4rem;">Reads like English. A research admin without SQL training can read it.</p>
+            </article>
+          </div>
+          <p class="slide-note" style="font-size:0.72rem !important;">
+            Plain-language names &middot; every column carries a description &middot; synonyms document source-system aliases
+            &middot; PII flags surface what's sensitive &middot; FK relationships are explicit.
+          </p>
+        </section>
+
+        <!-- ═══════════════════════════════════════════
+             SECTION 4 — ONTOLOGY & NAMING
+             ═══════════════════════════════════════════ -->
+
+        <!-- 13. ONTOLOGY INTRO -->
+        <section>
+          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
+          <h2>Predictable names, predictable joins</h2>
+          <p class="slide-lede">
+            The naming conventions are deliberately mechanical &mdash;
+            once you know the rules, you can guess the schema before reading it.
+          </p>
+        </section>
+
+        <!-- 14. NAMING CONVENTIONS -->
+        <section>
+          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
+          <h2>Naming conventions</h2>
+          <table class="udm-naming-table">
+            <thead>
+              <tr><th>Element</th><th>Convention</th><th>Examples</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Tables</td><td>PascalCase, singular</td><td><code>Award</code>, <code>ProjectRole</code></td></tr>
+              <tr><td>Columns</td><td>Capitalized Snake_case</td><td><code>Award_Number</code>, <code>Start_Date</code></td></tr>
+              <tr><td>Primary keys</td><td><code>TableName_ID</code></td><td><code>Award_ID</code>, <code>Personnel_ID</code></td></tr>
+              <tr><td>Booleans</td><td><code>Is_</code> prefix</td><td><code>Is_Active</code>, <code>Is_Primary</code></td></tr>
+              <tr><td>Status</td><td><code>_Status</code> suffix</td><td><code>Award_Status</code>, <code>Invoice_Status</code></td></tr>
+              <tr><td>Money</td><td><code>_Amount</code> suffix</td><td><code>Transaction_Amount</code></td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 15. FOREIGN KEYS BY ROLE -->
+        <section>
+          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
+          <h2>Foreign keys are named by role</h2>
+          <p class="slide-lede">
+            When a table references another, the FK describes <strong>what</strong> the relationship is &mdash;
+            not just where it points.
+          </p>
+          <div class="udm-fk-example">
+<span class="fk-comment">-- Proposal has three Organization references:</span>
+<span class="fk-name">Sponsor_Organization_ID</span>        the funder
+<span class="fk-name">Submitting_Organization_ID</span>     the unit preparing it
+<span class="fk-name">Administering_Organization_ID</span>  the unit managing finances
+          </div>
+          <p class="slide-note">A generic <code>Organization_ID</code> would lose the meaning that joins are built on.</p>
+        </section>
+
+        <!-- 16. SUFFIXES -->
+        <section>
+          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
+          <h2>Standard suffixes carry meaning</h2>
+          <div class="slide-badges" style="justify-content: center;">
+            <span class="slide-badge"><code>_ID</code></span>
+            <span class="slide-badge"><code>_Date</code></span>
+            <span class="slide-badge"><code>_Status</code></span>
+            <span class="slide-badge"><code>_Type</code></span>
+            <span class="slide-badge"><code>_Amount</code></span>
+            <span class="slide-badge"><code>_Percent</code></span>
+            <span class="slide-badge"><code>_Number</code></span>
+            <span class="slide-badge"><code>_Name</code></span>
+            <span class="slide-badge"><code>_Code</code></span>
+            <span class="slide-badge"><code>_Description</code></span>
+            <span class="slide-badge"><code>_URL</code></span>
+            <span class="slide-badge"><code>_Level</code></span>
+            <span class="slide-badge"><code>_Text</code></span>
+          </div>
+          <p class="slide-note">If a column name tells you nothing about its type or role, it's not following the ontology.</p>
+        </section>
+
+        <!-- ═══════════════════════════════════════════
+             SECTION 5 — DESIGN CHOICES
+             ═══════════════════════════════════════════ -->
+
+        <!-- 17. ALLOWEDVALUES VS CHECK -->
+        <section>
+          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
+          <h2>AllowedValues vs CHECK constraints</h2>
+          <p class="slide-lede">The model uses two ways to control enumerated values. Which one depends on whether the value is institution-specific.</p>
+          <div class="udm-compare-grid">
+            <article class="slide-card">
+              <h3>AllowedValues table</h3>
+              <p><strong>For values that vary by institution.</strong></p>
+              <p>Contact types, project roles, fund types, deliverable types. Institutions populate the lookup themselves.</p>
+              <p style="font-size: 0.72rem; color: var(--muted);">Used by <strong>12 fields</strong> across the model.</p>
+            </article>
+            <article class="slide-card accent">
+              <h3>CHECK constraint</h3>
+              <p><strong>For universal standards.</strong></p>
+              <p>GAAP account types, federal indirect rate structures, status workflows. Hardcoded because they should be consistent everywhere.</p>
+              <p style="font-size: 0.72rem; color: var(--muted);">Used for lifecycle states, GAAP categories, and federal compliance taxonomies.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- 18. THE TEST -->
+        <section>
+          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
+          <h2>When to pick which</h2>
+          <div class="udm-compare-grid">
+            <article class="slide-card">
+              <h3>Use AllowedValues when&hellip;</h3>
+              <ul>
+                <li>Institutions need different values</li>
+                <li>Business users should extend without schema changes</li>
+                <li>The values need metadata (labels, descriptions)</li>
+              </ul>
+            </article>
+            <article class="slide-card accent">
+              <h3>Use CHECK when&hellip;</h3>
+              <ul>
+                <li>Defined by external standards (GAAP, federal rules)</li>
+                <li>Must remain consistent across deployments</li>
+                <li>Schema-level documentation is valuable</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <!-- 19. OTHER PATTERNS -->
+        <section>
+          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
+          <h2>Other foundational patterns</h2>
+          <ul class="udm-pattern-list">
+            <li>
+              <strong>Self-referencing hierarchies</strong>
+              Organizations and Projects use <code>Parent_*_ID</code> to model nested structures &mdash; a department inside a college, a subproject inside a program.
+            </li>
+            <li>
+              <strong>Bridge tables with attributes</strong>
+              <code>ProjectRole</code>, <code>Effort</code>, <code>CohortParticipation</code> &mdash; many-to-many relationships that carry their own fields.
+            </li>
+            <li>
+              <strong>One Organization table for all roles</strong>
+              Sponsors, departments, subrecipients, vendors &mdash; same table, distinguished by <code>Organization_Type</code> and role-named foreign keys.
+            </li>
+            <li>
+              <strong>Polymorphic document attachment</strong>
+              The <code>Document</code> table links to any entity via <code>Related_Entity_Type</code> + <code>Related_Entity_ID</code>.
+            </li>
+          </ul>
+        </section>
+
+        <!-- 20. REFERENTIAL INTEGRITY -->
+        <section>
+          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
+          <h2>Referential integrity by default</h2>
+          <div class="udm-compare-grid">
+            <article class="slide-card">
+              <h3>ON DELETE RESTRICT</h3>
+              <p>You can't delete a sponsor while its awards still reference it. Reflects the interconnected nature of research admin data &mdash; deletion is rare and intentional.</p>
+            </article>
+            <article class="slide-card">
+              <h3>ON UPDATE CASCADE</h3>
+              <p>Key renames propagate through the model. Useful when an institution restructures identifiers.</p>
+            </article>
+          </div>
+          <p class="slide-note">Nullable foreign keys mark optional relationships &mdash; e.g. <code>Award.Proposal_ID</code> is nullable because not every award originates from a formal proposal.</p>
+        </section>
+
+        <!-- 21. SINGLE SOURCE OF TRUTH -->
+        <section>
+          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
+          <h2>One source of truth: <code>udm_schema.json</code></h2>
+          <p class="slide-lede">
+            Every table, column, type, constraint, FK, description, synonym, and PII flag lives in one file.
+          </p>
+          <div class="process-flow">
+            <span class="flow-node"><code>udm_schema.json</code></span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">Dashboard</span>
+            <span class="flow-arrow">&rarr;</span>
+            <span class="flow-node">DDL / Docs / APIs</span>
+          </div>
+          <p class="slide-note">Edit the JSON; everything downstream regenerates. No drift between schema and documentation.</p>
+          <p style="margin-top: 1rem;">
+            <a href="https://github.com/ui-insight/AI4RA-UDM" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.55rem 1.1rem; border-radius:999px; background:rgba(25,25,25,0.06); border:1px solid rgba(25,25,25,0.18); color:var(--ink); text-decoration:none; font-size:0.95rem; font-weight:700;">
+              <svg height="18" width="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.63 7.63 0 0 1 2-.27c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+              github.com/ui-insight/AI4RA-UDM
+            </a>
+          </p>
+          <p class="slide-note" style="font-size:0.78rem !important; margin-top:0.4rem;">
+            Open an issue or pull request &mdash; we want your suggestions on the schema.
+          </p>
+        </section>
+
+        <!-- 22. PART 3 CLOSER: SCHEMA AS LEVERAGE POINT -->
+        <section style="text-align:left;">
+          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
+          <h2 style="text-align:left;">A schema is the leverage point</h2>
+          <p class="slide-lede" style="margin-left:0; text-align:left; font-size:0.95rem;">
+            A research administrator at any institution should be able to ask <em>&ldquo;who's funded,
+            who's late, who's overdue on a deliverable?&rdquo;</em> &mdash; and get an answer without
+            rebuilding the data layer from scratch.
+          </p>
+          <table class="udm-naming-table" style="max-width: 44rem; margin-top: 0.4rem;">
+            <tbody>
+              <tr><td><strong>FAIR principles</strong></td><td>&rarr;</td><td>Data the schema enforces.</td></tr>
+              <tr><td><strong>Same shape across institutions</strong></td><td>&rarr;</td><td>Queries that travel.</td></tr>
+              <tr><td><strong>Self-explaining columns</strong></td><td>&rarr;</td><td>Queries any admin can read.</td></tr>
+              <tr><td><strong>Open-source exemplar</strong></td><td>&rarr;</td><td>Adopt as-is, adapt, contribute back.</td></tr>
+              <tr><td><strong>Designed for under-resourced institutions</strong></td><td>&rarr;</td><td>Leverage where it's hardest to come by.</td></tr>
+            </tbody>
+          </table>
+          <p class="slide-note" style="font-size:0.78rem !important;">
+            Part of an NSF-funded effort to democratize data infrastructure for research administration &mdash;
+            and to <strong>augment, not replace</strong> the administrators who do the work.
+          </p>
+        </section>
+
+        <!-- POLL 3 -->
+        <section class="poll-slide" style="text-align:center;">
+          <p class="poll-meta">Live poll &middot; Poll 3 &middot; Ranking</p>
+          <h2>What benefit of a UDM appeals to you the most?</h2>
+          <img class="poll-qr" src="img/slido-qr.png" alt="Slido QR code" />
+          <a class="poll-shortlink-big" href="https://bit.ly/4u37OCb" target="_blank" rel="noopener">bit.ly/4u37OCb</a>
+        </section>
+
+        <!-- ═══════════════════════════════════════════
+             SECTION 4 — OPEN DISCUSSION
+             ═══════════════════════════════════════════ -->
+
+        <!-- 23. NOW IT'S YOUR TURN -->
+        <section style="text-align:left;">
+          <p class="slide-kicker">Part 4 &middot; Open discussion</p>
+          <h2 style="text-align:left;">Now it's your turn &mdash; explore the schema</h2>
+          <p class="slide-lede" style="margin-left:0; text-align:left; font-size:0.95rem;">
+            We've shown you the shape. Walk through the actual spec at your own pace.
+            Browse domains, expand columns, see descriptions and synonyms, flag the gaps that matter for your institution.
+          </p>
+          <div class="udm-three-col">
+            <a class="udm-link-card" href="../">
+              <h3>UDM Dashboard</h3>
+              <p>Interactive browser for every table, column, relationship, and view.</p>
+            </a>
+            <a class="udm-link-card" href="https://github.com/ui-insight/AI4RA-UDM/blob/main/udm_schema.json" target="_blank" rel="noopener">
+              <h3>Schema JSON</h3>
+              <p>The single source of truth &mdash; readable, diffable, authoritative.</p>
+            </a>
+            <a class="udm-link-card" href="https://github.com/ui-insight/AI4RA-UDM" target="_blank" rel="noopener">
+              <h3>GitHub repo</h3>
+              <p>Vignettes, issues, contributions, and the full project README.</p>
+            </a>
+          </div>
+          <div class="slide-callout" style="margin-top: 0.7rem;">
+            <strong>While you look, ask yourself:</strong>
+            <ul style="margin: 0.4rem 0 0; font-size: 0.9rem;">
+              <li>Which domain best matches the work you do every day?</li>
+              <li>What does your source system call these columns?</li>
+              <li>What is missing that you'd need to add for your institution?</li>
+              <li>What feels wrong, redundant, or surprising?</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- 24. SLIDO FEEDBACK -->
+        <section class="slido-slide">
+          <p class="slide-kicker">Part 4 &middot; Open discussion</p>
+          <h2>Tell us what you would change</h2>
+          <div style="display:grid; grid-template-columns: auto 1fr; gap: 1.5rem; align-items:center; max-width: 56rem; margin: 0.5rem auto 0; text-align:left;">
+            <div style="text-align:center;">
+              <img class="slido-qr" src="img/slido-qr.png" alt="Slido QR code" style="width:14rem; margin:0;" />
+              <a class="slido-url" href="https://bit.ly/4u37OCb" target="_blank" rel="noopener" style="font-size:0.85rem; margin-top:0.5rem;">bit.ly/4u37OCb</a>
+            </div>
+            <div>
+              <p class="slide-label" style="margin-bottom: 0.4rem;">Questions we're collecting</p>
+              <ol style="margin: 0; font-size: 0.95rem; line-height: 1.5; padding-left: 1.2rem;">
+                <li>Which UDM domain feels incomplete for your work?</li>
+                <li>Which column needs a synonym we don't have yet?</li>
+                <li>Where in your post-award workflow would AI assistance save you the most time?</li>
+                <li>Would your institution be interested in piloting the UDM?</li>
+                <li>What did we get wrong?</li>
+              </ol>
+            </div>
+          </div>
+          <p class="slide-note" style="font-size:0.8rem !important; margin-top: 0.7rem;">
+            Anonymous. Read by the whole project team. Your answers shape the next iteration of the schema.
+          </p>
+        </section>
+
+        <!-- POLL 5 -->
+        <section class="poll-slide" style="text-align:center;">
+          <p class="poll-meta">Live poll &middot; Poll 5 &middot; Word cloud</p>
+          <h2>In one word: your biggest takeaway from today?</h2>
+          <img class="poll-qr" src="img/slido-qr.png" alt="Slido QR code" />
+          <a class="poll-shortlink-big" href="https://bit.ly/4u37OCb" target="_blank" rel="noopener">bit.ly/4u37OCb</a>
+        </section>
+
+        <!-- 25. CLOSING -->
+        <section class="title-slide" data-background-color="#f1b300">
+          <p class="slide-kicker slide-kicker-dark">Thanks</p>
+          <h1>Questions?</h1>
+          <p class="slide-lede slide-dark">
+            The UDM is a specification &mdash; not a database. Adopt it as-is,
+            adapt it to your institution, or contribute back.
+          </p>
+        </section>
+
+      </div>
+    </div>
+
+    <script src="reveal/dist/reveal.js"></script>
+    <script>
+      Reveal.initialize({
+        hash: true,
+        controls: true,
+        progress: true,
+        center: true,
+        slideNumber: true,
+        transition: "slide",
+        width: 1280,
+        height: 800,
+        margin: 0.04,
+        minScale: 0.2,
+        maxScale: 2.0
+      });
+    </script>
+  </body>
+</html>
