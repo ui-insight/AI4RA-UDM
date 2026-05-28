@@ -133,32 +133,34 @@
       }
 
       .udm-pattern-list {
-        margin-top: 0.6rem;
+        margin-top: 0.8rem;
         list-style: none;
         padding: 0;
-        max-width: 42rem;
+        max-width: 52rem;
         margin-left: auto;
         margin-right: auto;
         text-align: left;
       }
       .udm-pattern-list li {
-        padding: 0.5rem 0.75rem;
-        margin-bottom: 0.45rem;
-        border-radius: 0.55rem;
+        padding: 0.8rem 1rem;
+        margin-bottom: 0.65rem;
+        border-radius: 0.6rem;
         background: rgba(25, 25, 25, 0.04);
-        border-left: 4px solid var(--gold);
-        font-size: 0.85rem;
+        border-left: 5px solid var(--gold);
+        font-size: 1.35rem;
+        line-height: 1.5;
       }
       .udm-pattern-list li strong {
         color: var(--ink);
         display: block;
-        margin-bottom: 0.15rem;
+        margin-bottom: 0.3rem;
+        font-size: 1.5rem;
       }
       .udm-pattern-list li code {
-        font-size: 0.7rem;
+        font-size: 1.1rem;
         background: rgba(25, 25, 25, 0.07);
-        padding: 0.05rem 0.3rem;
-        border-radius: 3px;
+        padding: 0.05rem 0.35rem;
+        border-radius: 4px;
       }
 
       .udm-stat-row {
@@ -595,7 +597,7 @@
         <!-- 11. CENTRAL ENTITIES -->
         <section>
           <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
-          <h2>The entities everything orbits</h2>
+          <h2>The three at the heart of the model</h2>
           <div class="udm-three-col">
             <article class="slide-card">
               <h3>Project</h3>
@@ -611,36 +613,6 @@
             </article>
           </div>
           <p class="slide-note">Pattern: <strong>Project &gt; Proposal &gt; Award</strong> &mdash; one project can yield many proposals, each proposal at most one award.</p>
-        </section>
-
-        <!-- 12. AN EXEMPLAR, BY DESIGN -->
-        <section style="text-align:left;">
-          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
-          <h2 style="text-align:left;">An exemplar, by design</h2>
-          <p class="slide-lede" style="margin-left:0; text-align:left;">
-            The UDM is not a product. It is an <em>exemplar</em> &mdash; a starting point an
-            institution can adopt as-is or adapt to local realities.
-          </p>
-          <div class="udm-compare-grid">
-            <article class="slide-card">
-              <h3>Designed for adoption</h3>
-              <ul>
-                <li>Open-source, modular, FAIR-aligned.</li>
-                <li>Built iteratively with partner institutions &mdash; not imposed by a vendor.</li>
-                <li>Ships with documentation: data dictionaries, ER diagrams, synonyms, PII flags.</li>
-              </ul>
-            </article>
-            <article class="slide-card accent">
-              <h3>Built for the institutions that need it most</h3>
-              <p style="font-size: 0.85rem;">
-                Emerging research institutions, minority-serving institutions, and primarily undergraduate institutions
-                face the worst data silos and the thinnest infrastructure budgets. The UDM is designed to bridge the
-                <strong>Innovation Valley of Death</strong> &mdash; turning a shared standard into practical leverage
-                where leverage is hardest to come by.
-              </p>
-            </article>
-          </div>
-          <p class="slide-note" style="font-size:0.78rem !important;">Activity 1.1 of the AI4RA framework (NSF-funded). The rest of this tour shows what becomes possible when an institution shapes its data to the UDM.</p>
         </section>
 
         <!-- 13. EIGHT QUESTIONS THE UDM MAKES EASY -->
@@ -778,27 +750,6 @@ JOIN Award a USING (Award_ID)
              SECTION 5 — DESIGN CHOICES
              ═══════════════════════════════════════════ -->
 
-        <!-- 17. ALLOWEDVALUES VS CHECK (merged) -->
-        <section>
-          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
-          <h2>AllowedValues vs CHECK constraints</h2>
-          <p class="slide-lede" style="font-size: 1rem; margin-bottom: 0.4rem;">
-            Two ways to control enumerated values. Which one depends on whether the value is institution-specific or a universal standard.
-          </p>
-          <div class="udm-compare-grid">
-            <article class="slide-card">
-              <h3>AllowedValues table</h3>
-              <p style="font-size:0.85rem;"><strong>For values that vary by institution.</strong> Contact types, project roles, fund types, deliverable types. Institutions populate the lookup themselves.</p>
-              <p style="font-size:0.78rem; margin-top:0.45rem; color:var(--ink);"><strong>Use when:</strong> institutions need different values, business users should extend without schema changes, values need metadata.</p>
-              <p style="font-size:0.7rem; color: var(--muted); margin-top:0.4rem;">Used by <strong>12 fields</strong> across the model.</p>
-            </article>
-            <article class="slide-card accent">
-              <h3>CHECK constraint</h3>
-              <p style="font-size:0.85rem;"><strong>For universal standards.</strong> GAAP account types, federal indirect rate structures, status workflows. Hardcoded because they should be consistent everywhere.</p>
-              <p style="font-size:0.78rem; margin-top:0.45rem; color:var(--ink);"><strong>Use when:</strong> defined by external standards (GAAP, federal rules), must remain consistent across deployments, schema-level documentation is valuable.</p>
-            </article>
-          </div>
-        </section>
 
         <!-- 19. OTHER PATTERNS -->
         <section>
@@ -843,29 +794,29 @@ JOIN Award a USING (Award_ID)
         </section>
 
         <!-- 21b. LAKEHOUSE DEMO -->
-        <section style="text-align:left;">
+        <section>
           <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
-          <h2 style="text-align:left;">Try it live</h2>
-          <p class="slide-lede" style="margin-left:0; text-align:left; font-size:0.95rem;">
-            A public-facing demo of the data lakehouse &mdash; an implementation that consumes the UDM
-            schema and serves UDM-shaped data via SQL, dashboards, and APIs. Poke around: browse tables,
-            run queries, see the model running.
-          </p>
-          <div class="slide-callout" style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:1.25rem; align-items:center; padding:0.9rem 1.2rem; margin-top: 0.8rem;">
-            <div>
-              <p class="slide-label" style="margin-bottom:0.25rem;">Site</p>
-              <a href="https://lakehouse.insight.uidaho.edu" target="_blank" rel="noopener" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:1.05rem; font-weight:700; color:var(--ink); text-decoration:none; border-bottom:2px solid var(--gold);">lakehouse.insight.uidaho.edu</a>
-            </div>
-            <div>
-              <p class="slide-label" style="margin-bottom:0.25rem;">Username</p>
-              <code style="font-size:0.95rem;">admiral</code>
-            </div>
-            <div>
-              <p class="slide-label" style="margin-bottom:0.25rem;">Password</p>
-              <code style="font-size:0.95rem;">iceberg-icecream</code>
+          <h2>Try it live</h2>
+          <div style="display:grid; grid-template-columns: auto 1fr; gap:2rem; align-items:center; max-width:60rem; margin:0.8rem auto 0; text-align:left;">
+            <img src="img/data-lake.svg" alt="Data Lakehouse logo" style="width:11rem; height:auto;" />
+            <p style="margin:0; font-size:1.4rem; line-height:1.4;">
+              A public-facing demo of the data lakehouse &mdash; an implementation
+              that consumes the UDM schema and serves UDM-shaped data via SQL,
+              dashboards, and APIs.
+            </p>
+          </div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:0.6rem; margin-top:1.4rem;">
+            <a href="https://lakehouse.insight.uidaho.edu" target="_blank" rel="noopener"
+               style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:1.7rem; font-weight:800;
+                      color:var(--ink); text-decoration:none; border-bottom:4px solid var(--gold);">
+              lakehouse.insight.uidaho.edu
+            </a>
+            <div style="display:flex; gap:1.5rem; font-size:1.3rem; margin-top:0.4rem;">
+              <span><span style="color:#9a7300; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; font-size:0.95rem;">User</span> &nbsp; <code style="font-size:1.3rem; background:rgba(25,25,25,0.06); padding:0.15rem 0.55rem; border-radius:0.3rem;">admiral</code></span>
+              <span><span style="color:#9a7300; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; font-size:0.95rem;">Pass</span> &nbsp; <code style="font-size:1.3rem; background:rgba(25,25,25,0.06); padding:0.15rem 0.55rem; border-radius:0.3rem;">iceberg-icecream</code></span>
             </div>
           </div>
-          <p class="slide-note" style="font-size:0.78rem !important; margin-top:0.6rem;">
+          <p class="slide-note" style="font-size:1rem !important; margin-top:1rem;">
             Shared demo credentials &mdash; please don't use this for institutional data.
           </p>
         </section>
@@ -892,14 +843,6 @@ JOIN Award a USING (Award_ID)
             Part of an NSF-funded effort to democratize data infrastructure for research administration &mdash;
             and to <strong>augment, not replace</strong> the administrators who do the work.
           </p>
-        </section>
-
-        <!-- POLL 3 -->
-        <section class="poll-slide" style="text-align:center;">
-          <p class="poll-meta">Live poll &middot; Poll 3 &middot; Ranking</p>
-          <h2>What benefit of a UDM appeals to you the most?</h2>
-          <img class="poll-qr" src="img/slido-qr.png" alt="Slido QR code" />
-          <a class="poll-shortlink-big" href="https://bit.ly/4u37OCb" target="_blank" rel="noopener">bit.ly/4u37OCb</a>
         </section>
 
         <!-- ═══════════════════════════════════════════
@@ -939,37 +882,27 @@ JOIN Award a USING (Award_ID)
           </div>
         </section>
 
-        <!-- 24. SLIDO FEEDBACK -->
+        <!-- 24. SLIDO FEEDBACK (now also Polls 3 + 5) -->
         <section class="slido-slide">
           <p class="slide-kicker">Part 4 &middot; Open discussion</p>
-          <h2>Tell us what you would change</h2>
-          <div style="display:grid; grid-template-columns: auto 1fr; gap: 1.5rem; align-items:center; max-width: 56rem; margin: 0.5rem auto 0; text-align:left;">
+          <h2>Three final polls + open feedback</h2>
+          <div style="display:grid; grid-template-columns: auto 1fr; gap: 1.8rem; align-items:center; max-width: 62rem; margin: 0.6rem auto 0; text-align:left;">
             <div style="text-align:center;">
-              <img class="slido-qr" src="img/slido-qr.png" alt="Slido QR code" style="width:14rem; margin:0;" />
-              <a class="slido-url" href="https://bit.ly/4u37OCb" target="_blank" rel="noopener" style="font-size:0.85rem; margin-top:0.5rem;">bit.ly/4u37OCb</a>
+              <img class="slido-qr" src="img/slido-qr.png" alt="Slido QR code" style="width:15rem; margin:0;" />
+              <a class="slido-url" href="https://bit.ly/4u37OCb" target="_blank" rel="noopener" style="font-size:1.1rem; margin-top:0.6rem;">bit.ly/4u37OCb</a>
             </div>
             <div>
-              <p class="slide-label" style="margin-bottom: 0.4rem;">Questions we're collecting</p>
-              <ol style="margin: 0; font-size: 0.95rem; line-height: 1.5; padding-left: 1.2rem;">
-                <li>Which UDM domain feels incomplete for your work?</li>
-                <li>Which column needs a synonym we don't have yet?</li>
-                <li>Where in your post-award workflow would AI assistance save you the most time?</li>
-                <li>Would your institution be interested in piloting the UDM?</li>
-                <li>What did we get wrong?</li>
+              <p class="slide-label" style="margin-bottom: 0.5rem; font-size: 1rem;">Active in Slido right now</p>
+              <ol style="margin: 0; font-size: 1.2rem; line-height: 1.45; padding-left: 1.3rem;">
+                <li style="margin-bottom:0.4rem;"><strong>Poll 3 &middot; Ranking</strong> &mdash; What benefit of a UDM appeals to you the most?</li>
+                <li style="margin-bottom:0.4rem;"><strong>Poll 5 &middot; Word cloud</strong> &mdash; In one word, your biggest takeaway from today.</li>
+                <li><strong>Open text</strong> &mdash; What did we get wrong? What synonyms are we missing? Would your institution be interested in piloting the UDM?</li>
               </ol>
             </div>
           </div>
-          <p class="slide-note" style="font-size:0.8rem !important; margin-top: 0.7rem;">
+          <p class="slide-note" style="font-size:1rem !important; margin-top: 0.8rem;">
             Anonymous. Read by the whole project team. Your answers shape the next iteration of the schema.
           </p>
-        </section>
-
-        <!-- POLL 5 -->
-        <section class="poll-slide" style="text-align:center;">
-          <p class="poll-meta">Live poll &middot; Poll 5 &middot; Word cloud</p>
-          <h2>In one word: your biggest takeaway from today?</h2>
-          <img class="poll-qr" src="img/slido-qr.png" alt="Slido QR code" />
-          <a class="poll-shortlink-big" href="https://bit.ly/4u37OCb" target="_blank" rel="noopener">bit.ly/4u37OCb</a>
         </section>
 
         <!-- 25. CLOSING -->
