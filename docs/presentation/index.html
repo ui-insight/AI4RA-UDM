@@ -793,34 +793,6 @@ JOIN Award a USING (Award_ID)
           </p>
         </section>
 
-        <!-- 21b. LAKEHOUSE DEMO -->
-        <section>
-          <p class="slide-kicker">Part 3 &middot; Tour of the UDM</p>
-          <h2>Try it live</h2>
-          <div style="display:grid; grid-template-columns: auto 1fr; gap:2rem; align-items:center; max-width:60rem; margin:0.8rem auto 0; text-align:left;">
-            <img src="img/data-lake.svg" alt="Data Lakehouse logo" style="width:11rem; height:auto;" />
-            <p style="margin:0; font-size:1.4rem; line-height:1.4;">
-              A public-facing demo of the data lakehouse &mdash; an implementation
-              that consumes the UDM schema and serves UDM-shaped data via SQL,
-              dashboards, and APIs.
-            </p>
-          </div>
-          <div style="display:flex; flex-direction:column; align-items:center; gap:0.6rem; margin-top:1.4rem;">
-            <a href="https://lakehouse.insight.uidaho.edu" target="_blank" rel="noopener"
-               style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:1.7rem; font-weight:800;
-                      color:var(--ink); text-decoration:none; border-bottom:4px solid var(--gold);">
-              lakehouse.insight.uidaho.edu
-            </a>
-            <div style="display:flex; gap:1.5rem; font-size:1.3rem; margin-top:0.4rem;">
-              <span><span style="color:#9a7300; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; font-size:0.95rem;">User</span> &nbsp; <code style="font-size:1.3rem; background:rgba(25,25,25,0.06); padding:0.15rem 0.55rem; border-radius:0.3rem;">admiral</code></span>
-              <span><span style="color:#9a7300; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; font-size:0.95rem;">Pass</span> &nbsp; <code style="font-size:1.3rem; background:rgba(25,25,25,0.06); padding:0.15rem 0.55rem; border-radius:0.3rem;">iceberg-icecream</code></span>
-            </div>
-          </div>
-          <p class="slide-note" style="font-size:1rem !important; margin-top:1rem;">
-            Shared demo credentials &mdash; please don't use this for institutional data.
-          </p>
-        </section>
-
         <!-- ═══════════════════════════════════════════
              SECTION 4 — OPEN DISCUSSION
              ═══════════════════════════════════════════ -->
@@ -834,7 +806,7 @@ JOIN Award a USING (Award_ID)
             who's overdue?&rdquo;</em> and get an answer without rebuilding the data layer.
             Walk through the spec, flag the gaps that matter for your institution.
           </p>
-          <div class="udm-three-col">
+          <div class="udm-three-col" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
             <a class="udm-link-card" href="../">
               <h3>UDM Dashboard</h3>
               <p>Interactive browser for every table, column, relationship, and view.</p>
@@ -847,17 +819,15 @@ JOIN Award a USING (Award_ID)
               <h3>GitHub repo</h3>
               <p>Vignettes, issues, contributions, and the full project README.</p>
             </a>
+            <a class="udm-link-card" href="https://lakehouse.insight.uidaho.edu" target="_blank" rel="noopener" style="display:flex; align-items:center; gap:0.8rem;">
+              <img src="img/data-lake.svg" alt="Data Lakehouse" style="width:3.5rem; height:auto; flex-shrink:0;" />
+              <div>
+                <h3 style="margin:0;">Data Lakehouse demo</h3>
+                <p style="margin:0.2rem 0 0;">A working implementation of the UDM. Sign in as <code>admiral</code> / <code>iceberg-icecream</code>.</p>
+              </div>
+            </a>
           </div>
-          <div class="slide-callout" style="margin-top: 0.7rem;">
-            <strong>While you look, ask yourself:</strong>
-            <ul style="margin: 0.4rem 0 0;">
-              <li>Which domain best matches the work you do every day?</li>
-              <li>What does your source system call these columns?</li>
-              <li>What is missing that you'd need to add for your institution?</li>
-              <li>What feels wrong, redundant, or surprising?</li>
-            </ul>
-          </div>
-          <p class="slide-note" style="margin-top: 0.7rem;">
+          <p class="slide-note" style="margin-top: 1rem;">
             Part of an NSF-funded effort to democratize data infrastructure for research administration &mdash;
             built to <strong>augment, not replace</strong> the administrators who do the work.
           </p>
