@@ -13,16 +13,39 @@
     <link rel="stylesheet" href="reveal/dist/theme/white.css" />
     <link rel="stylesheet" href="slides.css" />
     <style>
+      /* Global font bump for readability — overrides REACH's shared slides.css */
+      .reveal h1 { font-size: 3.4rem; }
+      .reveal h2 { font-size: 2.6rem; }
+      .reveal h3 { font-size: 1.45rem; }
+      .reveal p, .reveal li { font-size: 1.45rem; line-height: 1.45; }
+      .slide-kicker { font-size: 1rem; }
+      .slide-lede { font-size: 1.5rem; max-width: 44rem; }
+      .slide-callout { font-size: 1.2rem; }
+      .slide-card h3 { font-size: 1.35rem; }
+      .slide-card p, .slide-card li { font-size: 1.15rem; line-height: 1.45; }
+      .slide-note { font-size: 1.05rem !important; }
+      .udm-domain-card h4 { font-size: 1rem; }
+      .udm-domain-card .udm-domain-tables { font-size: 0.85rem; }
+      .udm-domain-card .udm-domain-count { font-size: 0.7rem; }
+      .udm-stat strong { font-size: 2.8rem; }
+      .udm-stat span { font-size: 0.85rem; }
+      .udm-naming-table { font-size: 1rem; }
+      .udm-naming-table code { font-size: 0.95rem; }
+
       /* UDM-specific extensions */
       .reveal .preview-flow {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        max-width: 52rem;
-        gap: 0.55rem;
+        max-width: 56rem;
+        gap: 0.65rem;
       }
       .reveal .preview-step {
-        min-height: 4.2rem;
-        padding: 0.55rem 0.75rem;
+        min-height: 5.2rem;
+        padding: 0.7rem 0.95rem;
       }
+      .reveal .preview-part-number { font-size: 0.9rem !important; }
+      .reveal .preview-part-title { font-size: 1.15rem; }
+      .reveal .preview-time { font-size: 1rem; }
+      .reveal .preview-icon { font-size: 2rem !important; }
 
       .udm-domain-grid {
         display: grid;
@@ -318,12 +341,15 @@
             A common schema for research administration data &mdash;
             what it is, why it matters, and the design choices behind it.
           </p>
-          <p class="slide-lede slide-dark" style="margin-top: 1.5rem; font-size: 0.85rem;">
-            Follow along at
-            <a href="https://ui-insight.github.io/AI4RA-UDM/presentation/" style="color: var(--ink); font-weight: 800; text-decoration: none; border-bottom: 2px solid rgba(25, 25, 25, 0.5);">
-              ui-insight.github.io/AI4RA-UDM/presentation
-            </a>
-          </p>
+          <div style="margin-top: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+            <p class="slide-lede slide-dark" style="margin: 0; font-size: 1.3rem;">
+              Follow along at
+              <a href="https://bit.ly/4nWdn3Y" style="color: var(--ink); font-weight: 800; text-decoration: none; border-bottom: 3px solid rgba(25, 25, 25, 0.6); font-family: ui-monospace, SFMono-Regular, Menlo, monospace;">
+                bit.ly/4nWdn3Y
+              </a>
+            </p>
+            <img src="img/follow-along-qr.png" alt="QR code for the follow-along URL" style="width: 9rem; height: 9rem; border-radius: 0.5rem; background: #fff; padding: 0.4rem;" />
+          </div>
         </section>
 
         <!-- 2. MODULE PREVIEW -->
