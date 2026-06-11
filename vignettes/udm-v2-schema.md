@@ -6,6 +6,24 @@ The Unified Data Model (UDM) is a vendor-neutral data specification for research
 
 The specification is **deliberately implementation-agnostic**. It does not prescribe a database engine, SQL dialect, or storage technology. Concepts are expressed as abstract rules (*"is required"*, *"is unique"*, *"is constrained to a set of values"*, *"must reference an existing record"*) that any relational store can implement using its native mechanisms. An institution adopts the UDM by mapping its source systems (Banner, Cayuse, InfoEd, Workday, Kuali, custom systems) to the entities and constraints described here, then runs queries, dashboards, and integrations against a common shape.
 
+**What this spec covers:**
+
+- Entities, attributes, and primary keys.
+- Relationships and foreign keys.
+- Cross-row constraints: invariants the data must satisfy.
+- Semantic conventions: which mechanism to use when more than one would fit.
+- Allowed-value vocabularies and canonical codes for cross-institution interop.
+
+**What this spec does not cover:**
+
+- Storage engine, SQL dialect, indexing, partitioning, materialization.
+- Enforcement mechanism for any rule (trigger, application logic, deferrable constraint, scheduled check) — only the rule that must hold.
+- Query patterns, performance tuning, caching, denormalization for read efficiency.
+- Numeric precision, rounding, and tolerance.
+- UI, ETL pipelines, integration code, data-quality remediation workflows.
+
+Where the spec says "is unique," "must reference," "sums to N," or "is required," those are abstract rules the data must satisfy. How a deployment enforces them is the institution's choice.
+
 The model has 49 tables organized into 7 domains.
 
 ---
@@ -142,22 +160,50 @@ Rules that the schema can't express as a column constraint but that consumers sh
 - If the sponsor action issues a **new Award_Number** that is part of an incremental segment under the same prime (e.g., separately-numbered annual increments under one funded program), it is a **new Award** with `Parent_Award_ID` set to the predecessor.
 - If the sponsor action issues a **new Award_Number** through a **competing renewal** that supersedes a prior award identity, it is a **new Award** with `Previous_Award_ID` set to the predecessor (parallel to `Proposal.Previous_Proposal_ID`).
 
-The same rule applies to Subaward (Modification vs new Subaward with Parent_Subaward_ID or Previous_Subaward_ID).
+The same rule applies to Subaward: Modification vs new Subaward with `Parent_Subaward_ID` (cascading or amended subawards under the same prime). Subaward competing-renewal lineage flows through the Prime Award chain — when the prime renews to a new Award, a new Subaward at the same subrecipient is created under the new Prime; the predecessor Subaward is end-dated on the old Prime. No `Previous_Subaward_ID` column is needed.
 
 **Group_ID and Originating_Proposal_ID.** Two independent mechanisms answer "what group does this Award or Proposal belong to":
 
 - `Proposal.Originating_Proposal_ID` is the derived root of the `Previous_Proposal_ID` lineage chain. It auto-updates if the lineage is corrected.
 - `Proposal.Group_ID` is a user-maintained grouping label. The institution sets it deliberately and lineage edits do not change it.
 
-These can agree or disagree, and the disagreement is informative: lineage may continue while the institution chooses to fork the Group identity (or vice versa). On Award insert, `Award.Group_ID` is pre-filled from the originating Proposal's `Group_ID` as a default; it may be overridden afterward and is not constrained to remain equal to its Proposal's value.
+These can agree or disagree, and the disagreement is informative: lineage may continue while the institution chooses to fork the Group identity (or vice versa). On Award insert, `Award.Group_ID` is pre-filled from the originating Proposal's `Group_ID` as a default; it may be overridden afterward and is not constrained to remain equal to its Proposal's value. On Subaward insert, `Subaward.Group_ID` is pre-filled from the Prime Award's `Group_ID` when a Prime exists, otherwise from the originating Proposal's `Group_ID`.
 
-**Modification effect on the Budget chain.** A funding-changing Modification (Incremental_Funding, Supplement, Budget_Revision, Rebudget) creates a new Budget row at `Lifecycle_Stage = 'Current'` chained via `Parent_Budget_ID` to the prior Current row (or to the Approved row if no Current exists yet). The prior Current row becomes immutable once a Current descendant exists; the latest Current row (the one with no Current descendant) is the working budget that Actual-stage rows reconcile against. `Version_Number` increments per revision on the same `(Proposal_ID, post-award anchor, Period_Start_Date)` key. Because `Budget.Proposal_ID` is required at every Lifecycle_Stage, the chain identity is stable across Proposed → Approved → Current → Actual without an anchor switch; `Award_ID` / `Subaward_ID` is added at Approved+ for per-Award disambiguation when one Proposal yields multiple Awards. Non-funding-changing Modifications (No_Cost_Extension, PI_Change, Scope_Change) do not create a new Budget row; they change Award/Subaward state only. Chain immutability extends to same-stage parenting on Current: once a Current row has a Current descendant via `Parent_Budget_ID`, the predecessor's amounts are frozen.
+**Lineage mechanisms overview.** Twelve lineage-adjacent columns exist across Proposal (3), Award (5), and Subaward (4). They answer different questions; pick the column that matches the query:
+
+| Question | Use |
+|---|---|
+| "What proposal originated this Award?" | `Award.Proposal_ID` (required FK) |
+| "What proposal originated this planned Subaward?" | `Subaward.Proposal_ID` (persists past Prime_Award_ID) |
+| "What is the Prime Award for this Subaward?" | `Subaward.Prime_Award_ID` |
+| "What is this Proposal a resubmission / renewal of?" | `Proposal.Previous_Proposal_ID` |
+| "What is the root Proposal of a renewal chain?" | `Proposal.Originating_Proposal_ID` (derived) |
+| "What is this Award a competing renewal of?" | `Award.Previous_Award_ID` |
+| "What is the root Award of a renewal chain?" | `Award.Originating_Award_ID` (derived) |
+| "What other Awards are incremental segments under the same prime?" | walk `Award.Parent_Award_ID` |
+| "What is the predecessor Subaward in a renewal?" | walk `Subaward.Prime_Award_ID → Award.Previous_Award_ID`, then find Subaward with matching `Subrecipient_Organization_ID`. No dedicated `Previous_Subaward_ID` column |
+| "What other Subawards cascade or were amended under the same prime?" | walk `Subaward.Parent_Subaward_ID` |
+| "What institutional research-line group does this belong to?" | `*.Group_ID` (Proposal / Award / Subaward, all user-maintained) |
+
+Structural mechanisms (`Previous_*_ID`, `Parent_*_ID`, `Proposal_ID`, `Prime_Award_ID`) and user-maintained mechanisms (`Group_ID`) are independent. Where they disagree, the institution has deliberately forked or merged a group identity even though the lineage chain continues. Both readings remain meaningful for separate query purposes.
+
+**Modification effect on the Budget chain.** A Modification creates a new Current-stage Budget row when its event changes any Budget column. The discriminator is which Budget column is changed:
+
+- **Funding-changing events** (Incremental_Funding, Supplement, Budget_Revision, Rebudget) change `Amount`-class columns. The new Current row chains via `Parent_Budget_ID` to the prior Current row (or to the Approved row if no Current exists yet) for the affected period; `Period_End_Date` matches the predecessor.
+- **End-date-changing events** (No_Cost_Extension, end-date-extending Supplement, Sponsor_Transfer, Continuation) change `Period_End_Date` on the **last existing budget period** of the affected anchor. The new Current row chains from the prior latest Current row for that last period, `Period_End_Date` is set to match the new `Award.Current_End_Date` (or `Subaward.Current_End_Date`), and amounts stay unchanged.
+- **Award-state-only events** (PI_Change, Scope_Change) change no Budget column. They do not create a new Budget row; they change Award/Subaward state only (AwardRole row history for PI_Change, Award metadata for Scope_Change).
+
+`Version_Number` increments per revision on the same `(Proposal_ID, post-award anchor, Period_Start_Date)` key for both funding-changing and end-date-changing events. Because `Budget.Proposal_ID` is required at every Lifecycle_Stage, the chain identity is stable across Proposed → Approved → Current → Actual; `Award_ID` / `Subaward_ID` is added at Approved+ as the post-award disambiguation anchor without invalidating the Proposal anchor. Chain immutability extends to same-stage parenting on Current: once a Current row has a Current descendant via `Parent_Budget_ID`, the predecessor's amounts and period dates are frozen.
 
 **AwardRole role-bearer changes.** When a role-bearer on an Award or Subaward changes (a `PI_Change` Modification, a coordinator handoff, an off-boarding), the predecessor's AwardRole row is end-dated and a new AwardRole row is inserted for the successor. The predecessor's `End_Date` is the day **before** the successor's `Start_Date` (no day-of-transition overlap); the successor's `Start_Date` is the first day in role. AwardRole rows are not mutated in place; the row history is the canonical record of "who held this role on date D" (`Start_Date <= D AND (End_Date IS NULL OR End_Date >= D)`). Because predecessor.End_Date < successor.Start_Date, exactly one row matches a given date and the active-rows sum-to-100 constraint holds across the transition without double-counting. Because AwardRole is the canonical source for the PI on an Award (there is no denormalized `Award.PI_Personnel_ID`), the same insert-and-end-date pattern applies to PI changes.
 
 A `PI_Change` Modification (`Modification.Event_Type` resolving to `PI_Change`) **documents the sponsor-side approval or notice** of a PI change when the change requires sponsor prior approval or formal documentation. It is not required for every PI change (a routine internal coordinator handoff or a sub-PI swap may not need one), and the AwardRole row history remains authoritative for "who held the role on date D" regardless of whether a Modification row exists. When both exist, the Modification's `Effective_Date` should equal the successor AwardRole's `Start_Date`; if they disagree, AwardRole is authoritative for the role state and the Modification is interpreted as a documentation artifact only.
 
-**Budget Proposed-stage revisions.** During proposal preparation or in response to a JIT request, a revised Proposed-stage Budget row is inserted chained via `Parent_Budget_ID` to the prior Proposed row on the same `(Proposal_ID, Period_Start_Date)` key, with `Version_Number` incremented. The prior Proposed row becomes immutable once a Proposed descendant exists; the latest Proposed row (the one with no Proposed descendant) is the working budget that the eventual Approved-stage row chains from. Same-stage chain immutability on Proposed mirrors the Current-stage rule above; Proposed rows are not mutated in place.
+When an end-date-changing Modification (No_Cost_Extension, etc.) advances `Award.Current_End_Date`, **open AwardRole rows** (`End_Date` null) remain open and are not modified. The role's effective span extends to the new Award end date implicitly via the row's null End_Date. End-dating an AwardRole row happens only at an explicit role-bearer change or at Award_Status closure (see *Lifecycle closure*), not at a Modification that extends the period.
+
+**Budget Proposed-stage revisions.** During proposal preparation or in response to a JIT request, a revised Proposed-stage Budget row is inserted chained via `Parent_Budget_ID` to the prior Proposed row on the same `(Proposal_ID, Period_Start_Date)` key, with `Version_Number` incremented. The prior Proposed row becomes immutable once a Proposed descendant exists. Same-stage chain immutability on Proposed mirrors the Current-stage rule above; Proposed rows are not mutated in place.
+
+When the Proposal is awarded and the Approved-stage Budget row is created, its `Parent_Budget_ID` points at the **latest active Proposed row** for that period (the one with no Proposed descendant). This is how the Approved-stage row automatically picks up the most recent JIT or proposal-preparation revision without explicit selection logic.
 
 **Just-In-Time (JIT) cycle.** Sponsor JIT requests arrive between Proposal submission and Award. The exchange is captured by composition rather than by a dedicated entity:
 
@@ -165,8 +211,11 @@ A `PI_Change` Modification (`Modification.Event_Type` resolving to `PI_Change`) 
 - The sponsor's correspondence transmitting the request and the institution's reply are `Communication` rows attached to the same Proposal.
 - Updated Other Support is an `OtherSupportDisclosure` row with `Disclosure_Type = 'JIT'` and `Triggering_Proposal_ID` set to the Proposal.
 - An updated budget at JIT follows the *Budget Proposed-stage revisions* rule above.
+- JIT-driven compliance approvals (an IRB approval letter the sponsor wants before issuing the NoA, an export-control determination, etc.) are recorded as a `ComplianceRequirement` row of the appropriate `Requirement_Type` with `Submitted_Date` and `Approved_Date` populated. The approval document attaches to the ComplianceRequirement as a Document. The JIT_Request Action's `Linked_Document_ID` may also point at the same document so the approval surfaces directly from the JIT context.
 
 **ComplianceCoverage on protocol renewal.** When a ComplianceRequirement is renewed (a new ComplianceRequirement row is created with `Parent_ComplianceRequirement_ID` pointing at the predecessor), the predecessor's open ComplianceCoverage rows are end-dated (`Coverage_End_Date` set to the renewal date) and new ComplianceCoverage rows are created pointing at the renewed ComplianceRequirement with `Coverage_Start_Date` equal to the renewal date. Each Award's coverage is thus continuous in queries; the ComplianceRequirement row identity advances on every annual renewal cycle.
+
+**Removing one Award from a multi-Award ComplianceCoverage.** When a protocol amendment drops coverage of one Award (the requirement still covers the others, no renewal is happening), end-date the specific ComplianceCoverage row only: set `Coverage_End_Date` to the amendment date and mark `Is_Active = false`. The ComplianceRequirement and the other Coverage rows are untouched. This is distinct from the renewal cascade above: renewal advances the ComplianceRequirement row identity and rebuilds the entire Coverage set; amendment-removal touches a single Coverage row.
 
 **Lifecycle_Stage vs *_Status.** The criterion for choosing between the patterns is whether the **row's shape changes between states**:
 
@@ -183,13 +232,15 @@ New tables added to the spec follow the same rule.
 
 An external Co-Investigator at a subrecipient institution is recorded as **both** an AwardRole row (their scientific role on the Award or Subaward, with credit allocation) and an OrganizationRole row scoped to the Subaward (their administrative role at the subrecipient organization for that subaward). Queries about "the science" use AwardRole; queries about "the administrative contact" use OrganizationRole. A person who is the responsible PI on an IRB protocol covering an Award has both an AwardRole row (PI on the Award) and a ProtocolRole row (Primary_Investigator on the protocol).
 
-**ConflictOfInterest vs OtherSupport vs ComplianceRequirement(COI).** Three tables touch foreign-engagement and outside-relationship facts; each answers a different question:
+**ConflictOfInterest vs OtherSupport vs ComplianceRequirement(COI).** Three tables touch outside-relationship facts; each answers a different question:
 
-- **ConflictOfInterest** answers "what did this person disclose to the institution's COI office, and what was the review outcome." Personal disclosure with `Relationship_Type` (Financial / Foreign_Appointment / Foreign_Talent_Program / etc.) and `Review_Outcome`.
+- **ConflictOfInterest** answers "what did this person disclose to the institution's COI office, and what was the review outcome." Personal disclosure with `Relationship_Type` (Financial / Consulting / Employment / Equity / Royalty / Board_Membership) and `Review_Outcome`.
 - **OtherSupport** answers "what active and pending support does this person have on a sponsor biosketch." Sponsor-facing, with `Support_Type` (Current / Pending / In_Kind) and effort commitment.
 - **ComplianceRequirement** with `Requirement_Type = 'COI'` answers "what is the institutional COI compliance regime under which the disclosures are filed" (the annual attestation cycle, the training requirement, the policy artifact).
 
-A single foreign appointment can be all three: a disclosed conflict (ConflictOfInterest row), active outside support (OtherSupport row + OtherSupportDisclosure rows as it is reported to sponsors), and an instance under the institutional COI regime (ComplianceRequirement row of type COI). When ConflictOfInterest and OtherSupport describe the same engagement, the `ConflictOfInterest.OtherSupport_ID` FK links them so that "the COI disclosure for this Other Support entry" is a single join rather than a heuristic match by Personnel + Organization. The link is optional; many COI disclosures (royalties, board memberships without active support) have no OtherSupport counterpart, and many OtherSupport rows (purely sponsored work at another institution that the COI policy treats as non-conflicting) have no COI counterpart.
+A single consulting arrangement or equity holding can be all three: a disclosed conflict (ConflictOfInterest row), active outside support if the engagement provides research funding (OtherSupport row + OtherSupportDisclosure rows as it is reported to sponsors), and an instance under the institutional COI regime (ComplianceRequirement row of type COI). When ConflictOfInterest and OtherSupport describe the same engagement, the `ConflictOfInterest.OtherSupport_ID` FK links them so that "the COI disclosure for this Other Support entry" is a single join rather than a heuristic match by Personnel + Organization. The link is optional; many COI disclosures (royalties, board memberships without active support) have no OtherSupport counterpart, and many OtherSupport rows (purely sponsored work at another institution that the COI policy treats as non-conflicting) have no COI counterpart.
+
+Foreign-engagement disclosures (foreign affiliations, foreign appointments, foreign talent-program participation, foreign funding sources) are not modeled in the canonical ConflictOfInterest table; institutions subject to NSPM-33 or comparable research-security regimes add a local extension (see *Optional extensions*).
 
 **Sponsor decision artifacts (NoA, decline letter, modification notice).** Sponsor-issued decision documents have three independent representations:
 
@@ -368,7 +419,7 @@ The following rules require enforcement beyond what a single column declaration 
 | AwardRole | Exactly one of `Award_ID` or `Subaward_ID` is non-null |
 | AwardRole | For a given (parent agreement, `Personnel_ID`, `Role_Value_ID`), the `(Start_Date, End_Date)` ranges are non-overlapping (null `End_Date` is treated as +infinity) |
 | AwardRole | `FTE_Percent` is between 0.00 and 100.00 |
-| AwardRole | When **one or more** credit-bearing roles are active on a date on the parent agreement, the `Credit_Percent` values across those active credit-bearing roles sum to 100. A row is active on date D when `Start_Date <= D AND (End_Date IS NULL OR End_Date >= D)`. The constraint holds at every point in time, not across all historical rows in the table; predecessor and successor rows are non-overlapping (predecessor.End_Date < successor.Start_Date) so the sum holds across transitions without double-counting. Credit-bearing roles are those whose `Role_Value_ID` resolves (via `Canonical_Value_Code`) to one of: `PI`, `Co_PI`, `Co_I`, `Multi_PI`. Institutions extend the set by populating `Canonical_Value_Code` on their local Role values. Parent agreements with **zero credit-bearing roles active on a date** (typical for community-partner Subawards where no academic-PI structure applies) are allowed; the constraint is satisfied vacuously |
+| AwardRole | **PI vs Multi_PI mode is exclusive.** For a given parent agreement at any active date, either exactly one active AwardRole row has `Role_Value_ID` resolving to canonical `PI` (single-PI mode), or two-or-more active rows have `Role_Value_ID` resolving to canonical `Multi_PI` (multi-PI mode under NIH MPI policy or equivalent), or zero of either (e.g., community-partner Subaward). An Award or Subaward cannot simultaneously have an active `PI` row and active `Multi_PI` rows. Credit-bearing roles for institutional credit-allocation purposes are those whose `Role_Value_ID` resolves (via `Canonical_Value_Code`) to one of: `PI`, `Co_PI`, `Co_I`, `Multi_PI`; institutions extend the set by populating `Canonical_Value_Code` on their local Role values |
 | Effort | `Effort_Percent` is between 0.00 and 100.00 |
 | Effort | `Charged_Amount` and `Over_Cap_Amount` are required when `Lifecycle_Stage = 'Charged'` |
 | Effort | `Certification_Method`, `Certifier_Personnel_ID`, `Certification_Date` are required when `Lifecycle_Stage = 'Certified'` |
@@ -378,6 +429,7 @@ The following rules require enforcement beyond what a single column declaration 
 | Budget | Mode-specific required columns: `Module_Count` and `Module_Size_Amount` when `Budget_Mode = 'Modular'`; `Budget_Category_ID` and `Amount` when `Budget_Mode = 'Itemized'` |
 | Budget | At most one row per (`Proposal_ID`, post-award anchor, `Lifecycle_Stage`, `Period_Start_Date`, `Version_Number`, `Budget_Category_ID`), where the post-award anchor is the non-null one of `Award_ID` or `Subaward_ID` (or null at the Proposed stage). For the uniqueness key, null `Budget_Category_ID` values are treated as a single distinct value |
 | Budget | For a given (`Proposal_ID`, post-award anchor, `Lifecycle_Stage`) and active rows only (`Is_Active = true`), the `(Period_Start_Date, Period_End_Date)` ranges are non-overlapping |
+| Budget | **Outer-edge coverage.** For an Award (or Subaward), the MAX `Period_End_Date` across active Current-stage Budget rows for that anchor equals the Award's `Current_End_Date` (or Subaward's `Current_End_Date`). When an end-date-changing Modification advances `Current_End_Date`, a new Current-stage Budget row is created (per *Modification effect on the Budget chain*) so this equality is restored. Intermediate period rows may have earlier `Period_End_Date` values by design — the invariant binds only the latest period |
 | Payment | Exactly one of `Award_ID` or `Subaward_ID` is non-null |
 | Payment | `Scheduled_Date` and `Scheduled_Amount` are required when `Lifecycle_Stage = 'Scheduled'` |
 | Payment | `Invoice_Number` is required when `Lifecycle_Stage = 'Invoiced'` and later; unique within the parent agreement (Award or Subaward) |
@@ -398,6 +450,7 @@ The following rules require enforcement beyond what a single column declaration 
 | ComplianceRequirement | Referenced `Reviewing_Authority_Organization_ID` has an OrganizationCapability appropriate to the Requirement_Type: `Committee` for IRB/IACUC/IBC; `Program_Office` (or other institution-defined capability) for Export_Control/Radiation/etc. |
 | ComplianceCoverage | Exactly one of `Award_ID` or `Subaward_ID` is non-null |
 | ComplianceCoverage | A given (`ComplianceRequirement_ID`, parent anchor) pair appears at most once with a null `Coverage_End_Date`, where the parent anchor is the non-null one of `Award_ID` or `Subaward_ID` |
+| ProtocolRole | At most one of `Award_ID` or `Subaward_ID` is non-null. Both null indicates the person's responsibility spans all agreements the requirement covers (the default and most common case) |
 | ConflictOfInterest | `Management_Plan_Description` is required when `Review_Outcome` is `Manageable_Conflict` or `Management_Plan_Required` |
 | AllowedValues | `Value_Code` is unique within `Value_Group` |
 | OrganizationRole | At most one of `Award_ID`, `Subaward_ID`, `RFA_ID` is non-null. All null indicates a role at the Organization not scoped to a specific funding artifact |
@@ -470,6 +523,8 @@ Individuals involved in research administration: faculty, staff, students, postd
 | Person_Type | Status | required | Constrained: Faculty / Staff / Student / Postdoc / Resident / Fellow / External |
 
 **Disambiguating "External" personnel.** A sponsor program officer, an industry collaborator, and an external committee member all carry `Person_Type = 'External'`. Their affiliation is disambiguated by the Organization their `Home_Organization_ID` points at. That Organization's OrganizationCapability rows declare its functional role. A sponsor PO's Home_Organization points at an Organization with Capability = 'Sponsor'; an industry collaborator's points at an Organization with Capability = 'Vendor' (or just an external Organization with `Organization_Type = 'External'`); an external committee member's points at an Organization with Capability = 'Committee'. The Personnel row does not duplicate this classification.
+
+**Deduplicating sponsor-side and external Personnel.** External Personnel rarely carry an institutional identifier the operating institution knows. The recommended dedup keys, in priority order: `ORCID` when available; `Primary_Email` when available; `(Home_Organization_ID, Home_Organization_Identifier)` when the external organization's internal ID for the person is known and the institution chooses to store it. When none of these is populated (a common case for sponsor program officers known only by name and agency), the institution accepts that duplicate Personnel rows may accumulate and reconciles via batch matching as part of its data-quality workflow.
 
 #### PersonnelCredential
 
@@ -736,7 +791,7 @@ A subaward agreement between the institution and a subrecipient. Subaward exists
 | Proposal_ID | ID | conditional | → Proposal. The proposal that planned this subaward. Required when Subaward_Status = 'Proposed'. Persists after the transition to Pending/Active so the originating-proposal link is preserved across the subaward lifecycle |
 | Prime_Award_ID | ID | conditional | → Award (the parent inbound award). Required when Subaward_Status ≥ 'Pending' (i.e., the prime award has been received). Null while Subaward_Status = 'Proposed' |
 | Parent_Subaward_ID | ID | optional | → Subaward (self-referencing). For cascading or amended subawards where one subaward succeeds another under the same prime |
-| Previous_Subaward_ID | ID | optional | → Subaward (self-referencing). Competing-renewal lineage on the subaward side. When a renewed prime produces a new Subaward replacing the predecessor at the same subrecipient, the new Subaward points back at the predecessor. Parallels Award.Previous_Award_ID |
+| Group_ID | ShortCode | optional | A grouping label that ties related Subawards together under one longitudinal identity. Pre-filled at Subaward insert from the Prime Award's `Group_ID` (or from the originating Proposal's `Group_ID` at the Proposed stage when no Prime_Award_ID is set yet). The institution may override afterward; no enforced equality with the Prime or originating-Proposal value. Parallels `Award.Group_ID` and `Proposal.Group_ID`. Subaward renewal lineage flows through the Prime Award chain (`Subaward.Prime_Award_ID → Award.Previous_Award_ID + same Subrecipient_Organization_ID`); no dedicated `Previous_Subaward_ID` column is needed |
 | Subrecipient_Organization_ID | ID | required | → Organization. Referenced Organization has an OrganizationCapability with Capability = 'Subrecipient' |
 | Administering_Organization_ID | ID | required | → Organization. The institutional unit responsible for monitoring this subaward |
 | Subaward_Number | ShortCode | required | Unique within the institution |
@@ -890,8 +945,8 @@ Roles attach to the funding instrument (Award or Subaward). Cross-Award team que
 | Subaward_ID | ID | optional | → Subaward. Exactly one of `Award_ID` or `Subaward_ID` is non-null |
 | Role_Value_ID | ID | required | → AllowedValues with `Value_Group = 'AwardRole'`. Recommended values: PI / Co_PI / Co_I / Multi_PI / Coordinator / Key_Personnel / Cohort_Participant / Coach / Mentor / Trainee |
 | Coach_Personnel_ID | ID | optional | → Personnel. For cohort participation |
-| FTE_Percent | Percent | optional | Committed effort percentage (0.00–100.00). The authoritative "what was promised" figure |
-| Credit_Percent | Percent | optional | Investigator credit allocation. Sums to 100 across credit-bearing roles on the Award (or Subaward) |
+| FTE_Percent | Percent | optional | Committed effort percentage (0.00–100.00). The authoritative "what was promised" figure. Institutions typically arrange a person's concurrent FTE commitments not to exceed 100%, but this is a data invariant the institution maintains; the spec does not enforce a per-person sum constraint |
+| Credit_Percent | Percent | optional | Investigator credit allocation. Institutions that allocate credit typically arrange `Credit_Percent` to sum to 100 across active credit-bearing roles on the parent agreement, but this is a data invariant the institution maintains; the spec does not enforce a sum-to-100 constraint. Some institutions skip credit allocation, allow tolerances during transitions, or apply waivers |
 | Credit_Unit_Organization_ID | ID | optional | → Organization. Unit receiving the credit |
 | Is_Key_Personnel | Boolean | required | |
 | Start_Date | Date | required | |
@@ -1131,13 +1186,15 @@ A given (ComplianceRequirement_ID, Award_ID) pair (or (ComplianceRequirement_ID,
 
 #### ProtocolRole
 
-Personnel listed on a specific ComplianceRequirement (the PI on the protocol, IRB study staff, IACUC personnel, IBC investigators, cleared personnel under a Technology Control Plan). Scoped to the requirement, not to the Award: the same requirement may cover several Awards, and different requirements on one Award have different staff rosters. Parallels AwardRole (people on an Award) and OrganizationRole (people at an Organization).
+Personnel listed on a specific ComplianceRequirement (the PI on the protocol, IRB study staff, IACUC personnel, IBC investigators, cleared personnel under a Technology Control Plan). Scoped primarily to the requirement; optional Award / Subaward scoping narrows a row's responsibility to a specific covered agreement when the protocol covers more than one. Parallels AwardRole (people on an Award) and OrganizationRole (people at an Organization).
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | ProtocolRole_ID | ID | required | PK |
 | ComplianceRequirement_ID | ID | required | → ComplianceRequirement |
 | Personnel_ID | ID | required | → Personnel |
+| Award_ID | ID | optional | → Award. Scopes this person's protocol responsibility to a specific Award when the requirement covers multiple Awards (multi-PI multi-Award case: "Smith is the responsible PI on the protocol for Awards 1 and 2; Jones is responsible for Award 3"). Null means the person's responsibility spans all Awards the requirement covers |
+| Subaward_ID | ID | optional | → Subaward. Same as Award_ID but for Subaward scoping. At most one of `Award_ID` or `Subaward_ID` is non-null |
 | Role_Value_ID | ID | required | → AllowedValues with `Value_Group = 'ProtocolRole'`. Recommended values: Primary_Investigator / Co_Investigator / Study_Coordinator / Research_Staff / Consenting_Personnel / Lab_Manager / Veterinary_Staff / Biosafety_Officer / Radiation_Worker / TCP_Cleared_Personnel / Other. `Primary_Investigator` is the responsible person on the requirement (study PI for IRB, principal investigator for IACUC, responsible PI for Export Control determinations); multi-PI protocols carry multiple `Primary_Investigator` rows |
 | Training_Completion_Date | Date | optional | The date required compliance training (CITI, etc.) was completed |
 | Start_Date | Date | required | |
@@ -1145,18 +1202,17 @@ Personnel listed on a specific ComplianceRequirement (the PI on the protocol, IR
 
 #### ConflictOfInterest
 
-Personal disclosures covering conflicts of interest, conflicts of commitment, and foreign engagements (NSPM-33). The Relationship_Type discriminates the disclosure category.
+Personal disclosures covering conflicts of interest and conflicts of commitment. The Relationship_Type discriminates the disclosure category. Foreign-engagement disclosures and the broader research-security workflow (NSPM-33 reporting, foreign-component flags, foreign-affiliation / talent-program / funding details) are out of scope; see *Optional extensions*.
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | ConflictOfInterest_ID | ID | required | PK |
 | Personnel_ID | ID | required | → Personnel |
 | Award_ID | ID | optional | → Award. Required for project-specific disclosures; null for annual general disclosures |
-| Relationship_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'COIRelationshipType'`. Recommended values: Financial / Consulting / Employment / Equity / Royalty / Board_Membership / Foreign_Affiliation / Foreign_Appointment / Foreign_Talent_Program / Foreign_Funding |
+| Relationship_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'COIRelationshipType'`. Recommended values: Financial / Consulting / Employment / Equity / Royalty / Board_Membership |
 | Entity_Name | MediumName | conditional | The entity the personnel has the relationship with, as free text. Required when Entity_Organization_ID is null; optional when an Organization FK is set (the Organization.Organization_Name is the canonical source) |
 | Entity_Organization_ID | ID | optional | → Organization. Set when the entity is tracked as an Organization in the model; null when it is an outside party not otherwise tracked |
-| Entity_Country_Code | ShortCode | optional | ISO 3166-1 alpha-3 country code. Required for foreign-engagement relationship types |
-| OtherSupport_ID | ID | optional | → OtherSupport. Set when this COI disclosure describes the same engagement that is also recorded as Other Support on a sponsor biosketch (a foreign appointment that is both a disclosed conflict and active/pending support). Null when the two are not the same engagement (a Royalty stream from a past patent, a Board_Membership without active support, etc.) |
+| OtherSupport_ID | ID | optional | → OtherSupport. Set when this COI disclosure describes the same engagement that is also recorded as Other Support on a sponsor biosketch. Null when the two are not the same engagement (a Royalty stream from a past patent, a Board_Membership without active support, etc.) |
 | Financial_Interest_Amount | Money | optional | |
 | Disclosure_Date | Date | required | |
 | Disclosure_Period_Start_Date | Date | optional | The period the disclosure covers (annual disclosures span the prior year) |
@@ -1354,7 +1410,7 @@ Typed audit events on entities.
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | ActivityLog_ID | ID | required | PK |
-| Related_Entity_Type | Status | required | Constrained to any UDM table name except ActivityLog itself. Enumerated values: Personnel / PersonnelCredential / Organization / OrganizationCapability / OrganizationIdentifier / OrganizationRole / ContactDetails / RFA / RFARequirement / Proposal / ProposalApproval / PreAwardAuthorization / Award / Modification / Subaward / Negotiation / Terms / Report / Closeout / SubmissionProfile / SubmissionPackage / SubmissionAttempt / AwardRole / Effort / Budget / Fund / Account / FinanceCode / Transaction / RateAgreement / IndirectRate / Payment / CostShare / Equipment / ComplianceRequirement / ComplianceCoverage / ProtocolRole / ConflictOfInterest / OtherSupport / OtherSupportDisclosure / AllowedValues / BudgetCategory / Document / Communication / Restriction / Deadline / Classification / Action |
+| Related_Entity_Type | Status | required | Constrained to any UDM table name except ActivityLog itself (the table reference in this spec is authoritative for the set). Not enumerated inline to avoid drift when the canonical table set evolves |
 | Related_Entity_ID | ID | required | |
 | Activity_Type | Status | required | Constrained: data_change / submission_status_change / operator_action / field_change / status_transition. (Agency / sponsor correspondence lives in Communication, not here.) |
 | Activity_Timestamp | Timestamp | required | |
@@ -1372,6 +1428,8 @@ ActivityLog does not log to itself; ActivityLog rows do not appear in `Related_E
 Areas the UDM deliberately does not model in v2. Institutions that need these capabilities add local extension tables and reference them from the canonical entities listed below. These are not gaps in the model; they are scope decisions.
 
 **Detailed Export Control workflow.** ComplianceRequirement.Requirement_Type = 'Export_Control' captures the determination as a regulated approval. The model does not include dedicated entities for Technology Control Plans (the TCP document lives as a Document attachment on the ComplianceRequirement), per-shipment determinations, ECCN / commodity classification details, BIS or DDTC license records, foreign-national screening events, or visit-by-visit foreign national clearances. Institutions running active export control programs layer those records on top of ComplianceRequirement.
+
+**Foreign-engagement and research-security disclosures (NSPM-33).** Foreign affiliations, foreign appointments, foreign talent-program participation, foreign funding sources, country codes on COI entities, Award-level foreign-component flags, and senior/key personnel research-security disclosure state machines are not modeled. The canonical ConflictOfInterest table covers traditional domestic conflicts (Financial / Consulting / Employment / Equity / Royalty / Board_Membership). Institutions subject to NSPM-33, NSF research-security reporting, or DoD foreign-engagement review add a local extension with foreign-engagement subtypes, country codes, and the disclosure state machine; the extension references Personnel, ConflictOfInterest, and Award via FK as needed.
 
 **Publications and research outputs.** Publications, presentations, datasets, software releases, and research outputs are not modeled. The output portfolio (NSPM-33 reporting, public access mandates, RPPR publication lists, institutional bibliographic systems) is left to specialized publication systems (Symplectic Elements, ORCID-integrated CRIS systems, institutional repositories). Cross-references to those systems live in Document attachments or in local extensions keyed to Personnel.
 
@@ -1408,7 +1466,7 @@ Areas the UDM deliberately does not model in v2. Institutions that need these ca
 - Lifecycle_Stage tables: Budget, Effort, CostShare, Payment. Lifecycle_Stage is authoritative for these tables' state; once a row has a later-stage descendant, its primary fields are immutable.
 - Polymorphic Attachment tables: Document, Communication, Restriction, Deadline, Classification, Action, ActivityLog. These generalize the everyday "attach a document to an award" idea to all the records that accumulate around an entity. Deadline tracks *when* an obligation is due; Action tracks *what* work to do.
 - Subaward spans pre-award (Proposal_ID, Subaward_Status='Proposed') and post-award (Prime_Award_ID, Subaward_Status≥Pending) on a single row identity. Subaward is a first-class parent for Terms, Budget, Payment, Modification, Transaction, CostShare, Equipment, Report, Closeout, and all Attachment tables via the two-FK exclusive-or attachment pattern. Subaward carries Administering_Organization_ID and Parent_Subaward_ID to match Award's structure.
-- Award.Parent_Award_ID groups incremental segments under one award identity; Award.Previous_Award_ID points at the predecessor on a competing renewal (parallel to Proposal.Previous_Proposal_ID and Subaward.Previous_Subaward_ID). Award.Originating_Award_ID is a derived stored column pointing at the root of the Previous_Award_ID chain (parallel to Proposal.Originating_Proposal_ID), so lineage queries do not require recursive CTE traversal. The discriminator between Modification, Parent_Award_ID, and Previous_Award_ID is documented in *Semantic conventions*.
+- Award.Parent_Award_ID groups incremental segments under one award identity; Award.Previous_Award_ID points at the predecessor on a competing renewal (parallel to Proposal.Previous_Proposal_ID). Award.Originating_Award_ID is a derived stored column pointing at the root of the Previous_Award_ID chain (parallel to Proposal.Originating_Proposal_ID), so lineage queries do not require recursive CTE traversal. Subaward renewal lineage flows through the Prime Award chain (no dedicated `Previous_Subaward_ID`); Subaward.Parent_Subaward_ID handles within-prime cascading/amended subawards. The discriminator between Modification, Parent_Award_ID, and Previous_Award_ID is documented in *Semantic conventions*.
 - Organization_Type carries structural classification (Department / College / School / Institute / Center / External). Functional roles (Sponsor, Subrecipient, Vendor, Committee, Prime_Sponsor, Program_Office, Pass_Through_Entity) are recorded as OrganizationCapability rows so a single Organization can play multiple roles across contexts.
 - Three parallel "person-in-role" tables capture personnel relationships: AwardRole (institutional staff on an Award or Subaward), OrganizationRole (anyone playing a role at an Organization: committee member, sponsor program officer, subrecipient AO, vendor contact, institutional liaison), and ProtocolRole (personnel on a compliance protocol, including the responsible PI). Each uses a Role_Value_ID FK to AllowedValues with its own canonical Value_Group.
 - AwardRole is limited to award-side staffing (PI / Co_PI / Co_I / Multi_PI / Coordinator / Key_Personnel / Cohort_Participant / Coach / Mentor / Trainee). Protocol staff and the protocol PI live in ProtocolRole. Sponsor-side, subrecipient-side, vendor-side, and committee roles live in OrganizationRole. Trainee appointment metadata (slot, eligibility, payback obligations) is in Optional Extensions.
