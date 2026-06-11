@@ -24,8 +24,6 @@ The specification is **deliberately implementation-agnostic**. It does not presc
 
 Where the spec says "is unique," "must reference," "sums to N," or "is required," those are abstract rules the data must satisfy. How a deployment enforces them is the institution's choice.
 
-The model has 49 tables organized into 7 domains.
-
 ---
 
 ## Domains
@@ -433,6 +431,8 @@ The following rules require enforcement beyond what a single column declaration 
 | Budget | At most one row per (`Proposal_ID`, post-award anchor, `Lifecycle_Stage`, `Period_Start_Date`, `Version_Number`, `Budget_Category_ID`), where the post-award anchor is the non-null one of `Award_ID` or `Subaward_ID` (or null at the Proposed stage). For the uniqueness key, null `Budget_Category_ID` values are treated as a single distinct value |
 | Budget | For a given (`Proposal_ID`, post-award anchor, `Lifecycle_Stage`) and active rows only (`Is_Active = true`), the `(Period_Start_Date, Period_End_Date)` ranges are non-overlapping |
 | Budget | **Outer-edge coverage.** For an Award (or Subaward), the MAX `Period_End_Date` across active Current-stage Budget rows for that anchor equals the Award's `Current_End_Date` (or Subaward's `Current_End_Date`). When an end-date-changing Modification advances `Current_End_Date`, a new Current-stage Budget row is created (per *Modification effect on the Budget chain*) so this equality is restored. Intermediate period rows may have earlier `Period_End_Date` values by design — the invariant binds only the latest period |
+| Budget | **Inner-edge coverage.** For an Award (or Subaward), the MIN `Period_Start_Date` across active Current-stage Budget rows for that anchor equals the Award's `Original_Start_Date` (or Subaward's `Original_Start_Date`). The chain rules above keep this equality stable across Modifications |
+| Budget | **No gaps between periods.** For a given (Proposal_ID, post-award anchor, Lifecycle_Stage) and active rows only, consecutive periods (ordered by `Period_Start_Date`) have no gap: the next period's `Period_Start_Date` equals the prior period's `Period_End_Date + 1 day`. Together with the inner- and outer-edge invariants, this means the active Budget rows cover `[Original_Start_Date, Current_End_Date]` continuously |
 | Payment | Exactly one of `Award_ID` or `Subaward_ID` is non-null |
 | Payment | `Scheduled_Date` and `Scheduled_Amount` are required when `Lifecycle_Stage = 'Scheduled'` |
 | Payment | `Invoice_Number` is required when `Lifecycle_Stage = 'Invoiced'` and later; unique within the parent agreement (Award or Subaward) |
@@ -724,7 +724,7 @@ An institutional pre-award authorization to spend at-risk on a Proposal that has
 | Effective_End_Date | Date | required | |
 | Authorizing_Personnel_ID | ID | required | → Personnel. The institutional officer who authorized the at-risk spending |
 | Authorization_Status | Status | required | Constrained: Pending / Approved / Revoked / Converted_To_Award / Expired_Unused |
-| Converted_To_Award_ID | ID | optional | → Award. Populated once the Proposal becomes an Award and the pre-award authorization is folded into the executed funding |
+| Converted_To_Award_ID | ID | conditional | → Award. Required when `Authorization_Status = 'Converted_To_Award'`; otherwise null. Populated once the Proposal becomes an Award and the pre-award authorization is folded into the executed funding |
 | Notes | LongText | optional | |
 
 #### Award
@@ -1195,7 +1195,7 @@ Personnel listed on a specific ComplianceRequirement (the PI on the protocol, IR
 | ProtocolRole_ID | ID | required | PK |
 | ComplianceRequirement_ID | ID | required | → ComplianceRequirement |
 | Personnel_ID | ID | required | → Personnel |
-| Award_ID | ID | optional | → Award. Scopes this person's protocol responsibility to a specific Award when the requirement covers multiple Awards (multi-PI multi-Award case: "Smith is the responsible PI on the protocol for Awards 1 and 2; Jones is responsible for Award 3"). Null means the person's responsibility spans all Awards the requirement covers |
+| Award_ID | ID | optional | → Award. Scopes this person's protocol responsibility to a specific Award when the requirement covers multiple Awards (multi-PI multi-Award case: "Smith is the responsible PI on the protocol for Awards 1 and 2; Jones is responsible for Award 3"). Null means the person's responsibility spans **every** Award the requirement currently covers via ComplianceCoverage. Mixing modes is allowed: a blanket null-Award row for a person whose responsibility spans the whole protocol can coexist with another person's per-Award scoped rows. A consumer asking "who is responsible on Award X" returns the union of (rows scoped to X) and (blanket rows scoped to no specific Award) |
 | Subaward_ID | ID | optional | → Subaward. Same as Award_ID but for Subaward scoping. At most one of `Award_ID` or `Subaward_ID` is non-null |
 | Role_Value_ID | ID | required | → AllowedValues with `Value_Group = 'ProtocolRole'`. Recommended values: Primary_Investigator / Co_Investigator / Study_Coordinator / Research_Staff / Consenting_Personnel / Lab_Manager / Veterinary_Staff / Biosafety_Officer / Radiation_Worker / TCP_Cleared_Personnel / Other. `Primary_Investigator` is the responsible person on the requirement (study PI for IRB, principal investigator for IACUC, responsible PI for Export Control determinations); multi-PI protocols carry multiple `Primary_Investigator` rows |
 | Training_Completion_Date | Date | optional | The date required compliance training (CITI, etc.) was completed |
@@ -1461,7 +1461,7 @@ Areas the UDM deliberately does not model in v2. Institutions that need these ca
 
 ## Summary
 
-- 49 tables across 7 domains.
+- Seven domains: Actors, Funding Cycle, Effort, Money, Compliance, Reference, Attachments.
 - 7 universal patterns: identifier convention, hierarchy, role-named foreign keys, polymorphic attachment, two-FK exclusive-or attachment, Lifecycle_Stage discriminator, AllowedValues extensibility.
 - Audit and provenance columns (Created_At, Updated_At, Created_By_Personnel_ID, Updated_By_Personnel_ID, Source_System, Source_Record_ID, Is_Active) are universal across every table.
 - Hub entities: Personnel, Organization, Proposal, Award, AllowedValues.
