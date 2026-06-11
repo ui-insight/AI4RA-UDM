@@ -14,7 +14,7 @@ The model has 53 tables organized into 7 domains.
 
 | Domain | Tables |
 |---|---|
-| **Actors** | Personnel, PersonnelCredential, Organization, OrganizationCapability, OrganizationRole, ContactDetails |
+| **Actors** | Personnel, PersonnelCredential, Organization, OrganizationCapability, OrganizationIdentifier, OrganizationRole, ContactDetails |
 | **Funding Cycle** | RFA, RFARequirement, Proposal, ProposalApproval, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout, SubmissionProfile, SubmissionPackage, SubmissionAttempt |
 | **Effort** | AwardRole, Effort |
 | **Money** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment |
@@ -205,7 +205,7 @@ No single entity captures "the decision" abstractly; the three representations t
 
 **Internal funding represented as an Award.** An internally-funded pilot is modeled as an Award row whose `Sponsor_Organization_ID` is the internal sponsor (the VPR's office, the dean's office, etc.). Budget, Transaction, Payment, CostShare, Equipment, FinanceCode, Modification, and Closeout all attach to that Award using the same structures as for an externally-funded Award. The funding instrument is always an Award (or Subaward) regardless of whether the sponsor is external or internal.
 
-**Action.Outcome_Description.** When an Action records a structured workflow with a substantive result (Subrecipient_Risk_Review, Foreign_National_Screening, Modification_Approval, Cost_Transfer_Approval), the outcome lives in `Outcome_Description` plus an optional `Linked_Document_ID` for the formal report.
+**Action.Outcome_Description.** When an Action records a structured workflow with a substantive result (Subrecipient_Risk_Review, Modification_Approval, Cost_Transfer_Approval), the outcome lives in `Outcome_Description` plus an optional `Linked_Document_ID` for the formal report.
 
 ---
 
@@ -332,6 +332,8 @@ The following rules require enforcement beyond what a single column declaration 
 | Organization | `Sponsor_Type` is required when the Organization has an OrganizationCapability row with `Capability_Value` resolving to `Sponsor` |
 | Personnel | `Primary_Email` is unique across the table when not null |
 | Personnel | `ORCID` is unique across the table when not null |
+| Personnel | `(Home_Organization_ID, Home_Organization_Identifier)` is unique when `Home_Organization_Identifier` is not null |
+| OrganizationIdentifier | `(Identifier_Type, Identifier_Value)` is unique within the institution when `Is_Active = true` |
 | ContactDetails | Exactly one of `Personnel_ID` or `Organization_ID` is non-null |
 | ContactDetails | At most one row per (referenced entity, `Contact_Type_Value_ID`) has `Is_Primary = true` |
 | Proposal | `Decision_Status = 'Awarded'` only when `Internal_Approval_Status = 'Approved'` |
@@ -448,6 +450,7 @@ Individuals involved in research administration: faculty, staff, students, postd
 | Primary_Email | MediumName | optional | PII; unique when not null |
 | ORCID | ShortCode | optional | PII; format 0000-0000-0000-0000; unique when not null |
 | Home_Organization_ID | ID | required | → Organization. The Organization the person primarily affiliates with: their academic department for internal Personnel; their employing institution for external Personnel (a program officer at NSF references NSF; an industry collaborator references the company). Renamed from Department_Organization_ID to clarify that the field covers both internal departmental affiliation and external employer affiliation |
+| Home_Organization_Identifier | ShortCode | optional | The identifier this person carries at their `Home_Organization` (Banner ID, NetID, EmpID, or PeopleSoft ID for an internal employee; NSF's internal PO identifier for an NSF program officer; the vendor's internal contact ID for a vendor contact). Unique within `Home_Organization_ID` when not null. The institution's primary deduplication key for Personnel rows |
 | Person_Type | Status | required | Constrained: Faculty / Staff / Student / Postdoc / Resident / Fellow / External |
 
 **Disambiguating "External" personnel.** A sponsor program officer, an industry collaborator, and an external committee member all carry `Person_Type = 'External'`. Their affiliation is disambiguated by the Organization their `Home_Organization_ID` points at. That Organization's OrganizationCapability rows declare its functional role. A sponsor PO's Home_Organization points at an Organization with Capability = 'Sponsor'; an industry collaborator's points at an Organization with Capability = 'Vendor' (or just an external Organization with `Organization_Type = 'External'`); an external committee member's points at an Organization with Capability = 'Committee'. The Personnel row does not duplicate this classification.
@@ -494,11 +497,25 @@ The functional roles an Organization plays. An Organization may carry multiple c
 | Organization_ID | ID | required | → Organization |
 | Capability_Value_ID | ID | required | → AllowedValues with `Value_Group = 'OrganizationCapability'`. Recommended values: Sponsor / Prime_Sponsor / Subrecipient / Vendor / Committee / Program_Office / Pass_Through_Entity |
 | Capability_Status | Status | required | Constrained: Active / Suspended / Terminated / Probationary. Distinguishes a capability that is currently in good standing from one that has been suspended (e.g., a subrecipient suspended for risk reasons) or terminated. Distinct from `Is_Active` row-level soft delete |
+| Risk_Level | Status | optional | See Status taxonomy. Standing risk of this Organization in this capacity (subrecipient general risk profile, vendor performance risk, sponsor payment risk). Distinct from per-Subaward risk captured on `Subaward.Risk_Level` |
 | Effective_Start_Date | Date | optional | When the organization began playing this role (used for historical orgs no longer active in this capability) |
 | Effective_End_Date | Date | optional | When the organization stopped playing this role |
 | Notes | LongText | optional | |
 
 A given (Organization, Capability) pair appears at most once with no Effective_End_Date (an organization is not concurrently two of "the same" capability).
+
+#### OrganizationIdentifier
+
+External identifiers an Organization carries: UEI, EIN, DUNS, CAGE, IPF, IPEDS_ID, sponsor-issued codes. One row per identifier; an Organization usually carries several across federal and institutional registries. Parallels PersonnelCredential for people.
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| OrganizationIdentifier_ID | ID | required | PK |
+| Organization_ID | ID | required | → Organization |
+| Identifier_Type | Status | required | Constrained: UEI / EIN / DUNS / CAGE / IPF / IPEDS / Sponsor_Code / Other |
+| Identifier_Value | ShortCode | required | The actual identifier value |
+| Issuing_Authority_Organization_ID | ID | optional | → Organization. The agency that issued or maintains this identifier (SAM.gov, IRS, NIH, NCES, the local sponsor's office, etc.) |
+| Notes | LongText | optional | |
 
 #### ContactDetails
 
@@ -1300,7 +1317,7 @@ Work items attached to entities: deliverables, checklist items, service requests
 | Action_ID | ID | required | PK |
 | Related_Entity_Type | Status | required | Constrained: Award / Subaward / Proposal / ProposalApproval / PreAwardAuthorization / Personnel / ComplianceRequirement / Modification / Negotiation / Terms / Closeout / Report / Equipment |
 | Related_Entity_ID | ID | required | |
-| Action_Type | Status | required | Constrained: Deliverable / Checklist_Item / Service_Request / Modification_Approval / Compliance_Renewal / Training_Required / Training_Completion / Subrecipient_Risk_Review / Foreign_National_Screening / Cost_Transfer_Approval / JIT_Request / Other |
+| Action_Type | Status | required | Constrained: Deliverable / Checklist_Item / Service_Request / Modification_Approval / Compliance_Renewal / Training_Required / Training_Completion / Subrecipient_Risk_Review / Cost_Transfer_Approval / JIT_Request / Other |
 | Title | MediumName | required | |
 | Description | LongText | optional | |
 | Assignee_Personnel_ID | ID | optional | → Personnel |
@@ -1310,7 +1327,7 @@ Work items attached to entities: deliverables, checklist items, service requests
 | Priority | Status | required | Constrained: Low / Medium / High / Critical |
 | Completed_Date | Date | conditional | Required when Action_Status = 'Completed' |
 | Origin | Status | required | Constrained: Sponsor_Required / Internal / System_Generated / Manual |
-| Outcome_Description | LongText | optional | Free-text outcome when the Action records a structured workflow with a result (subrecipient risk review outcome, foreign-national screening decision, modification approval rationale, training completion notes). Used together with `Linked_Document_ID` when the formal outcome lives in an attached document |
+| Outcome_Description | LongText | optional | Free-text outcome when the Action records a structured workflow with a result (subrecipient risk review outcome, modification approval rationale, training completion notes). Used together with `Linked_Document_ID` when the formal outcome lives in an attached document |
 | Linked_Document_ID | ID | optional | → Document (e.g., the deliverable file, training certificate when Completed, the formal subrecipient risk review report) |
 
 #### ActivityLog
@@ -1320,7 +1337,7 @@ Typed audit events on entities.
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | ActivityLog_ID | ID | required | PK |
-| Related_Entity_Type | Status | required | Constrained to any UDM table name except ActivityLog itself. Enumerated values: Personnel / PersonnelCredential / Organization / OrganizationCapability / OrganizationRole / ContactDetails / RFA / RFARequirement / Proposal / ProposalApproval / PreAwardAuthorization / Award / Modification / Subaward / Negotiation / Terms / Report / Closeout / SubmissionProfile / SubmissionPackage / SubmissionAttempt / AwardRole / Effort / Budget / Fund / Account / FinanceCode / Transaction / RateAgreement / IndirectRate / Payment / CostShare / Equipment / ComplianceRequirement / ComplianceCoverage / ProtocolRole / ConflictOfInterest / OtherSupport / OtherSupportDisclosure / AllowedValues / BudgetCategory / Document / Communication / Restriction / Deadline / Classification / Action |
+| Related_Entity_Type | Status | required | Constrained to any UDM table name except ActivityLog itself. Enumerated values: Personnel / PersonnelCredential / Organization / OrganizationCapability / OrganizationIdentifier / OrganizationRole / ContactDetails / RFA / RFARequirement / Proposal / ProposalApproval / PreAwardAuthorization / Award / Modification / Subaward / Negotiation / Terms / Report / Closeout / SubmissionProfile / SubmissionPackage / SubmissionAttempt / AwardRole / Effort / Budget / Fund / Account / FinanceCode / Transaction / RateAgreement / IndirectRate / Payment / CostShare / Equipment / ComplianceRequirement / ComplianceCoverage / ProtocolRole / ConflictOfInterest / OtherSupport / OtherSupportDisclosure / AllowedValues / BudgetCategory / Document / Communication / Restriction / Deadline / Classification / Action |
 | Related_Entity_ID | ID | required | |
 | Activity_Type | Status | required | Constrained: data_change / submission_status_change / operator_action / field_change / status_transition. (Agency / sponsor correspondence lives in Communication, not here.) |
 | Activity_Timestamp | Timestamp | required | |
@@ -1337,7 +1354,7 @@ ActivityLog does not log to itself; ActivityLog rows do not appear in `Related_E
 
 Areas the UDM deliberately does not model in v2. Institutions that need these capabilities add local extension tables and reference them from the canonical entities listed below. These are not gaps in the model; they are scope decisions.
 
-**Detailed Export Control workflow.** ComplianceRequirement.Requirement_Type = 'Export_Control' captures the determination as a regulated approval, and Action.Action_Type includes Foreign_National_Screening. The model does not include dedicated entities for Technology Control Plans (the TCP document lives as a Document attachment on the ComplianceRequirement), per-shipment determinations, ECCN / commodity classification details, BIS or DDTC license records, or visit-by-visit foreign national clearances. Institutions running active export control programs layer those records on top of ComplianceRequirement.
+**Detailed Export Control workflow.** ComplianceRequirement.Requirement_Type = 'Export_Control' captures the determination as a regulated approval. The model does not include dedicated entities for Technology Control Plans (the TCP document lives as a Document attachment on the ComplianceRequirement), per-shipment determinations, ECCN / commodity classification details, BIS or DDTC license records, foreign-national screening events, or visit-by-visit foreign national clearances. Institutions running active export control programs layer those records on top of ComplianceRequirement.
 
 **Publications and research outputs.** Publications, presentations, datasets, software releases, and research outputs are not modeled. The output portfolio (NSPM-33 reporting, public access mandates, RPPR publication lists, institutional bibliographic systems) is left to specialized publication systems (Symplectic Elements, ORCID-integrated CRIS systems, institutional repositories). Cross-references to those systems live in Document attachments or in local extensions keyed to Personnel.
 
@@ -1367,7 +1384,7 @@ Areas the UDM deliberately does not model in v2. Institutions that need these ca
 
 ## Summary
 
-- 48 tables across 7 domains.
+- 49 tables across 7 domains.
 - 7 universal patterns: identifier convention, hierarchy, role-named foreign keys, polymorphic attachment, two-FK exclusive-or attachment, Lifecycle_Stage discriminator, AllowedValues extensibility.
 - Audit and provenance columns (Created_At, Updated_At, Created_By_Personnel_ID, Updated_By_Personnel_ID, Source_System, Source_Record_ID, Is_Active) are universal across every table.
 - Hub entities: Personnel, Organization, Proposal, Award, AllowedValues.
