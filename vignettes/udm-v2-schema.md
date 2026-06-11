@@ -1,5 +1,7 @@
 # UDM v2 Schema Specification
 
+**Version:** 2.0.0 — Released 2026-06-11. See [CHANGELOG.md](CHANGELOG.md) for the full version history. The companion JSON serialization lives at the repository root as [udm_schema_v2.json](../udm_schema_v2.json); the v1 model is preserved as [udm_schema.json](../udm_schema.json).
+
 ## Goal
 
 The Unified Data Model (UDM) is a vendor-neutral data specification for research administration. It defines the entities, relationships, constraints, and patterns an institution uses to track the lifecycle of sponsored work: from funding opportunity, through proposal preparation and submission, through award management and compliance, to closeout.
