@@ -324,7 +324,7 @@ Universal status taxonomies are listed here in one place. Each is enforced where
 | `Proposal.Decision_Status` | Pending, Submitted, Under_Review, Awarded, Declined, Withdrawn |
 | `RFA_Status` | Active, Closed, Superseded, Cancelled |
 | `Negotiation_Status` | Pending, Active, On_Hold, Resolved, Abandoned |
-| `Modification.Approval_Status` | Pending, Approved, Rejected, Not_Required |
+| `Modification.Approval_Status` | Pending, Approved, Rejected, Not_Required, Reversed (an approved Modification that was later withdrawn by sponsor or invalidated by institutional correction; excluded from derivations of `Award.Current_End_Date` and `Award.Current_Total_Funded`) |
 | `Modification.Continuation_Type` (optional) | Competing, Non_Competing, Supplement, Other |
 | `Payment_Status` | Open, Submitted, Paid, Disputed, Cancelled (dispositional; see note below) |
 | `Requirement_Status` (Compliance) | Draft, Submitted, In_Review, Approved, Expired, Conditional_Approval, Disapproved, Terminated, Suspended, Not_Applicable |
@@ -403,11 +403,13 @@ The following rules require enforcement beyond what a single column declaration 
 | Personnel | `(Home_Organization_ID, Home_Organization_Identifier)` is unique when `Home_Organization_Identifier` is not null |
 | OrganizationIdentifier | `(Identifier_Type, Identifier_Value)` is unique within the institution when `Is_Active = true` |
 | ContactDetails | Exactly one of `Personnel_ID` or `Organization_ID` is non-null |
+| Communication | Exactly one of `External_Personnel_ID` or `External_Party_Name` is non-null. Every Communication row identifies its external party either via FK to Personnel or via free-text name |
 | ContactDetails | At most one row per (referenced entity, `Contact_Type_Value_ID`) has `Is_Primary = true` |
 | Proposal | `Decision_Status = 'Awarded'` only when `Internal_Approval_Status = 'Approved'` |
 | Award | `FAIN` is required when the Sponsor's `Sponsor_Type = 'Federal'`; `FAIN` is unique within the institution when not null |
 | Award | Referenced `Sponsor_Organization_ID` has an OrganizationCapability with Capability resolving to `Sponsor` |
 | Award | Referenced `Prime_Sponsor_Organization_ID` has an OrganizationCapability with Capability resolving to `Sponsor` (or `Prime_Sponsor`) |
+| Award | The Proposal referenced by `Proposal_ID` has `Decision_Status = 'Awarded'`. Award rows exist only after the originating Proposal has been Awarded by the sponsor |
 | Modification | `Prior_Approval_Granted_Date` is required when `Requires_Prior_Approval = true` and `Approval_Status = 'Approved'` |
 | Modification | `Carryover_Amount` is required when the Event_Type value resolves to a carryover event |
 | Modification | `Funding_Change_Amount` is required for funding-changing event types (Incremental_Funding, Budget_Revision, Supplement); null is permitted for non-financial event types (No_Cost_Extension, PI_Change, Scope_Change). When the modification does not change funding, the value is null (not zero) |
@@ -1154,6 +1156,7 @@ Cost-sharing commitments across the lifecycle (proposed → committed → met / 
 | Commitment_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'CostShareCommitmentType'`. Recommended values: Cash / In_Kind / Third_Party / Waived_IDC / Effort_Only |
 | Amount_Committed | Money | required | |
 | Amount_Actual | Money | conditional | Required when Lifecycle_Stage = 'Met' |
+| Waiver_Reason | Status | conditional | Constrained: Effort_Not_Materialized / Sponsor_Approved_Removal / Sponsor_Removed_Requirement / Recategorized_To_Other_Funding / Other. Required when `Lifecycle_Stage = 'Waived'`; null otherwise. Distinguishes commitments waived because the work never happened vs commitments waived by sponsor or institutional decision |
 
 ---
 
@@ -1340,8 +1343,8 @@ Inbound or outbound correspondence between the institution and an external party
 | Subject | MediumName | optional | The subject line for emails, the topic for meetings |
 | Body_Text | LongText | optional | The full text of the correspondence; null when the body lives only in an attached Document |
 | Internal_Personnel_ID | ID | optional | → Personnel. The institution-side participant (sender for outbound, recipient for inbound) |
-| External_Personnel_ID | ID | optional | → Personnel. The external participant when tracked in Personnel; null when the external party is not maintained as a Personnel record |
-| External_Party_Name | MediumName | optional | Free-text name of the external party when no Personnel record exists |
+| External_Personnel_ID | ID | optional | → Personnel. The external participant when tracked in Personnel. Use this whenever the external party already exists as a Personnel row; prefer this over `External_Party_Name` |
+| External_Party_Name | MediumName | optional | Free-text name of the external party when no Personnel record exists. Use only when the external party is a one-off contact, a sponsor mailbox / correspondence team (e.g., "NIH Grants Management"), or someone the institution does not maintain as a Personnel row. When the external party is later promoted to a Personnel row, the institution may update prior Communication rows to set `External_Personnel_ID` and null `External_Party_Name` |
 | External_Organization_ID | ID | optional | → Organization. The external party's organization |
 
 #### Restriction
