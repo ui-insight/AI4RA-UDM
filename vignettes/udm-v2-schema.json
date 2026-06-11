@@ -1387,6 +1387,16 @@
         "name": "vw_Active_Restrictions",
         "purpose": "Currently-in-force Restriction rows across all attachable entity types, with the Restriction_Type resolved.",
         "sql": "CREATE VIEW vw_Active_Restrictions AS\nSELECT\n  r.Restriction_ID,\n  r.Related_Entity_Type,\n  r.Related_Entity_ID,\n  rt.Value_Code AS Restriction_Type_Code,\n  rt.Canonical_Value_Code AS Canonical_Restriction_Type,\n  r.Restriction_Level,\n  r.Effective_Start_Date,\n  r.Effective_End_Date,\n  r.Restriction_Status\nFROM Restriction r\nJOIN AllowedValues rt ON r.Restriction_Type_Value_ID = rt.AllowedValue_ID\nWHERE r.Restriction_Status = 'Active'\n  AND r.Effective_Start_Date <= CURRENT_DATE\n  AND (r.Effective_End_Date IS NULL OR r.Effective_End_Date >= CURRENT_DATE)\n  AND r.Is_Active = true;"
+      },
+      {
+        "name": "vw_All_ContactDetails",
+        "purpose": "Unified contact details from both Personnel and Organization owners, with the owner type and name surfaced so consumers can query 'all email addresses on file' or 'all contacts for organization X' without unioning the two XOR cases manually.",
+        "sql": "CREATE VIEW vw_All_ContactDetails AS\nSELECT\n  cd.ContactDetails_ID,\n  CASE WHEN cd.Personnel_ID IS NOT NULL THEN 'Personnel' ELSE 'Organization' END AS Owner_Type,\n  COALESCE(cd.Personnel_ID, cd.Organization_ID) AS Owner_ID,\n  CASE WHEN cd.Personnel_ID IS NOT NULL THEN CONCAT(p.First_Name, ' ', p.Last_Name) ELSE o.Organization_Name END AS Owner_Name,\n  ct.Value_Code AS Contact_Type_Code,\n  cd.Contact_Value,\n  cd.Is_Primary\nFROM ContactDetails cd\nLEFT JOIN Personnel p ON cd.Personnel_ID = p.Personnel_ID\nLEFT JOIN Organization o ON cd.Organization_ID = o.Organization_ID\nJOIN AllowedValues ct ON cd.Contact_Type_Value_ID = ct.AllowedValue_ID\nWHERE cd.Is_Active = true;"
+      },
+      {
+        "name": "vw_Active_Personnel_Roles",
+        "purpose": "Currently-active AwardRole rows on currently-active Awards or Subawards. Captures the operational 'who is on the team right now' query without per-consumer date filtering.",
+        "sql": "CREATE VIEW vw_Active_Personnel_Roles AS\nSELECT\n  ar.AwardRole_ID,\n  ar.Personnel_ID,\n  CONCAT(p.First_Name, ' ', p.Last_Name) AS Personnel_Name,\n  ar.Award_ID,\n  ar.Subaward_ID,\n  COALESCE(a.Award_Number, s.Subaward_Number) AS Agreement_Number,\n  rv.Value_Code AS Role_Code,\n  rv.Canonical_Value_Code AS Canonical_Role,\n  ar.FTE_Percent,\n  ar.Credit_Percent,\n  ar.Is_Key_Personnel,\n  ar.Is_Contact_PI,\n  ar.Start_Date,\n  ar.End_Date\nFROM AwardRole ar\nJOIN Personnel p ON ar.Personnel_ID = p.Personnel_ID\nLEFT JOIN Award a ON ar.Award_ID = a.Award_ID\nLEFT JOIN Subaward s ON ar.Subaward_ID = s.Subaward_ID\nJOIN AllowedValues rv ON ar.Role_Value_ID = rv.AllowedValue_ID\nWHERE ar.Is_Active = true\n  AND ar.Start_Date <= CURRENT_DATE\n  AND (ar.End_Date IS NULL OR ar.End_Date >= CURRENT_DATE)\n  AND (\n    (ar.Award_ID IS NOT NULL AND a.Award_Status = 'Active' AND a.Is_Active = true)\n    OR (ar.Subaward_ID IS NOT NULL AND s.Subaward_Status = 'Active' AND s.Is_Active = true)\n  );"
       }
     ]
   },
