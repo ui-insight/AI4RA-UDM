@@ -1,29 +1,22 @@
 # UDM v2 — pending work before next ask-a-child
 
-Items in flight or planned since the last cold-read (commit `4721a66`, score 5/10).
+Items in flight or planned since the last cold-read (commit `acd8790`, score 6/10).
 
 ## Done since last cold-read
 
-- **Drop `Foreign_National_Screening` from `Action_Type`.** Detailed export control (including screening events) is fully scoped out; ComplianceRequirement.Requirement_Type='Export_Control' is the only export-control touchpoint.
-- **Add `OrganizationIdentifier` junction table.** Carries UEI / EIN / DUNS / CAGE / IPF / IPEDS / Sponsor_Code / Other identifiers. Cross-row constraint: (Identifier_Type, Identifier_Value) unique within institution when active. Parallels PersonnelCredential.
-- **Add `OrganizationCapability.Risk_Level`.** Standing risk of this Organization in this capacity (subrecipient general risk profile, vendor performance risk, sponsor payment risk). Distinct from per-Subaward risk on `Subaward.Risk_Level`.
-- **Add `Personnel.Home_Organization_Identifier`.** Single ShortCode column. Unique within `(Home_Organization_ID, Home_Organization_Identifier)` when not null. Primary dedup key for Personnel rows. Works for internal (Banner ID, NetID, EmpID) and external (sponsor's internal PO ID) personnel symmetrically.
-- **`Action_Type` → AllowedValues.** Converted from fixed Status to `Action_Type_Value_ID` → AllowedValues with Value_Group = 'ActionType'. Added to canonical Value_Group names list.
-- **`Award.Current_End_Date` and `Subaward.Current_End_Date` declared derived.** Derivation rule: latest approved end-date-changing Modification's `New_End_Date`, falling back to Period_Of_Performance_End_Date / Original_End_Date when no qualifying Modification exists.
+- **Polymorphic FK existence — minimum behavior expectations.** Added three rules to *Implementation guidance > Polymorphic FK existence*: no dangling refs on write, parent removal preserves attachments (soft delete), type-stable references (Related_Entity_Type not edited after insert).
+- **POP_End_Date contradiction resolved.** Dropped redundant `Period_Of_Performance_Start_Date` / `Period_Of_Performance_End_Date`; `Original_Start_Date` / `Original_End_Date` are the frozen-at-execution values, `Current_End_Date` is the derived live value. Derivation rule updated to reference `Original_End_Date`.
+- **Budget anchor refactor (Option B).** `Budget.Proposal_ID` is now required at every Lifecycle_Stage. `Award_ID` / `Subaward_ID` XOR stays at Approved+ for per-Award disambiguation. Chain identity is Proposal_ID throughout; no anchor switch. Updated cross-row constraints (uniqueness key, period non-overlap) and the "Modification effect on the Budget chain" semantic convention.
+- **Credit_Percent active-on-date.** Tightened the AwardRole sum-to-100 constraint to active-on-date semantics. Holds at every point in time during PI transitions.
+- **Budget period non-overlap.** Added cross-row constraint: for a given (Proposal_ID, post-award anchor, Lifecycle_Stage) and active rows, (Period_Start_Date, Period_End_Date) ranges are non-overlapping.
+- **Effort period non-overlap.** Added cross-row constraint: for a given (AwardRole_ID, Lifecycle_Stage) and active rows, (Period_Start_Date, Period_End_Date) ranges are non-overlapping.
+- **No chain branching.** Added to Universal patterns: at any given time, a parent row has at most one Is_Active=true descendant. Multiple concurrent active siblings are a data error.
 
-## Planned (remaining cold-read findings to address)
+## Cold-read overreach to keep ignoring
 
-- **Same-stage chain forest semantics.** A stage-S row can have multiple stage-S descendants via `Parent_*_ID` under correction. The "latest leaf" rule is ambiguous when there are multiple leaves. Recommendation: forbid branching — require at most one non-superseded same-stage descendant per parent (others marked Is_Active=false). Needs user sign-off.
-
-- **Budget anchor refactor — Option B.** Make `Budget.Proposal_ID` required at all Lifecycle_Stage values; keep `Award_ID`/`Subaward_ID` at later stages too. Chain identity becomes Proposal_ID (stable across stages); per-Award disambiguation stays via Award_ID/Subaward_ID for the multi-Award case. Resolves the Proposed→Approved anchor switch.
-
-- **Credit_Percent sum during AwardRole transitions.** New PI inserted Day D, old PI end-dated Day D. Both rows visible on Day D. Tighten the constraint to "sum to 100 across credit-bearing roles active on any given date" (not all rows in the table).
-
-## Cold-read defensive complaints we're NOT addressing
-
-- "Canonical AllowedValues list isn't published as a separate document." Already addressed — Recommended values IN the column references ARE the canonical codes. Lines 424-428.
-- Polymorphic attachment orphans on attachments. Deliberately punted to institutional policy.
-- Four parallel time mechanisms (ActivityLog, Updated_At, Lifecycle chain, versioned storage). Each serves a different purpose; layering is intentional.
+- **No `Originating_Award_ID` on Award.** User explicitly rejected last round; Award → Proposal → Originating_Proposal_ID handles lineage queries.
+- **ConflictOfInterest no `Proposal_ID`.** Discussed; COI propagates via Award.Proposal_ID after the Award materializes.
+- **Polymorphic attachment "no reference implementation."** Spec is database-engine agnostic by design; minimum-behavior expectations now address consistency.
 
 ## Open architectural questions
 

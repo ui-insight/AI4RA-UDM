@@ -72,6 +72,8 @@ Later-stage rows store a `Parent_*_ID` value pointing at the earlier-stage row t
 
 **Chain immutability.** Once a row at stage S has a later-stage descendant row referencing it through `Parent_*_ID`, the row at stage S is immutable in the business sense; its primary fields (amount, dates, mode-specific columns) do not change. Corrections after a descendant exists are made by inserting a new row at stage S (with its own descendant chain forward) rather than by editing the existing row. The superseded row is retained for history and may be marked `Is_Active = false`. The `Updated_At` and audit columns on a frozen row may still be touched (e.g., to record a tombstone or a re-classification of `Is_Active`); those columns are metadata and not subject to the immutability rule.
 
+**No chain branching.** At any given time, a parent row has at most one descendant via `Parent_*_ID` with `Is_Active = true`. If a correction creates a same-stage or later-stage sibling pointing at the same parent, the prior sibling is marked `Is_Active = false` (superseded). This makes "the latest leaf" unambiguous: it is the unique active descendant chain ending at a row with no active descendant. Multiple concurrent active siblings are a data error.
+
 ### Two-FK exclusive-or attachment
 
 Some tables attach to one of two possible parents. The pattern is most commonly used for Award or Subaward, but also for Personnel or Organization on ContactDetails and Proposal or Award on Negotiation. The pattern uses two nullable foreign key columns and a constraint that exactly one is non-null. Used by:
@@ -149,7 +151,7 @@ The same rule applies to Subaward (Modification vs new Subaward with Parent_Suba
 
 These can agree or disagree, and the disagreement is informative: lineage may continue while the institution chooses to fork the Group identity (or vice versa). On Award insert, `Award.Group_ID` is pre-filled from the originating Proposal's `Group_ID` as a default; it may be overridden afterward and is not constrained to remain equal to its Proposal's value.
 
-**Modification effect on the Budget chain.** A funding-changing Modification (Incremental_Funding, Supplement, Budget_Revision, Rebudget) creates a new Budget row at `Lifecycle_Stage = 'Current'` chained via `Parent_Budget_ID` to the prior Current row (or to the Approved row if no Current exists yet). The prior Current row becomes immutable once a Current descendant exists; the latest Current row (the one with no Current descendant) is the working budget that Actual-stage rows reconcile against. `Version_Number` increments per revision on the same `(parent agreement, Period_Start_Date)` key. Non-funding-changing Modifications (No_Cost_Extension, PI_Change, Scope_Change) do not create a new Budget row; they change Award/Subaward state only. Chain immutability extends to same-stage parenting on Current: once a Current row has a Current descendant via `Parent_Budget_ID`, the predecessor's amounts are frozen.
+**Modification effect on the Budget chain.** A funding-changing Modification (Incremental_Funding, Supplement, Budget_Revision, Rebudget) creates a new Budget row at `Lifecycle_Stage = 'Current'` chained via `Parent_Budget_ID` to the prior Current row (or to the Approved row if no Current exists yet). The prior Current row becomes immutable once a Current descendant exists; the latest Current row (the one with no Current descendant) is the working budget that Actual-stage rows reconcile against. `Version_Number` increments per revision on the same `(Proposal_ID, post-award anchor, Period_Start_Date)` key. Because `Budget.Proposal_ID` is required at every Lifecycle_Stage, the chain identity is stable across Proposed → Approved → Current → Actual without an anchor switch; `Award_ID` / `Subaward_ID` is added at Approved+ for per-Award disambiguation when one Proposal yields multiple Awards. Non-funding-changing Modifications (No_Cost_Extension, PI_Change, Scope_Change) do not create a new Budget row; they change Award/Subaward state only. Chain immutability extends to same-stage parenting on Current: once a Current row has a Current descendant via `Parent_Budget_ID`, the predecessor's amounts are frozen.
 
 **AwardRole role-bearer changes.** When a role-bearer on an Award or Subaward changes (a `PI_Change` Modification, a coordinator handoff, an off-boarding), the predecessor's AwardRole row is end-dated and a new AwardRole row is inserted for the successor. `End_Date` on the predecessor is the last day the predecessor held the role; the successor's `Start_Date` is the first day in role. AwardRole rows are not mutated in place; the row history is the canonical record of "who held this role on date D" (`Start_Date <= D AND (End_Date IS NULL OR End_Date >= D)`). Because AwardRole is the canonical source for the PI on an Award (there is no denormalized `Award.PI_Personnel_ID`), the same insert-and-end-date pattern applies to PI changes.
 
@@ -311,7 +313,13 @@ For every Attachment table and every allowed target type, the implementation mus
 - **Per-target join tables** (one bridge table per Attachment × target pair), at the cost of more tables and more join paths.
 - **Scheduled integrity checks** that detect and report orphan Attachment rows.
 
-The institution chooses; the model is silent on which.
+The institution chooses the mechanism, but every conforming implementation must satisfy the following minimum behavior so that data semantics are consistent across deployments:
+
+- **No dangling references on write.** INSERT or UPDATE that would set `Related_Entity_ID` to a non-existent row in the table named by `Related_Entity_Type` must be rejected.
+- **Parent removal preserves attachments.** A parent row is removed by soft delete (`Is_Active = false`) rather than hard delete. Attached rows remain in place and retain their FK; the parent row is retained for historical traceability. Hard delete of a parent row is discouraged because it loses the attachment lineage and creates orphan attachments that no conforming consumer can interpret.
+- **Type-stable references.** `Related_Entity_Type` is not edited after insert. Re-pointing an Attachment at a different parent is done by inserting a new Attachment row, not by mutating an existing one's type.
+
+These three rules are minimum conformance; institutions are free to enforce additional integrity beyond them.
 
 ### Derived values
 
@@ -320,7 +328,7 @@ Some columns are derived from other data. The model specifies the rule; the impl
 | Derived column | Rule | Recomputation triggers |
 |---|---|---|
 | `Award.Subject_To_Federal_Funding` | True if the Award's Sponsor has Sponsor_Type='Federal', OR Is_Flow_Through is true and the Prime Sponsor has Sponsor_Type='Federal' | On insert/update of Award, Sponsor's Sponsor_Type, Prime Sponsor's Sponsor_Type |
-| `Award.Current_End_Date` | The Award's `Period_Of_Performance_End_Date` adjusted by the latest approved end-date-changing Modification. Computed as: among Modifications where `Award_ID` = the Award, `Approval_Status = 'Approved'`, and `Event_Type` resolves to an end-date-changing event (No_Cost_Extension, Supplement when it extends the period, Sponsor_Transfer, Continuation), take the one with the latest `Effective_Date` and use its `New_End_Date`. If no such Modification exists, use the Award's `Period_Of_Performance_End_Date`. | On insert/update of any qualifying Modification, on insert/update of Award |
+| `Award.Current_End_Date` | The Award's `Original_End_Date` adjusted by the latest approved end-date-changing Modification. Computed as: among Modifications where `Award_ID` = the Award, `Approval_Status = 'Approved'`, and `Event_Type` resolves to an end-date-changing event (No_Cost_Extension, Supplement when it extends the period, Sponsor_Transfer, Continuation), take the one with the latest `Effective_Date` and use its `New_End_Date`. If no such Modification exists, use the Award's `Original_End_Date`. | On insert/update of any qualifying Modification, on insert/update of Award |
 | `Subaward.Current_End_Date` | Symmetric to Award.Current_End_Date but scoped to Modifications where `Subaward_ID` = the Subaward. Falls back to the Subaward's `Original_End_Date` when no qualifying Modification exists. | On insert/update of any qualifying Modification, on insert/update of Subaward |
 
 Common implementation choices: generated column, trigger that maintains the value, view that computes it, or application-layer compute on read. The model accepts any approach that produces the correct value at the moment a consumer reads it.
@@ -356,14 +364,16 @@ The following rules require enforcement beyond what a single column declaration 
 | AwardRole | Exactly one of `Award_ID` or `Subaward_ID` is non-null |
 | AwardRole | For a given (parent agreement, `Personnel_ID`, `Role_Value_ID`), the `(Start_Date, End_Date)` ranges are non-overlapping (null `End_Date` is treated as +infinity) |
 | AwardRole | `FTE_Percent` is between 0.00 and 100.00 |
-| AwardRole | `Credit_Percent` values sum to 100 across credit-bearing roles on the parent agreement (the Award or Subaward identified by `Award_ID`/`Subaward_ID`). Credit-bearing roles are those whose `Role_Value_ID` resolves (via `Canonical_Value_Code`) to one of: `PI`, `Co_PI`, `Co_I`, `Multi_PI`. Institutions extend the set by populating `Canonical_Value_Code` on their local Role values |
+| AwardRole | `Credit_Percent` values sum to 100 across credit-bearing roles **active on any given date** on the parent agreement (the Award or Subaward identified by `Award_ID`/`Subaward_ID`). A row is active on date D when `Start_Date <= D AND (End_Date IS NULL OR End_Date >= D)`. The constraint holds at every point in time, not across all historical rows in the table; during PI transitions the predecessor and successor are non-overlapping and the sum holds across the boundary. Credit-bearing roles are those whose `Role_Value_ID` resolves (via `Canonical_Value_Code`) to one of: `PI`, `Co_PI`, `Co_I`, `Multi_PI`. Institutions extend the set by populating `Canonical_Value_Code` on their local Role values |
 | Effort | `Effort_Percent` is between 0.00 and 100.00 |
 | Effort | `Charged_Amount` and `Over_Cap_Amount` are required when `Lifecycle_Stage = 'Charged'` |
 | Effort | `Certification_Method`, `Certifier_Personnel_ID`, `Certification_Date` are required when `Lifecycle_Stage = 'Certified'` |
 | Effort | `Person_Months` semantics: months-per-year denominator is 12 for `Calendar_Type='Calendar'`, 9 for `Academic`, 3 for `Summer` |
-| Budget | Exactly one of `Award_ID` or `Subaward_ID` is non-null when `Lifecycle_Stage ≥ Approved`; `Proposal_ID` is required when `Lifecycle_Stage = 'Proposed'` |
+| Effort | For a given (`AwardRole_ID`, `Lifecycle_Stage`) and active rows only (`Is_Active = true`), the `(Period_Start_Date, Period_End_Date)` ranges are non-overlapping |
+| Budget | `Proposal_ID` is required at every Lifecycle_Stage; exactly one of `Award_ID` or `Subaward_ID` is non-null when `Lifecycle_Stage ≥ Approved` |
 | Budget | Mode-specific required columns: `Module_Count` and `Module_Size_Amount` when `Budget_Mode = 'Modular'`; `Budget_Category_ID` and `Amount` when `Budget_Mode = 'Itemized'` |
-| Budget | At most one row per (parent anchor, `Lifecycle_Stage`, `Period_Start_Date`, `Version_Number`, `Budget_Category_ID`), where the parent anchor is the non-null one of `Proposal_ID`, `Award_ID`, or `Subaward_ID`. For the uniqueness key, null `Budget_Category_ID` values are treated as a single distinct value |
+| Budget | At most one row per (`Proposal_ID`, post-award anchor, `Lifecycle_Stage`, `Period_Start_Date`, `Version_Number`, `Budget_Category_ID`), where the post-award anchor is the non-null one of `Award_ID` or `Subaward_ID` (or null at the Proposed stage). For the uniqueness key, null `Budget_Category_ID` values are treated as a single distinct value |
+| Budget | For a given (`Proposal_ID`, post-award anchor, `Lifecycle_Stage`) and active rows only (`Is_Active = true`), the `(Period_Start_Date, Period_End_Date)` ranges are non-overlapping |
 | Payment | Exactly one of `Award_ID` or `Subaward_ID` is non-null |
 | Payment | `Scheduled_Date` and `Scheduled_Amount` are required when `Lifecycle_Stage = 'Scheduled'` |
 | Payment | `Invoice_Number` is required when `Lifecycle_Stage = 'Invoiced'` and later; unique within the parent agreement (Award or Subaward) |
@@ -677,11 +687,9 @@ A funded grant, contract, or cooperative agreement. The central post-award entit
 | Assistance_Listing_Number | ShortCode | optional | Federal program identifier (formerly CFDA) |
 | Mechanism_Value_ID | ID | optional | → AllowedValues with `Value_Group = 'FundingMechanism'`. The funding mechanism / activity code (R01, R21, R03, P01, P30, U54, K01, K23, K99, T32, F31, F32, Cooperative_Agreement, Contract_BAA, Contract_RFP, OT_Other_Transaction, etc.). A major analytics dimension; institutions populate with their sponsor-recognized mechanism taxonomy |
 | Funding_Mechanism_Description | MediumName | optional | Free-text description for mechanisms not in the canonical taxonomy |
-| Original_Start_Date | Date | required | |
-| Original_End_Date | Date | required | |
-| Period_Of_Performance_Start_Date | Date | required | Total span of authorized work; distinct from a single budget period |
-| Period_Of_Performance_End_Date | Date | required | |
-| Current_End_Date | Date | derived | Current end after modifications. Derivation rule documented in *Derived values* |
+| Original_Start_Date | Date | required | Start of the originally authorized Period of Performance at award execution. Frozen; not adjusted by Modifications |
+| Original_End_Date | Date | required | End of the originally authorized Period of Performance at award execution. Frozen; not adjusted by Modifications. To query the live end date after extensions, use `Current_End_Date` |
+| Current_End_Date | Date | derived | Current end after Modifications. Derivation rule documented in *Derived values* |
 | Current_Total_Funded | Money | required | |
 | Total_Anticipated_Funding | Money | optional | |
 | Award_Status | Status | required | See Status taxonomy |
@@ -914,7 +922,7 @@ Per-stage effort detail for a AwardRole. The Lifecycle_Stage column distinguishe
 
 #### Budget
 
-Detailed line items for a budget at a specific lifecycle stage. Each Budget row attaches to a Proposal at the Proposed stage or to an Award/Subaward at later stages.
+Detailed line items for a budget at a specific lifecycle stage. Each Budget row carries a `Proposal_ID` at every stage (the stable chain identity) and a post-award `Award_ID` or `Subaward_ID` at Approved and later stages (per-Award disambiguation when one Proposal yields multiple Awards).
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
@@ -922,7 +930,7 @@ Detailed line items for a budget at a specific lifecycle stage. Each Budget row 
 | Lifecycle_Stage | Status | required | Constrained: Proposed / Approved / Current / Actual |
 | Budget_Mode | Status | required | Constrained: Itemized / Modular |
 | Parent_Budget_ID | ID | optional | → Budget. Later-stage rows point back to earlier-stage rows (revisions chain) |
-| Proposal_ID | ID | conditional | → Proposal. Required when Lifecycle_Stage = 'Proposed' |
+| Proposal_ID | ID | required | → Proposal. The originating Proposal; stable across all Lifecycle_Stages. The `Parent_Budget_ID` chain spans the Proposed → Approved → Current → Actual progression without changing anchor |
 | Award_ID | ID | conditional | → Award. Exactly one of Award_ID or Subaward_ID is non-null when Lifecycle_Stage ≥ Approved |
 | Subaward_ID | ID | conditional | → Subaward. Exactly one of Award_ID or Subaward_ID is non-null when Lifecycle_Stage ≥ Approved |
 | Period_Start_Date | Date | required | |
