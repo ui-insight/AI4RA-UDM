@@ -84,10 +84,9 @@ Moved to Optional Extensions:
 
 ### Documentation deliverables
 
-- [vignettes/udm-v2-schema.md](udm-v2-schema.md) — canonical prose specification (~1500 lines).
+- [vignettes/udm-v2-schema.md](udm-v2-schema.md) — canonical prose specification.
 - [udm_schema_v2.json](../udm_schema_v2.json) — MySQL/MariaDB serialization at the repository root with structured constraints, derived values, 12 example views, ~200-entry column synonyms sidecar.
-- [vignettes/ontology.md](ontology.md) — updated architectural overview describing v2.
-- Three rounds of comparative cold-read evaluation against the v1 schema; v2 scored 8.5/10 against v1's 5/10 in the final round.
+- [vignettes/ontology.md](ontology.md) — architectural overview describing v2.
 
 ### Migration from v1
 
