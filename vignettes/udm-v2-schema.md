@@ -386,6 +386,8 @@ Some columns are derived from other data. The model specifies the rule; the impl
 | `Subaward.Current_End_Date` | Symmetric to Award.Current_End_Date but scoped to Modifications where `Subaward_ID` = the Subaward. Falls back to the Subaward's `Original_End_Date` when no qualifying Modification exists. | On insert/update of any qualifying Modification, on insert/update of Subaward |
 | `Award.Current_Total_Funded` | The Award's `Original_Total_Funded` plus the sum of `Funding_Change_Amount` across Modifications where `Award_ID` = the Award and `Approval_Status = 'Approved'`. Modifications with null Funding_Change_Amount (non-financial event types) contribute 0. | On insert/update of any Modification, on insert/update of Award |
 | `Award.Originating_Award_ID` | Walk the `Previous_Award_ID` chain back from this Award until reaching an Award with null `Previous_Award_ID`; that Award's `Award_ID` is the originating Award. Null when this Award is itself the root (its own `Previous_Award_ID` is null). Parallels `Proposal.Originating_Proposal_ID`. | On insert/update of Award.Previous_Award_ID |
+| `Award.Current_PI_Personnel_ID` | The `Personnel_ID` of the unique active AwardRole row on this Award where `Role_Value_ID` resolves (via Canonical_Value_Code) to `PI` and the row is active on today's date (`Start_Date <= today AND (End_Date IS NULL OR End_Date >= today)`). Null when no such row exists — either the Award is in Multi_PI mode (one or more active rows resolving to `Multi_PI`) or no PI/Multi_PI rows are active (community-partner Subaward case). The exclusivity rule on AwardRole (PI vs Multi_PI is exclusive) guarantees at most one active PI row in single-PI mode | On insert/update of any AwardRole row on this Award; on the daily rollover that may change which rows are active on today's date |
+| `Subaward.Current_PI_Personnel_ID` | Symmetric to Award.Current_PI_Personnel_ID but scoped to AwardRole rows where `Subaward_ID` equals this Subaward. | On insert/update of any AwardRole row on this Subaward; on the daily rollover |
 
 Common implementation choices: generated column, trigger that maintains the value, view that computes it, or application-layer compute on read. The model accepts any approach that produces the correct value at the moment a consumer reads it.
 
@@ -755,6 +757,7 @@ A funded grant, contract, or cooperative agreement. The central post-award entit
 | Current_End_Date | Date | derived | Current end after Modifications. Derivation rule documented in *Derived values* |
 | Original_Total_Funded | Money | required | The funded amount at award execution. Frozen; not adjusted by Modifications |
 | Current_Total_Funded | Money | derived | Originally funded amount plus the sum of approved funding-changing Modifications. Derivation rule documented in *Derived values* |
+| Current_PI_Personnel_ID | ID | derived | → Personnel. The current PI on this Award when the agreement is in single-PI mode; null when in Multi_PI mode (multiple Multi_PI rows are active) or when no PI is active (community-partner Subaward case). Derivation rule documented in *Derived values*. The canonical source for "who is on this team" remains AwardRole; this column is a query-convenience denormalization parallel to Current_End_Date and Current_Total_Funded |
 | Total_Anticipated_Funding | Money | optional | |
 | Award_Status | Status | required | See Status taxonomy |
 | Risk_Level | Status | optional | See Status taxonomy |
@@ -804,6 +807,7 @@ A subaward agreement between the institution and a subrecipient. Subaward exists
 | Original_Start_Date | Date | required | |
 | Original_End_Date | Date | required | |
 | Current_End_Date | Date | derived | Current end after modifications. Derivation rule documented in *Derived values* |
+| Current_PI_Personnel_ID | ID | derived | → Personnel. The current PI on this Subaward when the agreement is in single-PI mode; null when in Multi_PI mode or when no PI is active (community-partner Subaward case). Derivation rule documented in *Derived values*. Parallels Award.Current_PI_Personnel_ID |
 | Risk_Level | Status | required | See Status taxonomy |
 | Subaward_Status | Status | required | See Status taxonomy. Subaward_Status = 'Proposed' indicates a pre-award planned subaward |
 | Monitoring_Frequency_Months | Count | optional | How often subrecipient monitoring is performed |
