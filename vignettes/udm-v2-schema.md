@@ -135,14 +135,15 @@ Every table includes the following columns. They are not repeated in the per-tab
 | `Source_Record_ID` | ID | optional | The originating record's identifier in the source system; preserves provenance for downstream reconciliation |
 | `Is_Active` | Boolean | required | Default true; used for soft-delete and to distinguish currently-valid records from historical ones. Tables with their own lifecycle/status fields may rely on those instead and treat Is_Active as always true |
 
-### Audit authority: Updated_At vs ActivityLog
+### Audit authority: Updated_At vs ActivityLog vs versioned storage
 
-Two fields appear to answer "when did this change?" but they answer different questions:
+Three mechanisms touch the question "when did this change?" and each answers a different scope:
 
-- `Updated_At` marks the moment of the most recent write to the row. It is a single timestamp, overwritten on every update; it does not preserve history.
-- `ActivityLog` records the history of changes: who changed what, when, with old and new values. It is append-only.
+- `Updated_At` marks the moment of the most recent write to the row. Single timestamp, overwritten on every update; preserves no history.
+- `ActivityLog` records **typed business events** the institution chooses to surface: status transitions, operator actions, submission status changes, and explicitly logged field changes. It is append-only and curated — not a CDC log of every column update. Institutions log the events that matter to their audit story; the `Activity_Type = 'field_change'` value is available for institutions that want to surface specific column changes (e.g., Award.PI_Personnel_ID, Modification.Approval_Status) but is not expected to capture every row write.
+- **Versioned storage** (Dolt, Trino on Apache Iceberg, temporal tables in Postgres / SQL Server) handles the raw-column-history layer when needed. Time-travel queries reconstruct any field's prior value at any past point in time without application instrumentation. The UDM assumes this layer for deployments that need full row history (see *Optional extensions > Field-level audit / history tables*).
 
-Consumers asking "is this row stale" or "what's the latest version" use `Updated_At`. Consumers asking "when did the status flip from X to Y" or "who changed this field" use `ActivityLog`. When the two appear to conflict (a recent `Updated_At` with no corresponding `ActivityLog` entry, or vice versa), `ActivityLog` is authoritative for the history of the row's content; `Updated_At` is authoritative for "has anything touched this row, including metadata."
+So: `Updated_At` answers "is this row stale." `ActivityLog` answers "which curated business events touched this row, and when." Versioned storage answers "what did column X look like on date D." When `Updated_At` and an `ActivityLog` field_change entry appear to disagree, the field_change entry is authoritative for the surfaced business event; the underlying raw column history (if needed) lives at the storage layer.
 
 ### Is_Active vs status-field authority
 
@@ -186,6 +187,8 @@ These can agree or disagree, and the disagreement is informative: lineage may co
 | "What institutional research-line group does this belong to?" | `*.Group_ID` (Proposal / Award / Subaward, all user-maintained) |
 
 Structural mechanisms (`Previous_*_ID`, `Parent_*_ID`, `Proposal_ID`, `Prime_Award_ID`) and user-maintained mechanisms (`Group_ID`) are independent. Where they disagree, the institution has deliberately forked or merged a group identity even though the lineage chain continues. Both readings remain meaningful for separate query purposes.
+
+**Originating_*_ID semantics for root rows.** `Originating_Proposal_ID` and `Originating_Award_ID` are derived stored columns that point at the root of the `Previous_*_ID` chain. They are **null when the row is itself the root** (i.e., `Previous_*_ID` is null). Queries for "all rows in this lineage chain" use `COALESCE(Originating_*_ID, *_ID)` to handle both cases uniformly. Example: `SELECT * FROM Award WHERE COALESCE(Originating_Award_ID, Award_ID) = COALESCE(:x_originating, :x_award_id)`.
 
 **Modification effect on the Budget chain.** A Modification creates a new Current-stage Budget row when its event changes any Budget column. The discriminator is which Budget column is changed:
 
@@ -447,7 +450,7 @@ The following rules require enforcement beyond what a single column declaration 
 | Subaward | `Proposal_ID` required when `Subaward_Status = 'Proposed'`; `Prime_Award_ID` required when `Subaward_Status ≥ 'Pending'`. Both columns may be non-null at the same time after transition so the originating-proposal link persists alongside the prime-award link |
 | Effort | When `Lifecycle_Stage = 'Certified'`, all of: `Certification_Method`, `Certifier_Personnel_ID`, `Certification_Date`, `Certification_Statement_Text` are required |
 | ComplianceRequirement | `Approved_Date` is required when `Requirement_Status = 'Approved'` |
-| ComplianceRequirement | Referenced `Reviewing_Authority_Organization_ID` has an OrganizationCapability appropriate to the Requirement_Type: `Committee` for IRB/IACUC/IBC; `Program_Office` (or other institution-defined capability) for Export_Control/Radiation/etc. |
+| ComplianceRequirement | `Reviewing_Authority_Organization_ID` is required when `Requirement_Type` is `IRB`, `IACUC`, or `IBC`; optional otherwise. When non-null, the referenced Organization has an OrganizationCapability appropriate to the Requirement_Type: `Committee` for IRB/IACUC/IBC; `Program_Office` (or other institution-defined capability) for Export_Control/Radiation/etc. |
 | ComplianceCoverage | Exactly one of `Award_ID` or `Subaward_ID` is non-null |
 | ComplianceCoverage | A given (`ComplianceRequirement_ID`, parent anchor) pair appears at most once with a null `Coverage_End_Date`, where the parent anchor is the non-null one of `Award_ID` or `Subaward_ID` |
 | ProtocolRole | At most one of `Award_ID` or `Subaward_ID` is non-null. Both null indicates the person's responsibility spans all agreements the requirement covers (the default and most common case) |
@@ -963,7 +966,7 @@ Per-stage effort detail for a AwardRole. The Lifecycle_Stage column distinguishe
 | Effort_ID | ID | required | PK |
 | AwardRole_ID | ID | required | → AwardRole (the assignment) |
 | Lifecycle_Stage | Status | required | Constrained: Proposed / Approved / Charged / Certified |
-| Parent_Effort_ID | ID | optional | → Effort. Later-stage rows point at the nearest existing earlier-stage row |
+| Parent_Effort_ID | ID | optional | → Effort. The chain pointer. Later-stage rows point at the nearest existing earlier-stage row (Proposed → Approved → Charged → Certified). Same-stage recertification (a Certified row corrected by a later Certified row) also chains via this column to the predecessor it supersedes; the *No chain branching* rule (Universal patterns) keeps the chain linear |
 | Period_Start_Date | Date | required | |
 | Period_End_Date | Date | required | |
 | Effort_Percent | Percent | required | Authoritative for this Lifecycle_Stage |
@@ -976,7 +979,6 @@ Per-stage effort detail for a AwardRole. The Lifecycle_Stage column distinguishe
 | Certification_Date | Date | conditional | Required when Lifecycle_Stage = 'Certified' |
 | Certification_Statement_Text | LongText | conditional | The legal attestation text the certifier accepted. Required when Lifecycle_Stage = 'Certified'. Recorded verbatim because the legal force of effort certification depends on what the certifier saw and accepted |
 | Certification_Signature_Reference | URL | optional | Reference to a stored signature artifact (signed PDF, e-signature service record, IDP claim). Optional but expected when audit traceability of the signature event matters |
-| Recertification_Of_Effort_ID | ID | optional | → Effort. When a Certified row is later recertified (correction to a previously-certified period), the new row references the row it supersedes |
 
 ---
 
@@ -1161,7 +1163,7 @@ The table is intentionally generic across regulatory regimes. AllowedValues-back
 | Requirement_Type | Status | required | Constrained: IRB / IACUC / IBC / COI / Radiation / Export_Control / Other. Determines which Reviewing Authority pattern applies (committee vs Empowered Official vs other) |
 | Compliance_Number | ShortCode | optional | The authority-issued identifier (IRB protocol number, IACUC protocol number, Export Control determination number, radiation registration number, etc.). Unique within (`Issuing_Authority_Organization_ID`, `Requirement_Type`) when not null. Scope of uniqueness is the issuing authority, not the institution: two different IRBs at the same institution might issue the same protocol number |
 | Issuing_Authority_Organization_ID | ID | optional | → Organization. The body that issues the Compliance_Number. May be the same as `Reviewing_Authority_Organization_ID` (the IRB issues its own protocol numbers) or different (DOE issues a radiation materials license while the internal Radiation Safety Committee reviews specific uses) |
-| Reviewing_Authority_Organization_ID | ID | optional | → Organization. The body that reviews and approves this requirement. May be a Committee (IRB, IACUC, IBC), an Export Control Office, a Radiation Safety Office, etc. Referenced Organization carries an OrganizationCapability appropriate to the Requirement_Type (Committee for IRB/IACUC/IBC; Program_Office or similar for export control and radiation safety) |
+| Reviewing_Authority_Organization_ID | ID | conditional | → Organization. The body that reviews and approves this requirement. Required when `Requirement_Type` is `IRB`, `IACUC`, or `IBC` (these are board-reviewed by definition). Optional for `Export_Control`, `Radiation`, `COI`, or `Other` where a self-certification or no formal reviewing body applies. Referenced Organization carries an OrganizationCapability appropriate to the Requirement_Type (Committee for IRB/IACUC/IBC; Program_Office or similar for export control and radiation safety) |
 | Review_Pathway_Value_ID | ID | optional | → AllowedValues with `Value_Group = 'ComplianceReviewPathway'`. The pathway/category that classifies how the requirement was determined or processed. Recommended values vary by Requirement_Type. For IRB: Exempt / Expedited / Full_Board / Not_Human_Subjects / Administrative. For Export Control: Fundamental_Research_Exclusion / Determination_Only / TCP_Required / License_Required. For COI: Annual / Event_Based. For IBC: Exempt / BL1 / BL2 / BL3 / BL4 (containment level functions as the pathway). Each Requirement_Type's reviewer brings its own vocabulary |
 | Submitted_Date | Date | optional | |
 | Approved_Date | Date | conditional | Required when Requirement_Status = 'Approved' |
