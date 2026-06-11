@@ -320,6 +320,8 @@ Some columns are derived from other data. The model specifies the rule; the impl
 | Derived column | Rule | Recomputation triggers |
 |---|---|---|
 | `Award.Subject_To_Federal_Funding` | True if the Award's Sponsor has Sponsor_Type='Federal', OR Is_Flow_Through is true and the Prime Sponsor has Sponsor_Type='Federal' | On insert/update of Award, Sponsor's Sponsor_Type, Prime Sponsor's Sponsor_Type |
+| `Award.Current_End_Date` | The Award's `Period_Of_Performance_End_Date` adjusted by the latest approved end-date-changing Modification. Computed as: among Modifications where `Award_ID` = the Award, `Approval_Status = 'Approved'`, and `Event_Type` resolves to an end-date-changing event (No_Cost_Extension, Supplement when it extends the period, Sponsor_Transfer, Continuation), take the one with the latest `Effective_Date` and use its `New_End_Date`. If no such Modification exists, use the Award's `Period_Of_Performance_End_Date`. | On insert/update of any qualifying Modification, on insert/update of Award |
+| `Subaward.Current_End_Date` | Symmetric to Award.Current_End_Date but scoped to Modifications where `Subaward_ID` = the Subaward. Falls back to the Subaward's `Original_End_Date` when no qualifying Modification exists. | On insert/update of any qualifying Modification, on insert/update of Subaward |
 
 Common implementation choices: generated column, trigger that maintains the value, view that computes it, or application-layer compute on read. The model accepts any approach that produces the correct value at the moment a consumer reads it.
 
@@ -679,7 +681,7 @@ A funded grant, contract, or cooperative agreement. The central post-award entit
 | Original_End_Date | Date | required | |
 | Period_Of_Performance_Start_Date | Date | required | Total span of authorized work; distinct from a single budget period |
 | Period_Of_Performance_End_Date | Date | required | |
-| Current_End_Date | Date | required | Current end after modifications |
+| Current_End_Date | Date | derived | Current end after modifications. Derivation rule documented in *Derived values* |
 | Current_Total_Funded | Money | required | |
 | Total_Anticipated_Funding | Money | optional | |
 | Award_Status | Status | required | See Status taxonomy |
@@ -728,7 +730,7 @@ A subaward agreement between the institution and a subrecipient. Subaward exists
 | Total_Anticipated_Amount | Money | optional | |
 | Original_Start_Date | Date | required | |
 | Original_End_Date | Date | required | |
-| Current_End_Date | Date | required | Current end after modifications |
+| Current_End_Date | Date | derived | Current end after modifications. Derivation rule documented in *Derived values* |
 | Risk_Level | Status | required | See Status taxonomy |
 | Subaward_Status | Status | required | See Status taxonomy. Subaward_Status = 'Proposed' indicates a pre-award planned subaward |
 | Monitoring_Frequency_Months | Count | optional | How often subrecipient monitoring is performed |
@@ -1196,7 +1198,7 @@ Institution-specific controlled vocabularies. The `Value_Group` column names a f
 | Value_Description | LongText | optional | |
 | Canonical_Value_Code | ShortCode | optional | The canonical code (across institutions) that this local code maps to. Null when the local code has no canonical equivalent. Used by cross-institution queries to normalize values |
 
-**Canonical Value_Group names:** ContactType, OrganizationCapability, AwardRole, OrganizationRole, ProtocolRole, FundType, TransactionType, ModificationEventType, DocumentType, FinanceCodePurpose, COIRelationshipType, IndirectRateType, CostShareCommitmentType, RestrictionType, DeadlineType, ProposalType, FundingMechanism, ComplianceReviewPathway, ComplianceClassificationLevel.
+**Canonical Value_Group names:** ContactType, OrganizationCapability, AwardRole, OrganizationRole, ProtocolRole, FundType, TransactionType, ModificationEventType, ActionType, DocumentType, FinanceCodePurpose, COIRelationshipType, IndirectRateType, CostShareCommitmentType, RestrictionType, DeadlineType, ProposalType, FundingMechanism, ComplianceReviewPathway, ComplianceClassificationLevel.
 
 #### BudgetCategory
 
@@ -1317,7 +1319,7 @@ Work items attached to entities: deliverables, checklist items, service requests
 | Action_ID | ID | required | PK |
 | Related_Entity_Type | Status | required | Constrained: Award / Subaward / Proposal / ProposalApproval / PreAwardAuthorization / Personnel / ComplianceRequirement / Modification / Negotiation / Terms / Closeout / Report / Equipment |
 | Related_Entity_ID | ID | required | |
-| Action_Type | Status | required | Constrained: Deliverable / Checklist_Item / Service_Request / Modification_Approval / Compliance_Renewal / Training_Required / Training_Completion / Subrecipient_Risk_Review / Cost_Transfer_Approval / JIT_Request / Other |
+| Action_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'ActionType'`. Recommended values: Deliverable / Checklist_Item / Service_Request / Modification_Approval / Compliance_Renewal / Training_Required / Training_Completion / Subrecipient_Risk_Review / Cost_Transfer_Approval / JIT_Request / Other |
 | Title | MediumName | required | |
 | Description | LongText | optional | |
 | Assignee_Personnel_ID | ID | optional | → Personnel |

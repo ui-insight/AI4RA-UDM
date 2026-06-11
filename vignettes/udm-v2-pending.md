@@ -8,18 +8,16 @@ Items in flight or planned since the last cold-read (commit `4721a66`, score 5/1
 - **Add `OrganizationIdentifier` junction table.** Carries UEI / EIN / DUNS / CAGE / IPF / IPEDS / Sponsor_Code / Other identifiers. Cross-row constraint: (Identifier_Type, Identifier_Value) unique within institution when active. Parallels PersonnelCredential.
 - **Add `OrganizationCapability.Risk_Level`.** Standing risk of this Organization in this capacity (subrecipient general risk profile, vendor performance risk, sponsor payment risk). Distinct from per-Subaward risk on `Subaward.Risk_Level`.
 - **Add `Personnel.Home_Organization_Identifier`.** Single ShortCode column. Unique within `(Home_Organization_ID, Home_Organization_Identifier)` when not null. Primary dedup key for Personnel rows. Works for internal (Banner ID, NetID, EmpID) and external (sponsor's internal PO ID) personnel symmetrically.
+- **`Action_Type` → AllowedValues.** Converted from fixed Status to `Action_Type_Value_ID` → AllowedValues with Value_Group = 'ActionType'. Added to canonical Value_Group names list.
+- **`Award.Current_End_Date` and `Subaward.Current_End_Date` declared derived.** Derivation rule: latest approved end-date-changing Modification's `New_End_Date`, falling back to Period_Of_Performance_End_Date / Original_End_Date when no qualifying Modification exists.
 
 ## Planned (remaining cold-read findings to address)
 
-- **`Action_Type` as AllowedValues, not fixed Status.** Per the spec's own rule at line 98, fixed Status enums are for cross-institution standards. `Subrecipient_Risk_Review`, `Cost_Transfer_Approval`, `JIT_Request`, `Service_Request` are institution-customized workflows — should be AllowedValues with a canonical recommended-values list.
+- **Same-stage chain forest semantics.** A stage-S row can have multiple stage-S descendants via `Parent_*_ID` under correction. The "latest leaf" rule is ambiguous when there are multiple leaves. Recommendation: forbid branching — require at most one non-superseded same-stage descendant per parent (others marked Is_Active=false). Needs user sign-off.
 
-- **Same-stage chain forest semantics.** A stage-S row can have multiple stage-S descendants via `Parent_*_ID` under correction. The "latest leaf" rule is ambiguous when there are multiple leaves. Needs a structural constraint ("at most one un-superseded same-stage descendant per anchor/period") or a tie-breaking convention.
+- **Budget anchor refactor — Option B.** Make `Budget.Proposal_ID` required at all Lifecycle_Stage values; keep `Award_ID`/`Subaward_ID` at later stages too. Chain identity becomes Proposal_ID (stable across stages); per-Award disambiguation stays via Award_ID/Subaward_ID for the multi-Award case. Resolves the Proposed→Approved anchor switch.
 
-- **NCE Modification → `Award.Current_End_Date` derivation.** The narrative says Current_End_Date reflects modifications; nothing in the schema enforces or derives it. Either declare it `derived` with a rule (latest approved NCE wins) or remove the narrative claim and let consumers compute it.
-
-- **Subaward Proposed→Pending Budget anchor switch.** Budget at Proposed has `Proposal_ID`; at Approved it has `Subaward_ID`. When the Subaward transitions and the Budget chain advances, the anchor switches across the chain. Needs a semantic convention paragraph.
-
-- **Credit_Percent sum during AwardRole transitions.** New PI inserted Day D, old PI end-dated Day D. Both rows visible on Day D. Does the sum-to-100 constraint apply to all rows or active-on-date rows? Needs to specify temporal slicing.
+- **Credit_Percent sum during AwardRole transitions.** New PI inserted Day D, old PI end-dated Day D. Both rows visible on Day D. Tighten the constraint to "sum to 100 across credit-bearing roles active on any given date" (not all rows in the table).
 
 ## Cold-read defensive complaints we're NOT addressing
 
