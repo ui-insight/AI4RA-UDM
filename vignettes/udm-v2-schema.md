@@ -423,6 +423,8 @@ The following rules require enforcement beyond what a single column declaration 
 | AwardRole | For a given (parent agreement, `Personnel_ID`, `Role_Value_ID`), the `(Start_Date, End_Date)` ranges are non-overlapping (null `End_Date` is treated as +infinity) |
 | AwardRole | `FTE_Percent` is between 0.00 and 100.00 |
 | AwardRole | **PI vs Multi_PI mode is exclusive.** For a given parent agreement at any active date, either exactly one active AwardRole row has `Role_Value_ID` resolving to canonical `PI` (single-PI mode), or two-or-more active rows have `Role_Value_ID` resolving to canonical `Multi_PI` (multi-PI mode under NIH MPI policy or equivalent), or zero of either (e.g., community-partner Subaward). An Award or Subaward cannot simultaneously have an active `PI` row and active `Multi_PI` rows. Credit-bearing roles for institutional credit-allocation purposes are those whose `Role_Value_ID` resolves (via `Canonical_Value_Code`) to one of: `PI`, `Co_PI`, `Co_I`, `Multi_PI`; institutions extend the set by populating `Canonical_Value_Code` on their local Role values |
+| AwardRole | **At most one Contact PI per Multi_PI agreement.** For a given parent agreement in Multi_PI mode, at most one active row has `Is_Contact_PI = true`. `Is_Contact_PI` is null for rows resolving to `PI` (single-PI mode) or other non-Multi_PI roles |
+| Transaction | `CostShare_ID` is required when `Transaction_Type_Value_ID` resolves to canonical `Cost_Share`; null otherwise |
 | Effort | `Effort_Percent` is between 0.00 and 100.00 |
 | Effort | `Charged_Amount` and `Over_Cap_Amount` are required when `Lifecycle_Stage = 'Charged'` |
 | Effort | `Certification_Method`, `Certifier_Personnel_ID`, `Certification_Date` are required when `Lifecycle_Stage = 'Certified'` |
@@ -956,6 +958,7 @@ Roles attach to the funding instrument (Award or Subaward). Cross-Award team que
 | Credit_Percent | Percent | optional | Investigator credit allocation. Institutions that allocate credit typically arrange `Credit_Percent` to sum to 100 across active credit-bearing roles on the parent agreement, but this is a data invariant the institution maintains; the spec does not enforce a sum-to-100 constraint. Some institutions skip credit allocation, allow tolerances during transitions, or apply waivers |
 | Credit_Unit_Organization_ID | ID | optional | → Organization. Unit receiving the credit |
 | Is_Key_Personnel | Boolean | required | |
+| Is_Contact_PI | Boolean | conditional | Required (defaulting to false) when `Role_Value_ID` resolves to canonical `Multi_PI`; null otherwise. Identifies the NIH MPI Contact PI on a multi-PI Award — the single point of contact the sponsor communicates with. At most one active Multi_PI row per parent agreement has `Is_Contact_PI = true` |
 | Start_Date | Date | required | |
 | End_Date | Date | optional | |
 
@@ -1008,6 +1011,7 @@ Detailed line items for a budget at a specific lifecycle stage. Each Budget row 
 | Module_Size_Amount | Money | conditional | Required when Budget_Mode = 'Modular' (typically $25,000 for NIH modular) |
 | Budget_Category_ID | ID | conditional | → BudgetCategory. Required when Budget_Mode = 'Itemized'; one Budget row per line item |
 | Amount | Money | conditional | The line-item amount. Required when Budget_Mode = 'Itemized' |
+| IndirectRate_ID | ID | optional | → IndirectRate. The F&A (indirect-cost) rate that applies to this Budget period. Set at the Budget granularity because multi-year Awards may use different rates per period (a renegotiated rate mid-Award, an off-campus rate for a specific period, etc.). Null when no F&A rate applies (Modular budgets that bundle F&A into modules, sub-budgets where indirect is waived, or proposal-stage rows where the rate is undecided) |
 
 #### Fund
 
@@ -1059,6 +1063,7 @@ An individual financial entry charged to an Award or Subaward.
 | Fund_ID | ID | optional | → Fund |
 | Account_ID | ID | optional | → Account |
 | FinanceCode_ID | ID | optional | → FinanceCode |
+| CostShare_ID | ID | conditional | → CostShare. Required when `Transaction_Type` resolves to `Cost_Share`. Identifies which cost-share commitment this transaction satisfies. Null for all other Transaction_Type values |
 | Transaction_Date | Date | required | |
 | Transaction_Amount | Money | required | Sign convention: positive for charges/encumbrances, negative for reversals/transfers-out |
 | Transaction_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'TransactionType'`. Recommended values: Expense / Revenue / Encumbrance / Transfer / Adjustment / Reversal / Cost_Share / Project_Income / Cost_Transfer_In / Cost_Transfer_Out |
@@ -1316,6 +1321,7 @@ Files associated with any entity.
 | File_Hash | Hash | required | SHA-256 of the file content |
 | File_Size_Bytes | LargeCount | required | |
 | Version_Number | Count | required | Default 1 |
+| Parent_Document_ID | ID | optional | → Document (self-referencing). When a new version of the same logical document is uploaded, the new row chains via this column to the predecessor; `Version_Number` increments. The chain is per-logical-document; the "no chain branching" rule (Universal patterns) keeps it linear. The latest version is the row at the end of the active chain (no active child). Used for document revisions where file_hash and content change but the logical document persists |
 | Uploaded_By_Personnel_ID | ID | required | → Personnel |
 | Uploaded_Timestamp | Timestamp | required | |
 
