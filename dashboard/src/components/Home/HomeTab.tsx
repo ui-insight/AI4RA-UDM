@@ -117,11 +117,16 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
           flexWrap: 'wrap',
         }}
       >
-        <img
-          src="assets/udm-survey-qr.png"
-          alt="QR code for UDM feedback survey"
-          style={{ width: 140, height: 140, borderRadius: 8, flexShrink: 0, background: 'white', padding: 6 }}
-        />
+        <div style={{ flexShrink: 0, textAlign: 'center' }}>
+          <img
+            src="assets/udm-survey-qr.png"
+            alt="QR code for UDM feedback survey"
+            style={{ width: 140, height: 140, borderRadius: 8, background: 'white', padding: 6, display: 'block' }}
+          />
+          <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.8rem', marginTop: '0.4rem' }}>
+            Scan to open the survey
+          </div>
+        </div>
         <div style={{ flex: 1, minWidth: 220 }}>
           <h3 style={{ color: 'white', fontSize: '1.3rem', margin: '0 0 0.5rem' }}>
             Share your feedback
@@ -283,6 +288,17 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
           input — suggest changes, report issues, or join the discussion on GitHub.
         </p>
         <ul style={{ paddingLeft: '1.25rem', color: '#546e7a', lineHeight: 1.8 }}>
+          <li>
+            <a
+              href="https://ai4ra.uidaho.edu"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '#667eea' }}
+            >
+              AI4RA project site
+            </a>{' '}
+            — the broader AI for Research Administration initiative
+          </li>
           <li>
             <a href={REPO_URL} target="_blank" rel="noopener noreferrer" style={{ color: '#667eea' }}>
               GitHub repository
