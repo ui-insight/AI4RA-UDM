@@ -130,16 +130,22 @@ export default function HomeTab({ dataDictionary, relationships }: Props) {
         </p>
         <ul style={{ paddingLeft: '1.25rem', color: '#546e7a', lineHeight: 1.8 }}>
           <li>
+            <a href="data/udm_schema_v2.json" style={{ color: '#667eea' }}>
+              /data/udm_schema_v2.json
+            </a>{' '}
+            — UDM v2 schema (current): semantic conventions, cross-row constraints, derived values, example views
+          </li>
+          <li>
             <a href="data/udm_schema.json" style={{ color: '#667eea' }}>
               /data/udm_schema.json
             </a>{' '}
-            — complete schema including views and constraints
+            — UDM v1 schema, preserved for reference
           </li>
           <li>
             <a href="data/data-dictionary.json" style={{ color: '#667eea' }}>
               /data/data-dictionary.json
             </a>{' '}
-            — table and column descriptions, synonyms, PII flags
+            — table and column descriptions, synonyms, PII flags (regenerated from v2)
           </li>
           <li>
             <a href="data/relationships.json" style={{ color: '#667eea' }}>
@@ -157,7 +163,7 @@ export default function HomeTab({ dataDictionary, relationships }: Props) {
         </code>
         . Table and relationship counts are derived at load time from{' '}
         <code style={{ background: '#f1f5f9', padding: '0.1rem 0.35rem', borderRadius: 3 }}>
-          udm_schema.json
+          udm_schema_v2.json
         </code>
         .
       </p>

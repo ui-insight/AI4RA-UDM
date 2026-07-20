@@ -6,12 +6,52 @@ export default function Header() {
       padding: '2rem',
       boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
     }}>
-      <h1 style={{ fontSize: '1.8rem', fontWeight: 600, marginBottom: '0.5rem' }}>
-        UDM Dashboard
-      </h1>
-      <p style={{ opacity: 0.9, fontSize: '1rem' }}>
-        Universal Data Model for Research Administration
-      </p>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem' }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+            <h1 style={{ fontSize: '1.8rem', fontWeight: 600, margin: 0 }}>
+              UDM Dashboard
+            </h1>
+            <span
+              title="UDM v2.0.0 released 2026-06-11"
+              style={{
+                padding: '0.2rem 0.6rem',
+                borderRadius: 999,
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                background: 'rgba(255,255,255,0.2)',
+                border: '1px solid rgba(255,255,255,0.35)',
+                letterSpacing: 0.5,
+              }}
+            >
+              v2.0.0
+            </span>
+          </div>
+          <p style={{ opacity: 0.9, fontSize: '1rem' }}>
+            Unified Data Model for Research Administration
+          </p>
+        </div>
+        <a
+          href="https://uidaho.co1.qualtrics.com/jfe/form/SV_6KyRYjHSYJxx2C2"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: 'inline-block',
+            padding: '0.5rem 1rem',
+            borderRadius: 6,
+            background: 'rgba(255,255,255,0.15)',
+            border: '1px solid rgba(255,255,255,0.4)',
+            color: 'white',
+            fontWeight: 600,
+            fontSize: '0.875rem',
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+          }}
+        >
+          Give Feedback
+        </a>
+      </div>
     </header>
   );
 }

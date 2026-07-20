@@ -13,3 +13,7 @@ docs/config.js
 
 # notes/ directory for personal notes (if you have any)
 notes/
+.env
+
+# Local planning docs (per-session, not committed)
+PLAN-*.md

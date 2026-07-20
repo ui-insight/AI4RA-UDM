@@ -108,7 +108,7 @@ function buildMedallionDiagram(): { nodes: Node[]; edges: Edge[] } {
 function buildDirectDiagram(): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = [
     makeNode('sources', 'Source Systems', '', 0, 0, colors.sources),
-    makeNode('schema', 'udm_schema.json', 'UDM Definition', 0, 80, colors.udm),
+    makeNode('schema', 'udm_schema_v2.json', 'UDM v2 Definition', 0, 80, colors.udm),
     makeNode('db', 'Your Database', 'MySQL, PostgreSQL, etc.', 280, 40, colors.gold),
     makeNode('apps', 'Dashboards & Reports', '', 560, 40, colors.apps),
   ];
@@ -179,9 +179,9 @@ export default function InfrastructureTab() {
         <div style={{ marginTop: '2rem' }}>
           <h3 style={{ color: '#2c3e50', marginBottom: '1rem', fontSize: '1.3rem' }}>Where the UDM Fits</h3>
           <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
-            The UDM defines the target schema for the Silver and Gold layers. Use the <code>synonyms</code> field in{' '}
-            <a href="https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json" style={{ color: '#667eea' }}>
-              udm_schema.json
+            The UDM defines the target schema for the Silver and Gold layers. Use the <code>column_synonyms</code> sidecar in{' '}
+            <a href="https://ui-insight.github.io/AI4RA-UDM/data/udm_schema_v2.json" style={{ color: '#667eea' }}>
+              udm_schema_v2.json
             </a>{' '}
             to help map your source field names to UDM column names.
           </p>
@@ -231,20 +231,20 @@ export default function InfrastructureTab() {
               <CrosswalkRow src="pi_email" tgt={'ContactDetails.Contact_Value\u00A0(Contact_Type=Email)'} note="pivot to ContactDetails row" />
               <CrosswalkRow src="STATUS_CD = 'A'" tgt="Award.Award_Status = 'Active'" note="value lookup via AllowedValues" />
               <CrosswalkRow src="proj_start (MM/DD/YYYY)" tgt="Proposal.Proposed_Start_Date" note="parse to DATE" />
-              <CrosswalkRow src="FOA_NUM" tgt="RFA.RFA_Number" note="synonym match" />
+              <CrosswalkRow src="FOA_NUM" tgt="RFA.RFA_Number" note="synonym match (column_synonyms sidecar)" />
             </tbody>
           </table>
         </div>
 
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
-          The UDM supports crosswalk authoring with two first-class fields on every table and column:
+          UDM v2 supports crosswalk authoring with two first-class metadata sources:
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
-          <LayerCard title="synonyms" color={colors.silver}
-            desc={'Alternate names on every entity — e.g., Award ↔ "Grant, Contract, Agreement". Matchers and LLMs use these to identify equivalent concepts without a hand-built dictionary.'} />
+          <LayerCard title="column_synonyms sidecar" color={colors.silver}
+            desc={'Top-level map in udm_schema_v2.json keyed by TableName.Column_Name → comma-separated list of common alternative names (e.g., Personnel.Personnel_ID → "Person ID, Employee ID, Researcher ID, Faculty ID, User ID"). Matchers and LLMs use these to identify equivalent concepts without a hand-built dictionary.'} />
           <LayerCard title="description" color={colors.silver}
-            desc="Plain-language column purpose. Combined with the column name, gives LLM/ML matchers enough semantic context to disambiguate near-duplicates like Sponsor vs. Submitting vs. Administering Organization." />
+            desc="Plain-language description on every table and column. Combined with the column name, gives LLM/ML matchers enough semantic context to disambiguate near-duplicates like Sponsor vs. Submitting vs. Administering Organization." />
         </div>
 
         <div style={{
@@ -252,7 +252,7 @@ export default function InfrastructureTab() {
           background: '#eef2ff', border: '1px solid #c7d2fe', color: '#3730a3', fontSize: '0.9rem',
         }}>
           <strong>In progress:</strong> AI-assisted / dynamic crosswalk generation — using the{' '}
-          <code>synonyms</code> and <code>description</code> fields plus table context to auto-propose
+          <code>column_synonyms</code> and <code>description</code> fields plus table context to auto-propose
           mappings from a source schema to UDM columns, with confidence scores and human review. See{' '}
           <a href="https://github.com/ui-insight/AI4RA-UDM/issues/33" style={{ color: '#4f46e5' }}>
             issue #33
@@ -312,7 +312,7 @@ export default function InfrastructureTab() {
               <VocabRow
                 term="Award"
                 tags={['Research Admin']}
-                def={'The formal instrument by which a sponsor commits funds to an institution for a specific project — the transition from "we proposed this" to "we are doing this with their money." Awards take multiple legal forms with different expectations about sponsor control and reporting: a grant (sponsor funds the work but does not direct it day-to-day), a cooperative agreement (sponsor is substantially involved in the work), a contract (sponsor specifies deliverables and accepts work product), and a subaward (a portion of an award passed through from a prime recipient). Every award has a project period — the overall funded window — and is typically broken into budget periods (usually annual) within which the PI can move money among categories. Sponsors often obligate funds period-by-period rather than releasing the entire commitment up front, which is why the distinction between total awarded and currently available matters for financial management. In the UDM, Award is the central post-award entity: it links back to the Proposal it originated from, out to Personnel via ProjectRole, and down to ProposalBudget / AwardBudget / Transaction records for the money.'}
+                def={'The formal instrument by which a sponsor commits funds to an institution for a specific project — the transition from "we proposed this" to "we are doing this with their money." Awards take multiple legal forms with different expectations about sponsor control and reporting: a grant (sponsor funds the work but does not direct it day-to-day), a cooperative agreement (sponsor is substantially involved in the work), a contract (sponsor specifies deliverables and accepts work product), and a subaward (a portion of an award passed through from a prime recipient). Every award has a project period — the overall funded window — and is typically broken into budget periods (usually annual) within which the PI can move money among categories. Sponsors often obligate funds period-by-period rather than releasing the entire commitment up front, which is why the distinction between total awarded and currently available matters for financial management. In UDM v2, Award is the central post-award entity: it links back to the Proposal it originated from, out to Personnel via AwardRole, and down to Budget / Transaction / Payment records for the money. Budget rows carry a Lifecycle_Stage (Proposed → Approved → Current → Actual) so the proposed, approved, and actual numbers all live in one table.'}
               />
               <VocabRow
                 term="Sponsored Projects"
@@ -377,7 +377,7 @@ export default function InfrastructureTab() {
               <VocabRow
                 term="CI/CD"
                 tags={['Software Practice']}
-                def={'Continuous Integration and Continuous Delivery (sometimes Continuous Deployment) — the practice of automating build, test, and release of software every time a change is committed. CI runs the build and test suite on each commit so regressions are caught within minutes instead of at release time; CD automates packaging and deploying those tested artifacts to the target environment, with or without a human approval gate. For the UDM specifically, the CI/CD pipeline lives in .github/workflows/: on every push to main, GitHub Actions regenerates the derived JSON endpoints (data-dictionary.json, relationships.json) from udm_schema.json, rebuilds the dashboard, and publishes to GitHub Pages. This is why the site and the SSOT stay in sync without manual steps, and why a broken commit is visible quickly.'}
+                def={'Continuous Integration and Continuous Delivery (sometimes Continuous Deployment) — the practice of automating build, test, and release of software every time a change is committed. CI runs the build and test suite on each commit so regressions are caught within minutes instead of at release time; CD automates packaging and deploying those tested artifacts to the target environment, with or without a human approval gate. For the UDM specifically, the CI/CD pipeline lives in .github/workflows/: on every push to main, GitHub Actions regenerates the derived JSON endpoints (data-dictionary.json, relationships.json) from udm_schema_v2.json, rebuilds the dashboard, and publishes to GitHub Pages. This is why the site and the SSOT stay in sync without manual steps, and why a broken commit is visible quickly.'}
               />
               <VocabRow
                 term="Metadata"
@@ -402,7 +402,7 @@ export default function InfrastructureTab() {
               <VocabRow
                 term="Schema"
                 tags={['Data Fundamentals']}
-                def={'The formal description of the structure of a database or dataset — which tables (or collections / entities) exist, what columns each one has, what data types those columns hold, what constraints apply (required, unique, value ranges), and how the tables relate to each other via foreign keys. A schema is about structure, not content; two databases can share a schema and hold completely different data. The UDM is itself a schema — the "S" is implicit in the name — published as udm_schema.json so other systems can adopt it directly. In SQL, "schema" is also used in a narrower namespacing sense (e.g., lakehouse.bronze.banner, lakehouse.gold.Award); in a medallion lakehouse each layer is typically a SQL schema containing its own views. Distinct from data (the values in the tables), from the data dictionary (the descriptive metadata about the schema), and from schema mapping (the process of connecting one schema to another).'}
+                def={'The formal description of the structure of a database or dataset — which tables (or collections / entities) exist, what columns each one has, what data types those columns hold, what constraints apply (required, unique, value ranges), and how the tables relate to each other via foreign keys. A schema is about structure, not content; two databases can share a schema and hold completely different data. The UDM is itself a schema — the "S" is implicit in the name — published as udm_schema_v2.json so other systems can adopt it directly. In SQL, "schema" is also used in a narrower namespacing sense (e.g., lakehouse.bronze.banner, lakehouse.gold.Award); in a medallion lakehouse each layer is typically a SQL schema containing its own views. Distinct from data (the values in the tables), from the data dictionary (the descriptive metadata about the schema), and from schema mapping (the process of connecting one schema to another).'}
               />
               <VocabRow
                 term="View"
@@ -417,7 +417,7 @@ export default function InfrastructureTab() {
               <VocabRow
                 term="Foreign key / parent-child relationship"
                 tags={['Data Fundamentals']}
-                def={'A foreign key is a column (or combination of columns) in one table whose value must match an existing primary-key value in another table — it is the mechanism that enforces a relationship between two tables at the database level. The parent/child terminology follows from which side of the relationship each row sits on: the table being referenced is the parent, the table carrying the foreign-key column is the child. Example in the UDM: ProposalBudget.Proposal_ID references Proposal.Proposal_ID, so Proposal is the parent and ProposalBudget is the child — one proposal has many budget line items, every budget line item belongs to exactly one proposal, and the database will refuse to create a budget row pointing at a non-existent proposal. Foreign keys are also what make joins meaningful — without them, two tables are just side-by-side lists. The "Parents" and "Children" columns on the Data Dictionary tab are derived directly from the foreign keys declared in udm_schema.json. Delete-time behavior (CASCADE, SET NULL, RESTRICT) controls what happens when a parent row is removed and is part of the relationship contract, not an afterthought.'}
+                def={'A foreign key is a column (or combination of columns) in one table whose value must match an existing primary-key value in another table — it is the mechanism that enforces a relationship between two tables at the database level. The parent/child terminology follows from which side of the relationship each row sits on: the table being referenced is the parent, the table carrying the foreign-key column is the child. Example in UDM v2: Budget.Proposal_ID references Proposal.Proposal_ID, so Proposal is the parent and Budget is the child — one proposal has many budget rows (Proposed-stage, then Approved-stage as the award is made), every budget row belongs to a specific Proposal or Award/Subaward, and the database will refuse to create a budget row pointing at a non-existent proposal. Foreign keys are also what make joins meaningful — without them, two tables are just side-by-side lists. The "Parents" and "Children" columns on the Data Dictionary tab are derived directly from the foreign keys declared in udm_schema_v2.json. Delete-time behavior (CASCADE, SET NULL, RESTRICT) controls what happens when a parent row is removed and is part of the relationship contract, not an afterthought.'}
               />
               <VocabRow
                 term="Stored procedure"
@@ -472,7 +472,7 @@ export default function InfrastructureTab() {
               <VocabRow
                 term="MTDC (Modified Total Direct Costs)"
                 tags={['Research Admin']}
-                def={'The F&A base most federal awards use — it is Total Direct Costs minus specific excluded categories. The standard exclusions are equipment ($5,000+ capital items), tuition remission, patient care costs, rent, scholarships and fellowships, participant-support costs, and the portion of each subaward exceeding $25,000. The exclusions exist so that large one-time or pass-through expenses don\u2019t inflate overhead recovery on items that don\u2019t actually drive institutional cost. MTDC is computed row-by-row over the ProposalBudget, then the applicable F&A rate is multiplied against it. Budget mistakes here are costly in both directions: applying F&A to equipment over-charges the sponsor; forgetting to exclude a $500,000 subaward partial-exclusion under-recovers indirect dollars.'}
+                def={'The F&A base most federal awards use — it is Total Direct Costs minus specific excluded categories. The standard exclusions are equipment ($5,000+ capital items), tuition remission, patient care costs, rent, scholarships and fellowships, participant-support costs, and the portion of each subaward exceeding $25,000. The exclusions exist so that large one-time or pass-through expenses don\u2019t inflate overhead recovery on items that don\u2019t actually drive institutional cost. MTDC is computed row-by-row over the Budget rows (Lifecycle_Stage = "Proposed"), then the applicable F&A rate is multiplied against it. Budget mistakes here are costly in both directions: applying F&A to equipment over-charges the sponsor; forgetting to exclude a $500,000 subaward partial-exclusion under-recovers indirect dollars.'}
               />
               <VocabRow
                 term="Cost share"
@@ -517,7 +517,7 @@ export default function InfrastructureTab() {
               <VocabRow
                 term="Closeout"
                 tags={['Research Admin']}
-                def={'The set of activities required to formally end an award: submitting the final technical / progress report, the final financial report (typically a Federal Financial Report for federal awards), the final invention / IP report, and any sponsor-specific deliverables, then disposing of equipment per sponsor terms and reconciling any cost share commitments. Federal Uniform Guidance requires closeout within 120 days of the end date for most awards — but in practice closeouts routinely slip because final invoices arrive late, subrecipient closeouts haven\u2019t completed, and effort certifications lag. Late closeout is an audit risk and can jeopardize the institution\u2019s ability to draw down on other awards from the same sponsor. The UDM surface for closeout is the Award table\u2019s status transition (Active \u2192 Closed) plus the AwardDeliverable records that get resolved.'}
+                def={'The set of activities required to formally end an award: submitting the final technical / progress report, the final financial report (typically a Federal Financial Report for federal awards), the final invention / IP report, and any sponsor-specific deliverables, then disposing of equipment per sponsor terms and reconciling any cost share commitments. Federal Uniform Guidance requires closeout within 120 days of the end date for most awards — but in practice closeouts routinely slip because final invoices arrive late, subrecipient closeouts haven\u2019t completed, and effort certifications lag. Late closeout is an audit risk and can jeopardize the institution\u2019s ability to draw down on other awards from the same sponsor. In UDM v2, closeout is modeled as a multi-subworkflow Closeout entity attached to Award/Subaward, tracking individual subworkflows (financial, technical, equipment disposition, invention statement) plus the Report rows that get resolved.'}
               />
               <VocabRow
                 term="Uniform Guidance (2 CFR 200)"
@@ -547,7 +547,7 @@ export default function InfrastructureTab() {
               <VocabRow
                 term="PI eligibility"
                 tags={['Research Admin']}
-                def={'The institutional policy that defines who is allowed to serve as Principal Investigator on a sponsored award — typically tenure-track faculty by default, with pathways to extend eligibility to research faculty, clinical faculty, emeriti, staff scientists, postdocs, and graduate students under documented criteria (often requiring department chair, dean, or VPR approval). PI-eligibility policy is an institutional governance artifact, not a sponsor rule: sponsors have their own PI-role expectations, but the institution decides whom it will allow to lead awards it administers. Divergence between sponsor-accepted PIs and institutionally eligible PIs is precisely why Sponsor PI vs. Internal PI (see entry) matters — PI-eligibility policy is the lever that forces the distinction. In OpenERA, this is an explicit workflow with VPR-override tracking; in the UDM, the data surface is the EligibilityOverride table (OpenERA extension) or institution-specific ProjectRole metadata.'}
+                def={'The institutional policy that defines who is allowed to serve as Principal Investigator on a sponsored award — typically tenure-track faculty by default, with pathways to extend eligibility to research faculty, clinical faculty, emeriti, staff scientists, postdocs, and graduate students under documented criteria (often requiring department chair, dean, or VPR approval). PI-eligibility policy is an institutional governance artifact, not a sponsor rule: sponsors have their own PI-role expectations, but the institution decides whom it will allow to lead awards it administers. Divergence between sponsor-accepted PIs and institutionally eligible PIs is precisely why Sponsor PI vs. Internal PI (see entry) matters — PI-eligibility policy is the lever that forces the distinction. In OpenERA, this is an explicit workflow with VPR-override tracking; in UDM v2, the data surface is AwardRole metadata (Role_Value_ID + Start_Date / End_Date) and any institution-specific extension layered on top.'}
               />
               <VocabRow
                 term="Data silo"
@@ -571,7 +571,7 @@ export default function InfrastructureTab() {
         </h3>
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
           For institutions that want a simpler approach, the UDM can be implemented directly as database tables.
-          Use <code>udm_schema.json</code> to generate CREATE TABLE statements for your platform
+          Use <code>udm_schema_v2.json</code> to generate CREATE TABLE statements for your platform
           (MySQL, PostgreSQL, SQLite, SQL Server) and load data via ETL.
         </p>
         <div style={{ background: '#f8f9fa', borderRadius: 8, height: 200 }}>
@@ -632,22 +632,24 @@ export default function InfrastructureTab() {
           background: '#1e1e1e', borderRadius: 8, padding: '1.25rem', marginBottom: '1rem',
           fontFamily: 'monospace', fontSize: '0.85rem', color: '#d4d4d4', overflowX: 'auto',
         }}>
-          <div style={{ color: '#6a9955', marginBottom: '0.5rem' }}># Fetch the full UDM schema</div>
-          <div>curl https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json</div>
+          <div style={{ color: '#6a9955', marginBottom: '0.5rem' }}># Fetch the UDM v2 schema</div>
+          <div>curl https://ui-insight.github.io/AI4RA-UDM/data/udm_schema_v2.json</div>
           <div style={{ color: '#6a9955', marginTop: '1rem', marginBottom: '0.5rem' }}># Python — load as a dictionary</div>
           <div><span style={{ color: '#c586c0' }}>import</span> requests</div>
-          <div>schema = requests.get(<span style={{ color: '#ce9178' }}>"https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json"</span>).json()</div>
+          <div>schema = requests.get(<span style={{ color: '#ce9178' }}>"https://ui-insight.github.io/AI4RA-UDM/data/udm_schema_v2.json"</span>).json()</div>
           <div style={{ color: '#6a9955', marginTop: '1rem', marginBottom: '0.5rem' }}># JavaScript — fetch in browser or Node.js</div>
-          <div><span style={{ color: '#c586c0' }}>const</span> schema = <span style={{ color: '#c586c0' }}>await</span> fetch(<span style={{ color: '#ce9178' }}>"https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json"</span>)</div>
+          <div><span style={{ color: '#c586c0' }}>const</span> schema = <span style={{ color: '#c586c0' }}>await</span> fetch(<span style={{ color: '#ce9178' }}>"https://ui-insight.github.io/AI4RA-UDM/data/udm_schema_v2.json"</span>)</div>
           <div>{'  '}.then(r =&gt; r.json());</div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
-          <LayerCard title="Schema Endpoint" color={colors.udm}
-            desc="ui-insight.github.io/AI4RA-UDM/data/udm_schema.json — the complete UDM definition including tables, columns, types, foreign keys, synonyms, and example views." />
+          <LayerCard title="Schema Endpoint (v2)" color={colors.udm}
+            desc="ui-insight.github.io/AI4RA-UDM/data/udm_schema_v2.json — the complete v2 UDM definition: tables, columns, types, foreign keys, semantic conventions, cross-row constraints, derived values, column synonyms, and example views." />
+          <LayerCard title="Schema Endpoint (v1)" color={colors.udm}
+            desc="ui-insight.github.io/AI4RA-UDM/data/udm_schema.json — the original v1 UDM, preserved alongside v2 for institutions still in migration." />
           <LayerCard title="Data Dictionary" color={colors.udm}
-            desc="ui-insight.github.io/AI4RA-UDM/data/data-dictionary.json — pre-processed table and column metadata for building tools and documentation." />
+            desc="ui-insight.github.io/AI4RA-UDM/data/data-dictionary.json — pre-processed v2 table and column metadata for building tools and documentation." />
           <LayerCard title="Relationships" color={colors.udm}
-            desc="ui-insight.github.io/AI4RA-UDM/data/relationships.json — all foreign key relationships extracted from the schema, ready for ERD generation or validation." />
+            desc="ui-insight.github.io/AI4RA-UDM/data/relationships.json — all foreign key relationships extracted from the v2 schema, ready for ERD generation or validation." />
         </div>
         <p style={{ color: '#546e7a', marginTop: '1rem', fontSize: '0.9rem' }}>
           These endpoints always reflect the latest version of the UDM. Use them to generate DDL for your database platform,

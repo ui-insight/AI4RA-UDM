@@ -11,7 +11,7 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 
 UDM v2 is a major refactor of the model. It supersedes UDM v1.
 
-Both versions of the JSON serialization are kept side-by-side at the repository root: [udm_schema.json](../udm_schema.json) (v1, preserved for reference) and [udm_schema_v2.json](../udm_schema_v2.json) (v2). The canonical prose specification lives in [udm-v2-schema.md](udm-v2-schema.md); the architectural overview is in [ontology.md](ontology.md).
+Both versions of the JSON serialization are kept side-by-side at the repository root: [udm_schema.json](../udm_schema.json) (v1, preserved for reference) and [udm_schema_v2.json](../udm_schema_v2.json) (v2). The canonical prose specification lives in [udm-v2-system-of-record.md](udm-v2-system-of-record.md); the architectural overview is in [ontology.md](ontology.md).
 
 ### Architectural changes
 
@@ -84,7 +84,7 @@ Moved to Optional Extensions:
 
 ### Documentation deliverables
 
-- [vignettes/udm-v2-schema.md](udm-v2-schema.md) — canonical prose specification.
+- [vignettes/udm-v2-system-of-record.md](udm-v2-system-of-record.md) — canonical prose specification.
 - [udm_schema_v2.json](../udm_schema_v2.json) — MySQL/MariaDB serialization at the repository root with structured constraints, derived values, 12 example views, ~200-entry column synonyms sidecar.
 - [vignettes/ontology.md](ontology.md) — architectural overview describing v2.
 
