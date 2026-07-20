@@ -26,7 +26,7 @@
         },
         {
           "name": "Middle_Name",
-          "description": "",
+          "description": "Middle name or initial",
           "synonyms": "Middle Initial",
           "pii": true
         },
@@ -38,7 +38,7 @@
         },
         {
           "name": "Suffix",
-          "description": "",
+          "description": "Name suffix (Jr., III, etc.)",
           "synonyms": "Name Suffix, Generation",
           "pii": false
         },
@@ -68,7 +68,7 @@
         },
         {
           "name": "Person_Type",
-          "description": "",
+          "description": "Constrained: Faculty / Staff / Student / Postdoc / Resident / Fellow / External",
           "synonyms": "Personnel Category, Affiliation Type",
           "pii": false
         }
@@ -88,13 +88,13 @@
         },
         {
           "name": "Personnel_ID",
-          "description": "",
+          "description": "The Personnel this credential belongs to",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Credential_Type",
-          "description": "",
+          "description": "Constrained: Citizenship / Visa_Status / Permanent_Resident_Status / eRA_Commons_ID / NSF_FastLane_ID / Sponsor_Login_ID / CITI_Training / IRB_Training / IACUC_Training / Biosafety_Training / Export_Control_Training / Security_Clearance / Background_Check / Other",
           "synonyms": "Identifier Type, Credential Category",
           "pii": false
         },
@@ -102,17 +102,17 @@
           "name": "Credential_Value",
           "description": "The credential's value (ISO 3166 country code, eRA Commons username, clearance level, etc.)",
           "synonyms": "Credential, Identifier Value",
-          "pii": false
+          "pii": true
         },
         {
           "name": "Issuing_Authority_Organization_ID",
-          "description": "",
+          "description": "The issuing or attesting authority",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Issued_Date",
-          "description": "",
+          "description": "When the credential was issued by the authority",
           "synonyms": null,
           "pii": false
         },
@@ -124,19 +124,19 @@
         },
         {
           "name": "Verification_Date",
-          "description": "",
+          "description": "When the institution last verified this credential",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Credential_Status",
-          "description": "",
+          "description": "Constrained: Active / Expired / Revoked / Pending_Verification",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Notes",
-          "description": "",
+          "description": "Free-text notes about this credential",
           "synonyms": null,
           "pii": false
         }
@@ -156,7 +156,7 @@
         },
         {
           "name": "Organization_Name",
-          "description": "",
+          "description": "Full name of the organization",
           "synonyms": "Org Name, Entity Name, Institution Name",
           "pii": false
         },
@@ -174,7 +174,7 @@
         },
         {
           "name": "Sponsor_Type",
-          "description": "",
+          "description": "Constrained when present: Federal / State / Local / Foundation / Industry / Higher_Ed_PassThrough / Foreign / Tribal / Internal. Required when the Organization has an OrganizationCapability row with Capability = 'Sponsor'",
           "synonyms": "Funder Type, Funding Source Type, Sponsor Category",
           "pii": false
         }
@@ -194,7 +194,7 @@
         },
         {
           "name": "Organization_ID",
-          "description": "",
+          "description": "The Organization this capability belongs to",
           "synonyms": null,
           "pii": false
         },
@@ -206,7 +206,7 @@
         },
         {
           "name": "Capability_Status",
-          "description": "",
+          "description": "Constrained: Active / Suspended / Terminated / Probationary. Distinguishes a capability that is currently in good standing from one that has been suspended (e.g., a subrecipient suspended for risk reasons) or terminated. Distinct from Is_Active row-level soft delete",
           "synonyms": "Capability State, Activation Status",
           "pii": false
         },
@@ -218,19 +218,19 @@
         },
         {
           "name": "Effective_Start_Date",
-          "description": "",
+          "description": "When the organization began playing this role (used for historical orgs no longer active in this capability)",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Effective_End_Date",
-          "description": "",
+          "description": "When the organization stopped playing this role",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Notes",
-          "description": "",
+          "description": "Free-text notes about this capability",
           "synonyms": null,
           "pii": false
         }
@@ -250,19 +250,19 @@
         },
         {
           "name": "Organization_ID",
-          "description": "",
+          "description": "The Organization this identifier belongs to",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Identifier_Type",
-          "description": "",
+          "description": "Constrained: UEI / EIN / DUNS / CAGE / IPF / IPEDS / Sponsor_Code / Other",
           "synonyms": "ID Type, Registry Type",
           "pii": false
         },
         {
           "name": "Identifier_Value",
-          "description": "",
+          "description": "The actual identifier value",
           "synonyms": "Registry Value, Identifier",
           "pii": false
         },
@@ -274,7 +274,7 @@
         },
         {
           "name": "Notes",
-          "description": "",
+          "description": "Free-text notes about this identifier",
           "synonyms": null,
           "pii": false
         }
@@ -294,13 +294,13 @@
         },
         {
           "name": "Personnel_ID",
-          "description": "",
+          "description": "Exactly one of Personnel_ID or Organization_ID is non-null",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Organization_ID",
-          "description": "",
+          "description": "Exactly one of Personnel_ID or Organization_ID is non-null",
           "synonyms": null,
           "pii": false
         },
@@ -314,7 +314,7 @@
           "name": "Contact_Value",
           "description": "The actual email/phone/address text",
           "synonyms": "Email Address, Phone Number, Address",
-          "pii": false
+          "pii": true
         },
         {
           "name": "Is_Primary",
@@ -338,13 +338,13 @@
         },
         {
           "name": "Personnel_ID",
-          "description": "",
+          "description": "The person holding the role",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Organization_ID",
-          "description": "",
+          "description": "The Organization the person holds a role at",
           "synonyms": null,
           "pii": false
         },
@@ -374,13 +374,13 @@
         },
         {
           "name": "Start_Date",
-          "description": "",
+          "description": "When the person assumed the role",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "End_Date",
-          "description": "",
+          "description": "When the person left the role; null while current",
           "synonyms": null,
           "pii": false
         }
@@ -406,7 +406,7 @@
         },
         {
           "name": "RFA_Title",
-          "description": "",
+          "description": "Title of the funding opportunity",
           "synonyms": "Opportunity Title, Solicitation Title",
           "pii": false
         },
@@ -436,61 +436,61 @@
         },
         {
           "name": "Announcement_Date",
-          "description": "",
+          "description": "When the opportunity was announced",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "LOI_Deadline",
-          "description": "",
+          "description": "Letter-of-intent deadline, when required",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Pre_Proposal_Deadline",
-          "description": "",
+          "description": "Pre-proposal deadline, when required",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Submission_Deadline",
-          "description": "",
+          "description": "Full proposal submission deadline",
           "synonyms": "Due Date, Application Deadline",
           "pii": false
         },
         {
           "name": "Funding_Floor_Amount",
-          "description": "",
+          "description": "Minimum award amount stated in the opportunity",
           "synonyms": "Minimum Award, Floor",
           "pii": false
         },
         {
           "name": "Funding_Ceiling_Amount",
-          "description": "",
+          "description": "Maximum award amount stated in the opportunity",
           "synonyms": "Maximum Award, Ceiling, Cap",
           "pii": false
         },
         {
           "name": "Expected_Award_Count",
-          "description": "",
+          "description": "Number of awards the sponsor expects to make",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Maximum_Duration_Months",
-          "description": "",
+          "description": "Maximum project period allowed, in months",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "RFA_Status",
-          "description": "",
+          "description": "See Status taxonomy",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Submission_Portal_URL",
-          "description": "",
+          "description": "URL of the sponsor submission portal for this opportunity",
           "synonyms": null,
           "pii": false
         }
@@ -510,7 +510,7 @@
         },
         {
           "name": "RFA_ID",
-          "description": "",
+          "description": "The RFA this requirement belongs to",
           "synonyms": null,
           "pii": false
         },
@@ -522,13 +522,13 @@
         },
         {
           "name": "Requirement_Text",
-          "description": "",
+          "description": "The requirement as stated in the opportunity",
           "synonyms": "Requirement Description, Rule Text",
           "pii": false
         },
         {
           "name": "Requirement_Category",
-          "description": "",
+          "description": "Constrained: Eligibility / Budget / Format / Compliance / Reporting / Personnel / Document / Review_Criterion / Submission / Deadline / Special_Condition / PAPPG_Deviation / Other",
           "synonyms": "Requirement Type, Rule Category",
           "pii": false
         },
@@ -540,7 +540,7 @@
         },
         {
           "name": "Format_Specification",
-          "description": "",
+          "description": "Formatting rules (page limits, font, margins, file format)",
           "synonyms": null,
           "pii": false
         },
@@ -578,7 +578,7 @@
         },
         {
           "name": "Proposal_Title",
-          "description": "",
+          "description": "Title of the proposed work",
           "synonyms": "Application Title, Project Title",
           "pii": false
         },
@@ -626,37 +626,37 @@
         },
         {
           "name": "Submission_Version",
-          "description": "",
+          "description": "Default 1",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Proposed_Start_Date",
-          "description": "",
+          "description": "Proposed project period start",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Proposed_End_Date",
-          "description": "",
+          "description": "Proposed project period end",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Total_Proposed_Direct",
-          "description": "",
+          "description": "Total proposed direct costs across all periods",
           "synonyms": "Direct Costs, DC Total",
           "pii": false
         },
         {
           "name": "Total_Proposed_Indirect",
-          "description": "",
+          "description": "Total proposed indirect (F&A) costs across all periods",
           "synonyms": "Indirect Costs, F&A Total, IDC",
           "pii": false
         },
         {
           "name": "Total_Proposed_Budget",
-          "description": "",
+          "description": "Total proposed costs (direct + indirect) across all periods",
           "synonyms": "Total Costs, TC Total, Total Budget",
           "pii": false
         },
@@ -674,25 +674,25 @@
         },
         {
           "name": "Internal_Approval_Status",
-          "description": "",
+          "description": "See Status taxonomy",
           "synonyms": "Internal Routing Status, OSP Approval",
           "pii": false
         },
         {
           "name": "Decision_Status",
-          "description": "",
+          "description": "See Status taxonomy",
           "synonyms": "Outcome, Sponsor Decision, Award Decision",
           "pii": false
         },
         {
           "name": "Decision_Date",
-          "description": "",
+          "description": "When the sponsor decision was received",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Risk_Level",
-          "description": "",
+          "description": "See Status taxonomy",
           "synonyms": null,
           "pii": false
         },
@@ -724,7 +724,7 @@
         },
         {
           "name": "Proposal_ID",
-          "description": "",
+          "description": "The Proposal being routed for approval",
           "synonyms": null,
           "pii": false
         },
@@ -736,31 +736,31 @@
         },
         {
           "name": "Approval_Role",
-          "description": "",
+          "description": "Constrained: PI / Co_Investigator / Department_Chair / College_Dean / Center_Director / OSP_Pre_Award / Compliance_Office / VPR / Other. The institutional role that performs this step",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Approver_Personnel_ID",
-          "description": "",
+          "description": "The specific person who performs (or is expected to perform) this step",
           "synonyms": "Approver, Signoff Authority",
           "pii": false
         },
         {
           "name": "Approval_Status",
-          "description": "",
+          "description": "Constrained: Pending / Approved / Rejected / Bypassed / Returned_for_Revision",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Action_Date",
-          "description": "",
+          "description": "Required when Approval_Status is not Pending",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Notes",
-          "description": "",
+          "description": "Free-text notes recorded at this approval step",
           "synonyms": null,
           "pii": false
         }
@@ -780,7 +780,7 @@
         },
         {
           "name": "Proposal_ID",
-          "description": "",
+          "description": "The Proposal the at-risk authorization is for",
           "synonyms": null,
           "pii": false
         },
@@ -792,43 +792,43 @@
         },
         {
           "name": "Authorization_Date",
-          "description": "",
+          "description": "When the at-risk spending was authorized",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Effective_Start_Date",
-          "description": "",
+          "description": "Start of the authorized at-risk spending window",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Effective_End_Date",
-          "description": "",
+          "description": "End of the authorized at-risk spending window",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Authorizing_Personnel_ID",
-          "description": "",
+          "description": "The institutional officer who authorized the at-risk spending",
           "synonyms": "Authorizing Officer, Approver",
           "pii": false
         },
         {
           "name": "Authorization_Status",
-          "description": "",
+          "description": "Constrained: Pending / Approved / Revoked / Converted_To_Award / Expired_Unused",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Converted_To_Award_ID",
-          "description": "",
+          "description": "Required when Authorization_Status = 'Converted_To_Award'; otherwise null. Populated once the Proposal becomes an Award and the pre-award authorization is folded into the executed funding",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Notes",
-          "description": "",
+          "description": "Free-text notes about the authorization",
           "synonyms": null,
           "pii": false
         }
@@ -860,7 +860,7 @@
         },
         {
           "name": "Award_Title",
-          "description": "",
+          "description": "Title of the funded work",
           "synonyms": "Grant Title, Project Title, Funded Title",
           "pii": false
         },
@@ -914,7 +914,7 @@
         },
         {
           "name": "RFA_ID",
-          "description": "",
+          "description": "The funding opportunity the Award originated from, when known",
           "synonyms": null,
           "pii": false
         },
@@ -980,19 +980,19 @@
         },
         {
           "name": "Total_Anticipated_Funding",
-          "description": "",
+          "description": "Total funding anticipated across all periods if all increments are funded",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Award_Status",
-          "description": "",
+          "description": "See Status taxonomy",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Risk_Level",
-          "description": "",
+          "description": "See Status taxonomy",
           "synonyms": null,
           "pii": false
         },
@@ -1004,7 +1004,7 @@
         },
         {
           "name": "Subject_To_Federal_Funding",
-          "description": "",
+          "description": "Derivation rule and recomputation triggers documented in *Implementation guidance*",
           "synonyms": "Federal Source, Has Federal Money",
           "pii": false
         }
@@ -1024,13 +1024,13 @@
         },
         {
           "name": "Award_ID",
-          "description": "",
+          "description": "Exactly one of Award_ID or Subaward_ID is non-null",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Subaward_ID",
-          "description": "",
+          "description": "Exactly one of Award_ID or Subaward_ID is non-null",
           "synonyms": null,
           "pii": false
         },
@@ -1042,7 +1042,7 @@
         },
         {
           "name": "Effective_Date",
-          "description": "",
+          "description": "When the modification takes effect",
           "synonyms": "Mod Effective Date, Change Effective Date",
           "pii": false
         },
@@ -1054,7 +1054,7 @@
         },
         {
           "name": "Continuation_Type",
-          "description": "",
+          "description": "Constrained when present: Competing / Non_Competing / Supplement / Other",
           "synonyms": null,
           "pii": false
         },
@@ -1066,31 +1066,31 @@
         },
         {
           "name": "Requires_Prior_Approval",
-          "description": "",
+          "description": "Whether the change required sponsor prior approval",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Prior_Approval_Granted_Date",
-          "description": "",
+          "description": "Required when Requires_Prior_Approval is true and Approval_Status is Approved",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Funding_Change_Amount",
-          "description": "",
+          "description": "Positive for adds, negative for reductions. Required for funding-changing event types; null for non-financial event types",
           "synonyms": "Supplement, Reduction, Net Change",
           "pii": false
         },
         {
           "name": "New_End_Date",
-          "description": "",
+          "description": "The revised end date of the parent agreement after this Modification takes effect. Required when Event_Type resolves to an end-date-changing event (No_Cost_Extension, Supplement when it extends the period, Sponsor_Transfer, Continuation). Null otherwise. Used by the derived Award.Current_End_Date and Subaward.Current_End_Date rules",
           "synonyms": "Revised End Date, Extended End",
           "pii": false
         },
         {
           "name": "Carryover_Amount",
-          "description": "",
+          "description": "Required when the Event_Type resolves to Carryover",
           "synonyms": "Carry-Forward, Unobligated Balance",
           "pii": false
         },
@@ -1108,7 +1108,7 @@
         },
         {
           "name": "Description",
-          "description": "",
+          "description": "Free-text description of the change",
           "synonyms": null,
           "pii": false
         }
@@ -1128,13 +1128,13 @@
         },
         {
           "name": "Proposal_ID",
-          "description": "",
+          "description": "The proposal that planned this subaward. Required when Subaward_Status = 'Proposed'. Persists after the transition to Pending/Active so the originating-proposal link is preserved across the subaward lifecycle",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Prime_Award_ID",
-          "description": "",
+          "description": "References Award (the parent inbound award). Required when Subaward_Status \u2265 'Pending' (i.e., the prime award has been received). Null while Subaward_Status = 'Proposed'",
           "synonyms": "Parent Award, Primary Award, Prime",
           "pii": false
         },
@@ -1170,7 +1170,7 @@
         },
         {
           "name": "Subaward_Title",
-          "description": "",
+          "description": "Title of the subrecipient scope of work",
           "synonyms": "Sub Title, Subrecipient Project Title",
           "pii": false
         },
@@ -1182,19 +1182,19 @@
         },
         {
           "name": "Total_Anticipated_Amount",
-          "description": "",
+          "description": "Total subaward amount anticipated if all increments are funded",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Original_Start_Date",
-          "description": "",
+          "description": "Original subaward period start, frozen at execution",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Original_End_Date",
-          "description": "",
+          "description": "Original subaward period end, frozen at execution",
           "synonyms": null,
           "pii": false
         },
@@ -1212,7 +1212,7 @@
         },
         {
           "name": "Risk_Level",
-          "description": "",
+          "description": "See Status taxonomy",
           "synonyms": null,
           "pii": false
         },
@@ -1244,7 +1244,7 @@
         },
         {
           "name": "Proposal_ID",
-          "description": "",
+          "description": "At least one of Proposal_ID, Award_ID, or Subaward_ID is non-null",
           "synonyms": null,
           "pii": false
         },
@@ -1268,37 +1268,37 @@
         },
         {
           "name": "Institutional_Lead_Personnel_ID",
-          "description": "",
+          "description": "The institution's lead negotiator",
           "synonyms": "Lead Negotiator, OSP Lead",
           "pii": false
         },
         {
           "name": "Counterparty_Contact_Personnel_ID",
-          "description": "",
+          "description": "The counterparty's lead negotiator",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Negotiation_Start_Date",
-          "description": "",
+          "description": "When negotiation began",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Negotiation_End_Date",
-          "description": "",
+          "description": "Required when Negotiation_Status is Resolved or Abandoned",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Negotiation_Status",
-          "description": "",
+          "description": "See Status taxonomy",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Outcome_Description",
-          "description": "",
+          "description": "Free-text summary of the negotiation outcome",
           "synonyms": null,
           "pii": false
         }
@@ -1318,25 +1318,25 @@
         },
         {
           "name": "Award_ID",
-          "description": "",
+          "description": "Exactly one of Award_ID or Subaward_ID is non-null",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Subaward_ID",
-          "description": "",
+          "description": "Exactly one of Award_ID or Subaward_ID is non-null",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Payment_Method",
-          "description": "",
+          "description": "Constrained: Reimbursement / Advance / Cost_Reimbursement / Fixed_Price / Letter_of_Credit / Payment_Request",
           "synonyms": "Billing Method, Payment Approach",
           "pii": false
         },
         {
           "name": "Invoicing_Frequency",
-          "description": "",
+          "description": "Constrained: Monthly / Quarterly / Semi_Annual / Annual / Upon_Request / Milestone",
           "synonyms": "Billing Frequency, Invoice Cadence",
           "pii": false
         },
@@ -1348,13 +1348,13 @@
         },
         {
           "name": "Reporting_Requirements",
-          "description": "",
+          "description": "Free-text summary of reporting obligations under the agreement",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Special_Conditions",
-          "description": "",
+          "description": "Free-text special award conditions",
           "synonyms": null,
           "pii": false
         },
@@ -1378,7 +1378,7 @@
         },
         {
           "name": "Record_Retention_Years",
-          "description": "",
+          "description": "Required record retention period, in years",
           "synonyms": null,
           "pii": false
         }
@@ -1398,49 +1398,49 @@
         },
         {
           "name": "Award_ID",
-          "description": "",
+          "description": "Exactly one of Award_ID or Subaward_ID is non-null",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Subaward_ID",
-          "description": "",
+          "description": "Exactly one of Award_ID or Subaward_ID is non-null",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Report_Type",
-          "description": "",
+          "description": "Constrained: Progress / RPPR / Financial / FFR_SF425 / Final_Progress / Final_Financial / Invention_Statement / Data_Sharing / Equipment_Inventory / Audit_Response / Other",
           "synonyms": "Deliverable Type, Submission Type",
           "pii": false
         },
         {
           "name": "Reporting_Period_Start_Date",
-          "description": "",
+          "description": "Start of the period the report covers",
           "synonyms": "Period Start, Coverage Start",
           "pii": false
         },
         {
           "name": "Reporting_Period_End_Date",
-          "description": "",
+          "description": "End of the period the report covers",
           "synonyms": "Period End, Coverage End",
           "pii": false
         },
         {
           "name": "Due_Date",
-          "description": "",
+          "description": "When the report is due to the sponsor",
           "synonyms": "Submission Deadline, Report Deadline",
           "pii": false
         },
         {
           "name": "Submitted_Date",
-          "description": "",
+          "description": "Required when Report_Status \u2265 'Submitted'",
           "synonyms": "Submission Date",
           "pii": false
         },
         {
           "name": "Submitted_By_Personnel_ID",
-          "description": "",
+          "description": "Required when Report_Status \u2265 'Submitted'",
           "synonyms": null,
           "pii": false
         },
@@ -1452,13 +1452,13 @@
         },
         {
           "name": "Report_Status",
-          "description": "",
+          "description": "Constrained: Pending / Drafted / Submitted / Accepted / Returned_for_Revision / Late / Waived",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Acceptance_Date",
-          "description": "",
+          "description": "Required when Report_Status = 'Accepted'",
           "synonyms": null,
           "pii": false
         },
@@ -1490,43 +1490,43 @@
         },
         {
           "name": "Subaward_ID",
-          "description": "",
+          "description": "Exactly one of Award_ID or Subaward_ID is non-null",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Closeout_Initiated_Date",
-          "description": "",
+          "description": "When closeout was initiated",
           "synonyms": "Closeout Start",
           "pii": false
         },
         {
           "name": "Final_Report_Status",
-          "description": "",
+          "description": "Constrained: Not_Required / Pending / Submitted / Accepted",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Final_Invoice_Status",
-          "description": "",
+          "description": "Constrained: Not_Required / Pending / Submitted / Paid",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Equipment_Disposition_Status",
-          "description": "",
+          "description": "Constrained: Not_Applicable / In_Progress / Complete",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "IP_Closeout_Status",
-          "description": "",
+          "description": "Constrained: Not_Applicable / In_Progress / Complete",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "COI_Closeout_Status",
-          "description": "",
+          "description": "Constrained: Not_Applicable / In_Progress / Complete",
           "synonyms": null,
           "pii": false
         },
@@ -1544,13 +1544,13 @@
         },
         {
           "name": "Final_Closeout_Date",
-          "description": "",
+          "description": "Required when Closeout_Status = 'Complete'",
           "synonyms": "Closeout Complete, Records Closed",
           "pii": false
         },
         {
           "name": "Closeout_Status",
-          "description": "",
+          "description": "Constrained: In_Progress / Pending_Sponsor_Final_Audit / Complete / Reopened",
           "synonyms": null,
           "pii": false
         }
@@ -1576,13 +1576,13 @@
         },
         {
           "name": "Submission_System",
-          "description": "",
+          "description": "Constrained: grants_gov / research_gov / era_commons / nspires / manual / other",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Environment",
-          "description": "",
+          "description": "Constrained: training / production",
           "synonyms": null,
           "pii": false
         },
@@ -1608,7 +1608,7 @@
         },
         {
           "name": "Proposal_ID",
-          "description": "",
+          "description": "The Proposal this package was assembled for",
           "synonyms": null,
           "pii": false
         },
@@ -1626,13 +1626,13 @@
         },
         {
           "name": "Assembled_Date",
-          "description": "",
+          "description": "When the package was assembled",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Package_Status",
-          "description": "",
+          "description": "See Status taxonomy",
           "synonyms": null,
           "pii": false
         }
@@ -1652,13 +1652,13 @@
         },
         {
           "name": "SubmissionPackage_ID",
-          "description": "",
+          "description": "The package this attempt transmitted",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "SubmissionProfile_ID",
-          "description": "",
+          "description": "The submission profile (system + credentials context) used",
           "synonyms": null,
           "pii": false
         },
@@ -1670,7 +1670,7 @@
         },
         {
           "name": "Environment",
-          "description": "",
+          "description": "Same; constrained to: training / production",
           "synonyms": null,
           "pii": false
         },
@@ -1682,13 +1682,13 @@
         },
         {
           "name": "Submitted_Timestamp",
-          "description": "",
+          "description": "When the attempt was transmitted",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Attempt_Status",
-          "description": "",
+          "description": "See Status taxonomy",
           "synonyms": null,
           "pii": false
         },
@@ -1714,19 +1714,19 @@
         },
         {
           "name": "Personnel_ID",
-          "description": "",
+          "description": "The person holding the role",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Award_ID",
-          "description": "",
+          "description": "Exactly one of Award_ID or Subaward_ID is non-null",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Subaward_ID",
-          "description": "",
+          "description": "Exactly one of Award_ID or Subaward_ID is non-null",
           "synonyms": null,
           "pii": false
         },
@@ -1762,7 +1762,7 @@
         },
         {
           "name": "Is_Key_Personnel",
-          "description": "",
+          "description": "Whether the person is designated key/senior personnel",
           "synonyms": "Key Person, Senior Personnel, Senior/Key",
           "pii": false
         },
@@ -1774,13 +1774,13 @@
         },
         {
           "name": "Start_Date",
-          "description": "",
+          "description": "When the person assumed the role",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "End_Date",
-          "description": "",
+          "description": "When the person left the role; null while current",
           "synonyms": null,
           "pii": false
         }
@@ -1800,13 +1800,13 @@
         },
         {
           "name": "AwardRole_ID",
-          "description": "",
+          "description": "References AwardRole (the assignment)",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Lifecycle_Stage",
-          "description": "",
+          "description": "Constrained: Proposed / Approved / Charged / Certified",
           "synonyms": null,
           "pii": false
         },
@@ -1818,13 +1818,13 @@
         },
         {
           "name": "Period_Start_Date",
-          "description": "",
+          "description": "Start of the effort reporting period",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Period_End_Date",
-          "description": "",
+          "description": "End of the effort reporting period",
           "synonyms": null,
           "pii": false
         },
@@ -1842,43 +1842,43 @@
         },
         {
           "name": "Calendar_Type",
-          "description": "",
+          "description": "Constrained: Calendar / Academic / Summer",
           "synonyms": "Effort Calendar, Appointment Type, Calendar Basis",
           "pii": false
         },
         {
           "name": "Charged_Amount",
-          "description": "",
+          "description": "Required when Lifecycle_Stage = 'Charged'",
           "synonyms": "Salary Charged, Direct Charge",
           "pii": false
         },
         {
           "name": "Over_Cap_Amount",
-          "description": "",
+          "description": "Required when Lifecycle_Stage = 'Charged' (zero when not over cap)",
           "synonyms": "Over-Cap Salary, NIH Cap Excess, Salary Cap Excess",
           "pii": false
         },
         {
           "name": "Certification_Method",
-          "description": "",
+          "description": "Constrained when present: PAR / Activity_Report / Timesheet / Other. Required when Lifecycle_Stage = 'Certified'",
           "synonyms": "Certification Type, PAR Method",
           "pii": false
         },
         {
           "name": "Certifier_Personnel_ID",
-          "description": "",
+          "description": "Required when Lifecycle_Stage = 'Certified'",
           "synonyms": "Effort Certifier, Approving Authority, PAR Certifier",
           "pii": false
         },
         {
           "name": "Certification_Date",
-          "description": "",
+          "description": "Required when Lifecycle_Stage = 'Certified'",
           "synonyms": "Cert Date, PAR Date",
           "pii": false
         },
         {
           "name": "Certification_Statement_Text",
-          "description": "",
+          "description": "The legal attestation text the certifier accepted. Required when Lifecycle_Stage = 'Certified'. Recorded verbatim because the legal force of effort certification depends on what the certifier saw and accepted",
           "synonyms": "Cert Statement, Certification Language",
           "pii": false
         },
@@ -1904,13 +1904,13 @@
         },
         {
           "name": "Lifecycle_Stage",
-          "description": "",
+          "description": "Constrained: Proposed / Approved / Current / Actual",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Budget_Mode",
-          "description": "",
+          "description": "Constrained: Itemized / Modular",
           "synonyms": "Budget Format, Itemization Mode",
           "pii": false
         },
@@ -1928,49 +1928,49 @@
         },
         {
           "name": "Award_ID",
-          "description": "",
+          "description": "The Award this budget belongs to at post-award stages. Exactly one of Award_ID or Subaward_ID is non-null when Lifecycle_Stage \u2265 Approved; both null at Proposed.",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Subaward_ID",
-          "description": "",
+          "description": "The Subaward this budget belongs to at post-award stages. Exactly one of Award_ID or Subaward_ID is non-null when Lifecycle_Stage \u2265 Approved; both null at Proposed.",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Period_Start_Date",
-          "description": "",
+          "description": "Start of the budget period this row covers",
           "synonyms": "Budget Period Start, Year Start, Budget Year Begin",
           "pii": false
         },
         {
           "name": "Period_End_Date",
-          "description": "",
+          "description": "End of the budget period this row covers",
           "synonyms": "Budget Period End, Year End, Budget Year Close",
           "pii": false
         },
         {
           "name": "Version_Number",
-          "description": "",
+          "description": "Default 1",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Module_Count",
-          "description": "",
+          "description": "Required when Budget_Mode = 'Modular'",
           "synonyms": "Modules, NIH Modules",
           "pii": false
         },
         {
           "name": "Module_Size_Amount",
-          "description": "",
+          "description": "Required when Budget_Mode = 'Modular' (typically $25,000 for NIH modular)",
           "synonyms": "Module Size, Per-Module Amount",
           "pii": false
         },
         {
           "name": "Budget_Category_ID",
-          "description": "",
+          "description": "Required when Budget_Mode = 'Itemized'; one Budget row per line item",
           "synonyms": "Cost Category, SF424 Category",
           "pii": false
         },
@@ -2008,7 +2008,7 @@
         },
         {
           "name": "Fund_Name",
-          "description": "",
+          "description": "Human-readable name of the fund",
           "synonyms": null,
           "pii": false
         },
@@ -2046,7 +2046,7 @@
         },
         {
           "name": "Account_Name",
-          "description": "",
+          "description": "Human-readable name of the account",
           "synonyms": null,
           "pii": false
         },
@@ -2058,7 +2058,7 @@
         },
         {
           "name": "Account_Type",
-          "description": "",
+          "description": "Constrained: Asset / Liability / Equity / Revenue / Expense",
           "synonyms": "GL Type, GAAP Type, Account Classification",
           "pii": false
         }
@@ -2078,19 +2078,19 @@
         },
         {
           "name": "Award_ID",
-          "description": "",
+          "description": "The Award this finance code string is provisioned for",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Fund_ID",
-          "description": "",
+          "description": "The Fund segment of the code string",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Account_ID",
-          "description": "",
+          "description": "The Account segment of the code string",
           "synonyms": null,
           "pii": false
         },
@@ -2122,13 +2122,13 @@
         },
         {
           "name": "Award_ID",
-          "description": "",
+          "description": "Exactly one of Award_ID or Subaward_ID is non-null",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Subaward_ID",
-          "description": "",
+          "description": "Exactly one of Award_ID or Subaward_ID is non-null",
           "synonyms": null,
           "pii": false
         },
@@ -2140,31 +2140,31 @@
         },
         {
           "name": "Fund_ID",
-          "description": "",
+          "description": "The Fund the transaction posted against",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Account_ID",
-          "description": "",
+          "description": "The Account the transaction posted against",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "FinanceCode_ID",
-          "description": "",
+          "description": "The full finance code string the transaction posted against",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "CostShare_ID",
-          "description": "",
+          "description": "Required when Transaction_Type resolves to Cost_Share. Identifies which cost-share commitment this transaction satisfies. Null for all other Transaction_Type values",
           "synonyms": "Cost Share Match, Match Reference",
           "pii": false
         },
         {
           "name": "Transaction_Date",
-          "description": "",
+          "description": "When the transaction posted",
           "synonyms": null,
           "pii": false
         },
@@ -2182,13 +2182,13 @@
         },
         {
           "name": "Income_Treatment",
-          "description": "",
+          "description": "Constrained when present: Offset / Additive. Required when Transaction_Type resolves to project income",
           "synonyms": "Project Income Handling, Income Disposition",
           "pii": false
         },
         {
           "name": "Activity_Description",
-          "description": "",
+          "description": "Free-text description of the charge or entry",
           "synonyms": null,
           "pii": false
         }
@@ -2220,13 +2220,13 @@
         },
         {
           "name": "Agreement_Number",
-          "description": "",
+          "description": "The agreement reference number",
           "synonyms": "NICRA Number, F&A Agreement Number, Indirect Cost Agreement Number",
           "pii": false
         },
         {
           "name": "Agreement_Date",
-          "description": "",
+          "description": "Date the agreement was executed",
           "synonyms": null,
           "pii": false
         },
@@ -2244,7 +2244,7 @@
         },
         {
           "name": "Agreement_Status",
-          "description": "",
+          "description": "Constrained: Active / Expired / Superseded / Provisional",
           "synonyms": "NICRA Status, F&A Agreement Status",
           "pii": false
         }
@@ -2264,31 +2264,31 @@
         },
         {
           "name": "RateAgreement_ID",
-          "description": "",
+          "description": "References RateAgreement (the parent agreement)",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Rate_Type",
-          "description": "",
+          "description": "Constrained: On_Campus / Off_Campus / MTDC / TDC / Clinical_Trial / Fringe_Benefits / Facilities / Administrative",
           "synonyms": "F&A Rate Type, Indirect Cost Type, Overhead Type",
           "pii": false
         },
         {
           "name": "Base_Type",
-          "description": "",
+          "description": "Constrained: MTDC / TDC / Salaries_and_Wages / Direct_Salaries",
           "synonyms": "Rate Base, Cost Base",
           "pii": false
         },
         {
           "name": "Rate_Percent",
-          "description": "",
+          "description": "The indirect (F&A) rate, as a percentage",
           "synonyms": "F&A Rate, Indirect Rate, Overhead Rate, IDC Rate",
           "pii": false
         },
         {
           "name": "Effective_Start_Date",
-          "description": "",
+          "description": "When this rate becomes effective (may be a sub-period of the agreement)",
           "synonyms": null,
           "pii": false
         },
@@ -2320,37 +2320,37 @@
         },
         {
           "name": "Equipment_Name",
-          "description": "",
+          "description": "Name or short description of the asset",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Award_ID",
-          "description": "",
+          "description": "Exactly one of Award_ID or Subaward_ID is non-null",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Subaward_ID",
-          "description": "",
+          "description": "Exactly one of Award_ID or Subaward_ID is non-null",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Acquisition_Date",
-          "description": "",
+          "description": "When the asset was acquired",
           "synonyms": "Purchase Date, Asset Acquisition",
           "pii": false
         },
         {
           "name": "Acquisition_Amount",
-          "description": "",
+          "description": "Acquisition cost of the asset",
           "synonyms": "Purchase Cost, Asset Cost",
           "pii": false
         },
         {
           "name": "Title_Vesting",
-          "description": "",
+          "description": "Constrained: Institution / Sponsor / Vendor / Shared / To_Be_Determined",
           "synonyms": "Title Holder, Property Owner",
           "pii": false
         },
@@ -2368,19 +2368,19 @@
         },
         {
           "name": "Description",
-          "description": "",
+          "description": "Free-text description of the asset",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Equipment_Status",
-          "description": "",
+          "description": "Constrained: In_Use / In_Storage / Surplused / Transferred / Disposed / Lost",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Disposition_Date",
-          "description": "",
+          "description": "Required when Equipment_Status is Surplused, Transferred, Disposed, or Lost",
           "synonyms": null,
           "pii": false
         }
@@ -2400,7 +2400,7 @@
         },
         {
           "name": "Lifecycle_Stage",
-          "description": "",
+          "description": "Constrained: Scheduled / Invoiced / Received / Reconciled",
           "synonyms": null,
           "pii": false
         },
@@ -2412,13 +2412,13 @@
         },
         {
           "name": "Award_ID",
-          "description": "",
+          "description": "Exactly one of Award_ID or Subaward_ID is non-null",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Subaward_ID",
-          "description": "",
+          "description": "Exactly one of Award_ID or Subaward_ID is non-null",
           "synonyms": null,
           "pii": false
         },
@@ -2430,37 +2430,37 @@
         },
         {
           "name": "Scheduled_Date",
-          "description": "",
+          "description": "Required when Lifecycle_Stage = 'Scheduled'",
           "synonyms": "Billing Date, Expected Bill Date",
           "pii": false
         },
         {
           "name": "Scheduled_Amount",
-          "description": "",
+          "description": "Required when Lifecycle_Stage = 'Scheduled'",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Invoice_Number",
-          "description": "",
+          "description": "Required when Lifecycle_Stage = 'Invoiced' or later; unique within the parent agreement",
           "synonyms": "Bill Number, Voucher Number",
           "pii": false
         },
         {
           "name": "Submission_Date",
-          "description": "",
+          "description": "Required when Lifecycle_Stage = 'Invoiced'",
           "synonyms": "Invoice Submitted, Bill Submitted",
           "pii": false
         },
         {
           "name": "Actual_Date",
-          "description": "",
+          "description": "Required when Lifecycle_Stage = 'Received' or later",
           "synonyms": "Payment Received Date, Receipt Date",
           "pii": false
         },
         {
           "name": "Actual_Amount",
-          "description": "",
+          "description": "Required when Lifecycle_Stage = 'Received' or later",
           "synonyms": "Amount Received, Paid Amount",
           "pii": false
         },
@@ -2486,13 +2486,13 @@
         },
         {
           "name": "Lifecycle_Stage",
-          "description": "",
+          "description": "Constrained: Proposed / Committed / Met / Waived",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Parent_CostShare_ID",
-          "description": "",
+          "description": "Later-stage rows point back to earlier ones",
           "synonyms": null,
           "pii": false
         },
@@ -2504,13 +2504,13 @@
         },
         {
           "name": "Award_ID",
-          "description": "",
+          "description": "The Award this commitment belongs to at Committed and later stages. Exactly one of Award_ID or Subaward_ID is non-null when Lifecycle_Stage \u2265 Committed; both null at Proposed.",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Subaward_ID",
-          "description": "",
+          "description": "The Subaward this commitment belongs to at Committed and later stages. Exactly one of Award_ID or Subaward_ID is non-null when Lifecycle_Stage \u2265 Committed; both null at Proposed.",
           "synonyms": null,
           "pii": false
         },
@@ -2522,19 +2522,19 @@
         },
         {
           "name": "Amount_Committed",
-          "description": "",
+          "description": "Cost share amount committed",
           "synonyms": "Match Commitment, Cost Share Pledge",
           "pii": false
         },
         {
           "name": "Amount_Actual",
-          "description": "",
+          "description": "Required when Lifecycle_Stage = 'Met'",
           "synonyms": "Match Actual, Met Cost Share",
           "pii": false
         },
         {
           "name": "Waiver_Reason",
-          "description": "",
+          "description": "Constrained: Effort_Not_Materialized / Sponsor_Approved_Removal / Sponsor_Removed_Requirement / Recategorized_To_Other_Funding / Other. Required when Lifecycle_Stage = 'Waived'; null otherwise. Distinguishes commitments waived because the work never happened vs commitments waived by sponsor or institutional decision",
           "synonyms": "Cost Share Waiver, Match Waiver",
           "pii": false
         }
@@ -2560,7 +2560,7 @@
         },
         {
           "name": "Requirement_Type",
-          "description": "",
+          "description": "Constrained: IRB / IACUC / IBC / COI / Radiation / Export_Control / Other. Determines which Reviewing Authority pattern applies (committee vs Empowered Official vs other)",
           "synonyms": "Compliance Category, Regulatory Domain, Protocol Type",
           "pii": false
         },
@@ -2578,7 +2578,7 @@
         },
         {
           "name": "Reviewing_Authority_Organization_ID",
-          "description": "",
+          "description": "The body that reviews and approves this requirement. Required when Requirement_Type is IRB, IACUC, or IBC (these are board-reviewed by definition). Optional for Export_Control, Radiation, COI, or Other where a self-certification or no formal reviewing body applies. Referenced Organization carries an OrganizationCapability appropriate to the Requirement_Type (Committee for IRB/IACUC/IBC; Program_Office or similar for export control and radiation safety)",
           "synonyms": "Reviewing Body, IRB Committee, IACUC Committee",
           "pii": false
         },
@@ -2590,13 +2590,13 @@
         },
         {
           "name": "Submitted_Date",
-          "description": "",
+          "description": "When the protocol or requirement was submitted for review",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Approved_Date",
-          "description": "",
+          "description": "Required when Requirement_Status = 'Approved'",
           "synonyms": null,
           "pii": false
         },
@@ -2608,7 +2608,7 @@
         },
         {
           "name": "Requirement_Status",
-          "description": "",
+          "description": "See Status taxonomy",
           "synonyms": null,
           "pii": false
         },
@@ -2634,19 +2634,19 @@
         },
         {
           "name": "ComplianceRequirement_ID",
-          "description": "",
+          "description": "The compliance requirement providing coverage",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Award_ID",
-          "description": "",
+          "description": "Exactly one of Award_ID or Subaward_ID is non-null",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Subaward_ID",
-          "description": "",
+          "description": "Exactly one of Award_ID or Subaward_ID is non-null",
           "synonyms": null,
           "pii": false
         },
@@ -2678,13 +2678,13 @@
         },
         {
           "name": "ComplianceRequirement_ID",
-          "description": "",
+          "description": "The protocol this roster entry belongs to",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Personnel_ID",
-          "description": "",
+          "description": "The person on the protocol roster",
           "synonyms": null,
           "pii": false
         },
@@ -2714,13 +2714,13 @@
         },
         {
           "name": "Start_Date",
-          "description": "",
+          "description": "When the person joined the protocol",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "End_Date",
-          "description": "",
+          "description": "When the person left the protocol; null while current",
           "synonyms": null,
           "pii": false
         }
@@ -2740,7 +2740,7 @@
         },
         {
           "name": "Personnel_ID",
-          "description": "",
+          "description": "The person making the disclosure",
           "synonyms": null,
           "pii": false
         },
@@ -2758,13 +2758,13 @@
         },
         {
           "name": "Entity_Name",
-          "description": "",
+          "description": "The entity the personnel has the relationship with, as free text. Required when Entity_Organization_ID is null; optional when an Organization FK is set (the Organization.Organization_Name is the canonical source)",
           "synonyms": "External Entity, Conflicted Entity, Outside Org Name",
           "pii": false
         },
         {
           "name": "Entity_Organization_ID",
-          "description": "",
+          "description": "Set when the entity is tracked as an Organization in the model; null when it is an outside party not otherwise tracked",
           "synonyms": null,
           "pii": false
         },
@@ -2776,37 +2776,37 @@
         },
         {
           "name": "Financial_Interest_Amount",
-          "description": "",
+          "description": "Dollar value of the disclosed financial interest, when quantifiable",
           "synonyms": "Financial Interest Value, Equity Value",
           "pii": false
         },
         {
           "name": "Disclosure_Date",
-          "description": "",
+          "description": "When the disclosure was filed",
           "synonyms": "COI Date, Filing Date",
           "pii": false
         },
         {
           "name": "Disclosure_Period_Start_Date",
-          "description": "",
+          "description": "The period the disclosure covers (annual disclosures span the prior year)",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Disclosure_Period_End_Date",
-          "description": "",
+          "description": "End of the period the disclosure covers",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Review_Outcome",
-          "description": "",
+          "description": "Constrained: Under_Review / No_Conflict / Manageable_Conflict / Unmanageable_Conflict / Management_Plan_Required / Cleared",
           "synonyms": "COI Decision, Disclosure Outcome",
           "pii": false
         },
         {
           "name": "Management_Plan_Description",
-          "description": "",
+          "description": "Required when Review_Outcome is Manageable_Conflict or Management_Plan_Required",
           "synonyms": "COI Management Plan, Mitigation Plan",
           "pii": false
         }
@@ -2826,19 +2826,19 @@
         },
         {
           "name": "Personnel_ID",
-          "description": "",
+          "description": "The person whose other support this is",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "External_Sponsor_Name",
-          "description": "",
+          "description": "The funding source for the disclosed support, as free text. Required when External_Sponsor_Organization_ID is null; optional when an Organization FK is set (the Organization.Organization_Name is the canonical source)",
           "synonyms": "Other Funder, External Sponsor",
           "pii": false
         },
         {
           "name": "External_Sponsor_Organization_ID",
-          "description": "",
+          "description": "Set when the external sponsor is tracked as an Organization in the model",
           "synonyms": null,
           "pii": false
         },
@@ -2850,7 +2850,7 @@
         },
         {
           "name": "Support_Type",
-          "description": "",
+          "description": "Constrained: Current / Pending / In_Kind",
           "synonyms": "Other Support Category, Active vs Pending",
           "pii": false
         },
@@ -2862,19 +2862,19 @@
         },
         {
           "name": "Total_Award_Amount",
-          "description": "",
+          "description": "The total funded amount of the disclosed support",
           "synonyms": "External Award Amount, Outside Funding Total",
           "pii": false
         },
         {
           "name": "Effective_Start_Date",
-          "description": "",
+          "description": "When the external support began or is expected to begin",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Effective_End_Date",
-          "description": "",
+          "description": "Null when the support is open-ended",
           "synonyms": null,
           "pii": false
         }
@@ -2894,43 +2894,43 @@
         },
         {
           "name": "OtherSupport_ID",
-          "description": "",
+          "description": "The OtherSupport item this disclosure event reported",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Disclosure_Date",
-          "description": "",
+          "description": "When this specific disclosure event occurred",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Disclosure_Type",
-          "description": "",
+          "description": "Constrained: Initial / Annual / JIT / Progress_Report / Research_Security_Reaffirmation / Other",
           "synonyms": "Disclosure Event, Filing Type",
           "pii": false
         },
         {
           "name": "Triggering_Proposal_ID",
-          "description": "",
+          "description": "The proposal whose submission triggered this disclosure event (null when the disclosure is not proposal-triggered)",
           "synonyms": "Filing Trigger, Triggering Application",
           "pii": false
         },
         {
           "name": "Triggering_Award_ID",
-          "description": "",
+          "description": "The award whose reporting cycle triggered this disclosure event (null when the disclosure is not award-triggered)",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Disclosed_To_Sponsor_Organization_ID",
-          "description": "",
+          "description": "The sponsor that received this disclosure",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Notes",
-          "description": "",
+          "description": "Free-text notes about the disclosure event",
           "synonyms": null,
           "pii": false
         }
@@ -2968,7 +2968,7 @@
         },
         {
           "name": "Value_Description",
-          "description": "",
+          "description": "Longer description of what the value means at this institution",
           "synonyms": null,
           "pii": false
         },
@@ -3000,7 +3000,7 @@
         },
         {
           "name": "Category_Name",
-          "description": "",
+          "description": "Human-readable name of the budget category",
           "synonyms": "Cost Category Name",
           "pii": false
         },
@@ -3032,7 +3032,7 @@
         },
         {
           "name": "Related_Entity_Type",
-          "description": "",
+          "description": "Constrained: Award / Subaward / Proposal / ProposalApproval / PreAwardAuthorization / Personnel / PersonnelCredential / ComplianceRequirement / SubmissionPackage / Modification / Action / Restriction / Budget / Negotiation / Terms / Report / Closeout / Equipment",
           "synonyms": null,
           "pii": false
         },
@@ -3050,7 +3050,7 @@
         },
         {
           "name": "File_Name",
-          "description": "",
+          "description": "Original file name of the document",
           "synonyms": "Document Name, Attachment Name",
           "pii": false
         },
@@ -3068,13 +3068,13 @@
         },
         {
           "name": "File_Size_Bytes",
-          "description": "",
+          "description": "File size in bytes",
           "synonyms": "File Size",
           "pii": false
         },
         {
           "name": "Version_Number",
-          "description": "",
+          "description": "Default 1",
           "synonyms": null,
           "pii": false
         },
@@ -3086,13 +3086,13 @@
         },
         {
           "name": "Uploaded_By_Personnel_ID",
-          "description": "",
+          "description": "The person who uploaded the document",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Uploaded_Timestamp",
-          "description": "",
+          "description": "When the document was uploaded",
           "synonyms": null,
           "pii": false
         }
@@ -3112,37 +3112,37 @@
         },
         {
           "name": "Related_Entity_Type",
-          "description": "",
+          "description": "Constrained: Award / Subaward / Proposal / RFA / Modification / Negotiation / Terms / ComplianceRequirement / Personnel / Closeout / Report",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Related_Entity_ID",
-          "description": "",
+          "description": "The row in the table named by Related_Entity_Type this communication attaches to",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Communication_Type",
-          "description": "",
+          "description": "Constrained: Email / Phone_Call / Meeting / Letter / Portal_Message / Other",
           "synonyms": "Correspondence Type, Channel",
           "pii": false
         },
         {
           "name": "Direction",
-          "description": "",
+          "description": "Constrained: Inbound / Outbound",
           "synonyms": "Inbound vs Outbound, Sender Side",
           "pii": false
         },
         {
           "name": "Communication_Date",
-          "description": "",
+          "description": "The moment the communication occurred (or the email's sent-at timestamp)",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Subject",
-          "description": "",
+          "description": "The subject line for emails, the topic for meetings",
           "synonyms": "Subject Line, Topic",
           "pii": false
         },
@@ -3172,7 +3172,7 @@
         },
         {
           "name": "External_Organization_ID",
-          "description": "",
+          "description": "The external party's organization",
           "synonyms": "External Org, Counterparty Organization",
           "pii": false
         }
@@ -3192,13 +3192,13 @@
         },
         {
           "name": "Related_Entity_Type",
-          "description": "",
+          "description": "Constrained: Award / Subaward / Proposal / Personnel / Equipment",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Related_Entity_ID",
-          "description": "",
+          "description": "The row in the table named by Related_Entity_Type this restriction attaches to",
           "synonyms": null,
           "pii": false
         },
@@ -3216,13 +3216,13 @@
         },
         {
           "name": "Effective_Start_Date",
-          "description": "",
+          "description": "When the restriction takes effect",
           "synonyms": "Restriction Begin, In-Force Start",
           "pii": false
         },
         {
           "name": "Effective_End_Date",
-          "description": "",
+          "description": "Null for restrictions in effect indefinitely",
           "synonyms": "Restriction End, In-Force End",
           "pii": false
         },
@@ -3234,13 +3234,13 @@
         },
         {
           "name": "Certified_By_Personnel_ID",
-          "description": "",
+          "description": "References Personnel (the OSP or compliance officer who certified the restriction)",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Restriction_Status",
-          "description": "",
+          "description": "See Status taxonomy",
           "synonyms": null,
           "pii": false
         }
@@ -3260,13 +3260,13 @@
         },
         {
           "name": "Related_Entity_Type",
-          "description": "",
+          "description": "Constrained: Award / Subaward / Proposal / ProposalApproval / ComplianceRequirement / Modification / RFA / Closeout / Report",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Related_Entity_ID",
-          "description": "",
+          "description": "The row in the table named by Related_Entity_Type this deadline attaches to",
           "synonyms": null,
           "pii": false
         },
@@ -3278,7 +3278,7 @@
         },
         {
           "name": "Due_Date",
-          "description": "",
+          "description": "When the obligation is due",
           "synonyms": "Calendar Due Date, Obligation Due",
           "pii": false
         },
@@ -3290,19 +3290,19 @@
         },
         {
           "name": "Responsible_Personnel_ID",
-          "description": "",
+          "description": "The person responsible for meeting the deadline",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Deadline_Status",
-          "description": "",
+          "description": "See Status taxonomy",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Description",
-          "description": "",
+          "description": "Free-text description of the obligation",
           "synonyms": null,
           "pii": false
         }
@@ -3322,19 +3322,19 @@
         },
         {
           "name": "Related_Entity_Type",
-          "description": "",
+          "description": "Constrained: Proposal / Award / Subaward / ComplianceRequirement",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Related_Entity_ID",
-          "description": "",
+          "description": "The row in the table named by Related_Entity_Type this classification attaches to",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Scheme",
-          "description": "",
+          "description": "Constrained: NSF_Science_Code / NIH_MeSH / Institution_Research_Area / Free_Tag",
           "synonyms": null,
           "pii": false
         },
@@ -3346,13 +3346,13 @@
         },
         {
           "name": "Value_Label",
-          "description": "",
+          "description": "Human-readable label",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Sort_Order",
-          "description": "",
+          "description": "When the entity carries multiple classifications, the order to display them",
           "synonyms": null,
           "pii": false
         }
@@ -3372,13 +3372,13 @@
         },
         {
           "name": "Related_Entity_Type",
-          "description": "",
+          "description": "Constrained: Award / Subaward / Proposal / ProposalApproval / PreAwardAuthorization / Personnel / ComplianceRequirement / Modification / Negotiation / Terms / Closeout / Report / Equipment",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Related_Entity_ID",
-          "description": "",
+          "description": "The row in the table named by Related_Entity_Type this action attaches to",
           "synonyms": null,
           "pii": false
         },
@@ -3390,55 +3390,55 @@
         },
         {
           "name": "Title",
-          "description": "",
+          "description": "Short title of the work item",
           "synonyms": "Task Title, Action Name",
           "pii": false
         },
         {
           "name": "Description",
-          "description": "",
+          "description": "Free-text description of the work item",
           "synonyms": "Task Description, Action Detail",
           "pii": false
         },
         {
           "name": "Assignee_Personnel_ID",
-          "description": "",
+          "description": "The person the action is assigned to",
           "synonyms": "Owner, Task Assignee, Responsible Person",
           "pii": false
         },
         {
           "name": "Requestor_Personnel_ID",
-          "description": "",
+          "description": "The person who requested the action",
           "synonyms": "Requester, Task Originator",
           "pii": false
         },
         {
           "name": "Due_Date",
-          "description": "",
+          "description": "When the action is due",
           "synonyms": "Task Due, Action Deadline",
           "pii": false
         },
         {
           "name": "Action_Status",
-          "description": "",
+          "description": "See Status taxonomy",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Priority",
-          "description": "",
+          "description": "Constrained: Low / Medium / High / Critical",
           "synonyms": "Task Priority, Urgency",
           "pii": false
         },
         {
           "name": "Completed_Date",
-          "description": "",
+          "description": "Required when Action_Status = 'Completed'",
           "synonyms": null,
           "pii": false
         },
         {
           "name": "Origin",
-          "description": "",
+          "description": "Constrained: Sponsor_Required / Internal / System_Generated / Manual",
           "synonyms": "Action Source, Task Originator Type",
           "pii": false
         },
@@ -3450,7 +3450,7 @@
         },
         {
           "name": "Linked_Document_ID",
-          "description": "",
+          "description": "References Document (e.g., the deliverable file, training certificate when Completed, the formal subrecipient risk review report)",
           "synonyms": "Attached Artifact, Resolution Document",
           "pii": false
         }
@@ -3476,7 +3476,7 @@
         },
         {
           "name": "Related_Entity_ID",
-          "description": "",
+          "description": "The row in the table named by Related_Entity_Type this event is about",
           "synonyms": null,
           "pii": false
         },
@@ -3488,7 +3488,7 @@
         },
         {
           "name": "Activity_Timestamp",
-          "description": "",
+          "description": "When the event occurred",
           "synonyms": "Audit Timestamp, Event Time",
           "pii": false
         },

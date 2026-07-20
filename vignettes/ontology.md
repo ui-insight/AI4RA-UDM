@@ -1,6 +1,6 @@
 # UDM v2 Ontology
 
-This document describes the structure, conventions, and purpose of every entity in the AI4RA Unified Data Model, version 2. The UDM contains **49 tables** organized into **7 domains**, plus **10 reference views**.
+This document describes the structure, conventions, and purpose of every entity in the AI4RA Unified Data Model, version 2. The UDM contains **49 tables** organized into **7 domains**, plus **12 reference views**.
 
 For the canonical machine-readable specification, see [udm-v2-system-of-record.md](udm-v2-system-of-record.md) (prose) and [udm_schema_v2.json](../udm_schema_v2.json) (MySQL/MariaDB serialization at the repository root, alongside the v1 [udm_schema.json](../udm_schema.json)).
 
@@ -505,7 +505,7 @@ ActivityLog does not log to itself; ActivityLog rows do not appear in `Related_E
 
 ## Semantic Conventions
 
-Beyond the universal patterns, the schema documents 17 semantic conventions covering rules that no column constraint can express. Highlights:
+Beyond the universal patterns, the schema documents 19 semantic conventions covering rules that no column constraint can express. Highlights:
 
 - **Modification vs Parent_Award_ID vs Previous_Award_ID** — when sponsor action issues a new Award_Number, it's a new Award; otherwise it's a Modification.
 - **AwardRole role-bearer changes** — when a PI (or other role-bearer) changes, end-date the prior row and insert a new one. No mutation in place.

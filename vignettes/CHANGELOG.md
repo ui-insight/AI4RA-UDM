@@ -16,7 +16,7 @@ Both versions of the JSON serialization are kept side-by-side at the repository 
 ### Architectural changes
 
 #### Entities dropped
-- **`Project` as a first-class entity.** Longitudinal-identity grouping is now handled by `Proposal.Group_ID` (user-maintained), `Proposal.Originating_Proposal_ID` (derived lineage root), and `Award.Group_ID` (pre-filled from originating Proposal at insert).
+- **`Project` as a first-class entity.** "Project" means different things to different users depending on their current eRA and finance systems (a proposal, an award, a chart string, a longitudinal research effort), so keeping it as a first-class entity created dissonance with users; the term is avoided rather than redefined. Longitudinal-identity grouping is now handled by `Proposal.Group_ID` (user-maintained), `Proposal.Originating_Proposal_ID` (derived lineage root), and `Award.Group_ID` (pre-filled from originating Proposal at insert).
 - **`ProjectRole`** → split into three parallel role tables: `AwardRole`, `OrganizationRole`, `ProtocolRole`. Each answers a different question (people on the work, people at an Organization, people on a protocol).
 - **`ProposalBudget`, `AwardBudget`, `AwardBudgetPeriod`** → unified into a single `Budget` table with a `Lifecycle_Stage` discriminator (Proposed → Approved → Current → Actual).
 - **`Invoice`** → subsumed by `Payment` with `Lifecycle_Stage = 'Invoiced'`.
@@ -25,7 +25,7 @@ Both versions of the JSON serialization are kept side-by-side at the repository 
 - **`SubmissionAttachment`, `SubmissionEvent`** → subsumed by `Document` polymorphic attachment + `ActivityLog`.
 - **`ApplicationSystem`, `ServiceRequest`** → removed from canonical model; documented in Optional Extensions. Service tickets recommended as `Action` rows with `Action_Type = 'Service_Request'`.
 - **`ProjectCohort`, `CohortParticipation`** → removed. Faculty-development cohorts deferred to local extensions.
-- **`InventionDisclosure`, `InventionDisclosureInventor`** → removed. Tech transfer deferred to specialized systems (Wellspring, Inteum, Sophia); Bayh-Dole touchpoint via `Report.Report_Type = 'Invention_Statement'`.
+- **`InventionDisclosure`, `InventionDisclosureInventor`** → removed. Tech transfer deferred to specialized systems (Wellspring, Inteum, Sophia); Bayh-Dole touchpoint via `Report.Report_Type = 'Invention_Statement'`. (These two entities existed only in v1-era prose drafts, not in the v1 `udm_schema.json`; listed here so the design decision is on record.)
 
 #### Entities added
 - `PersonnelCredential` — sponsor-system IDs (eRA Commons, NSF FastLane) and HR-domain credentials for non-employee Personnel.
@@ -46,13 +46,13 @@ Both versions of the JSON serialization are kept side-by-side at the repository 
 
 #### Universal patterns added
 - **Lifecycle_Stage discriminator** with chain immutability and no-branching rules. Used by Budget, Effort, CostShare, Payment.
-- **Two-FK XOR attachment.** Twelve satellite tables (Budget, Payment, Modification, Transaction, Equipment, Report, Closeout, Terms, AwardRole, ComplianceCoverage, etc.) attach to Award OR Subaward via two nullable FK columns. Keeps Award and Subaward symmetric without duplicate sub-side tables.
+- **Two-FK XOR attachment.** Eleven satellite tables (Budget, Payment, Modification, Transaction, Equipment, Report, Closeout, Terms, AwardRole, ComplianceCoverage, CostShare) attach to Award OR Subaward via two nullable FK columns; ContactDetails (Personnel or Organization) and Negotiation (Proposal, Award, or Subaward) use the same two-parent mechanics with different targets. On Budget and CostShare the exclusive-or applies only at post-award Lifecycle_Stages. Keeps Award and Subaward symmetric without duplicate sub-side tables.
 - **Polymorphic attachment** with documented minimum-conformance behavior (no dangling refs on write, parent removal preserves attachments via soft delete, type-stable references).
 - **Derived columns** with documented recompute triggers (Current_End_Date, Current_Total_Funded, Current_PI_Personnel_ID, Originating_*_ID, Subject_To_Federal_Funding).
 - **Lineage mechanisms overview** — 12-column query-to-column map across Proposal / Award / Subaward.
 
 #### Rule catalogs added
-- **17 semantic conventions** covering rules that no column constraint can express (Modification vs Parent_Award_ID vs Previous_Award_ID, AwardRole role-bearer changes, Group_ID prefill, JIT cycle composition, Sponsor decision artifacts, etc.).
+- **19 semantic conventions** covering rules that no column constraint can express (Modification vs Parent_Award_ID vs Previous_Award_ID, AwardRole role-bearer changes, Group_ID prefill, JIT cycle composition, Sponsor decision artifacts, etc.).
 - **~70 cross-row constraints** with 11 typed structured forms (`xor`, `at_least_one_of`, `at_most_one_of`, `conditional_required`, `unique_scope`, `non_overlap_ranges`, `aggregate_equality`, `no_gap_periods`, `mutual_exclusion_by_canonical_role`, `at_most_one_true_in_partition`, `referenced_has_capability`, `referenced_status_is`). Code generators can emit deferrable constraints or trigger templates directly.
 - **8 derived value rules** with recompute triggers documented in the spec.
 

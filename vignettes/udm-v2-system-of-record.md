@@ -48,7 +48,7 @@ These patterns recur throughout the schema. Recognizing them is the fastest path
 
 ### Identifier convention
 
-Every table has a primary key named `TableName_ID`. The primary key is opaque (no business meaning is implied by the value) and unique across the table.
+Every table has a primary key named `TableName_ID`. The primary key is opaque (no business meaning is implied by the value) and unique across the table. One deliberate exception: `AllowedValues` uses the singular `AllowedValue_ID`, since each row is a single allowed value.
 
 ### Hierarchy
 
@@ -102,6 +102,7 @@ Some tables attach to one of two possible parents. The pattern is most commonly 
 - ComplianceCoverage (Award_ID or Subaward_ID)
 - Terms (Award_ID or Subaward_ID)
 - Budget (Award_ID or Subaward_ID; only when Lifecycle_Stage ≥ Approved)
+- CostShare (Award_ID or Subaward_ID; only when Lifecycle_Stage ≥ Committed)
 - Payment (Award_ID or Subaward_ID)
 - Modification (Award_ID or Subaward_ID)
 - Transaction (Award_ID or Subaward_ID)
@@ -119,7 +120,7 @@ The AllowedValues table holds institution-specific enumerated values. Tables tha
 
 ### Boolean naming
 
-Boolean columns are prefixed `Is_` (e.g. `Is_Active`, `Is_Flow_Through`, `Is_Key_Personnel`).
+Boolean columns are prefixed `Is_` (e.g. `Is_Active`, `Is_Flow_Through`, `Is_Key_Personnel`), or use a similarly interrogative form where it reads more naturally (`Subject_To_Federal_Funding`, `Requires_Prior_Approval`).
 
 ### Audit and provenance pattern
 
@@ -349,7 +350,7 @@ The seven Attachment tables (Document, Communication, Restriction, Deadline, Cla
 
 The model requires two enforcement properties:
 
-1. **`Related_Entity_Type` is constrained** to a per-attachment allowed list of target table names (enumerated in each attachment's table reference).
+1. **`Related_Entity_Type` is constrained** to a per-attachment allowed list of target table names (enumerated in each attachment's table reference). One deliberate exception: ActivityLog does not enumerate its targets — any UDM table except ActivityLog itself is a valid target — to avoid drift as the canonical table set evolves.
 2. **`Related_Entity_ID` references an existing row** in the table named by `Related_Entity_Type`.
 
 Implementations satisfy (1) using the platform's enumeration mechanism. Implementations satisfy (2) using whatever the platform provides: database triggers, application-layer hooks, scheduled integrity checks, or other mechanisms appropriate to the institution's stack. The *Implementation guidance* section discusses common approaches; the schema does not prescribe one. Removal behavior (what happens to attached rows when the parent is removed) is an institutional choice and is not specified.
@@ -549,7 +550,7 @@ A person-level credential or identifier the institution needs to hold itself. Tw
 | PersonnelCredential_ID | ID | required | PK |
 | Personnel_ID | ID | required | → Personnel |
 | Credential_Type | Status | required | Constrained: Citizenship / Visa_Status / Permanent_Resident_Status / eRA_Commons_ID / NSF_FastLane_ID / Sponsor_Login_ID / CITI_Training / IRB_Training / IACUC_Training / Biosafety_Training / Export_Control_Training / Security_Clearance / Background_Check / Other |
-| Credential_Value | MediumName | required | The credential's value (ISO 3166 country code for Citizenship, the eRA Commons username, a clearance level, etc.) |
+| Credential_Value | MediumName | required | PII. The credential's value (ISO 3166 country code for Citizenship, the eRA Commons username, a clearance level, etc.) |
 | Issuing_Authority_Organization_ID | ID | optional | → Organization. The issuing or attesting authority |
 | Issued_Date | Date | optional | |
 | Expiration_Date | Date | optional | Null when the credential does not expire |
@@ -609,7 +610,7 @@ Email, phone, fax, mobile, and address records. Each record attaches to exactly 
 | Personnel_ID | ID | optional | → Personnel. Exactly one of `Personnel_ID` or `Organization_ID` is non-null |
 | Organization_ID | ID | optional | → Organization. Exactly one of `Personnel_ID` or `Organization_ID` is non-null |
 | Contact_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'ContactType'`. Recommended values: Email / Phone / Mobile / Fax / Mailing_Address |
-| Contact_Value | URL | required | The actual email / phone / address text |
+| Contact_Value | URL | required | PII. The actual email / phone / address text |
 | Is_Primary | Boolean | required | At most one primary per (referenced entity, Contact_Type) |
 
 #### OrganizationRole
