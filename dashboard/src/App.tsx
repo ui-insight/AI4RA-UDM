@@ -32,7 +32,7 @@ export default function App() {
       <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
       <div style={{ display: activeTab === 'home' ? 'block' : 'none' }}>
         {dataDictionary && (
-          <HomeTab dataDictionary={dataDictionary} relationships={relationships} />
+          <HomeTab dataDictionary={dataDictionary} relationships={relationships} onNavigate={setActiveTab} />
         )}
         {loading && <div style={{ textAlign: 'center', padding: '3rem', color: '#95a5a6' }}>Loading...</div>}
       </div>

@@ -1,12 +1,13 @@
-import type { DataDictionary, Relationship } from '../../types';
+import type { DataDictionary, Relationship, TabName } from '../../types';
 import { domainGroups, getDomain } from '../../data/domains';
 
 interface Props {
   dataDictionary: DataDictionary;
   relationships: Relationship[];
+  onNavigate: (tab: TabName) => void;
 }
 
-export default function HomeTab({ dataDictionary, relationships }: Props) {
+export default function HomeTab({ dataDictionary, relationships, onNavigate }: Props) {
   const tableCount = dataDictionary.table_count;
   const relationshipCount = relationships.length;
   const domainCount = domainGroups.length;
@@ -83,6 +84,51 @@ export default function HomeTab({ dataDictionary, relationships }: Props) {
         </div>
       </Card>
 
+      <div
+        style={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          borderRadius: 8,
+          padding: '2rem',
+          marginBottom: '1.5rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '2rem',
+          flexWrap: 'wrap',
+        }}
+      >
+        <img
+          src="assets/udm-survey-qr.png"
+          alt="QR code for UDM feedback survey"
+          style={{ width: 140, height: 140, borderRadius: 8, flexShrink: 0, background: 'white', padding: 6 }}
+        />
+        <div style={{ flex: 1, minWidth: 220 }}>
+          <h3 style={{ color: 'white', fontSize: '1.3rem', margin: '0 0 0.5rem' }}>
+            Share your feedback
+          </h3>
+          <p style={{ color: 'rgba(255,255,255,0.85)', margin: '0 0 1rem', lineHeight: 1.5 }}>
+            Help shape the UDM by telling us what works, what's missing, and what your institution needs.
+            Scan the QR code or use the link below.
+          </p>
+          <a
+            href="https://bit.ly/4b2ruQ3"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-block',
+              background: 'white',
+              color: '#667eea',
+              fontWeight: 700,
+              padding: '0.5rem 1.25rem',
+              borderRadius: 6,
+              textDecoration: 'none',
+              fontSize: '0.95rem',
+            }}
+          >
+            Take the survey
+          </a>
+        </div>
+      </div>
+
       <Card>
         <h3 style={{ color: '#2c3e50', fontSize: '1.3rem', marginBottom: '1rem' }}>
           Where to start
@@ -97,26 +143,32 @@ export default function HomeTab({ dataDictionary, relationships }: Props) {
           <NavCard
             title="Data Dictionary"
             desc="Summary table of every entity with field counts, descriptions, parents, children, and domain."
+            onClick={() => onNavigate('dictionary')}
           />
           <NavCard
             title="Explorer"
             desc="Drill down into individual tables column-by-column. Navigate foreign keys with a breadcrumb trail."
+            onClick={() => onNavigate('tables')}
           />
           <NavCard
             title="ERD Visualization"
             desc="Interactive entity-relationship diagram. Zoom, pan, and highlight neighbourhoods of related tables."
+            onClick={() => onNavigate('erd')}
           />
           <NavCard
             title="Example Views"
             desc="Reference SQL views for common analytics: active awards, expiring deliverables, budget comparisons."
+            onClick={() => onNavigate('views')}
           />
           <NavCard
             title="Ontology & Design"
             desc="Naming conventions, design patterns, and the rationale behind the schema's structure."
+            onClick={() => onNavigate('ontology')}
           />
           <NavCard
             title="Infrastructure"
             desc="Medallion-architecture guidance (Bronze / Silver / Gold / Platinum) and the JSON endpoints served by this site."
+            onClick={() => onNavigate('infrastructure')}
           />
         </div>
       </Card>
@@ -208,14 +260,16 @@ function Stat({ value, label, accent }: { value: number; label: string; accent: 
   );
 }
 
-function NavCard({ title, desc }: { title: string; desc: string }) {
+function NavCard({ title, desc, onClick }: { title: string; desc: string; onClick: () => void }) {
   return (
     <div
+      onClick={onClick}
       style={{
         background: '#f8f9fa',
         padding: '1rem',
         borderRadius: 6,
         borderLeft: '4px solid #667eea',
+        cursor: 'pointer',
       }}
     >
       <h4 style={{ color: '#2c3e50', marginBottom: '0.35rem' }}>{title}</h4>
@@ -225,7 +279,8 @@ function NavCard({ title, desc }: { title: string; desc: string }) {
 }
 
 function DomainFallbackNotice({ dataDictionary }: { dataDictionary: DataDictionary }) {
-  const orphan = Object.keys(dataDictionary.tables).filter((t) => !getDomain(t));
+  const IMPLEMENTATION_TABLES = new Set(['AllowedValues', 'BudgetCategory']);
+  const orphan = Object.keys(dataDictionary.tables).filter((t) => !getDomain(t) && !IMPLEMENTATION_TABLES.has(t));
   if (orphan.length === 0) return null;
   return (
     <div

@@ -76,11 +76,6 @@ export const domainGroups: DomainGroup[] = [
     ],
   },
   {
-    name: 'Reference',
-    color: '#64748b',
-    tables: ['AllowedValues', 'BudgetCategory'],
-  },
-  {
     name: 'Attachments',
     color: '#7c3aed',
     tables: [
