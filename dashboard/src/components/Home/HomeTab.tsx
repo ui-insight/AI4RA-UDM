@@ -128,7 +128,8 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
           </h3>
           <p style={{ color: 'rgba(255,255,255,0.85)', margin: '0 0 1rem', lineHeight: 1.5 }}>
             Help shape the UDM by telling us what works, what's missing, and what your institution needs.
-            Take the anonymous survey, or start a public discussion on GitHub (requires a free GitHub account).
+            Take the anonymous survey, join the public feedback thread on GitHub (requires a free GitHub
+            account), or email us directly.
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
             <a
@@ -149,7 +150,7 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
               Take the survey
             </a>
             <a
-              href={`${REPO_URL}/discussions/new/choose`}
+              href={`${REPO_URL}/discussions/59#new_comment_field`}
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -165,6 +166,29 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
               }}
             >
               Leave feedback on GitHub
+            </a>
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                // Assembled at click time so the address never appears in the page source
+                const user = ['nlay', 'man'].join('');
+                const host = ['uidaho', 'edu'].join('.');
+                window.location.href = `mailto:${user}@${host}?subject=${encodeURIComponent('UDM feedback')}`;
+              }}
+              style={{
+                display: 'inline-block',
+                background: 'rgba(255,255,255,0.15)',
+                border: '1px solid rgba(255,255,255,0.6)',
+                color: 'white',
+                fontWeight: 700,
+                padding: '0.5rem 1.25rem',
+                borderRadius: 6,
+                textDecoration: 'none',
+                fontSize: '0.95rem',
+              }}
+            >
+              Email feedback
             </a>
           </div>
         </div>
