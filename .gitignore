@@ -17,3 +17,6 @@ notes/
 
 # Local planning docs (per-session, not committed)
 PLAN-*.md
+
+# Claude Code local config
+.claude/
