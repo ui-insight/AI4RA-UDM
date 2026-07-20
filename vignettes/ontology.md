@@ -1,6 +1,6 @@
 # UDM v2 Ontology
 
-This document describes the structure, conventions, and purpose of every entity in the AI4RA Unified Data Model, version 2. The UDM contains **49 tables** organized into **7 domains**, plus **12 reference views**.
+This document describes the structure, conventions, and purpose of every entity in the AI4RA Unified Data Model, version 2. The UDM contains **49 tables** organized into **6 domains** plus two implementation tables, along with **12 reference views**.
 
 For the canonical machine-readable specification, see [udm-v2-system-of-record.md](udm-v2-system-of-record.md) (prose) and [udm_schema_v2.json](../udm_schema_v2.json) (MySQL/MariaDB serialization at the repository root, alongside the v1 [udm_schema.json](../udm_schema.json)).
 
@@ -21,7 +21,7 @@ The guiding principle: if a concept is something a research administrator would 
 
 If you read the v1 ontology, the most visible changes:
 
-- **40 tables → 49 tables; 10 domains → 7 domains.** v2 dropped some tables, added more, and reorganized domains.
+- **40 tables → 49 tables; 10 domains → 6 domains plus implementation tables.** v2 dropped some tables, added more, and reorganized domains. Domains now refer strictly to research-administration organizational concepts; AllowedValues and BudgetCategory are counted as implementation tables rather than a domain.
 - **Project as a first-class entity is gone.** Longitudinal-identity grouping is handled by `Proposal.Group_ID` + `Originating_Proposal_ID` (derived chain root) + `Award.Group_ID` (pre-filled from Proposal). See *Lineage mechanisms* below.
 - **ProjectRole became three tables.** `AwardRole` (people on the work), `OrganizationRole` (people at an Organization), `ProtocolRole` (people on a compliance protocol). Each answers a different question.
 - **Budget unified.** `ProposalBudget` + `AwardBudgetPeriod` + `AwardBudget` collapsed into a single `Budget` table with a `Lifecycle_Stage` discriminator (Proposed → Approved → Current → Actual).
@@ -247,7 +247,7 @@ Three mechanisms answer "when did this change?", each at a different scope:
 
 ## Domains
 
-The 49 tables organize into 7 domains:
+The 49 tables organize into 6 domains plus two implementation tables:
 
 | Domain | Tables |
 |---|---|
@@ -256,8 +256,10 @@ The 49 tables organize into 7 domains:
 | **Effort** | AwardRole, Effort |
 | **Money** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment |
 | **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure |
-| **Reference** | AllowedValues, BudgetCategory |
 | **Attachments** | Document, Communication, Restriction, Deadline, Classification, Action, ActivityLog |
+| *Implementation tables (not a domain)* | AllowedValues, BudgetCategory |
+
+Domains refer to research-administration organizational concepts. AllowedValues and BudgetCategory support the model's mechanics — controlled vocabularies and shared reference codes — and are intentionally not counted as a domain.
 
 ## Actors
 
@@ -453,7 +455,9 @@ A Personnel record's external research support (current, pending, in-kind). The 
 
 A single disclosure event of an OtherSupport row. The same outside appointment is typically disclosed many times across a researcher's career — at each proposal submission, at each annual report, at each JIT request. Each disclosure is its own row.
 
-## Reference
+## Implementation tables
+
+Not a domain: these tables support the model's mechanics rather than a research-administration organizational concept.
 
 ### AllowedValues
 

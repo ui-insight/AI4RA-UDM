@@ -1,5 +1,9 @@
+import { useEffect } from 'react';
 import type { DataDictionary, Relationship, TabName } from '../../types';
 import { domainGroups, getDomain } from '../../data/domains';
+
+const SURVEY_URL = 'https://bit.ly/4b2ruQ3';
+const REPO_URL = 'https://github.com/ui-insight/AI4RA-UDM';
 
 interface Props {
   dataDictionary: DataDictionary;
@@ -11,9 +15,10 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
   const tableCount = dataDictionary.table_count;
   const relationshipCount = relationships.length;
   const domainCount = domainGroups.length;
-  const piiCount = Object.values(dataDictionary.tables)
-    .flatMap((t) => t.columns)
-    .filter((c) => c.pii).length;
+  const columnCount = Object.values(dataDictionary.tables)
+    .reduce((n, t) => n + t.columns.length, 0);
+
+  useDomainCoverageWarning(dataDictionary);
 
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2rem' }}>
@@ -21,11 +26,27 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
         <h2 style={{ color: '#2c3e50', fontSize: '1.8rem', marginBottom: '0.5rem' }}>
           AI4RA Unified Data Model
         </h2>
-        <p style={{ color: '#546e7a', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
-          A canonical schema for research administration — pre-award proposal preparation, sponsor
-          submission, post-award management, financial accounting, personnel effort, compliance, and
-          the operational systems that tie them together. The UDM is a specification, not a database:
-          institutions implement it in whatever storage technology fits their environment.
+        <p style={{ color: '#546e7a', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '1rem' }}>
+          Every institution stores the same research administration data differently. Proposals,
+          awards, budgets, and compliance records are scattered across eRA, finance, and HR systems —
+          locked in proprietary schemas with inconsistent names, structures, and definitions. Simple
+          questions span three systems, cross-institution reporting means manual reconciliation, and
+          every institution hand-builds the same field mappings from scratch.
+        </p>
+        <p style={{ color: '#546e7a', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '1rem' }}>
+          The UDM is a shared answer: a canonical schema for research administration — pre-award
+          proposal preparation, sponsor submission, post-award management, financial accounting,
+          personnel effort, and compliance — that institutions map their local systems onto. It is a
+          specification, not a database: implement it in whatever storage technology fits your
+          environment. A common model makes research administration data Findable, Accessible,
+          Interoperable, and Reusable (FAIR) — within an institution and across them.
+        </p>
+        <p style={{ color: '#546e7a', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
+          <strong>New here?</strong> Research administrators: start with the{' '}
+          <NavLink onClick={() => onNavigate('dictionary')}>Data Dictionary</NavLink> to see the
+          entities in plain language. Data engineers and IT: start with{' '}
+          <NavLink onClick={() => onNavigate('infrastructure')}>Infrastructure</NavLink> for how the
+          UDM fits your stack, then grab the JSON endpoints below.
         </p>
 
         <div
@@ -36,9 +57,9 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
           }}
         >
           <Stat value={tableCount} label="Tables" accent="#667eea" />
+          <Stat value={columnCount} label="Documented Columns" accent="#0ea5e9" />
           <Stat value={relationshipCount} label="Foreign-Key Relationships" accent="#7c3aed" />
-          <Stat value={domainCount} label="Domains" accent="#0ea5e9" />
-          <Stat value={piiCount} label="PII Fields" accent="#dc2626" />
+          <Stat value={domainCount} label="Domains" accent="#16a34a" />
         </div>
       </Card>
 
@@ -107,25 +128,45 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
           </h3>
           <p style={{ color: 'rgba(255,255,255,0.85)', margin: '0 0 1rem', lineHeight: 1.5 }}>
             Help shape the UDM by telling us what works, what's missing, and what your institution needs.
-            Scan the QR code or use the link below.
+            Take the anonymous survey, or start a public discussion on GitHub (requires a free GitHub account).
           </p>
-          <a
-            href="https://bit.ly/4b2ruQ3"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: 'inline-block',
-              background: 'white',
-              color: '#667eea',
-              fontWeight: 700,
-              padding: '0.5rem 1.25rem',
-              borderRadius: 6,
-              textDecoration: 'none',
-              fontSize: '0.95rem',
-            }}
-          >
-            Take the survey
-          </a>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <a
+              href={SURVEY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-block',
+                background: 'white',
+                color: '#667eea',
+                fontWeight: 700,
+                padding: '0.5rem 1.25rem',
+                borderRadius: 6,
+                textDecoration: 'none',
+                fontSize: '0.95rem',
+              }}
+            >
+              Take the survey
+            </a>
+            <a
+              href={`${REPO_URL}/discussions/new/choose`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-block',
+                background: 'rgba(255,255,255,0.15)',
+                border: '1px solid rgba(255,255,255,0.6)',
+                color: 'white',
+                fontWeight: 700,
+                padding: '0.5rem 1.25rem',
+                borderRadius: 6,
+                textDecoration: 'none',
+                fontSize: '0.95rem',
+              }}
+            >
+              Leave feedback on GitHub
+            </a>
+          </div>
         </div>
       </div>
 
@@ -208,19 +249,46 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
         </ul>
       </Card>
 
-      <p style={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem', marginTop: '1rem' }}>
-        Domain assignments are defined at{' '}
-        <code style={{ background: '#f1f5f9', padding: '0.1rem 0.35rem', borderRadius: 3 }}>
-          dashboard/src/data/domains.ts
-        </code>
-        . Table and relationship counts are derived at load time from{' '}
-        <code style={{ background: '#f1f5f9', padding: '0.1rem 0.35rem', borderRadius: 3 }}>
-          udm_schema_v2.json
-        </code>
-        .
-      </p>
-
-      <DomainFallbackNotice dataDictionary={dataDictionary} />
+      <Card>
+        <h3 style={{ color: '#2c3e50', fontSize: '1.3rem', marginBottom: '0.75rem' }}>
+          About the project
+        </h3>
+        <p style={{ color: '#546e7a', lineHeight: 1.7, marginBottom: '0.75rem' }}>
+          The UDM is developed by <strong>AI4RA</strong> (AI for Research Administration) at the
+          University of Idaho. It is open source under GPL-3.0 and improves through community
+          input — suggest changes, report issues, or join the discussion on GitHub.
+        </p>
+        <ul style={{ paddingLeft: '1.25rem', color: '#546e7a', lineHeight: 1.8 }}>
+          <li>
+            <a href={REPO_URL} target="_blank" rel="noopener noreferrer" style={{ color: '#667eea' }}>
+              GitHub repository
+            </a>{' '}
+            — source of truth for the schema, spec, and this dashboard
+          </li>
+          <li>
+            <a
+              href={`${REPO_URL}/blob/main/vignettes/CHANGELOG.md`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '#667eea' }}
+            >
+              Changelog
+            </a>{' '}
+            — what changed in v2, and migration guidance from v1
+          </li>
+          <li>
+            <a
+              href={`${REPO_URL}/issues`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '#667eea' }}
+            >
+              Issues &amp; discussions
+            </a>{' '}
+            — propose tables, columns, or conventions
+          </li>
+        </ul>
+      </Card>
     </div>
   );
 }
@@ -278,24 +346,33 @@ function NavCard({ title, desc, onClick }: { title: string; desc: string; onClic
   );
 }
 
-function DomainFallbackNotice({ dataDictionary }: { dataDictionary: DataDictionary }) {
-  const IMPLEMENTATION_TABLES = new Set(['AllowedValues', 'BudgetCategory']);
-  const orphan = Object.keys(dataDictionary.tables).filter((t) => !getDomain(t) && !IMPLEMENTATION_TABLES.has(t));
-  if (orphan.length === 0) return null;
+function NavLink({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
   return (
-    <div
-      style={{
-        background: '#fef3c7',
-        border: '1px solid #fcd34d',
-        color: '#92400e',
-        padding: '0.85rem 1rem',
-        borderRadius: 6,
-        fontSize: '0.85rem',
-        marginTop: '1rem',
+    <a
+      onClick={(e) => {
+        e.preventDefault();
+        onClick();
       }}
+      href="#"
+      style={{ color: '#667eea', fontWeight: 600 }}
     >
-      <strong>Unmapped tables:</strong> {orphan.join(', ')} — update{' '}
-      <code>dashboard/src/data/domains.ts</code>.
-    </div>
+      {children}
+    </a>
   );
+}
+
+// Maintainer aid: if a table in the data dictionary has no domain assignment,
+// warn in the console instead of showing internal plumbing to visitors.
+function useDomainCoverageWarning(dataDictionary: DataDictionary) {
+  useEffect(() => {
+    const IMPLEMENTATION_TABLES = new Set(['AllowedValues', 'BudgetCategory']);
+    const orphan = Object.keys(dataDictionary.tables).filter(
+      (t) => !getDomain(t) && !IMPLEMENTATION_TABLES.has(t),
+    );
+    if (orphan.length > 0) {
+      console.warn(
+        `[UDM Dashboard] Tables missing a domain assignment in dashboard/src/data/domains.ts: ${orphan.join(', ')}`,
+      );
+    }
+  }, [dataDictionary]);
 }

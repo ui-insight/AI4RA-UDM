@@ -37,8 +37,9 @@ Where the spec says "is unique," "must reference," "sums to N," or "is required,
 | **Effort** | AwardRole, Effort |
 | **Money** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment |
 | **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure |
-| **Reference** | AllowedValues, BudgetCategory |
 | **Attachments** | Document, Communication, Restriction, Deadline, Classification, Action, ActivityLog |
+
+Domains refer to research-administration organizational concepts. Two additional tables — **AllowedValues** and **BudgetCategory** — are implementation tables that support the model's mechanics (controlled vocabularies and shared reference codes) and are intentionally not counted as a domain. They are documented at the end of the Table reference.
 
 ---
 
@@ -1271,7 +1272,9 @@ A single disclosure event of an OtherSupport row. The same outside appointment i
 
 ---
 
-### Reference
+### Implementation tables
+
+Not a domain: these tables support the model's mechanics (controlled vocabularies and shared reference codes) rather than a research-administration organizational concept.
 
 #### AllowedValues
 
@@ -1483,7 +1486,7 @@ Institutions with substantial ticket volume that need structured analysis beyond
 
 ## Summary
 
-- Seven domains: Actors, Funding Cycle, Effort, Money, Compliance, Reference, Attachments.
+- Six domains: Actors, Funding Cycle, Effort, Money, Compliance, Attachments. AllowedValues and BudgetCategory are implementation tables, not a domain.
 - 7 universal patterns: identifier convention, hierarchy, role-named foreign keys, polymorphic attachment, two-FK exclusive-or attachment, Lifecycle_Stage discriminator, AllowedValues extensibility.
 - Audit and provenance columns (Created_At, Updated_At, Created_By_Personnel_ID, Updated_By_Personnel_ID, Source_System, Source_Record_ID, Is_Active) are universal across every table.
 - Hub entities: Personnel, Organization, Proposal, Award, AllowedValues.

@@ -34,13 +34,13 @@ const suffixes = [
   { suffix: '_ID', purpose: 'Primary or foreign key identifier', example: 'Organization_ID, Award_ID' },
   { suffix: '_Code', purpose: 'Short, human-readable identifier', example: 'Fund_Code, Account_Code' },
   { suffix: '_Name', purpose: 'Human-readable name or title', example: 'Organization_Name, First_Name' },
-  { suffix: '_Description', purpose: 'Longer text description', example: 'Project_Description, Role_Description' },
-  { suffix: '_Date', purpose: 'Date or datetime value', example: 'Start_Date, Award_Date' },
-  { suffix: '_Type', purpose: 'Classification or category (use AllowedValues)', example: 'Project_Type → use Type_Value_ID' },
-  { suffix: '_Status', purpose: 'Current state or status', example: 'Award_Status, Proposal_Status' },
-  { suffix: '_Amount', purpose: 'Monetary value', example: 'Award_Amount, Transaction_Amount' },
-  { suffix: '_Percent', purpose: 'Percentage value', example: 'Effort_Percent, Indirect_Rate_Percent' },
-  { suffix: '_Number', purpose: 'Sequential or reference number', example: 'Award_Number, Period_Number' },
+  { suffix: '_Description', purpose: 'Longer text description', example: 'Value_Description, Outcome_Description' },
+  { suffix: '_Date', purpose: 'Date or datetime value', example: 'Start_Date, Due_Date' },
+  { suffix: '_Type', purpose: 'Classification or category', example: 'Report_Type; institution-specific types use *_Type_Value_ID → AllowedValues' },
+  { suffix: '_Status', purpose: 'Current state or status', example: 'Award_Status, Deadline_Status' },
+  { suffix: '_Amount', purpose: 'Monetary value', example: 'Transaction_Amount, Funding_Ceiling_Amount' },
+  { suffix: '_Percent', purpose: 'Percentage value', example: 'Effort_Percent, Rate_Percent' },
+  { suffix: '_Number', purpose: 'Sequential or reference number', example: 'Award_Number, Modification_Number' },
 ];
 
 export default function OntologyTab() {
@@ -120,7 +120,7 @@ export default function OntologyTab() {
             <p style={{ color: '#546e7a', fontSize: '0.9rem' }}><strong>Example:</strong> <code>ComplianceCoverage</code> (links ComplianceRequirement to Award/Subaward)</p>
           </PatternCard>
           <PatternCard title="Status vs Type">
-            <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}><strong>Status:</strong> Current state (often changes) - stored as ENUM</p>
+            <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}><strong>Status:</strong> Current state (often changes) - fixed vocabulary, enforced with a CHECK constraint or ENUM</p>
             <p style={{ color: '#546e7a', fontSize: '0.9rem' }}><strong>Type:</strong> Category/classification (institution-specific) - use AllowedValues</p>
           </PatternCard>
         </div>
@@ -129,9 +129,10 @@ export default function OntologyTab() {
       <Section>
         <SectionTitle>UDM v2 Patterns</SectionTitle>
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
-          v2 introduces four universal patterns that recur across multiple tables. Each one is documented
-          in detail in the prose spec (see <code>vignettes/udm-v2-system-of-record.md</code>) and in the
-          structured constraint catalog in <code>udm_schema_v2.json</code>.
+          v2 defines eight universal patterns; the four below do the most structural work and recur
+          across the most tables. Each one is documented in detail in the prose spec
+          (see <code>vignettes/udm-v2-system-of-record.md</code>) and in the structured constraint
+          catalog in <code>udm_schema_v2.json</code>.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
           <PatternCard title="Lifecycle_Stage Discriminator">
@@ -140,18 +141,21 @@ export default function OntologyTab() {
               Revisions chain through <code>Parent_*_ID</code>; chains are immutable and never branch.
             </p>
             <p style={{ color: '#546e7a', fontSize: '0.9rem' }}>
-              <strong>Used by:</strong> Budget (Proposed/Approved/Current/Actual), Effort (Committed/Certified),
-              CostShare (Pledged/Certified), Payment (Scheduled/Invoiced/Received/Reconciled).
+              <strong>Used by:</strong> Budget (Proposed/Approved/Current/Actual),
+              Effort (Proposed/Approved/Charged/Certified), CostShare (Proposed/Committed/Met/Waived),
+              Payment (Scheduled/Invoiced/Received/Reconciled).
             </p>
           </PatternCard>
           <PatternCard title="Two-FK XOR Attachment">
             <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
               Satellite tables attach to either Award or Subaward via two nullable FK columns; exactly
-              one is populated per row.
+              one is populated per row. On Budget and CostShare the exclusive-or applies only at
+              post-award Lifecycle_Stages (both FKs are null at Proposed).
             </p>
             <p style={{ color: '#546e7a', fontSize: '0.9rem' }}>
-              <strong>Used by:</strong> Budget, Payment, Modification, Transaction, Equipment, Report,
-              Closeout, Terms, AwardRole, ComplianceCoverage, and others.
+              <strong>Used by:</strong> Payment, Modification, Transaction, Equipment, Report,
+              Closeout, Terms, AwardRole, ComplianceCoverage, and (stage-conditionally) Budget and
+              CostShare. ContactDetails and Negotiation use the same mechanics with different parents.
             </p>
           </PatternCard>
           <PatternCard title="Polymorphic Attachment">

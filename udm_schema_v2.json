@@ -289,7 +289,7 @@
     ],
     "deployment_scope": "Single-tenant per institution by default. Each deployment serves one operating Organization. The word 'institution' in scoped-uniqueness annotations refers to that operating Organization. Cross-institution analytics happen at a federation layer above the database, not in shared physical storage."
   },
-  "_structure_note": "domain_membership maps domain -> [table names] (shallow index). The deep table definitions live under the tables key. The two are intentionally separate: domain_membership is a navigability aid; tables is the canonical column-level definition.",
+  "_structure_note": "domain_membership maps domain -> [table names] (shallow index). The deep table definitions live under the tables key. The two are intentionally separate: domain_membership is a navigability aid; tables is the canonical column-level definition. Implementation tables (AllowedValues, BudgetCategory) are listed under implementation_tables, not domain_membership.",
   "domain_membership": {
     "Actors": [
       "Personnel",
@@ -340,10 +340,6 @@
       "ConflictOfInterest",
       "OtherSupport",
       "OtherSupportDisclosure"
-    ],
-    "Reference": [
-      "AllowedValues",
-      "BudgetCategory"
     ],
     "Attachments": [
       "Document",
@@ -5057,7 +5053,7 @@
       }
     },
     "AllowedValues": {
-      "domain": "Reference",
+      "domain": "Implementation",
       "description": "Institution-specific controlled vocabularies. The Value_Group column names a family.",
       "columns": {
         "AllowedValue_ID": {
@@ -5094,7 +5090,7 @@
       }
     },
     "BudgetCategory": {
-      "domain": "Reference",
+      "domain": "Implementation",
       "description": "Standardized budget line item categories (SF-424 R&R standard).",
       "columns": {
         "BudgetCategory_ID": {
@@ -5900,7 +5896,7 @@
     ]
   },
   "summary": [
-    "Seven domains: Actors, Funding Cycle, Effort, Money, Compliance, Reference, Attachments.",
+    "Six domains: Actors, Funding Cycle, Effort, Money, Compliance, Attachments. AllowedValues and BudgetCategory are implementation tables that support the model rather than a domain.",
     "Eight universal patterns: identifier convention, hierarchy, role-named foreign keys, polymorphic attachment, two-FK exclusive-or attachment, Lifecycle_Stage discriminator, AllowedValues extensibility, boolean naming.",
     "Audit and provenance columns (Created_At, Updated_At, Created_By_Personnel_ID, Updated_By_Personnel_ID, Source_System, Source_Record_ID, Is_Active) are universal across every table.",
     "Hub entities: Personnel, Organization, Proposal, Award, AllowedValues.",
@@ -5912,5 +5908,12 @@
     "Award is the fundamental unit of sponsored work. Every Award originates from a Proposal. Original_End_Date and Original_Total_Funded are frozen at execution; Current_End_Date, Current_Total_Funded, and Current_PI_Personnel_ID are derived.",
     "Grouping of related Awards under one longitudinal identity is supported by Proposal.Originating_Proposal_ID (derived lineage root), Proposal.Group_ID (user-maintained), and Award.Group_ID (pre-filled from originating Proposal).",
     "Foreign-engagement disclosures and the full tech-transfer pipeline are out of scope; institutions add local extensions."
-  ]
+  ],
+  "implementation_tables": {
+    "description": "Tables that support the model's mechanics rather than a research administration domain: institution-specific controlled vocabularies and shared reference codes. 'Domains' in the UDM refer to research-administration organizational concepts; these tables are implementation infrastructure and are intentionally not counted as a domain.",
+    "tables": [
+      "AllowedValues",
+      "BudgetCategory"
+    ]
+  }
 }

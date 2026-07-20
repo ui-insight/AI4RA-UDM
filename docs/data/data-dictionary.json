@@ -2940,7 +2940,7 @@
       "name": "AllowedValues",
       "description": "Institution-specific controlled vocabularies. The Value_Group column names a family.",
       "synonyms": null,
-      "domain": "Reference",
+      "domain": "Implementation",
       "columns": [
         {
           "name": "AllowedValue_ID",
@@ -2984,7 +2984,7 @@
       "name": "BudgetCategory",
       "description": "Standardized budget line item categories (SF-424 R&R standard).",
       "synonyms": null,
-      "domain": "Reference",
+      "domain": "Implementation",
       "columns": [
         {
           "name": "BudgetCategory_ID",
