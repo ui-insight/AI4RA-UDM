@@ -1,5 +1,5 @@
-// Canonical domain assignments for each UDM table.
-// Kept in sync with the Domain Organization table in README.md.
+// Canonical domain assignments for each UDM v2 table.
+// Source of truth: domain_membership in udm_schema_v2.json.
 
 export interface DomainGroup {
   name: string;
@@ -9,74 +9,89 @@ export interface DomainGroup {
 
 export const domainGroups: DomainGroup[] = [
   {
-    name: 'Reference',
-    color: '#64748b',
-    tables: ['Organization', 'AllowedValues', 'BudgetCategory'],
-  },
-  {
-    name: 'Core',
+    name: 'Actors',
     color: '#0ea5e9',
-    tables: ['Personnel', 'ContactDetails', 'Project'],
-  },
-  {
-    name: 'Pre-Award',
-    color: '#6366f1',
-    tables: ['RFA', 'RFARequirement', 'Proposal', 'ProposalBudget', 'ProposalChecklistItem'],
-  },
-  {
-    name: 'Submission',
-    color: '#7c3aed',
     tables: [
-      'SubmissionProfile',
-      'SubmissionPackage',
-      'SubmissionAttachment',
-      'SubmissionAttempt',
-      'SubmissionEvent',
+      'Personnel',
+      'PersonnelCredential',
+      'Organization',
+      'OrganizationCapability',
+      'OrganizationIdentifier',
+      'OrganizationRole',
+      'ContactDetails',
     ],
   },
   {
-    name: 'Post-Award',
-    color: '#16a34a',
+    name: 'Funding Cycle',
+    color: '#6366f1',
     tables: [
+      'RFA',
+      'RFARequirement',
+      'Proposal',
+      'ProposalApproval',
+      'PreAwardAuthorization',
       'Award',
       'Modification',
-      'Terms',
-      'AwardBudgetPeriod',
-      'AwardBudget',
       'Subaward',
-      'CostShare',
-      'AwardDeliverable',
+      'Negotiation',
+      'Terms',
+      'Report',
+      'Closeout',
+      'SubmissionProfile',
+      'SubmissionPackage',
+      'SubmissionAttempt',
     ],
   },
   {
-    name: 'Financial',
-    color: '#ca8a04',
-    tables: ['Fund', 'Account', 'FinanceCode', 'Transaction', 'IndirectRate', 'Invoice'],
-  },
-  {
-    name: 'Personnel & Effort',
+    name: 'Effort',
     color: '#d97706',
-    tables: ['ProjectRole', 'Effort'],
+    tables: ['AwardRole', 'Effort'],
   },
   {
-    name: 'Faculty Development',
-    color: '#db2777',
-    tables: ['ProjectCohort', 'CohortParticipation'],
-  },
-  {
-    name: 'Operations',
-    color: '#0891b2',
-    tables: ['ApplicationSystem', 'ServiceRequest'],
+    name: 'Money',
+    color: '#16a34a',
+    tables: [
+      'Budget',
+      'Fund',
+      'Account',
+      'FinanceCode',
+      'Transaction',
+      'RateAgreement',
+      'IndirectRate',
+      'Payment',
+      'CostShare',
+      'Equipment',
+    ],
   },
   {
     name: 'Compliance',
     color: '#dc2626',
-    tables: ['ComplianceRequirement', 'ConflictOfInterest'],
+    tables: [
+      'ComplianceRequirement',
+      'ComplianceCoverage',
+      'ProtocolRole',
+      'ConflictOfInterest',
+      'OtherSupport',
+      'OtherSupportDisclosure',
+    ],
   },
   {
-    name: 'System',
-    color: '#475569',
-    tables: ['Document', 'ActivityLog'],
+    name: 'Reference',
+    color: '#64748b',
+    tables: ['AllowedValues', 'BudgetCategory'],
+  },
+  {
+    name: 'Attachments',
+    color: '#7c3aed',
+    tables: [
+      'Document',
+      'Communication',
+      'Restriction',
+      'Deadline',
+      'Classification',
+      'Action',
+      'ActivityLog',
+    ],
   },
 ];
 

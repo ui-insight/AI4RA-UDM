@@ -2,7 +2,7 @@
 
 This document describes the structure, conventions, and purpose of every entity in the AI4RA Unified Data Model, version 2. The UDM contains **49 tables** organized into **7 domains**, plus **10 reference views**.
 
-For the canonical machine-readable specification, see [udm-v2-schema.md](udm-v2-schema.md) (prose) and [udm_schema_v2.json](../udm_schema_v2.json) (MySQL/MariaDB serialization at the repository root, alongside the v1 [udm_schema.json](../udm_schema.json)).
+For the canonical machine-readable specification, see [udm-v2-system-of-record.md](udm-v2-system-of-record.md) (prose) and [udm_schema_v2.json](../udm_schema_v2.json) (MySQL/MariaDB serialization at the repository root, alongside the v1 [udm_schema.json](../udm_schema.json)).
 
 ## Scope
 
@@ -124,7 +124,7 @@ The schema uses two approaches for controlling enumerated values.
 
 **The decision rule:** a field is a fixed Status enum when (a) the value set is standardized across institutions (regulatory, GAAP, or industry standard), AND (b) the model's correctness depends on stable, known values. Otherwise it's an AllowedValues FK.
 
-Recommended values are documented per column in the JSON. The complete status taxonomy reference is in [udm-v2-schema.md](udm-v2-schema.md#status-taxonomy-reference).
+Recommended values are documented per column in the JSON. The complete status taxonomy reference is in [udm-v2-system-of-record.md](udm-v2-system-of-record.md#status-taxonomy-reference).
 
 ### Self-Referencing Hierarchies
 
@@ -517,7 +517,7 @@ Beyond the universal patterns, the schema documents 17 semantic conventions cove
 - **ConflictOfInterest vs OtherSupport vs ComplianceRequirement(COI)** — three tables touch outside-relationship facts; each answers a different question.
 - **Internal funding represented as an Award** — the funding instrument is always an Award (or Subaward) regardless of internal vs external sponsor.
 
-The full convention list is in [udm-v2-schema.md](udm-v2-schema.md#semantic-conventions).
+The full convention list is in [udm-v2-system-of-record.md](udm-v2-system-of-record.md#semantic-conventions).
 
 ## Deployment scope
 

@@ -55,7 +55,7 @@ export default function OntologyTab() {
         <h3 style={{ color: '#2c3e50', marginTop: '1.5rem', marginBottom: '0.75rem' }}>Tables</h3>
         <ul style={{ listStyle: 'none', padding: 0 }}>
           <ConventionItem><strong style={{ fontFamily: 'monospace' }}>PascalCase</strong> - All table names use PascalCase with no underscores</ConventionItem>
-          <ConventionItem>Examples: <code>Organization</code>, <code>ProjectRole</code>, <code>AwardBudgetPeriod</code></ConventionItem>
+          <ConventionItem>Examples: <code>Organization</code>, <code>AwardRole</code>, <code>ComplianceCoverage</code></ConventionItem>
           <ConventionItem>Singular nouns (e.g., <code>Personnel</code> not <code>People</code>, <code>Organization</code> not <code>Organizations</code>)</ConventionItem>
         </ul>
 
@@ -69,7 +69,7 @@ export default function OntologyTab() {
         <h3 style={{ color: '#2c3e50', marginTop: '1.5rem', marginBottom: '0.75rem' }}>Primary Keys</h3>
         <ul style={{ listStyle: 'none', padding: 0 }}>
           <ConventionItem><strong>Pattern:</strong> <code>TableName_ID</code></ConventionItem>
-          <ConventionItem>Examples: <code>Organization_ID</code>, <code>Project_ID</code>, <code>Personnel_ID</code></ConventionItem>
+          <ConventionItem>Examples: <code>Organization_ID</code>, <code>Award_ID</code>, <code>Personnel_ID</code></ConventionItem>
           <ConventionItem>Always ends with <code>_ID</code> suffix</ConventionItem>
         </ul>
 
@@ -117,11 +117,60 @@ export default function OntologyTab() {
           </PatternCard>
           <PatternCard title="Bridge/Junction Tables">
             <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Many-to-many relationships use compound names.</p>
-            <p style={{ color: '#546e7a', fontSize: '0.9rem' }}><strong>Example:</strong> <code>ProjectRole</code> (links Project + Personnel + Role)</p>
+            <p style={{ color: '#546e7a', fontSize: '0.9rem' }}><strong>Example:</strong> <code>ComplianceCoverage</code> (links ComplianceRequirement to Award/Subaward)</p>
           </PatternCard>
           <PatternCard title="Status vs Type">
             <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}><strong>Status:</strong> Current state (often changes) - stored as ENUM</p>
             <p style={{ color: '#546e7a', fontSize: '0.9rem' }}><strong>Type:</strong> Category/classification (institution-specific) - use AllowedValues</p>
+          </PatternCard>
+        </div>
+      </Section>
+
+      <Section>
+        <SectionTitle>UDM v2 Patterns</SectionTitle>
+        <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
+          v2 introduces four universal patterns that recur across multiple tables. Each one is documented
+          in detail in the prose spec (see <code>vignettes/udm-v2-system-of-record.md</code>) and in the
+          structured constraint catalog in <code>udm_schema_v2.json</code>.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
+          <PatternCard title="Lifecycle_Stage Discriminator">
+            <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+              One table carries multiple lifecycle stages distinguished by a <code>Lifecycle_Stage</code> column.
+              Revisions chain through <code>Parent_*_ID</code>; chains are immutable and never branch.
+            </p>
+            <p style={{ color: '#546e7a', fontSize: '0.9rem' }}>
+              <strong>Used by:</strong> Budget (Proposed/Approved/Current/Actual), Effort (Committed/Certified),
+              CostShare (Pledged/Certified), Payment (Scheduled/Invoiced/Received/Reconciled).
+            </p>
+          </PatternCard>
+          <PatternCard title="Two-FK XOR Attachment">
+            <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+              Satellite tables attach to either Award or Subaward via two nullable FK columns; exactly
+              one is populated per row.
+            </p>
+            <p style={{ color: '#546e7a', fontSize: '0.9rem' }}>
+              <strong>Used by:</strong> Budget, Payment, Modification, Transaction, Equipment, Report,
+              Closeout, Terms, AwardRole, ComplianceCoverage, and others.
+            </p>
+          </PatternCard>
+          <PatternCard title="Polymorphic Attachment">
+            <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+              A satellite table references a parent of arbitrary type via <code>(Related_Entity_Type, Related_Entity_ID)</code>.
+              Type-stable references; soft deletes preserve attachments.
+            </p>
+            <p style={{ color: '#546e7a', fontSize: '0.9rem' }}>
+              <strong>Used by:</strong> Document, Communication, Restriction, Deadline, Classification, Action, ActivityLog.
+            </p>
+          </PatternCard>
+          <PatternCard title="Derived Columns">
+            <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
+              Materialized convenience columns recomputed on documented triggers. Always recoverable from base data.
+            </p>
+            <p style={{ color: '#546e7a', fontSize: '0.9rem' }}>
+              <strong>Examples:</strong> <code>Award.Current_End_Date</code>, <code>Award.Current_Total_Funded</code>,
+              <code>Proposal.Originating_Proposal_ID</code>, <code>Award.Subject_To_Federal_Funding</code>.
+            </p>
           </PatternCard>
         </div>
       </Section>

@@ -46,13 +46,13 @@ export const exampleViews: ExampleView[] = [
   },
   {
     name: 'vw_Active_Personnel_Roles',
-    description: 'All active personnel assignments to projects and awards, showing roles, FTE percentages, and key personnel designations.',
+    description: 'All active personnel assignments to awards, showing roles, FTE percentages, and key personnel designations.',
     color: '#F5A623',
     columns: [
       { header: 'Name' },
       { header: 'Email' },
       { header: 'Role' },
-      { header: 'Project_Title' },
+      { header: 'Award_Title' },
       { header: 'Key?', align: 'center' },
       { header: 'FTE%', align: 'right' },
       { header: 'Award' },
