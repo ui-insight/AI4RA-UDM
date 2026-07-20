@@ -20,3 +20,6 @@ PLAN-*.md
 
 # Claude Code local config
 .claude/
+
+# macOS metadata
+.DS_Store
