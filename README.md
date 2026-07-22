@@ -194,7 +194,7 @@ The UDM improves through community input. There are several ways to participate:
 
 - **Suggest changes or report issues**: Open a [GitHub Issue](https://github.com/ui-insight/AI4RA-UDM/issues) describing the table, column, or convention you'd like to add, change, or discuss
 - **Join the discussion**: Use [GitHub Discussions](https://github.com/ui-insight/AI4RA-UDM/discussions) for broader questions about the model's direction, new domain coverage, or adoption experiences
-- **Take the survey**: A short [practitioner survey](https://bit.ly/4b2ruQ3) on what your institution needs from a shared model
+- **Take the survey**: A short [practitioner survey](https://bit.ly/4b5b21q) on what your institution needs from a shared model
 
 When `udm_schema_v2.json` is updated on `main`, CI automatically regenerates the dashboard data files served via GitHub Pages.
 

@@ -2,7 +2,8 @@ import { useEffect } from 'react';
 import type { DataDictionary, Relationship, TabName } from '../../types';
 import { domainGroups, getDomain } from '../../data/domains';
 
-const SURVEY_URL = 'https://bit.ly/4b2ruQ3';
+// Temporary survey link (original: https://bit.ly/4b2ruQ3, to be restored later)
+const SURVEY_URL = 'https://bit.ly/4b5b21q';
 const REPO_URL = 'https://github.com/ui-insight/AI4RA-UDM';
 
 interface Props {

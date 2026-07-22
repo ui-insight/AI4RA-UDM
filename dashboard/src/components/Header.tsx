@@ -52,7 +52,7 @@ export default function Header() {
             GitHub
           </a>
           <a
-            href="https://bit.ly/4b2ruQ3"
+            href="https://bit.ly/4b5b21q"
             target="_blank"
             rel="noopener noreferrer"
             style={{
