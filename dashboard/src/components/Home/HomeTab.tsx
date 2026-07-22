@@ -153,7 +153,7 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
                 fontSize: '0.95rem',
               }}
             >
-              Take the survey
+              Get involved
             </a>
             <a
               href={`${REPO_URL}/discussions/59#new_comment_field`}
