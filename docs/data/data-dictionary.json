@@ -836,14 +836,14 @@
     },
     "Award": {
       "name": "Award",
-      "description": "A funded grant, contract, or cooperative agreement. The central post-award entity. Award represents inbound funding; Subaward represents the outbound symmetric case.",
+      "description": "A funded grant, contract, or cooperative agreement \u2014 also called a 'project' or 'grant' in many institutional systems. The central post-award entity. Award represents inbound funding; Subaward represents the outbound symmetric case.",
       "synonyms": null,
       "domain": "Funding Cycle",
       "columns": [
         {
           "name": "Award_ID",
           "description": "PK",
-          "synonyms": "Grant ID, Funded Project ID, Post-Award ID",
+          "synonyms": "Grant ID, Project ID, Funded Project ID, Post-Award ID",
           "pii": false
         },
         {
@@ -861,7 +861,7 @@
         {
           "name": "Award_Title",
           "description": "Title of the funded work",
-          "synonyms": "Grant Title, Project Title, Funded Title",
+          "synonyms": "Grant Title, Project Title, Project Name, Funded Title",
           "pii": false
         },
         {

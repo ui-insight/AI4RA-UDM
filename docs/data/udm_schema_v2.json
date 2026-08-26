@@ -84,10 +84,10 @@
       "ProposalApproval.Approval_Step_Order": "Routing Step, Signature Order",
       "PreAwardAuthorization.Maximum_Amount": "Pre-Award Ceiling, At-Risk Spending Limit",
       "PreAwardAuthorization.Authorizing_Personnel_ID": "Authorizing Officer, Approver",
-      "Award.Award_ID": "Grant ID, Funded Project ID, Post-Award ID",
+      "Award.Award_ID": "Grant ID, Project ID, Funded Project ID, Post-Award ID",
       "Award.Award_Number": "Sponsor Award Number, NoA Number, Grant Number, Funded Number",
       "Award.Internal_Award_Number": "Project String, PeopleSoft Project, Internal Grant Number, Internal Project",
-      "Award.Award_Title": "Grant Title, Project Title, Funded Title",
+      "Award.Award_Title": "Grant Title, Project Title, Project Name, Funded Title",
       "Award.Group_ID": "Project Group, Research Line, Program Label",
       "Award.Sponsor_Organization_ID": "Funder, Funding Agency, Direct Sponsor",
       "Award.Prime_Sponsor_Organization_ID": "Pass-Through Sponsor, Original Funder, Ultimate Funder, Prime",
@@ -2471,7 +2471,7 @@
     },
     "Award": {
       "domain": "Funding Cycle",
-      "description": "A funded grant, contract, or cooperative agreement. The central post-award entity. Award represents inbound funding; Subaward represents the outbound symmetric case.",
+      "description": "A funded grant, contract, or cooperative agreement — also called a 'project' or 'grant' in many institutional systems. The central post-award entity. Award represents inbound funding; Subaward represents the outbound symmetric case.",
       "columns": {
         "Award_ID": {
           "type": "VARCHAR(50)",
