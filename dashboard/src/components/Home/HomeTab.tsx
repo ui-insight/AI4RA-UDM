@@ -35,12 +35,13 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
           every institution hand-builds the same field mappings from scratch.
         </p>
         <p style={{ color: '#546e7a', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '1rem' }}>
-          The UDM is a shared answer: a canonical schema for research administration — pre-award
-          proposal preparation, sponsor submission, post-award management, financial accounting,
-          personnel effort, and compliance — that institutions map their local systems onto. It is a
-          specification, not a database: implement it in whatever storage technology fits your
-          environment. A common model makes research administration data Findable, Accessible,
-          Interoperable, and Reusable (FAIR) — within an institution and across them.
+          The UDM is a shared answer: a common language for research administration data. It defines
+          a canonical schema — pre-award proposal preparation, sponsor submission, post-award
+          management, financial accounting, personnel effort, and compliance — that institutions map
+          their local systems onto. It is a specification, not a database: implement it in whatever
+          storage technology fits your environment. A shared language makes research administration
+          data Findable, Accessible, Interoperable, and Reusable (FAIR) — within an institution and
+          across them.
         </p>
         <p style={{ color: '#546e7a', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
           <strong>New here?</strong> Research administrators: start with the{' '}
