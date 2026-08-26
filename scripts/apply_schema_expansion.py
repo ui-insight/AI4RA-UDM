@@ -181,7 +181,7 @@ def apply_changes(schema):
                 "TIMESTAMP", "Date and time the request was last modified",
                 "Updated, Last Modified")),
         ]),
-        "description": "Service requests and tickets from institutional ticketing systems (TDX, ServiceNow, Jira) related to research administration operations",
+        "description": "Service requests and tickets from institutional ticketing systems related to research administration operations",
         "synonyms": "Ticket, Work Request, Service Ticket",
     }
 

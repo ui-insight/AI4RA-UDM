@@ -107,7 +107,7 @@ Created_At                  -- row creation time
 Updated_At                  -- last modification time
 Created_By_Personnel_ID     -- FK to Personnel (nullable for system rows)
 Updated_By_Personnel_ID     -- FK to Personnel (nullable for system rows)
-Source_System               -- originating source system (Banner, Cayuse, etc.)
+Source_System               -- originating source system (ERP, eRA system, etc.)
 Source_Record_ID            -- source system's record ID for provenance
 Is_Active                   -- soft delete; true by default
 ```
@@ -564,5 +564,5 @@ Areas the v2 model deliberately does not include in the canonical schema. Instit
 - **Audit and findings tracking** — sponsor audits, single audits, DCAA audits
 - **Field-level audit / history tables** — relegated to versioned storage (Dolt, Iceberg, temporal tables) or a local extension for deployments without versioned storage
 - **Clinical trial management** — ClinicalTrials.gov registration, NCT numbers, DSMB, enrollment, eCRF (lives in CTMS)
-- **Human subjects participant payments** — per-participant compensation (lives in REDCap / OnCore)
+- **Human subjects participant payments** — per-participant compensation (lives in study-team systems)
 - **Multi-currency awards and subawards** — per-row currency code and exchange rate

@@ -646,7 +646,7 @@ An operational system, portal, or tool used in research administration: an ERA, 
 
 ### Service Request
 
-A request or ticket related to research administration operations (TDX, ServiceNow, Jira, etc.). May link to a related funded agreement, application, or system.
+A request or ticket related to research administration operations, from the institutional ticketing system. May link to a related funded agreement, application, or system.
 
 **Synonyms:** Ticket, Help request, Case, Inquiry
 

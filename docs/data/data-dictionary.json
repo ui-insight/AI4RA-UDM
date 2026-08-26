@@ -62,8 +62,8 @@
         },
         {
           "name": "Home_Organization_Identifier",
-          "description": "The identifier this person carries at their Home_Organization (Banner ID, NetID, EmpID, NSF PO ID, etc.). Unique within Home_Organization_ID when not null. Primary deduplication key.",
-          "synonyms": "Banner ID, NetID, EmpID, PeopleSoft ID, Internal ID",
+          "description": "The identifier this person carries at their Home_Organization (institutional person ID, NetID, EmpID, NSF PO ID, etc.). Unique within Home_Organization_ID when not null. Primary deduplication key.",
+          "synonyms": "NetID, EmpID, Employee Number, Institutional ID",
           "pii": false
         },
         {
@@ -854,8 +854,8 @@
         },
         {
           "name": "Internal_Award_Number",
-          "description": "Institution's own internal award/project identifier (PeopleSoft project string, internal grant number, etc.)",
-          "synonyms": "Project String, PeopleSoft Project, Internal Grant Number, Internal Project",
+          "description": "Institution's own internal award/project identifier (ERP project string, internal grant number, etc.)",
+          "synonyms": "Project String, ERP Project String, Internal Grant Number, Internal Project",
           "pii": false
         },
         {
@@ -2103,7 +2103,7 @@
         {
           "name": "Finance_Code_String",
           "description": "The full FOAP (or equivalent) string",
-          "synonyms": "FOAP, FOAPAL, Chart String, Banner String, PeopleSoft String, GL String",
+          "synonyms": "FOAP, FOAPAL, Chart String, Accounting String, GL String",
           "pii": false
         }
       ]

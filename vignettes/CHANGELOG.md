@@ -7,6 +7,23 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 - **MINOR** when entities or columns are added in a backward-compatible way
 - **PATCH** for documentation, convention clarifications, or fixes to non-load-bearing rules
 
+## [2.0.1] — 2026-08-26
+
+Documentation and hygiene release. No structural changes to tables, columns, or constraints.
+
+### Changed
+- Filled in 289 previously blank column descriptions across all 49 tables.
+- Dissolved the `Reference` domain: `AllowedValues` and `BudgetCategory` are now classed as implementation tables (a new `implementation_tables` key in the JSON) rather than a domain. The model has 6 domains plus two implementation tables.
+- Marked `PersonnelCredential.Credential_Value` and `ContactDetails.Contact_Value` as PII.
+- Added `CostShare` to the documented two-FK exclusive-or list; documented the `AllowedValue_ID` identifier exception and the ActivityLog target-enumeration exception; expanded the Boolean naming note.
+- Added 'project' and 'grant' to Award entity synonyms; adjusted `Award_ID` and `Award_Title` synonym lists.
+- Removed commercial product names from all descriptions, synonyms, examples, and extension entries. Source systems are now described by role (ERP financial system, eRA platform, HR system). Federal sponsor systems (Grants.gov, eRA Commons, Research.gov) remain named because integrating with them is itself a research administration requirement.
+- Reframed the v2.1 issue drafts requirement-first.
+
+### Added
+- `Unfunded agreements` entry in the optional-extensions registry (MTA, DUA, NDA, teaming agreements, MOUs).
+- Validation tooling: a formal metaschema for the JSON artifact (`schemas/udm_schema_v2.metaschema.json`), a structural and referential validator (`scripts/validate_schema.py`), and a prose/JSON sync checker (`scripts/check_spec_sync.py`), all wired into CI.
+
 ## [2.0.0] — 2026-06-11
 
 UDM v2 is a major refactor of the model. It supersedes UDM v1.
@@ -25,7 +42,7 @@ Both versions of the JSON serialization are kept side-by-side at the repository 
 - **`SubmissionAttachment`, `SubmissionEvent`** → subsumed by `Document` polymorphic attachment + `ActivityLog`.
 - **`ApplicationSystem`, `ServiceRequest`** → removed from canonical model; documented in Optional Extensions. Service tickets recommended as `Action` rows with `Action_Type = 'Service_Request'`.
 - **`ProjectCohort`, `CohortParticipation`** → removed. Faculty-development cohorts deferred to local extensions.
-- **`InventionDisclosure`, `InventionDisclosureInventor`** → removed. Tech transfer deferred to specialized systems (Wellspring, Inteum, Sophia); Bayh-Dole touchpoint via `Report.Report_Type = 'Invention_Statement'`. (These two entities existed only in v1-era prose drafts, not in the v1 `udm_schema.json`; listed here so the design decision is on record.)
+- **`InventionDisclosure`, `InventionDisclosureInventor`** → removed. Invention disclosures, patent prosecution, licensing, royalty distribution, and spinout tracking live in specialized tech transfer management systems; Bayh-Dole touchpoint via `Report.Report_Type = 'Invention_Statement'`. (These two entities existed only in v1-era prose drafts, not in the v1 `udm_schema.json`; listed here so the design decision is on record.)
 
 #### Entities added
 - `PersonnelCredential` — sponsor-system IDs (eRA Commons, NSF FastLane) and HR-domain credentials for non-employee Personnel.

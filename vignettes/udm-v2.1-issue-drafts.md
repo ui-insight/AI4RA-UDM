@@ -1,6 +1,8 @@
 # UDM v2.1 Issue Drafts
 
-Drafted from a cold-read gap analysis comparing UDM v2 against the OpenERA application schema (`vignettes/openera-model-inventory.md`). Each section below is a self-contained GitHub issue ready to file.
+Drafted from a design review of UDM v2 against the requirements of the research administration function: regulatory mandates (Uniform Guidance, Bayh-Dole, PHS Policy), sponsor requirements, and institutional workflows. Each section below is a self-contained GitHub issue ready to file.
+
+Release plan (per the 2026-08-26 design review): v2.1 carries the cleanup and small additions (issues #2, #7-#12); the compliance protocol and governance work (issues #1, #13, #14) is targeted at v2.2 as the first standard modules under a core / standard-module / local-extension structure.
 
 ---
 
@@ -108,7 +110,7 @@ At most one of (`Proposal_ID`, `Award_ID`, `Subaward_ID`) is non-null per row. A
 
 **Example 1: PI eligibility exception for a research scientist on one proposal.**
 
-A research scientist (Personnel: jsmith) wants to serve as Co-PI on Proposal P-2026-104. Institutional APM 45.22 normally requires tenure-track appointment for Co-PI role. VPR grants exception for this proposal.
+A research scientist (Personnel: jsmith) wants to serve as Co-PI on Proposal P-2026-104. Institutional policy normally requires a tenure-track appointment for the Co-PI role. VPR grants exception for this proposal.
 
 One PolicyException row: Personnel_ID = jsmith, Policy_Rule_Code = PI_Eligibility_Appointment_Type, Proposal_ID = P-2026-104, Requested_Action = "Serve as Co-PI", Justification = [career narrative], Status = Approved, Decided_By = VPR.
 
@@ -156,7 +158,7 @@ One PolicyException row: Policy_Rule_Code = Cost_Share_Minimum, Proposal_ID = P-
 
 1. **PolicyException (issue #2) is forward-compatible with any future rule-entity design.** Adding a structured rule entity later means one optional FK column on PolicyException alongside the existing `Policy_Rule_Code` string. No breaking change.
 2. **The cost of getting the rule shape wrong is high.** Rule parameters encode regulatory regime specifics that vary by sponsor and evolve with policy. Locking in a structure now without real adopter pressure means probably redesigning it in v2.2 or v2.3 anyway. Better to design once with feedback than twice without.
-3. **No concrete adopter use case beyond OpenERA exists yet.** OpenERA's `SponsorCompliancePolicy` and `SponsorEligibilityRule` shapes encode institutionally-specific assumptions (APM 45.22 categories, local appointment vocabulary). Lifting them into UDM without seeing how other institutions model the same data risks abstraction without evidence.
+3. **No concrete adopter use case exists yet.** Early rule-entity shapes encode institutionally-specific assumptions (local eligibility policy categories, local appointment vocabulary). Standardizing a structure before seeing how multiple institutions model the same data risks abstraction without evidence.
 4. **PolicyException + Policy_Rule_Code is sufficient for most v2.1 institutional use.** It captures the exception event; the rule definition can live in application config or institutional documentation. The "which specific rule instance was excepted" ambiguity is real but minor (institutions usually have one rule per type, not multiple).
 5. **Aligns with the bloat-resistance principle.** Adding 1-6 entities for speculative completeness is scope inflation worth resisting.
 
@@ -166,7 +168,7 @@ One PolicyException row: Policy_Rule_Code = Cost_Share_Minimum, Proposal_ID = P-
 
 **B. Single `PolicyRule` entity with JSON parameter blob.** One generic entity, JSON column for type-specific parameters. Loses schema validation per rule type.
 
-**C. Multiple typed rule entities (OpenERA's approach).** `SponsorEligibilityRule`, `SponsorCompliancePolicy`, `InstitutionalPolicyRule` with type-specific structured columns. Schema validation per type but adds 3-5 entities and proliferates with new rule types.
+**C. Multiple typed rule entities.** `SponsorEligibilityRule`, `SponsorCompliancePolicy`, `InstitutionalPolicyRule` with type-specific structured columns. Schema validation per type but adds 3-5 entities and proliferates with new rule types.
 
 **D. Hybrid: `PolicyRule` root + per-rule-type parameter sub-resources.** Mirrors the compliance-protocol Layer 3 pattern. Universal root + flat per-type sub-resources hung off PolicyRule_ID. Adding a new rule type adds one sub-resource. 4-6 entities.
 
@@ -175,7 +177,7 @@ When v2.2 picks this up, Option D is the strongest candidate because it matches 
 ### v2.2 prerequisites
 
 Before this can be designed responsibly:
-- At least two adopter institutions (beyond OpenERA) modeling sponsor-specific rule data. Compare their shapes; identify what's truly universal vs. institutionally-specific.
+- At least two adopter institutions modeling sponsor-specific rule data. Compare their shapes; identify what's truly universal vs. institutionally-specific.
 - Real query patterns from review engines that consume the rules. Without knowing what queries the data must serve, the structure is guesswork.
 
 ### Open questions (deferred to v2.2)
@@ -218,7 +220,7 @@ Review findings are derived data: re-computable from source data plus engine log
 
 ### What's explicitly NOT included
 
-- No `ReviewFinding` entity in UDM. The OpenERA implementation has one; UDM does not.
+- No `ReviewFinding` entity in UDM.
 - No `Acknowledgment` entity. Acknowledgments reuse `Action`.
 - No Check_Code namespace registry. Institutions choose their own convention; a shared registry can emerge later if cross-institution comparison is demanded.
 
@@ -238,7 +240,7 @@ Review findings are derived data: re-computable from source data plus engine log
 **Body:**
 
 ### Summary
-A monolithic `ChecklistItem` entity (as OpenERA implemented it) conflates three different kinds of data: derived requirement satisfaction, manual reviewer work items, and gating logic. None of the three needs a new UDM entity; each piece already has a home under the three-layer architecture.
+A monolithic `ChecklistItem` entity conflates three different kinds of data: derived requirement satisfaction, manual reviewer work items, and gating logic. None of the three needs a new UDM entity; each piece already has a home under the three-layer architecture.
 
 ### Decision
 
@@ -252,11 +254,11 @@ A monolithic `ChecklistItem` entity (as OpenERA implemented it) conflates three 
 
 ### Analysis
 
-The OpenERA `ChecklistItem` table works because OpenERA conflates three concerns at the application layer. In a layered architecture each concern has its own natural home:
+A single checklist table can work inside one application because the application conflates three concerns at its own layer. In a layered architecture each concern has its own natural home:
 
 - **Why derived items don't belong in UDM:** Per the principle "UDM tables hold source-of-truth data," derived data belongs in the SoI layer as views. A `ChecklistItem` row for "Biosketch missing" duplicates information already present in UDM (RFARequirement + absence of Document). Persisting the row creates drift risk (the row says Missing but a Document was just uploaded) and adds maintenance burden.
 - **Why manual items don't need a new entity:** `Action` is the canonical UDM entity for source-of-truth work items. `Action_Type = Checklist_Item` is already in the recommended list. Adding a parallel `ChecklistItem` entity duplicates `Action`'s purpose.
-- **Why gating logic isn't UDM:** Whether "Is_Blocker = true blocks the Ready_For_Setup → Sent_To_Banner transition" is an institutional workflow decision encoded in application code. Different institutions gate differently. UDM models the data the workflow reads, not the workflow itself.
+- **Why gating logic isn't UDM:** Whether "Is_Blocker = true blocks the Ready_For_Setup → Sent_To_Financial_System transition" is an institutional workflow decision encoded in application code. Different institutions gate differently. UDM models the data the workflow reads, not the workflow itself.
 
 ### Where each piece lives
 
@@ -269,7 +271,7 @@ The OpenERA `ChecklistItem` table works because OpenERA conflates three concerns
 
 ### Counter-argument addressed
 
-**"OpenERA's UI shows a unified checklist; doesn't UDM need to model that view?"** No. UDM models the data; the UI is built by composing the SoI requirement-satisfaction view (derived items) with `Action` rows of `Action_Type = Checklist_Item` (manual items) into a single list. The presentation layer does the merge.
+**"An application UI shows a unified checklist; doesn't UDM need to model that view?"** No. UDM models the data; the UI is built by composing the SoI requirement-satisfaction view (derived items) with `Action` rows of `Action_Type = Checklist_Item` (manual items) into a single list. The presentation layer does the merge.
 
 ### Related changes
 
@@ -299,7 +301,7 @@ None. Decision is settled: no UDM entity, use existing Action for manual items, 
 **Body:**
 
 ### Summary
-The cold-read gap analysis flagged that OpenERA has a `Project` entity (with `Parent_Project_ID` self-reference for multi-component awards) while UDM does not. The flag is real, but the absence is intentional: UDM v2.0 explicitly dropped `Project` as a first-class entity in favor of lineage helpers on Proposal and Award.
+The design review flagged that institutional systems commonly model a `Project` entity (with a parent-project self-reference for multi-component awards) while UDM does not. The flag is real, but the absence is intentional: UDM v2.0 explicitly dropped `Project` as a first-class entity in favor of lineage helpers on Proposal and Award.
 
 ### Resolution (from v2.0 CHANGELOG)
 
@@ -312,7 +314,7 @@ Multi-component awards and longitudinal program lineage are handled by:
 - `Proposal.Previous_Proposal_ID` and `Award.Previous_Award_ID`: immediate predecessor link.
 - `Award.Parent_Award_ID`: for incremental funding segments under one prime award.
 
-Together these capture the longitudinal "what is the funded research line" question without a separate `Project` entity. Fields that OpenERA's `Project` carries (Title, Abstract, Start/End Date, Lead Organization, Status) are already present on Award (or recoverable via the lineage helpers).
+Together these capture the longitudinal "what is the funded research line" question without a separate `Project` entity. Fields such a `Project` entity typically carries (Title, Abstract, Start/End Date, Lead Organization, Status) are already present on Award (or recoverable via the lineage helpers).
 
 ### Why this stays the design
 
@@ -323,7 +325,7 @@ Together these capture the longitudinal "what is the funded research line" quest
 
 ### Migration note for v2.0 adopters
 
-OpenERA migrating to UDM v2 would replace `Project` rows with the appropriate combination of `Group_ID` + `Originating_*_ID` lineage on the corresponding Proposal/Award rows. The v2.0 CHANGELOG migration guidance covers this (item 1 in the migration list).
+An adopter migrating to UDM v2 replaces `Project` rows with the appropriate combination of `Group_ID` + `Originating_*_ID` lineage on the corresponding Proposal/Award rows. The v2.0 CHANGELOG migration guidance covers this (item 1 in the migration list).
 
 ### What's NOT proposed for v2.1
 
@@ -343,7 +345,7 @@ No change. `Project` stays out of UDM. No new lineage helpers beyond what v2.0 i
 A cold reader of the v2 spec assumed UDM's generic `ProposalApproval` and a fixed N-step institutional chain were interchangeable. They are not: `ProposalApproval` is a configurable sign-off sequence. Implementations with fixed chains (e.g., PI Cert → Department → College → OSP) need guidance on how to encode "this step is always third" and how to auto-assign reviewers.
 
 ### Context
-The OpenERA application's `ApprovalStep` is a fixed 4-step chain (step_order 1-4, step_name from a constants registry) auto-created on submission with reviewer auto-assignment based on user role. The mapping from this concrete pattern to UDM's generic model is not obvious from the spec.
+A common institutional implementation is a fixed 4-step chain (step order 1-4, step names from a constants registry) auto-created on submission with reviewer auto-assignment based on user role. The mapping from this concrete pattern to UDM's generic model is not obvious from the spec.
 
 ### Proposal
 Add a worked example to the v2 schema doc showing:
@@ -368,7 +370,7 @@ Add a worked example to the v2 schema doc showing:
 UDM v2 provides `Communication` and `Action` as separate polymorphic attachment types. A common real-world pattern (inbound sponsor letter requiring a response by date X, linked to the Modification it drove) requires composing both. The spec describes them in isolation; nothing shows the composition.
 
 ### Context
-The OpenERA application has a dedicated `AwardCorrespondence` table with embedded action-item fields (Action_Required, Action_Due_Date, Action_Assignee_ID, Action_Resolved_At) and a separate `AwardCorrespondenceModification` junction. A UDM-native equivalent would use `Communication` for the message, `Action` for the follow-up, and cross-link from either to a `Modification`.
+Institutions commonly track award correspondence in a dedicated table with embedded action-item fields (action required, due date, assignee, resolved-at) and a junction to the modification it drove. A UDM-native equivalent would use `Communication` for the message, `Action` for the follow-up, and cross-link from either to a `Modification`.
 
 ### Proposal
 Add a worked example to the v2 schema doc showing:
@@ -587,7 +589,7 @@ This is a breaking change for adopters that wrote against `ActivityLog`. Migrati
 **Body:**
 
 ### Summary
-The three submission-related entities (`SubmissionProfile`, `SubmissionPackage`, `SubmissionAttempt`) in the Funding Cycle domain are infrastructure and institution-specific. They model submission-tooling artifacts (assembled package hashes, retry mechanics, connection configuration) rather than source-of-truth research-admin data. Different institutions use different submission tooling (Cayuse, eRA-direct, in-house code, sponsor portals) and the artifacts of each tooling stack do not generalize.
+The three submission-related entities (`SubmissionProfile`, `SubmissionPackage`, `SubmissionAttempt`) in the Funding Cycle domain are infrastructure and institution-specific. They model submission-tooling artifacts (assembled package hashes, retry mechanics, connection configuration) rather than source-of-truth research-admin data. Different institutions use different submission tooling (commercial eRA platforms, direct sponsor-system integrations, in-house code, sponsor portals) and the artifacts of each tooling stack do not generalize.
 
 The research-admin-relevant fact ("this proposal was submitted to this sponsor on this date with this confirmation number") is captured via the existing `Action` attachment using a documented `Action_Type = Sponsor_Submission` convention. No new UDM entities or columns; the `Action` entity already carries every needed field.
 

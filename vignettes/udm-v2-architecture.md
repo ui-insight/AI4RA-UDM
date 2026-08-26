@@ -47,7 +47,7 @@ If a piece of the model uses something else, it should be rewritten to fit one o
 
 ### 1.5 The UDM is for research-administration data, not for the systems that hold it
 
-If the data is a record of work an OSP or research office does, it belongs. If it's metadata about an IT system or a workflow engine, it doesn't. ServiceRequest belongs because OSP tickets are operational records of work; the underlying TDX schema does not.
+If the data is a record of work an OSP or research office does, it belongs. If it's metadata about an IT system or a workflow engine, it doesn't. ServiceRequest belongs because OSP tickets are operational records of work; the underlying ticketing-system schema does not.
 
 ---
 
@@ -201,9 +201,9 @@ The "three amounts" (proposed/approved/current) become snapshots in the same lin
 
 ### 4.7 ApplicationSystem — keep with clarification
 
-**Decision:** Keep `ApplicationSystem` as a small reference catalog. Document that it exists so Actions can reference "the system this work pertains to" (e.g., "fix Banner integration for award #12345").
+**Decision:** Keep `ApplicationSystem` as a small reference catalog. Document that it exists so Actions can reference "the system this work pertains to" (e.g., "fix ERP integration for award #12345").
 
-**Rationale:** Without it, queries like "how many tickets are about Banner integration this quarter?" require text matching. The catalog is institutional reference data, not IT inventory.
+**Rationale:** Without it, queries like "how many tickets are about ERP integration this quarter?" require text matching. The catalog is institutional reference data, not IT inventory.
 
 ### 4.8 ServiceRequest — absorbed into Action
 
@@ -539,7 +539,7 @@ Tab preferences, dashboard layout, view configurations, saved searches, draft fo
 
 ### 10.7 External system internals
 
-Banner's financial posting tables, Cayuse's submission logs, TDX's ticket queues, Workday's HR transactions. The UDM models the *records that flow through* these systems (a Transaction is research-admin data even though Banner holds it), not the systems' internal metadata.
+The ERP's financial posting tables, the eRA system's submission logs, the ticketing system's queues, the HR system's transactions. The UDM models the *records that flow through* these systems (a Transaction is research-admin data even though the ERP holds it), not the systems' internal metadata.
 
 ### 10.8 Reporting engine configuration
 

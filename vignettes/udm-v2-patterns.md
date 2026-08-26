@@ -147,7 +147,7 @@ The finding itself stays derived (regeneratable from source data plus engine log
 
 ### Recurrences
 
-- **OpenERA `ReviewFinding`** (rule-based and AI-generated review engines). Uses STI on Review_Type with values personnel / document / content; carries Severity, Check_Code, Is_AI_Generated, and acknowledgment columns. Shape conforms to this pattern except acknowledgment is recorded on the finding row itself rather than a separate Action.
+- **Review-engine finding tables** (rule-based and AI-generated review engines). A typical shape uses STI on Review_Type with values personnel / document / content and carries Severity, Check_Code, Is_AI_Generated, and acknowledgment columns. Such shapes conform to this pattern except when acknowledgment is recorded on the finding row itself rather than a separate Action.
 - **Future review engines** in adopters' systems. Shape conformance recommended for portability.
 
 ### Notes
@@ -208,7 +208,7 @@ An institution using Dolt or Iceberg satisfies the pattern via query projection;
 ### Recurrences
 
 - **Storage-layer versioning** in Dolt, Trino + Iceberg, Postgres temporal tables, SQL Server temporal tables, and similar implementations. Shape recovered via time-travel queries.
-- **Application-layer audit tables** in institutions running plain Postgres or similar. OpenERA's `ActivityLog` table is one example (Table_Name, Record_ID, Action_Type, Action_Timestamp, User_ID, Old_Values, New_Values, IP_Address, Session_ID). Shape conforms with field-name differences.
+- **Application-layer audit tables** in institutions running plain Postgres or similar. A typical shape: (Table_Name, Record_ID, Action_Type, Action_Timestamp, User_ID, Old_Values, New_Values, IP_Address, Session_ID). Conforms with field-name differences.
 - **Event-stream change-data-capture** pipelines feeding downstream consumers. Shape conforms to the field set; persistence is the stream.
 
 ### Notes

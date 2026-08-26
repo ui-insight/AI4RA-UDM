@@ -84,7 +84,7 @@ Consumed by: compliance officer dashboards, pre-spending gate checks, award-acti
 
 ## Sample 3: Personnel eligibility findings (review engine)
 
-**Purpose:** Produce a `v_personnel_eligibility_findings` view that conforms to the "Automated finding shape" pattern. Engine logic encodes APM 45.22 PI/Co-PI eligibility rules and accounts for any active PolicyException rows.
+**Purpose:** Produce a `v_personnel_eligibility_findings` view that conforms to the "Automated finding shape" pattern. Engine logic encodes institutional PI/Co-PI eligibility policy and accounts for any active PolicyException rows.
 
 ```sql
 CREATE VIEW v_personnel_eligibility_findings AS
@@ -127,7 +127,7 @@ SELECT
   CASE
     WHEN ae.Personnel_ID IS NOT NULL
     THEN 'Eligibility waived by active PolicyException'
-    ELSE 'PI appointment type does not satisfy APM 45.22'
+    ELSE 'PI appointment type does not satisfy institutional eligibility policy'
   END AS Message,
   false AS Is_AI_Generated,
   'eligibility_engine_v1' AS Engine_Identifier,

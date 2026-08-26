@@ -2,7 +2,7 @@
 
 A universal data model for research administration. The UDM provides a common schema that any institution can adopt to standardize how research administration data is structured, described, and shared — regardless of what systems they use internally.
 
-**Current version: v2.0** (released 2026-06-11). The v1 model is preserved for reference; see [Versions](#versions) below.
+**Current version: v2.0.1** (updated 2026-08-26; v2.0.0 released 2026-06-11). The v1 model is preserved for reference; see [Versions](#versions) below.
 
 ## Mission
 

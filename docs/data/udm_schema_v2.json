@@ -1,8 +1,8 @@
 {
   "metadata": {
     "name": "UDM",
-    "version": "2.0.0",
-    "released": "2026-06-11",
+    "version": "2.0.1",
+    "released": "2026-08-26",
     "dialect": "MySQL",
     "description": "Vendor-neutral research administration data model, v2. This JSON is a MySQL/MariaDB-flavored example implementation of the abstract specification in vignettes/udm-v2-system-of-record.md. The abstract spec is database-engine agnostic; this JSON picks one dialect for concrete adoption. The prior version (v1) is preserved as udm_schema.json at the repository root.",
     "spec_source": "vignettes/udm-v2-system-of-record.md",
@@ -37,7 +37,7 @@
       "Personnel.Primary_Email": "Email, Work Email, Institutional Email",
       "Personnel.ORCID": "ORCID iD, Open Researcher ID",
       "Personnel.Home_Organization_ID": "Department, Home Department, Affiliation, Home Org",
-      "Personnel.Home_Organization_Identifier": "Banner ID, NetID, EmpID, PeopleSoft ID, Internal ID",
+      "Personnel.Home_Organization_Identifier": "NetID, EmpID, Employee Number, Institutional ID",
       "Personnel.Person_Type": "Personnel Category, Affiliation Type",
       "PersonnelCredential.Credential_Type": "Identifier Type, Credential Category",
       "PersonnelCredential.Credential_Value": "Credential, Identifier Value",
@@ -86,7 +86,7 @@
       "PreAwardAuthorization.Authorizing_Personnel_ID": "Authorizing Officer, Approver",
       "Award.Award_ID": "Grant ID, Project ID, Funded Project ID, Post-Award ID",
       "Award.Award_Number": "Sponsor Award Number, NoA Number, Grant Number, Funded Number",
-      "Award.Internal_Award_Number": "Project String, PeopleSoft Project, Internal Grant Number, Internal Project",
+      "Award.Internal_Award_Number": "Project String, ERP Project String, Internal Grant Number, Internal Project",
       "Award.Award_Title": "Grant Title, Project Title, Project Name, Funded Title",
       "Award.Group_ID": "Project Group, Research Line, Program Label",
       "Award.Sponsor_Organization_ID": "Funder, Funding Agency, Direct Sponsor",
@@ -173,7 +173,7 @@
       "Account.Account_Code": "Account Number, GL Code, Object Code, Account String",
       "Account.Account_Type": "GL Type, GAAP Type, Account Classification",
       "Account.Parent_Account_Code": "Parent Account, Account Roll-Up",
-      "FinanceCode.Finance_Code_String": "FOAP, FOAPAL, Chart String, Banner String, PeopleSoft String, GL String",
+      "FinanceCode.Finance_Code_String": "FOAP, FOAPAL, Chart String, Accounting String, GL String",
       "FinanceCode.Purpose_Value_ID": "Purpose Code, Cost Purpose, Account Purpose",
       "Transaction.Transaction_ID": "Charge ID, Posting ID, Journal ID, JV ID",
       "Transaction.Transaction_Amount": "Charge Amount, Cost, Expense Amount",
@@ -564,7 +564,7 @@
       "Source_System": {
         "type": "VARCHAR(50)",
         "required": false,
-        "description": "The originating source system (Banner, Cayuse, InfoEd, Workday, Kuali, etc.)"
+        "description": "The originating source system (ERP financial system, eRA platform, HR system, etc.)"
       },
       "Source_Record_ID": {
         "type": "VARCHAR(50)",
@@ -1540,7 +1540,7 @@
         "Home_Organization_Identifier": {
           "type": "VARCHAR(50)",
           "required": false,
-          "description": "The identifier this person carries at their Home_Organization (Banner ID, NetID, EmpID, NSF PO ID, etc.). Unique within Home_Organization_ID when not null. Primary deduplication key."
+          "description": "The identifier this person carries at their Home_Organization (institutional person ID, NetID, EmpID, NSF PO ID, etc.). Unique within Home_Organization_ID when not null. Primary deduplication key."
         },
         "Person_Type": {
           "type": "VARCHAR(50)",
@@ -2487,7 +2487,7 @@
         "Internal_Award_Number": {
           "type": "VARCHAR(50)",
           "required": false,
-          "description": "Institution's own internal award/project identifier (PeopleSoft project string, internal grant number, etc.)"
+          "description": "Institution's own internal award/project identifier (ERP project string, internal grant number, etc.)"
         },
         "Award_Title": {
           "type": "VARCHAR(500)",
@@ -5752,15 +5752,15 @@
     },
     {
       "name": "Publications and research outputs",
-      "description": "Publications, presentations, datasets, software releases. Output portfolio left to specialized publication systems (Symplectic, ORCID-integrated CRIS, institutional repositories)."
+      "description": "Publications, presentations, datasets, software releases. Output portfolio left to specialized publication and research-information systems (CRIS platforms, institutional repositories)."
     },
     {
       "name": "Invention disclosures and tech transfer",
-      "description": "Invention disclosures, patent filing, prosecution, licensing, royalty distribution, spinout/equity tracking. Live in specialized tech transfer systems (Wellspring, Inteum, Sophia). UDM touchpoints: Bayh-Dole reporting via Report.Report_Type = 'Invention_Statement'."
+      "description": "Invention disclosures, patent prosecution, licensing, royalty distribution, and spinout/equity tracking. These activities live in specialized tech transfer management systems. UDM touchpoint: Bayh-Dole reporting via Report.Report_Type = 'Invention_Statement'; institutions that need a cross-reference attach the disclosure as a Document or link via local extension."
     },
     {
       "name": "HR / payroll data",
-      "description": "Academic rank, IBS, appointment calendar type, joint appointments, benefits, etc. Live in HRIS (Workday, Banner HR, PeopleSoft HR)."
+      "description": "Academic rank, IBS, appointment calendar type, joint appointments, benefits, etc. Live in the institution's HR information system."
     },
     {
       "name": "Detailed accounting / general ledger",
@@ -5780,7 +5780,7 @@
     },
     {
       "name": "Service tickets and request tracking",
-      "description": "Service requests and tickets from institutional ticketing systems (TeamDynamix, ServiceNow, Jira, Zendesk) related to research administration. The canonical model does not include a ServiceRequest entity. Recommended pattern: capture each ticket as an Action row with Action_Type resolving to 'Service_Request', attached polymorphically to the relevant Proposal / Award / Subaward / ComplianceRequirement via Related_Entity_Type + Related_Entity_ID. Action carries Title, Description, Assignee_Personnel_ID, Requestor_Personnel_ID, Due_Date, Action_Status, Priority, Origin, and Outcome_Description; the upstream ticketing system is named in the title or in the Source_System audit column; the ticket's external ID lives in Source_Record_ID. Per-ticket operational state (queue, escalation level, SLA timers, internal comments) stays in the ticketing system. Institutions with substantial ticket volume that need fields beyond Action's columns add a local TicketDetail extension keyed by Action_ID with platform-specific fields. No separate ApplicationSystem catalog is needed.",
+      "description": "Service requests and tickets from institutional ticketing systems related to research administration. The canonical model does not include a ServiceRequest entity. Recommended pattern: capture each ticket as an Action row with Action_Type resolving to 'Service_Request', attached polymorphically to the relevant Proposal / Award / Subaward / ComplianceRequirement via Related_Entity_Type + Related_Entity_ID. Action carries Title, Description, Assignee_Personnel_ID, Requestor_Personnel_ID, Due_Date, Action_Status, Priority, Origin, and Outcome_Description; the upstream ticketing system is named in the title or in the Source_System audit column; the ticket's external ID lives in Source_Record_ID. Per-ticket operational state (queue, escalation level, SLA timers, internal comments) stays in the ticketing system. Institutions with substantial ticket volume that need fields beyond Action's columns add a local TicketDetail extension keyed by Action_ID with platform-specific fields. No separate ApplicationSystem catalog is needed.",
       "implementation": {
         "recommended_pattern": "Action with Action_Type='Service_Request'",
         "polymorphic_attach_targets": [
@@ -5801,7 +5801,7 @@
           "Origin": "Sponsor_Required / Internal / System_Generated / Manual",
           "Outcome_Description": "resolution notes",
           "Linked_Document_ID": "attached resolution artifact",
-          "Source_System": "ticketing platform (TDX, ServiceNow, Jira, Zendesk)",
+          "Source_System": "the institutional ticketing platform",
           "Source_Record_ID": "platform-native ticket ID"
         },
         "local_extension_when_needed": "TicketDetail keyed by Action_ID; only when platform-specific fields beyond Action are required"
@@ -5821,11 +5821,15 @@
     },
     {
       "name": "Human subjects participant payments",
-      "description": "Per-participant compensation records live in study-team systems (REDCap, OnCore). UDM sees only the bulk drawdown as a Transaction."
+      "description": "Per-participant compensation records live in study-team-managed systems. UDM sees only the bulk drawdown as a Transaction."
     },
     {
       "name": "Multi-currency awards and subawards",
       "description": "All Money columns carry a single institutional currency convention. Institutions with multi-currency activity add a local extension for per-row currency, exchange rate at posting, and reporting-currency conversion."
+    },
+    {
+      "name": "Unfunded agreements",
+      "description": "Material transfer agreements, data use agreements, non-disclosure agreements, teaming agreements, and memoranda of understanding. These follow their own negotiation and lifecycle processes outside the funding cycle; Negotiation covers award-related negotiation only. Institutions track unfunded agreements in contract management processes or a local extension. Candidate for a future standard addition if adopter demand warrants."
     }
   ],
   "example_views": {
