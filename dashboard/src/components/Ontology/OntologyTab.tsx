@@ -103,6 +103,38 @@ export default function OntologyTab() {
             </tbody>
           </table>
         </div>
+        <h3 style={{ color: '#2c3e50', marginBottom: '0.75rem' }}>Data needs by layer</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+          <PatternCard title="System of Record — the durable facts">
+            <p style={{ color: '#546e7a', fontSize: '0.88rem', margin: 0 }}>
+              Who (personnel, organizations, roles), the funding lifecycle (opportunity through
+              proposal, award, and closeout), money (budgets, transactions, rates, cost share),
+              effort, compliance status, and the attachments that accumulate around all of it.
+              This data needs versioned history with transaction metadata (who changed what, when),
+              source-system provenance on every row, controlled vocabularies with canonical codes
+              for cross-institution comparison, and PII flagging. Only finalized facts land here,
+              never drafts.
+            </p>
+          </PatternCard>
+          <PatternCard title="System of Insight — the derived answers">
+            <p style={{ color: '#546e7a', fontSize: '0.88rem', margin: 0 }}>
+              Everything re-computable from the Record: active-award rosters, overdue reports,
+              requirement satisfaction, review findings, effort certification status, and metrics
+              like success rate or income by sponsor type. This data needs read access to the
+              Record and nothing else. It stores no source-of-truth of its own, so views can be
+              rebuilt, corrected, or redesigned at any time without a data migration.
+            </p>
+          </PatternCard>
+          <PatternCard title="System of Engagement — the work in flight">
+            <p style={{ color: '#546e7a', fontSize: '0.88rem', margin: 0 }}>
+              Operational and transactional state: in-progress proposal drafts, user sessions and
+              authentication, submission tooling artifacts, notification queues, application
+              telemetry. This data needs OLTP speed and mutability, and most of it is ephemeral.
+              When work finalizes (a proposal is submitted, an award is set up), the resulting
+              facts flow into the System of Record by ETL or streaming; the scaffolding stays behind.
+            </p>
+          </PatternCard>
+        </div>
         <h3 style={{ color: '#2c3e50', marginBottom: '0.75rem' }}>Where logic lives</h3>
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
           Logic follows the same layering as data. The UDM fully specifies the logic the System of
