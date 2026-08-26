@@ -7,6 +7,10 @@ on:
       - 'udm_schema.json'
       - 'udm_schema_v2.json'
       - 'scripts/generate_dashboard_data.py'
+      - 'scripts/validate_schema.py'
+      - 'scripts/check_spec_sync.py'
+      - 'schemas/**'
+      - 'vignettes/udm-v2-system-of-record.md'
       - 'dashboard/**'
 
 jobs:
@@ -27,6 +31,12 @@ jobs:
           node-version: '20'
           cache: 'npm'
           cache-dependency-path: 'dashboard/package-lock.json'
+
+      - name: Validate schema structure and referential integrity
+        run: python scripts/validate_schema.py
+
+      - name: Check prose spec / JSON sync
+        run: python scripts/check_spec_sync.py
 
       - name: Generate dashboard data files from udm_schema_v2.json
         run: python scripts/generate_dashboard_data.py

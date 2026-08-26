@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ui-insight.github.io/AI4RA-UDM/schemas/udm_schema_v2.metaschema.json",
+  "title": "UDM v2 schema artifact metaschema",
+  "description": "Structural contract for udm_schema_v2.json. Referential rules (foreign keys resolve, domain membership covers the table set, primary-key naming) are enforced by scripts/validate_schema.py and cannot be expressed in JSON Schema.",
+  "type": "object",
+  "required": [
+    "metadata",
+    "column_synonyms",
+    "scope",
+    "domain_membership",
+    "universal_patterns",
+    "audit_columns",
+    "status_taxonomies",
+    "semantic_conventions",
+    "polymorphic_attachment_enforcement",
+    "derived_values",
+    "constraint_vocabulary",
+    "cross_row_constraints",
+    "tables",
+    "optional_extensions",
+    "example_views",
+    "summary",
+    "implementation_tables"
+  ],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["name", "version", "released", "dialect"],
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "released": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "dialect": { "type": "string" }
+      }
+    },
+    "domain_membership": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" },
+        "minItems": 1
+      }
+    },
+    "implementation_tables": {
+      "type": "object",
+      "required": ["description", "tables"],
+      "properties": {
+        "description": { "type": "string" },
+        "tables": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "tables": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "$ref": "#/$defs/table" }
+    },
+    "cross_row_constraints": { "type": "array" },
+    "optional_extensions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "description"],
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "summary": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "table": {
+      "type": "object",
+      "required": ["domain", "description", "columns"],
+      "properties": {
+        "domain": { "type": "string" },
+        "description": { "type": "string" },
+        "columns": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "$ref": "#/$defs/column" }
+        },
+        "notes": {}
+      }
+    },
+    "column": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": { "type": "string" },
+        "required": { "type": "boolean" },
+        "primary_key": { "type": "boolean" },
+        "description": { "type": "string" },
+        "pii": { "type": "boolean" },
+        "references": {
+          "type": "object",
+          "required": ["table", "column"],
+          "properties": {
+            "table": { "type": "string" },
+            "column": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}
