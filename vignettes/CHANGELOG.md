@@ -7,6 +7,32 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 - **MINOR** when entities or columns are added in a backward-compatible way
 - **PATCH** for documentation, convention clarifications, or fixes to non-load-bearing rules
 
+## [2.1.0] — 2026-08-26
+
+Cleanup release: the model sheds infrastructure entities that belong to other architectural layers and gains two small, broadly useful entities. 49 → 47 tables. Implements roadmap issues #66, #67, #68, #61, #65, #63, #64.
+
+### Architectural changes
+
+- **Three-layer architecture documented in the spec** (issue #66). A top-level Architecture section names System of Record / System of Insight / System of Engagement, states that the UDM is the data model of the System of Record, defines the regeneration test, and introduces conformance tiers (core / standard modules / local extensions).
+
+### Entities removed (breaking)
+
+- **`ActivityLog`** (issue #67). Row-history events are redundant with the storage layer's versioned history; operator-action events are observability and belong in the System of Engagement. Migration: `data_change` / `field_change` / `status_transition` / `submission_status_change` consumers switch to storage-layer history queries projecting the "Audit record shape" pattern; `operator_action` consumers move capture to application logging.
+- **`SubmissionProfile`, `SubmissionPackage`, `SubmissionAttempt`** (issue #68). Submission-tooling artifacts, not research-administration source-of-truth. The RA fact ("submitted to this sponsor on this date with this confirmation number") is captured as an `Action` row with `Action_Type = 'Sponsor_Submission'` per the new semantic convention. Migration: each historical attempt becomes one Action row (Submitted timestamp → Completed_Date, status → Action_Status, confirmation number → Outcome_Description); package metadata and connection profiles move to the institution's submission tooling.
+
+### Entities added
+
+- **`PolicyException`** (Compliance, issue #61). Institutionally granted exceptions to sponsor or institutional policy rules (PI eligibility, COI management, cost share, indirect rate), scoped to a person and optionally to one Proposal / Award / Subaward.
+- **`CommunicationResponse`** (Attachments, issue #65). Per-recipient structured responses to a Communication, composing with a Deadline on the Communication for response windows. Covers designated-member-review polling, RPPR sign-off, COI reminders, JIT collection, effort-certification reminders.
+
+### Other changes
+
+- `Sponsor_Submission` added to recommended ActionType values; new "Sponsor submission events" semantic convention (20 conventions total).
+- `Communication` added to Deadline's allowed polymorphic targets (response windows attach to notifications).
+- Worked examples added to the spec: encoding fixed approval chains on ProposalApproval, and correspondence-with-follow-up via Communication + Action (issues #63, #64).
+- Audit-authority guidance simplified to two mechanisms (Updated_At, versioned storage).
+- Cross-row constraints for the new entities; 71 constraints total.
+
 ## [2.0.1] — 2026-08-26
 
 Documentation and hygiene release. No structural changes to tables, columns, or constraints.

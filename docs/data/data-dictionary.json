@@ -1556,150 +1556,6 @@
         }
       ]
     },
-    "SubmissionProfile": {
-      "name": "SubmissionProfile",
-      "description": "Configuration of an institution's connection to a sponsor's electronic submission system.",
-      "synonyms": null,
-      "domain": "Funding Cycle",
-      "columns": [
-        {
-          "name": "SubmissionProfile_ID",
-          "description": "PK",
-          "synonyms": null,
-          "pii": false
-        },
-        {
-          "name": "Organization_ID",
-          "description": "The sponsor",
-          "synonyms": null,
-          "pii": false
-        },
-        {
-          "name": "Submission_System",
-          "description": "Constrained: grants_gov / research_gov / era_commons / nspires / manual / other",
-          "synonyms": null,
-          "pii": false
-        },
-        {
-          "name": "Environment",
-          "description": "Constrained: training / production",
-          "synonyms": null,
-          "pii": false
-        },
-        {
-          "name": "Credential_Reference_Path",
-          "description": "External secret-store path; credentials are NOT stored in the schema",
-          "synonyms": null,
-          "pii": false
-        }
-      ]
-    },
-    "SubmissionPackage": {
-      "name": "SubmissionPackage",
-      "description": "An immutable snapshot of the documents and metadata assembled for submission.",
-      "synonyms": null,
-      "domain": "Funding Cycle",
-      "columns": [
-        {
-          "name": "SubmissionPackage_ID",
-          "description": "PK",
-          "synonyms": null,
-          "pii": false
-        },
-        {
-          "name": "Proposal_ID",
-          "description": "The Proposal this package was assembled for",
-          "synonyms": null,
-          "pii": false
-        },
-        {
-          "name": "Package_Version",
-          "description": "Default 1; increments per snapshot",
-          "synonyms": null,
-          "pii": false
-        },
-        {
-          "name": "Package_Hash",
-          "description": "SHA-256 of the assembled package",
-          "synonyms": "Submission Checksum, Bundle Hash",
-          "pii": false
-        },
-        {
-          "name": "Assembled_Date",
-          "description": "When the package was assembled",
-          "synonyms": null,
-          "pii": false
-        },
-        {
-          "name": "Package_Status",
-          "description": "See Status taxonomy",
-          "synonyms": null,
-          "pii": false
-        }
-      ]
-    },
-    "SubmissionAttempt": {
-      "name": "SubmissionAttempt",
-      "description": "One outbound transmission of a SubmissionPackage to an external sponsor system.",
-      "synonyms": null,
-      "domain": "Funding Cycle",
-      "columns": [
-        {
-          "name": "SubmissionAttempt_ID",
-          "description": "PK",
-          "synonyms": null,
-          "pii": false
-        },
-        {
-          "name": "SubmissionPackage_ID",
-          "description": "The package this attempt transmitted",
-          "synonyms": null,
-          "pii": false
-        },
-        {
-          "name": "SubmissionProfile_ID",
-          "description": "The submission profile (system + credentials context) used",
-          "synonyms": null,
-          "pii": false
-        },
-        {
-          "name": "Submission_System",
-          "description": "Denormalized from the profile at attempt creation for historical accuracy",
-          "synonyms": null,
-          "pii": false
-        },
-        {
-          "name": "Environment",
-          "description": "Same; constrained to: training / production",
-          "synonyms": null,
-          "pii": false
-        },
-        {
-          "name": "Attempt_Number",
-          "description": "Unique within (SubmissionPackage, SubmissionProfile)",
-          "synonyms": "Try Number, Submission Iteration",
-          "pii": false
-        },
-        {
-          "name": "Submitted_Timestamp",
-          "description": "When the attempt was transmitted",
-          "synonyms": null,
-          "pii": false
-        },
-        {
-          "name": "Attempt_Status",
-          "description": "See Status taxonomy",
-          "synonyms": null,
-          "pii": false
-        },
-        {
-          "name": "Sponsor_Confirmation_Number",
-          "description": "Sponsor-issued upon acceptance",
-          "synonyms": "Confirmation Number, Sponsor Receipt",
-          "pii": false
-        }
-      ]
-    },
     "AwardRole": {
       "name": "AwardRole",
       "description": "A person's role on an Award (or Subaward), with effort allocation, date range, and credit attribution. Limited to award-side staffing roles.",
@@ -2936,6 +2792,110 @@
         }
       ]
     },
+    "PolicyException": {
+      "name": "PolicyException",
+      "description": "An institutionally granted exception to a sponsor or institutional policy rule: PI-eligibility waivers, COI management exceptions, cost-share waivers, indirect-rate exceptions. Scoped to a Personnel record, optionally narrowed to one Proposal, Award, or Subaward; all three scope FKs null means a blanket exception for the person.",
+      "synonyms": null,
+      "domain": "Compliance",
+      "columns": [
+        {
+          "name": "PolicyException_ID",
+          "description": "PK",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Personnel_ID",
+          "description": "The person to whom the exception is granted",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Policy_Rule_Code",
+          "description": "Identifies the rule being excepted. Recommended values: PI_Eligibility_Appointment_Type / PI_Eligibility_Degree / PI_Eligibility_Years_Since_Degree / Co_PI_Eligibility / COI_Disqualifying_Engagement / COI_Management_Plan_Required / Cost_Share_Minimum / Indirect_Rate_Minimum / Foreign_Collaboration_Restriction / Sponsor_Specific_Other",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Requested_Action",
+          "description": "What the exception enables (e.g., serve as Co-PI on this proposal despite a non-qualifying appointment)",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Justification",
+          "description": "Why the exception is requested",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Proposal_ID",
+          "description": "Scopes the exception to one proposal. At most one of Proposal_ID / Award_ID / Subaward_ID is non-null",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Award_ID",
+          "description": "Scopes the exception to one award",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Subaward_ID",
+          "description": "Scopes the exception to one subaward",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Requested_Date",
+          "description": "When the exception was requested",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Requested_By_Personnel_ID",
+          "description": "Who submitted the request",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Exception_Status",
+          "description": "Constrained: Pending / Approved / Denied / Withdrawn / Expired",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Decided_By_Personnel_ID",
+          "description": "Decision authority. Required when Exception_Status reaches a terminal value",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Decision_Date",
+          "description": "Required when Exception_Status reaches a terminal value",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Decision_Notes",
+          "description": "Decision authority's rationale",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Effective_Start_Date",
+          "description": "When the exception takes effect (often equals Decision_Date)",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Effective_End_Date",
+          "description": "Null means indefinite or until policy changes",
+          "synonyms": null,
+          "pii": false
+        }
+      ]
+    },
     "AllowedValues": {
       "name": "AllowedValues",
       "description": "Institution-specific controlled vocabularies. The Value_Group column names a family.",
@@ -3032,7 +2992,7 @@
         },
         {
           "name": "Related_Entity_Type",
-          "description": "Constrained: Award / Subaward / Proposal / ProposalApproval / PreAwardAuthorization / Personnel / PersonnelCredential / ComplianceRequirement / SubmissionPackage / Modification / Action / Restriction / Budget / Negotiation / Terms / Report / Closeout / Equipment",
+          "description": "Constrained: Award / Subaward / Proposal / ProposalApproval / PreAwardAuthorization / Personnel / PersonnelCredential / ComplianceRequirement / Modification / Action / Restriction / Budget / Negotiation / Terms / Report / Closeout / Equipment",
           "synonyms": null,
           "pii": false
         },
@@ -3178,6 +3138,62 @@
         }
       ]
     },
+    "CommunicationResponse": {
+      "name": "CommunicationResponse",
+      "description": "A per-recipient structured response to a Communication. The Communication carries the message; a Deadline attached to the Communication carries the response window; each recipient's response is one row. Pre-create one Pending row per intended recipient at notification time.",
+      "synonyms": null,
+      "domain": "Attachments",
+      "columns": [
+        {
+          "name": "CommunicationResponse_ID",
+          "description": "PK",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Communication_ID",
+          "description": "The originating notification",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Respondent_Personnel_ID",
+          "description": "The person whose response this row captures. Unique per (Communication_ID, Respondent_Personnel_ID)",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Response_Type_Value_ID",
+          "description": "Value_Group = 'CommunicationResponseType'. Identifies the kind of response solicited. Recommended values: DMR_FCR / RPPR_Signoff / COI_Annual / IRB_Concurrence / JIT_Component / Effort_Certification",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Response_Value_Value_ID",
+          "description": "The actual response value, from the Value_Group keyed by Response_Type. Required when Response_Status = 'Responded'. The host system enforces the type-to-value-group mapping",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Responded_At",
+          "description": "When the respondent acted. Required when Response_Status = 'Responded'",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Notes",
+          "description": "Free-text comment from the respondent",
+          "synonyms": null,
+          "pii": false
+        },
+        {
+          "name": "Response_Status",
+          "description": "Constrained: Pending / Responded / Declined_To_Respond / Timed_Out / Withdrawn. Pending rows transition to Timed_Out when the Deadline passes; a removed recipient's row transitions to Withdrawn",
+          "synonyms": null,
+          "pii": false
+        }
+      ]
+    },
     "Restriction": {
       "name": "Restriction",
       "description": "Operational constraints attached to an entity (CUI, CMMC, export control, publication holds, foreign-personnel limits).",
@@ -3260,7 +3276,7 @@
         },
         {
           "name": "Related_Entity_Type",
-          "description": "Constrained: Award / Subaward / Proposal / ProposalApproval / ComplianceRequirement / Modification / RFA / Closeout / Report",
+          "description": "Constrained: Award / Subaward / Proposal / ProposalApproval / ComplianceRequirement / Modification / RFA / Closeout / Report / Communication",
           "synonyms": null,
           "pii": false
         },
@@ -3384,7 +3400,7 @@
         },
         {
           "name": "Action_Type_Value_ID",
-          "description": "Value_Group = 'ActionType'. Recommended values: Deliverable / Checklist_Item / Service_Request / Modification_Approval / Compliance_Renewal / Training_Required / Training_Completion / Subrecipient_Risk_Review / Cost_Transfer_Approval / JIT_Request / Other",
+          "description": "Value_Group = 'ActionType'. Recommended values: Deliverable / Checklist_Item / Service_Request / Modification_Approval / Compliance_Renewal / Training_Required / Training_Completion / Subrecipient_Risk_Review / Cost_Transfer_Approval / JIT_Request / Sponsor_Submission / Other",
           "synonyms": "Work Item Type, Task Category, Workflow Type",
           "pii": false
         },
@@ -3455,69 +3471,7 @@
           "pii": false
         }
       ]
-    },
-    "ActivityLog": {
-      "name": "ActivityLog",
-      "description": "Typed audit events on entities. Curated business events the institution chooses to surface, not a CDC log of every column update.",
-      "synonyms": null,
-      "domain": "Attachments",
-      "columns": [
-        {
-          "name": "ActivityLog_ID",
-          "description": "PK",
-          "synonyms": null,
-          "pii": false
-        },
-        {
-          "name": "Related_Entity_Type",
-          "description": "Constrained to any UDM table name except ActivityLog itself. Not enumerated inline to avoid drift when the canonical table set evolves.",
-          "synonyms": "Audit Target Table, Entity Type",
-          "pii": false
-        },
-        {
-          "name": "Related_Entity_ID",
-          "description": "The row in the table named by Related_Entity_Type this event is about",
-          "synonyms": null,
-          "pii": false
-        },
-        {
-          "name": "Activity_Type",
-          "description": "Agency / sponsor correspondence lives in Communication, not here.",
-          "synonyms": "Audit Event Type, Audit Action",
-          "pii": false
-        },
-        {
-          "name": "Activity_Timestamp",
-          "description": "When the event occurred",
-          "synonyms": "Audit Timestamp, Event Time",
-          "pii": false
-        },
-        {
-          "name": "Actor_Personnel_ID",
-          "description": "Null for system-initiated events",
-          "synonyms": "Actor, Acting User, Event Initiator",
-          "pii": false
-        },
-        {
-          "name": "Old_Value",
-          "description": "For Activity_Type = 'field_change'",
-          "synonyms": "Prior Value, Before Value",
-          "pii": false
-        },
-        {
-          "name": "New_Value",
-          "description": "For Activity_Type = 'field_change'",
-          "synonyms": "Updated Value, After Value",
-          "pii": false
-        },
-        {
-          "name": "Description",
-          "description": "Free-text description; for field changes, includes the field name",
-          "synonyms": null,
-          "pii": false
-        }
-      ]
     }
   },
-  "table_count": 49
+  "table_count": 47
 }

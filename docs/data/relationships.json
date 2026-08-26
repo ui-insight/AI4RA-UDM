@@ -397,30 +397,6 @@
       "to_column": "Subaward_ID"
     },
     {
-      "from_table": "SubmissionProfile",
-      "from_column": "Organization_ID",
-      "to_table": "Organization",
-      "to_column": "Organization_ID"
-    },
-    {
-      "from_table": "SubmissionPackage",
-      "from_column": "Proposal_ID",
-      "to_table": "Proposal",
-      "to_column": "Proposal_ID"
-    },
-    {
-      "from_table": "SubmissionAttempt",
-      "from_column": "SubmissionPackage_ID",
-      "to_table": "SubmissionPackage",
-      "to_column": "SubmissionPackage_ID"
-    },
-    {
-      "from_table": "SubmissionAttempt",
-      "from_column": "SubmissionProfile_ID",
-      "to_table": "SubmissionProfile",
-      "to_column": "SubmissionProfile_ID"
-    },
-    {
       "from_table": "AwardRole",
       "from_column": "Personnel_ID",
       "to_table": "Personnel",
@@ -835,6 +811,42 @@
       "to_column": "Organization_ID"
     },
     {
+      "from_table": "PolicyException",
+      "from_column": "Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "PolicyException",
+      "from_column": "Proposal_ID",
+      "to_table": "Proposal",
+      "to_column": "Proposal_ID"
+    },
+    {
+      "from_table": "PolicyException",
+      "from_column": "Award_ID",
+      "to_table": "Award",
+      "to_column": "Award_ID"
+    },
+    {
+      "from_table": "PolicyException",
+      "from_column": "Subaward_ID",
+      "to_table": "Subaward",
+      "to_column": "Subaward_ID"
+    },
+    {
+      "from_table": "PolicyException",
+      "from_column": "Requested_By_Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "PolicyException",
+      "from_column": "Decided_By_Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
       "from_table": "Document",
       "from_column": "Document_Type_Value_ID",
       "to_table": "AllowedValues",
@@ -869,6 +881,30 @@
       "from_column": "External_Organization_ID",
       "to_table": "Organization",
       "to_column": "Organization_ID"
+    },
+    {
+      "from_table": "CommunicationResponse",
+      "from_column": "Communication_ID",
+      "to_table": "Communication",
+      "to_column": "Communication_ID"
+    },
+    {
+      "from_table": "CommunicationResponse",
+      "from_column": "Respondent_Personnel_ID",
+      "to_table": "Personnel",
+      "to_column": "Personnel_ID"
+    },
+    {
+      "from_table": "CommunicationResponse",
+      "from_column": "Response_Type_Value_ID",
+      "to_table": "AllowedValues",
+      "to_column": "AllowedValue_ID"
+    },
+    {
+      "from_table": "CommunicationResponse",
+      "from_column": "Response_Value_Value_ID",
+      "to_table": "AllowedValues",
+      "to_column": "AllowedValue_ID"
     },
     {
       "from_table": "Restriction",
@@ -917,13 +953,7 @@
       "from_column": "Linked_Document_ID",
       "to_table": "Document",
       "to_column": "Document_ID"
-    },
-    {
-      "from_table": "ActivityLog",
-      "from_column": "Actor_Personnel_ID",
-      "to_table": "Personnel",
-      "to_column": "Personnel_ID"
     }
   ],
-  "relationship_count": 154
+  "relationship_count": 159
 }

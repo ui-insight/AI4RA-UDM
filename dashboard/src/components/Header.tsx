@@ -13,7 +13,7 @@ export default function Header() {
               UDM Dashboard
             </h1>
             <span
-              title="UDM v2.0.1 released 2026-08-26"
+              title="UDM v2.1.0 released 2026-08-26"
               style={{
                 padding: '0.2rem 0.6rem',
                 borderRadius: 999,
@@ -24,7 +24,7 @@ export default function Header() {
                 letterSpacing: 0.5,
               }}
             >
-              v2.0.1
+              v2.1.0
             </span>
           </div>
           <p style={{ opacity: 0.9, fontSize: '1rem' }}>

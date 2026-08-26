@@ -1,6 +1,6 @@
 # UDM v2 Ontology
 
-This document describes the structure, conventions, and purpose of every entity in the AI4RA Unified Data Model, version 2. The UDM contains **49 tables** organized into **6 domains** plus two implementation tables, along with **12 reference views**.
+This document describes the structure, conventions, and purpose of every entity in the AI4RA Unified Data Model, version 2. The UDM contains **47 tables** organized into **6 domains** plus two implementation tables, along with **12 reference views**.
 
 For the canonical machine-readable specification, see [udm-v2-system-of-record.md](udm-v2-system-of-record.md) (prose) and [udm_schema_v2.json](../udm_schema_v2.json) (MySQL/MariaDB serialization at the repository root, alongside the v1 [udm_schema.json](../udm_schema.json)).
 
@@ -21,7 +21,7 @@ The guiding principle: if a concept is something a research administrator would 
 
 If you read the v1 ontology, the most visible changes:
 
-- **40 tables → 49 tables; 10 domains → 6 domains plus implementation tables.** v2 dropped some tables, added more, and reorganized domains. Domains now refer strictly to research-administration organizational concepts; AllowedValues and BudgetCategory are counted as implementation tables rather than a domain.
+- **40 tables → 47 tables (v2.1); 10 domains → 6 domains plus implementation tables.** v2 dropped some tables, added more, and reorganized domains. Domains now refer strictly to research-administration organizational concepts; AllowedValues and BudgetCategory are counted as implementation tables rather than a domain.
 - **Project as a first-class entity is gone.** Longitudinal-identity grouping is handled by `Proposal.Group_ID` + `Originating_Proposal_ID` (derived chain root) + `Award.Group_ID` (pre-filled from Proposal). See *Lineage mechanisms* below.
 - **ProjectRole became three tables.** `AwardRole` (people on the work), `OrganizationRole` (people at an Organization), `ProtocolRole` (people on a compliance protocol). Each answers a different question.
 - **Budget unified.** `ProposalBudget` + `AwardBudgetPeriod` + `AwardBudget` collapsed into a single `Budget` table with a `Lifecycle_Stage` discriminator (Proposed → Approved → Current → Actual).
@@ -114,6 +114,10 @@ Is_Active                   -- soft delete; true by default
 
 These are not repeated in the per-table reference; assume them present everywhere.
 
+### PolicyException
+
+An institutionally granted exception to a sponsor or institutional policy rule: PI-eligibility waivers, COI management exceptions, cost-share waivers. Scoped to a Personnel record, optionally narrowed to one Proposal, Award, or Subaward; all three scope FKs null means a blanket personal exception. Carries the rule code, justification, decision authority, and effective period. Lifecycle: Pending / Approved / Denied / Withdrawn / Expired.
+
 ### AllowedValues vs fixed Status enums
 
 The schema uses two approaches for controlling enumerated values.
@@ -151,16 +155,15 @@ Tables using this pattern:
 
 ### Polymorphic attachment
 
-Seven attachment tables can attach to any listed parent via two columns: `Related_Entity_Type` (the parent table name) and `Related_Entity_ID` (the parent row's PK). This generalizes the "attach a document to an award" idea to all the records that accumulate around an entity.
+Six polymorphic attachment tables can attach to any listed parent via two columns: `Related_Entity_Type` (the parent table name) and `Related_Entity_ID` (the parent row's PK). This generalizes the "attach a document to an award" idea to all the records that accumulate around an entity.
 
-The seven attachment tables:
+The six polymorphic attachment tables (CommunicationResponse, the seventh Attachments-domain table, attaches to Communication by direct FK):
 - `Document` — files
 - `Communication` — inbound/outbound correspondence with external parties
 - `Restriction` — operational constraints (CUI, CMMC, ITAR, etc.)
 - `Deadline` — ad-hoc obligations that don't have a first-class entity
 - `Classification` — subject tags and research-area codes
 - `Action` — work items (deliverables, checklist items, service requests)
-- `ActivityLog` — typed audit events
 
 Each attachment table's allowed `Related_Entity_Type` list is enumerated in its column reference. Enforcement is left to the institution (triggers, application logic, scheduled checks) but minimum conformance behavior is documented: no dangling refs on write, parent removal preserves attachments (soft delete), type-stable references.
 
@@ -235,28 +238,27 @@ Derivations include:
 - `Proposal.Originating_Proposal_ID` — root of Previous_Proposal_ID chain
 - `Subaward.Current_End_Date`, `Subaward.Current_PI_Personnel_ID` — symmetric to Award
 
-### Audit authority: Updated_At vs ActivityLog vs versioned storage
+### Audit authority: Updated_At vs versioned storage
 
 Three mechanisms answer "when did this change?", each at a different scope:
 
 - **`Updated_At`** — the most recent write to the row. Answers: is this row stale.
-- **`ActivityLog`** — curated typed business events (status transitions, operator actions, explicitly logged field changes). Append-only, not a CDC log. Answers: which curated business events touched this row.
 - **Versioned storage** (Dolt, Iceberg, temporal tables) — raw column history. Answers: what did column X look like on date D.
 
 ---
 
 ## Domains
 
-The 49 tables organize into 6 domains plus two implementation tables:
+The 47 tables organize into 6 domains plus two implementation tables:
 
 | Domain | Tables |
 |---|---|
 | **Actors** | Personnel, PersonnelCredential, Organization, OrganizationCapability, OrganizationIdentifier, OrganizationRole, ContactDetails |
-| **Funding Cycle** | RFA, RFARequirement, Proposal, ProposalApproval, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout, SubmissionProfile, SubmissionPackage, SubmissionAttempt |
+| **Funding Cycle** | RFA, RFARequirement, Proposal, ProposalApproval, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout |
 | **Effort** | AwardRole, Effort |
 | **Money** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment |
-| **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure |
-| **Attachments** | Document, Communication, Restriction, Deadline, Classification, Action, ActivityLog |
+| **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure, PolicyException |
+| **Attachments** | Document, Communication, Restriction, Deadline, Classification, Action, CommunicationResponse |
 | *Implementation tables (not a domain)* | AllowedValues, BudgetCategory |
 
 Domains refer to research-administration organizational concepts. AllowedValues and BudgetCategory support the model's mechanics — controlled vocabularies and shared reference codes — and are intentionally not counted as a domain.
@@ -309,7 +311,7 @@ Specific requirements extracted from an RFA. Acts as a template; per-proposal co
 
 ### Proposal
 
-A formal request for funding submitted to a sponsor. Tracks the full lifecycle: drafting, internal routing (via ProposalApproval), submission (via SubmissionPackage/SubmissionAttempt), and decision. Links to three distinct Organization roles: Sponsor, Submitting, Administering.
+A formal request for funding submitted to a sponsor. Tracks the full lifecycle: drafting, internal routing (via ProposalApproval), submission (recorded as a Sponsor_Submission Action), and decision. Links to three distinct Organization roles: Sponsor, Submitting, Administering.
 
 Carries lineage columns: `Previous_Proposal_ID` (resubmission/renewal/continuation), `Originating_Proposal_ID` (derived chain root), `Group_ID` (user-maintained grouping).
 
@@ -357,13 +359,6 @@ Scheduled or ad hoc deliverables to the sponsor: progress reports, RPPR, FFR (SF
 ### Closeout
 
 The closeout workflow object for an Award or Subaward. Coordinates several subworkflows (final report, final invoice, equipment disposition, IP closeout, COI closeout, records retention). Structured rather than narrative because federal closeout reporting requires a defined end state.
-
-### SubmissionProfile, SubmissionPackage, SubmissionAttempt
-
-The submission infrastructure:
-- **SubmissionProfile** — institution's connection configuration to a sponsor system (grants.gov, eRA Commons, etc.). Credentials are referenced by external secret-store path, not stored.
-- **SubmissionPackage** — immutable snapshot of documents and metadata assembled for submission. Versioned per Proposal. `Package_Hash` is SHA-256 of the assembled package.
-- **SubmissionAttempt** — one outbound transmission. Multiple attempts may reference the same package (retry, resubmit). Submission_System and Environment are denormalized at attempt creation for historical accuracy.
 
 ## Effort
 
@@ -471,7 +466,7 @@ Standardized budget line item categories (SF-424 R&R standard): Senior Personnel
 
 ## Attachments
 
-All seven Attachment tables share polymorphic `Related_Entity_Type` + `Related_Entity_ID` columns. Each table's allowed target list is enumerated in its column reference. Enforcement is left to the institution; minimum conformance behavior is documented.
+Six Attachment tables share polymorphic `Related_Entity_Type` + `Related_Entity_ID` columns; CommunicationResponse attaches to Communication by direct FK. Each table's allowed target list is enumerated in its column reference. Enforcement is left to the institution; minimum conformance behavior is documented.
 
 ### Document
 
@@ -479,7 +474,11 @@ Files associated with any entity. `Document_Type_Value_ID` resolves to AllowedVa
 
 ### Communication
 
-Inbound or outbound correspondence between the institution and an external party (sponsor program officer, subrecipient, committee, regulator). Distinct from Document (a file) and ActivityLog (a system audit event). Either `External_Personnel_ID` (preferred when the party is tracked as Personnel) or `External_Party_Name` (free text) identifies the external party.
+Inbound or outbound correspondence between the institution and an external party (sponsor program officer, subrecipient, committee, regulator). Distinct from Document (a file). Either `External_Personnel_ID` (preferred when the party is tracked as Personnel) or `External_Party_Name` (free text) identifies the external party.
+
+### CommunicationResponse
+
+A per-recipient structured response to a Communication. The Communication carries the message, a Deadline attached to the Communication carries the response window, and one row per intended recipient captures each structured response (designated-member-review polling, RPPR sign-off, COI reminders, JIT collection). Attaches to Communication by direct FK, not polymorphically. Lifecycle: Pending / Responded / Declined_To_Respond / Timed_Out / Withdrawn.
 
 ### Restriction
 
@@ -499,17 +498,9 @@ Worklist items attached to entities: deliverables, checklist items, service requ
 
 `Action_Type_Value_ID` resolves to AllowedValues; the recommended values list is documented per institution-extensibility.
 
-### ActivityLog
-
-Typed audit events. **Not a CDC log of every column update** — it records curated business events the institution chooses to surface: status transitions, operator actions, submission status changes, and explicitly logged field changes. Append-only.
-
-ActivityLog does not log to itself; ActivityLog rows do not appear in `Related_Entity_Type`.
-
----
-
 ## Semantic Conventions
 
-Beyond the universal patterns, the schema documents 19 semantic conventions covering rules that no column constraint can express. Highlights:
+Beyond the universal patterns, the schema documents 20 semantic conventions covering rules that no column constraint can express. Highlights:
 
 - **Modification vs Parent_Award_ID vs Previous_Award_ID** — when sponsor action issues a new Award_Number, it's a new Award; otherwise it's a Modification.
 - **AwardRole role-bearer changes** — when a PI (or other role-bearer) changes, end-date the prior row and insert a new one. No mutation in place.

@@ -2,7 +2,7 @@
 
 A universal data model for research administration. The UDM provides a common schema that any institution can adopt to standardize how research administration data is structured, described, and shared — regardless of what systems they use internally.
 
-**Current version: v2.0.1** (updated 2026-08-26; v2.0.0 released 2026-06-11). The v1 model is preserved for reference; see [Versions](#versions) below.
+**Current version: v2.1.0** (released 2026-08-26; v2.0.0 released 2026-06-11). The v1 model is preserved for reference; see [Versions](#versions) below.
 
 ## Mission
 
@@ -28,16 +28,16 @@ The two are kept in exact sync; the prose spec is authoritative on intent, the J
 
 ### Domain Organization
 
-The model's 49 tables are organized into six research administration domains, plus two implementation tables:
+The model's 47 tables are organized into six research administration domains, plus two implementation tables:
 
 | Domain | Tables | Purpose |
 |--------|--------|---------|
 | **Actors** | Personnel, PersonnelCredential, Organization, OrganizationCapability, OrganizationIdentifier, OrganizationRole, ContactDetails | People, organizations, their roles, credentials, and contact information |
-| **Funding Cycle** | RFA, RFARequirement, Proposal, ProposalApproval, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout, SubmissionProfile, SubmissionPackage, SubmissionAttempt | The full lifecycle from funding opportunity through proposal, award, and closeout |
+| **Funding Cycle** | RFA, RFARequirement, Proposal, ProposalApproval, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout | The full lifecycle from funding opportunity through proposal, award, and closeout |
 | **Effort** | AwardRole, Effort | Roles on funded work and effort certification |
 | **Money** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment | Budgets, accounting, transactions, rates, and capital assets |
-| **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure | IRB/IACUC protocols, COI, other support, and regulatory tracking |
-| **Attachments** | Document, Communication, Restriction, Deadline, Classification, Action, ActivityLog | Supporting records that attach polymorphically to entities across all domains |
+| **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure, PolicyException | IRB/IACUC protocols, COI, other support, policy exceptions, and regulatory tracking |
+| **Attachments** | Document, Communication, Restriction, Deadline, Classification, Action, CommunicationResponse | Supporting records that attach to entities across all domains |
 
 **Implementation tables** (not a domain): `AllowedValues` (institution-specific controlled vocabularies with cross-institution canonical codes) and `BudgetCategory` (shared budget category reference). Domains refer to research-administration organizational concepts; these two tables support the model's mechanics.
 
@@ -126,7 +126,7 @@ const response = await fetch('https://ui-insight.github.io/AI4RA-UDM/data/udm_sc
 const udm = await response.json();
 
 // Browse tables
-Object.keys(udm.tables);  // ["Account", "Action", "ActivityLog", ...]
+Object.keys(udm.tables);  // ["Account", "Action", "Award", ...]
 
 // Get a table's columns and descriptions
 udm.tables.Award.columns;
@@ -183,10 +183,10 @@ See the [Infrastructure tab](https://ui-insight.github.io/AI4RA-UDM/) of the das
 
 | Version | Status | Artifacts |
 |---------|--------|-----------|
-| **v2.0** | Current | [`udm_schema_v2.json`](udm_schema_v2.json), [prose spec](vignettes/udm-v2-system-of-record.md) |
+| **v2.1** | Current | [`udm_schema_v2.json`](udm_schema_v2.json), [prose spec](vignettes/udm-v2-system-of-record.md) |
 | v1.0 | Preserved for reference | [`udm_schema.json`](udm_schema.json) |
 
-v2 is a major refactor: 49 tables (from 40), six domains (from ten), unified lifecycle modeling, Award/Subaward symmetry, and rule catalogs for cross-row constraints and semantic conventions. See the [CHANGELOG](vignettes/CHANGELOG.md) for the full delta and migration guidance from v1.
+v2 is a major refactor: 47 tables (from 40), six domains (from ten), unified lifecycle modeling, Award/Subaward symmetry, and rule catalogs for cross-row constraints and semantic conventions. See the [CHANGELOG](vignettes/CHANGELOG.md) for the full delta and migration guidance from v1.
 
 ## Contributing
 
@@ -204,142 +204,144 @@ When `udm_schema_v2.json` is updated on `main`, CI automatically regenerates the
 ```mermaid
 graph TD
 
-    Account-->FinanceCode
-    Account-->Transaction
-    AllowedValues-->Action
-    AllowedValues-->Award
-    AllowedValues-->AwardRole
-    AllowedValues-->ComplianceRequirement
-    AllowedValues-->ConflictOfInterest
-    AllowedValues-->ContactDetails
-    AllowedValues-->CostShare
-    AllowedValues-->Deadline
-    AllowedValues-->Document
-    AllowedValues-->FinanceCode
-    AllowedValues-->Fund
-    AllowedValues-->Modification
-    AllowedValues-->OrganizationCapability
-    AllowedValues-->OrganizationRole
-    AllowedValues-->Proposal
-    AllowedValues-->ProtocolRole
-    AllowedValues-->RFA
-    AllowedValues-->Restriction
-    AllowedValues-->Transaction
+    Action-->AllowedValues
+    Action-->Document
+    Action-->Personnel
+    Award-->AllowedValues
     Award-->Award
-    Award-->AwardRole
-    Award-->Budget
-    Award-->Closeout
-    Award-->ComplianceCoverage
-    Award-->ConflictOfInterest
-    Award-->CostShare
-    Award-->Equipment
-    Award-->FinanceCode
-    Award-->Modification
-    Award-->Negotiation
-    Award-->OrganizationRole
-    Award-->OtherSupportDisclosure
-    Award-->Payment
-    Award-->PreAwardAuthorization
-    Award-->ProtocolRole
-    Award-->Report
-    Award-->Subaward
-    Award-->Terms
-    Award-->Transaction
-    AwardRole-->Effort
+    Award-->Organization
+    Award-->Personnel
+    Award-->Proposal
+    Award-->RFA
+    AwardRole-->AllowedValues
+    AwardRole-->Award
+    AwardRole-->Organization
+    AwardRole-->Personnel
+    AwardRole-->Subaward
+    Budget-->Award
     Budget-->Budget
-    Budget-->Payment
-    Budget-->Transaction
-    BudgetCategory-->Budget
-    ComplianceRequirement-->ComplianceCoverage
+    Budget-->BudgetCategory
+    Budget-->IndirectRate
+    Budget-->Proposal
+    Budget-->Subaward
+    Closeout-->Award
+    Closeout-->Subaward
+    Communication-->Organization
+    Communication-->Personnel
+    CommunicationResponse-->AllowedValues
+    CommunicationResponse-->Communication
+    CommunicationResponse-->Personnel
+    ComplianceCoverage-->Award
+    ComplianceCoverage-->ComplianceRequirement
+    ComplianceCoverage-->Subaward
+    ComplianceRequirement-->AllowedValues
     ComplianceRequirement-->ComplianceRequirement
-    ComplianceRequirement-->ProtocolRole
+    ComplianceRequirement-->Organization
+    ConflictOfInterest-->AllowedValues
+    ConflictOfInterest-->Award
+    ConflictOfInterest-->Organization
+    ConflictOfInterest-->OtherSupport
+    ConflictOfInterest-->Personnel
+    ContactDetails-->AllowedValues
+    ContactDetails-->Organization
+    ContactDetails-->Personnel
+    CostShare-->AllowedValues
+    CostShare-->Award
     CostShare-->CostShare
-    CostShare-->Transaction
-    Document-->Action
+    CostShare-->Proposal
+    CostShare-->Subaward
+    Deadline-->AllowedValues
+    Deadline-->Personnel
+    Document-->AllowedValues
     Document-->Document
-    Document-->Report
+    Document-->Personnel
+    Effort-->AwardRole
     Effort-->Effort
-    FinanceCode-->Transaction
-    Fund-->FinanceCode
-    Fund-->Transaction
-    IndirectRate-->Budget
-    Organization-->Award
-    Organization-->AwardRole
-    Organization-->Communication
-    Organization-->ComplianceRequirement
-    Organization-->ConflictOfInterest
-    Organization-->ContactDetails
-    Organization-->Equipment
-    Organization-->Fund
-    Organization-->Negotiation
+    Effort-->Personnel
+    Equipment-->Award
+    Equipment-->Organization
+    Equipment-->Personnel
+    Equipment-->Subaward
+    FinanceCode-->Account
+    FinanceCode-->AllowedValues
+    FinanceCode-->Award
+    FinanceCode-->Fund
+    Fund-->AllowedValues
+    Fund-->Organization
+    IndirectRate-->RateAgreement
+    Modification-->AllowedValues
+    Modification-->Award
+    Modification-->Subaward
+    Negotiation-->Award
+    Negotiation-->Organization
+    Negotiation-->Personnel
+    Negotiation-->Proposal
+    Negotiation-->Subaward
     Organization-->Organization
-    Organization-->OrganizationCapability
-    Organization-->OrganizationIdentifier
-    Organization-->OrganizationRole
-    Organization-->OtherSupport
-    Organization-->OtherSupportDisclosure
-    Organization-->Personnel
-    Organization-->PersonnelCredential
-    Organization-->Proposal
-    Organization-->RFA
-    Organization-->RateAgreement
-    Organization-->Subaward
-    Organization-->SubmissionProfile
-    OtherSupport-->ConflictOfInterest
-    OtherSupport-->OtherSupportDisclosure
+    OrganizationCapability-->AllowedValues
+    OrganizationCapability-->Organization
+    OrganizationIdentifier-->Organization
+    OrganizationRole-->AllowedValues
+    OrganizationRole-->Award
+    OrganizationRole-->Organization
+    OrganizationRole-->Personnel
+    OrganizationRole-->RFA
+    OrganizationRole-->Subaward
+    OtherSupport-->Organization
+    OtherSupport-->Personnel
+    OtherSupportDisclosure-->Award
+    OtherSupportDisclosure-->Organization
+    OtherSupportDisclosure-->OtherSupport
+    OtherSupportDisclosure-->Proposal
+    Payment-->Award
+    Payment-->Budget
     Payment-->Payment
-    Personnel-->Action
-    Personnel-->ActivityLog
-    Personnel-->Award
-    Personnel-->AwardRole
-    Personnel-->Communication
-    Personnel-->ConflictOfInterest
-    Personnel-->ContactDetails
-    Personnel-->Deadline
-    Personnel-->Document
-    Personnel-->Effort
-    Personnel-->Equipment
-    Personnel-->Negotiation
-    Personnel-->OrganizationRole
-    Personnel-->OtherSupport
-    Personnel-->PersonnelCredential
-    Personnel-->PreAwardAuthorization
-    Personnel-->ProposalApproval
-    Personnel-->ProtocolRole
-    Personnel-->Report
-    Personnel-->Restriction
-    Personnel-->Subaward
-    Proposal-->Award
-    Proposal-->Budget
-    Proposal-->CostShare
-    Proposal-->Negotiation
-    Proposal-->OtherSupportDisclosure
-    Proposal-->PreAwardAuthorization
+    Payment-->Subaward
+    Personnel-->Organization
+    PersonnelCredential-->Organization
+    PersonnelCredential-->Personnel
+    PolicyException-->Award
+    PolicyException-->Personnel
+    PolicyException-->Proposal
+    PolicyException-->Subaward
+    PreAwardAuthorization-->Award
+    PreAwardAuthorization-->Personnel
+    PreAwardAuthorization-->Proposal
+    Proposal-->AllowedValues
+    Proposal-->Organization
     Proposal-->Proposal
-    Proposal-->ProposalApproval
-    Proposal-->Subaward
-    Proposal-->SubmissionPackage
-    RFA-->Award
-    RFA-->OrganizationRole
-    RFA-->Proposal
-    RFA-->RFARequirement
-    RateAgreement-->IndirectRate
-    Subaward-->AwardRole
-    Subaward-->Budget
-    Subaward-->Closeout
-    Subaward-->ComplianceCoverage
-    Subaward-->CostShare
-    Subaward-->Equipment
-    Subaward-->Modification
-    Subaward-->Negotiation
-    Subaward-->OrganizationRole
-    Subaward-->Payment
-    Subaward-->ProtocolRole
-    Subaward-->Report
+    Proposal-->RFA
+    ProposalApproval-->Personnel
+    ProposalApproval-->Proposal
+    ProtocolRole-->AllowedValues
+    ProtocolRole-->Award
+    ProtocolRole-->ComplianceRequirement
+    ProtocolRole-->Personnel
+    ProtocolRole-->Subaward
+    RFA-->AllowedValues
+    RFA-->Organization
+    RFARequirement-->RFA
+    RateAgreement-->Organization
+    Report-->Award
+    Report-->Document
+    Report-->Personnel
+    Report-->Subaward
+    Restriction-->AllowedValues
+    Restriction-->Personnel
+    Subaward-->Award
+    Subaward-->Organization
+    Subaward-->Personnel
+    Subaward-->Proposal
     Subaward-->Subaward
-    Subaward-->Terms
-    Subaward-->Transaction
-    SubmissionPackage-->SubmissionAttempt
-    SubmissionProfile-->SubmissionAttempt
+    Terms-->Award
+    Terms-->Subaward
+    Transaction-->Account
+    Transaction-->AllowedValues
+    Transaction-->Award
+    Transaction-->Budget
+    Transaction-->CostShare
+    Transaction-->FinanceCode
+    Transaction-->Fund
+    Transaction-->Subaward
 ```
 <!-- ERD_END -->

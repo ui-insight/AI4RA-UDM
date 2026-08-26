@@ -23,6 +23,7 @@ SCHEMA_PATH = Path(__file__).resolve().parent.parent / "udm_schema_v2.json"
 
 REQUIRED_TOP_LEVEL = [
     "metadata",
+    "architecture",
     "column_synonyms",
     "scope",
     "domain_membership",

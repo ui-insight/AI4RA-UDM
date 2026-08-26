@@ -37,9 +37,6 @@ export const domainGroups: DomainGroup[] = [
       'Terms',
       'Report',
       'Closeout',
-      'SubmissionProfile',
-      'SubmissionPackage',
-      'SubmissionAttempt',
     ],
   },
   {
@@ -73,6 +70,7 @@ export const domainGroups: DomainGroup[] = [
       'ConflictOfInterest',
       'OtherSupport',
       'OtherSupportDisclosure',
+      'PolicyException',
     ],
   },
   {
@@ -85,7 +83,7 @@ export const domainGroups: DomainGroup[] = [
       'Deadline',
       'Classification',
       'Action',
-      'ActivityLog',
+      'CommunicationResponse',
     ],
   },
 ];

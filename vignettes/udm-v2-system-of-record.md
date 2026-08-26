@@ -28,16 +28,38 @@ Where the spec says "is unique," "must reference," "sums to N," or "is required,
 
 ---
 
+## Architecture
+
+**The UDM is the data model of the System of Record.** That single claim anchors what belongs in the model and what does not.
+
+| Layer | Standard term | Holds | Tech profile | Examples |
+|---|---|---|---|---|
+| 1 | System of Record | UDM source-of-truth research administration data | Versioned OLAP storage with transaction metadata capture | Apache Iceberg + Nessie, Dolt, PostgreSQL temporal tables |
+| 2 | System of Insight | Derived data: review findings, dashboards, reports, computed aggregates | View / projection layer inside the System of Record's query engine | Trino views, materialized views |
+| 3 | System of Engagement | Non-UDM application infrastructure: authentication, session state, submission tooling, in-flight drafts, observability | OLTP, transactional, user-facing | PostgreSQL or equivalent |
+
+ETL or streaming pipelines carry finalized application data from the System of Engagement into the System of Record. The System of Insight requires no data movement; it lives entirely inside the System of Record's query engine.
+
+**The regeneration test.** Data belongs in UDM only if it is source-of-truth research administration data that cannot be regenerated from other UDM data plus engine logic. Derived data (review findings, requirement-satisfaction checklists, computed aggregates) lives in the System of Insight. Infrastructure data (sessions, submission tooling artifacts, telemetry) lives in the System of Engagement. Row history lives in the storage layer's versioned history; UDM has no audit-log entity for this reason.
+
+**Conformance tiers.** An implementation is described by what it adopts:
+
+- **Core** — the canonical tables in this document. Required for any UDM implementation.
+- **Standard modules** — optional, fully specified, versioned extensions (planned: compliance protocols, governance, research outputs). An implementation declares which modules it adopts, e.g. "UDM 2.x core + modules: governance, outputs."
+- **Local extensions** — institution-specific additions outside the specification. The *Optional extensions* section documents common cases and where they belong.
+
+---
+
 ## Domains
 
 | Domain | Tables |
 |---|---|
 | **Actors** | Personnel, PersonnelCredential, Organization, OrganizationCapability, OrganizationIdentifier, OrganizationRole, ContactDetails |
-| **Funding Cycle** | RFA, RFARequirement, Proposal, ProposalApproval, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout, SubmissionProfile, SubmissionPackage, SubmissionAttempt |
+| **Funding Cycle** | RFA, RFARequirement, Proposal, ProposalApproval, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout |
 | **Effort** | AwardRole, Effort |
 | **Money** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment |
 | **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure |
-| **Attachments** | Document, Communication, Restriction, Deadline, Classification, Action, ActivityLog |
+| **Attachments** | Document, Communication, Restriction, Deadline, Classification, Action, CommunicationResponse |
 
 Domains refer to research-administration organizational concepts. Two additional tables — **AllowedValues** and **BudgetCategory** — are implementation tables that support the model's mechanics (controlled vocabularies and shared reference codes) and are intentionally not counted as a domain. They are documented at the end of the Table reference.
 
@@ -137,15 +159,14 @@ Every table includes the following columns. They are not repeated in the per-tab
 | `Source_Record_ID` | ID | optional | The originating record's identifier in the source system; preserves provenance for downstream reconciliation |
 | `Is_Active` | Boolean | required | Default true; used for soft-delete and to distinguish currently-valid records from historical ones. Tables with their own lifecycle/status fields may rely on those instead and treat Is_Active as always true |
 
-### Audit authority: Updated_At vs ActivityLog vs versioned storage
+### Audit authority: Updated_At vs versioned storage
 
 Three mechanisms touch the question "when did this change?" and each answers a different scope:
 
 - `Updated_At` marks the moment of the most recent write to the row. Single timestamp, overwritten on every update; preserves no history.
-- `ActivityLog` records **typed business events** the institution chooses to surface: status transitions, operator actions, submission status changes, and explicitly logged field changes. It is append-only and curated — not a CDC log of every column update. Institutions log the events that matter to their audit story; the `Activity_Type = 'field_change'` value is available for institutions that want to surface specific column changes (e.g., Award.PI_Personnel_ID, Modification.Approval_Status) but is not expected to capture every row write.
 - **Versioned storage** (Dolt, Trino on Apache Iceberg, temporal tables in Postgres / SQL Server) handles the raw-column-history layer when needed. Time-travel queries reconstruct any field's prior value at any past point in time without application instrumentation. The UDM assumes this layer for deployments that need full row history (see *Optional extensions > Field-level audit / history tables*).
 
-So: `Updated_At` answers "is this row stale." `ActivityLog` answers "which curated business events touched this row, and when." Versioned storage answers "what did column X look like on date D." When `Updated_At` and an `ActivityLog` field_change entry appear to disagree, the field_change entry is authoritative for the surfaced business event; the underlying raw column history (if needed) lives at the storage layer.
+So: `Updated_At` answers "is this row stale." Versioned storage answers "what did column X look like on date D, and which business events touched this row." Any history question deeper than the latest write resolves at the storage layer; the "Audit record shape" pattern (vignettes/udm-v2-patterns.md) documents the canonical projected shape.
 
 ### Is_Active vs status-field authority
 
@@ -250,7 +271,7 @@ Foreign-engagement disclosures (foreign affiliations, foreign appointments, fore
 **Sponsor decision artifacts (NoA, decline letter, modification notice).** Sponsor-issued decision documents have three independent representations:
 
 - The **document** itself (the NoA PDF, the modification notice email) is a `Document` row with the appropriate Document_Type (NOA / Modification_Notice / Decline_Letter / etc.) attached to the relevant entity (Proposal, Award, Modification).
-- The **decision's effect on schema state** is captured by updating the relevant status field (Proposal.Decision_Status='Awarded', Modification.Approval_Status='Approved') and recording the transition in ActivityLog.
+- The **decision's effect on schema state** is captured by updating the relevant status field (Proposal.Decision_Status='Awarded', Modification.Approval_Status='Approved') with the transition preserved by the storage layer's versioned history.
 - The **accompanying correspondence** (program officer's email transmitting the decision) is a `Communication` row attached to the same parent.
 
 No single entity captures "the decision" abstractly; the three representations together do.
@@ -266,6 +287,14 @@ No single entity captures "the decision" abstractly; the three representations t
 **Internal funding represented as an Award.** An internally-funded pilot is modeled as an Award row whose `Sponsor_Organization_ID` is the internal sponsor (the VPR's office, the dean's office, etc.). Budget, Transaction, Payment, CostShare, Equipment, FinanceCode, Modification, and Closeout all attach to that Award using the same structures as for an externally-funded Award. The funding instrument is always an Award (or Subaward) regardless of whether the sponsor is external or internal.
 
 **Action.Outcome_Description.** When an Action records a structured workflow with a substantive result (Subrecipient_Risk_Review, Modification_Approval, Cost_Transfer_Approval), the outcome lives in `Outcome_Description` plus an optional `Linked_Document_ID` for the formal report.
+
+**Sponsor submission events.** The *fact* that a proposal was submitted to a sponsor is research-administration data; the *mechanics* of how the submission tooling assembled and transmitted it are not.
+
+- Each submission event is one `Action` row attached to the Proposal (`Related_Entity_Type = 'Proposal'`) with `Action_Type` resolving to `Sponsor_Submission`.
+- `Completed_Date` carries the actual submission (or rejection) timestamp; `Action_Status` is `Completed` on success or `Failed`.
+- Sponsor confirmation / tracking numbers live in `Outcome_Description` as free text; a System of Insight view extracts them when an indexed lookup is needed.
+- Re-submissions add additional `Action` rows; re-submission history is the natural row sequence.
+- Package assembly artifacts, connection profiles, and retry mechanics are submission-tooling internals and live in the System of Engagement.
 
 ---
 
@@ -336,8 +365,8 @@ Universal status taxonomies are listed here in one place. Each is enforced where
 | `Restriction_Status` | Active, Expired, Lifted, Pending_Review |
 | `Deadline_Status` | Open, Approaching, Overdue, Met, Waived |
 | `Action_Status` | Open, In_Progress, Blocked, Completed, Cancelled |
-| `Package_Status` (Submission) | Assembled, Submitted, Withdrawn |
-| `Attempt_Status` (Submission) | submitting, submitted, received, validated, accepted, rejected, error |
+| `Exception_Status` (PolicyException) | Pending, Approved, Denied, Withdrawn, Expired |
+| `Response_Status` (CommunicationResponse) | Pending, Responded, Declined_To_Respond, Timed_Out, Withdrawn |
 
 **Lifecycle_Stage vs *_Status (Payment).** The Lifecycle_Stage discriminator on Payment names which *shape* of payment data a row holds (Scheduled → Invoiced → Received → Reconciled). Payment_Status names the row's *disposition* (whether the payment is on-track, contested, or withdrawn). The two are orthogonal: a Payment at Lifecycle_Stage = 'Invoiced' may carry Payment_Status = 'Disputed' (the invoice was submitted and the sponsor pushed back) or Payment_Status = 'Cancelled' (the invoice was withdrawn). Query writers filter by Lifecycle_Stage to select a row shape and by Payment_Status to filter healthy vs problem rows.
 
@@ -347,11 +376,11 @@ CostShare has no separate `*_Status` column; CostShare.Lifecycle_Stage is author
 
 ## Polymorphic attachment enforcement
 
-The seven Attachment tables (Document, Communication, Restriction, Deadline, Classification, Action, ActivityLog) use a polymorphic foreign key (`Related_Entity_Type` + `Related_Entity_ID`) that no single declarative reference can fully enforce.
+The six polymorphic Attachment tables (Document, Communication, Restriction, Deadline, Classification, Action) use a polymorphic foreign key (`Related_Entity_Type` + `Related_Entity_ID`) that no single declarative reference can fully enforce.
 
 The model requires two enforcement properties:
 
-1. **`Related_Entity_Type` is constrained** to a per-attachment allowed list of target table names (enumerated in each attachment's table reference). One deliberate exception: ActivityLog does not enumerate its targets — any UDM table except ActivityLog itself is a valid target — to avoid drift as the canonical table set evolves.
+1. **`Related_Entity_Type` is constrained** to a per-attachment allowed list of target table names (enumerated in each attachment's table reference).
 2. **`Related_Entity_ID` references an existing row** in the table named by `Related_Entity_Type`.
 
 Implementations satisfy (1) using the platform's enumeration mechanism. Implementations satisfy (2) using whatever the platform provides: database triggers, application-layer hooks, scheduled integrity checks, or other mechanisms appropriate to the institution's stack. The *Implementation guidance* section discusses common approaches; the schema does not prescribe one. Removal behavior (what happens to attached rows when the parent is removed) is an institutional choice and is not specified.
@@ -424,7 +453,6 @@ The following rules require enforcement beyond what a single column declaration 
 | Negotiation | `Negotiation_End_Date` is required when `Negotiation_Status` is `Resolved` or `Abandoned` |
 | Terms | Exactly one of `Award_ID` or `Subaward_ID` is non-null |
 | Terms | One Terms row per parent agreement |
-| SubmissionAttempt | `Attempt_Number` is unique within (`SubmissionPackage_ID`, `SubmissionProfile_ID`) |
 | AwardRole | Exactly one of `Award_ID` or `Subaward_ID` is non-null |
 | AwardRole | For a given (parent agreement, `Personnel_ID`, `Role_Value_ID`), the `(Start_Date, End_Date)` ranges are non-overlapping (null `End_Date` is treated as +infinity) |
 | AwardRole | `FTE_Percent` is between 0.00 and 100.00 |
@@ -897,49 +925,6 @@ The closeout workflow object for an Award or Subaward. Each closeout coordinates
 | Final_Closeout_Date | Date | conditional | Required when Closeout_Status = 'Complete' |
 | Closeout_Status | Status | required | Constrained: In_Progress / Pending_Sponsor_Final_Audit / Complete / Reopened |
 
-#### SubmissionProfile
-
-Configuration of an institution's connection to a sponsor's electronic submission system.
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| SubmissionProfile_ID | ID | required | PK |
-| Organization_ID | ID | required | → Organization (the sponsor) |
-| Submission_System | Status | required | Constrained: grants_gov / research_gov / era_commons / nspires / manual / other |
-| Environment | Status | required | Constrained: training / production |
-| Credential_Reference_Path | URL | optional | External secret-store path; credentials are NOT stored in the schema |
-
-#### SubmissionPackage
-
-An immutable snapshot of the documents and metadata assembled for submission.
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| SubmissionPackage_ID | ID | required | PK |
-| Proposal_ID | ID | required | → Proposal |
-| Package_Version | Count | required | Default 1; increments per snapshot |
-| Package_Hash | Hash | required | SHA-256 of the assembled package |
-| Assembled_Date | Timestamp | required | |
-| Package_Status | Status | required | See Status taxonomy |
-
-#### SubmissionAttempt
-
-One outbound transmission of a SubmissionPackage to an external sponsor system.
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| SubmissionAttempt_ID | ID | required | PK |
-| SubmissionPackage_ID | ID | required | → SubmissionPackage |
-| SubmissionProfile_ID | ID | required | → SubmissionProfile |
-| Submission_System | Status | required | Denormalized from the profile at attempt creation for historical accuracy |
-| Environment | Status | required | Same; constrained to: training / production |
-| Attempt_Number | Count | required | Unique within (SubmissionPackage, SubmissionProfile) |
-| Submitted_Timestamp | Timestamp | required | |
-| Attempt_Status | Status | required | See Status taxonomy |
-| Sponsor_Confirmation_Number | ShortName | optional | Sponsor-issued upon acceptance |
-
----
-
 ### Effort
 
 #### AwardRole
@@ -1272,6 +1257,31 @@ A single disclosure event of an OtherSupport row. The same outside appointment i
 
 ---
 
+#### PolicyException
+
+An institutionally granted exception to a sponsor or institutional policy rule: a PI-eligibility waiver, a COI management exception, a cost-share waiver, an indirect-rate exception. Scoped to a Personnel record, optionally narrowed to one Proposal, Award, or Subaward; all three scope FKs null means a blanket exception for the person (e.g., a reduced effort minimum for a sabbatical year). One row per person, even when several personnel on one proposal need the same waiver; exceptions are personal even when they share a triggering context.
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| PolicyException_ID | ID | required | PK |
+| Personnel_ID | ID | required | → Personnel. The person to whom the exception is granted |
+| Policy_Rule_Code | ShortCode | required | Identifies the rule being excepted. Recommended values: PI_Eligibility_Appointment_Type / PI_Eligibility_Degree / PI_Eligibility_Years_Since_Degree / Co_PI_Eligibility / COI_Disqualifying_Engagement / COI_Management_Plan_Required / Cost_Share_Minimum / Indirect_Rate_Minimum / Foreign_Collaboration_Restriction / Sponsor_Specific_Other |
+| Requested_Action | LongText | required | What the exception enables |
+| Justification | LongText | required | Why the exception is requested |
+| Proposal_ID | ID | optional | → Proposal. At most one of Proposal_ID / Award_ID / Subaward_ID is non-null |
+| Award_ID | ID | optional | → Award |
+| Subaward_ID | ID | optional | → Subaward |
+| Requested_Date | Date | required | |
+| Requested_By_Personnel_ID | ID | required | → Personnel. Who submitted the request |
+| Exception_Status | Status | required | Constrained: Pending / Approved / Denied / Withdrawn / Expired |
+| Decided_By_Personnel_ID | ID | conditional | → Personnel. Required when Exception_Status reaches a terminal value |
+| Decision_Date | Date | conditional | Required when Exception_Status reaches a terminal value |
+| Decision_Notes | LongText | optional | Decision authority's rationale |
+| Effective_Start_Date | Date | optional | Often equals Decision_Date |
+| Effective_End_Date | Date | optional | Null means indefinite or until policy changes |
+
+A policy exception is a substantive regulatory event, not a work item: `Action`'s assigned / completed lifecycle does not map to requested / approved / denied / withdrawn / expired. Exception grants are also independent of proposal-routing approvals; an exception may be granted before any proposal exists. Multi-step exception review, where wanted, uses the `ProposalApproval` pattern; supporting letters attach as Documents.
+
 ### Implementation tables
 
 Not a domain: these tables support the model's mechanics (controlled vocabularies and shared reference codes) rather than a research-administration organizational concept.
@@ -1307,7 +1317,7 @@ Standardized budget line item categories (SF-424 R&R standard).
 
 ### Attachments
 
-All seven Attachment tables share the polymorphic columns `Related_Entity_Type` and `Related_Entity_ID`. Enforcement rules are described in *Polymorphic attachment enforcement* above. Each table's allowed `Related_Entity_Type` values are listed in its Notes column.
+Six of the Attachment tables share the polymorphic columns `Related_Entity_Type` and `Related_Entity_ID`; CommunicationResponse attaches to Communication by direct foreign key. Enforcement rules are described in *Polymorphic attachment enforcement* above. Each table's allowed `Related_Entity_Type` values are listed in its Notes column.
 
 **Deadline vs Action.** Both Deadline and Action carry a due date, a responsible person, and a status. They differ in what they primarily describe:
 
@@ -1322,7 +1332,7 @@ Files associated with any entity.
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | Document_ID | ID | required | PK |
-| Related_Entity_Type | Status | required | Constrained: Award / Subaward / Proposal / ProposalApproval / PreAwardAuthorization / Personnel / PersonnelCredential / ComplianceRequirement / SubmissionPackage / Modification / Action / Restriction / Budget / Negotiation / Terms / Report / Closeout / Equipment |
+| Related_Entity_Type | Status | required | Constrained: Award / Subaward / Proposal / ProposalApproval / PreAwardAuthorization / Personnel / PersonnelCredential / ComplianceRequirement / Modification / Action / Restriction / Budget / Negotiation / Terms / Report / Closeout / Equipment |
 | Related_Entity_ID | ID | required | The PK value in the table named by Related_Entity_Type |
 | Document_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'DocumentType'`. Recommended values: NOA / Biosketch / DMP / Budget_Justification / Other_Support / Public_Access_Plan / LOI / Sponsor_Agreement / Subaward_Agreement / Modification_Notice / Approved_Items_Schedule / Closeout_Document / Compliance_Approval_Letter / Restriction_Authority_Document / Training_Certificate |
 | File_Name | MediumName | required | |
@@ -1336,7 +1346,7 @@ Files associated with any entity.
 
 #### Communication
 
-Inbound or outbound correspondence between the institution and an external party (sponsor program officer, subrecipient, committee, regulator). Distinct from Document (which is a file) and from ActivityLog (which is a system audit event). A Communication may have one or more Document rows attached when the correspondence includes file attachments.
+Inbound or outbound correspondence between the institution and an external party (sponsor program officer, subrecipient, committee, regulator). Distinct from Document (which is a file). A Communication may have one or more Document rows attached when the correspondence includes file attachments.
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
@@ -1352,6 +1362,23 @@ Inbound or outbound correspondence between the institution and an external party
 | External_Personnel_ID | ID | optional | → Personnel. The external participant when tracked in Personnel. Use this whenever the external party already exists as a Personnel row; prefer this over `External_Party_Name` |
 | External_Party_Name | MediumName | optional | Free-text name of the external party when no Personnel record exists. Use only when the external party is a one-off contact, a sponsor mailbox / correspondence team (e.g., "NIH Grants Management"), or someone the institution does not maintain as a Personnel row. When the external party is later promoted to a Personnel row, the institution may update prior Communication rows to set `External_Personnel_ID` and null `External_Party_Name` |
 | External_Organization_ID | ID | optional | → Organization. The external party's organization |
+
+#### CommunicationResponse
+
+A per-recipient structured response to a Communication. Several workflows collect structured responses to a notification within a deadline: designated-member-review polling, RPPR co-PI sign-off, COI annual disclosure reminders, Just-in-Time component collection, effort-certification reminders. The Communication carries the message; a Deadline attached to the Communication carries the response window; each recipient's response is one row here. This table attaches to Communication by direct foreign key, not polymorphically.
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| CommunicationResponse_ID | ID | required | PK |
+| Communication_ID | ID | required | → Communication. The originating notification |
+| Respondent_Personnel_ID | ID | required | → Personnel. One row per respondent per communication |
+| Response_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'CommunicationResponseType'`. Recommended values: DMR_FCR / RPPR_Signoff / COI_Annual / IRB_Concurrence / JIT_Component / Effort_Certification |
+| Response_Value_Value_ID | ID | conditional | → AllowedValues, from the Value_Group keyed by the response type. Required when Response_Status = 'Responded'. The host system enforces the type-to-value-group mapping |
+| Responded_At | Timestamp | conditional | Required when Response_Status = 'Responded' |
+| Notes | LongText | optional | Free-text comment from the respondent |
+| Response_Status | Status | required | Constrained: Pending / Responded / Declined_To_Respond / Timed_Out / Withdrawn |
+
+The cycle: the sender creates a Communication attached to the parent entity the notification is about, attaches a Deadline to the Communication for the response window, and pre-creates one Pending row per intended recipient. Rows update to Responded as recipients act; remaining Pending rows transition to Timed_Out when the Deadline passes; a recipient removed mid-cycle transitions to Withdrawn. Workflow logic for the originating cycle reads the rows and acts.
 
 #### Restriction
 
@@ -1424,23 +1451,27 @@ Work items attached to entities: deliverables, checklist items, service requests
 | Outcome_Description | LongText | optional | Free-text outcome when the Action records a structured workflow with a result (subrecipient risk review outcome, modification approval rationale, training completion notes). Used together with `Linked_Document_ID` when the formal outcome lives in an attached document |
 | Linked_Document_ID | ID | optional | → Document (e.g., the deliverable file, training certificate when Completed, the formal subrecipient risk review report) |
 
-#### ActivityLog
+## Worked examples
 
-Typed audit events on entities.
+### Encoding a fixed approval chain on ProposalApproval
 
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| ActivityLog_ID | ID | required | PK |
-| Related_Entity_Type | Status | required | Constrained to any UDM table name except ActivityLog itself (the table reference in this spec is authoritative for the set). Not enumerated inline to avoid drift when the canonical table set evolves |
-| Related_Entity_ID | ID | required | |
-| Activity_Type | Status | required | Constrained: data_change / submission_status_change / operator_action / field_change / status_transition. (Agency / sponsor correspondence lives in Communication, not here.) |
-| Activity_Timestamp | Timestamp | required | |
-| Actor_Personnel_ID | ID | optional | → Personnel. Null for system-initiated events |
-| Old_Value | LongText | optional | For Activity_Type = 'field_change' |
-| New_Value | LongText | optional | For Activity_Type = 'field_change' |
-| Description | LongText | optional | Free-text description; for field changes, includes the field name |
+`ProposalApproval` is a configurable sign-off sequence, not a fixed chain. An institution whose routing is always PI Certification → Department Chair → College Dean → OSP encodes it as:
 
-ActivityLog does not log to itself; ActivityLog rows do not appear in `Related_Entity_Type`.
+- Four `ProposalApproval` rows per Proposal, created at routing time, with `Approval_Step_Order` = 1-4 and `Approval_Role` drawn from an AllowedValues group (`PI_Certification`, `Department_Approval`, `College_Approval`, `OSP_Approval`).
+- Auto-assignment policy is application logic: the application resolves each role to a Personnel via OrganizationRole (who chairs the PI's department, who is the dean of the college) and sets `Approver_Personnel_ID` at row creation.
+- "This step is always third" is data, not schema: the fixed chain is a row-template the application applies. An institution with per-RFA or per-sponsor variation applies a different template; the schema does not change.
+- A step is complete when `Approval_Status` reaches a terminal value with `Action_Date` set; the proposal may not advance while any row with a lower `Approval_Step_Order` is non-terminal. That gate is institutional workflow logic reading the rows.
+
+### Correspondence with follow-up: Communication + Action
+
+An inbound sponsor letter requires a response by a date and ultimately drives a Modification:
+
+1. The letter is a `Communication` row attached to the Award (`Direction` inbound, `External_Personnel_ID` = the program officer) with the letter itself as an attached Document.
+2. The follow-up obligation is an `Action` row attached to the same Award: assignee, `Due_Date`, `Action_Status`. The Action's `Description` names the Communication it answers.
+3. When the response drives a Modification, the resulting `Modification` row carries the substantive change; the Action's `Outcome_Description` records the resolution and its `Linked_Document_ID` points at the response document.
+4. "Action required / action resolved" reads off the Action's lifecycle; the correspondence trail reads off Communication rows attached to the Award; the contractual effect reads off the Modification.
+
+Convention: attachments reference other attachments by attaching to the same parent entity and naming each other in text fields, not by FK. The one structured cross-link is `Action.Linked_Document_ID`. If adopter experience shows an indexed Communication-to-Action link is needed, that is a v2.2 column addition, not a modeling change.
 
 ---
 
@@ -1493,7 +1524,7 @@ Institutions with substantial ticket volume that need structured analysis beyond
 - Audit and provenance columns (Created_At, Updated_At, Created_By_Personnel_ID, Updated_By_Personnel_ID, Source_System, Source_Record_ID, Is_Active) are universal across every table.
 - Hub entities: Personnel, Organization, Proposal, Award, AllowedValues.
 - Lifecycle_Stage tables: Budget, Effort, CostShare, Payment. Lifecycle_Stage is authoritative for these tables' state; once a row has a later-stage descendant, its primary fields are immutable.
-- Polymorphic Attachment tables: Document, Communication, Restriction, Deadline, Classification, Action, ActivityLog. These generalize the everyday "attach a document to an award" idea to all the records that accumulate around an entity. Deadline tracks *when* an obligation is due; Action tracks *what* work to do.
+- Polymorphic Attachment tables: Document, Communication, Restriction, Deadline, Classification, Action. These generalize the everyday "attach a document to an award" idea to all the records that accumulate around an entity. Deadline tracks *when* an obligation is due; Action tracks *what* work to do.
 - Subaward spans pre-award (Proposal_ID, Subaward_Status='Proposed') and post-award (Prime_Award_ID, Subaward_Status≥Pending) on a single row identity. Subaward is a first-class parent for Terms, Budget, Payment, Modification, Transaction, CostShare, Equipment, Report, Closeout, and all Attachment tables via the two-FK exclusive-or attachment pattern. Subaward carries Administering_Organization_ID and Parent_Subaward_ID to match Award's structure.
 - Award.Parent_Award_ID groups incremental segments under one award identity; Award.Previous_Award_ID points at the predecessor on a competing renewal (parallel to Proposal.Previous_Proposal_ID). Award.Originating_Award_ID is a derived stored column pointing at the root of the Previous_Award_ID chain (parallel to Proposal.Originating_Proposal_ID), so lineage queries do not require recursive CTE traversal. Subaward renewal lineage flows through the Prime Award chain (no dedicated `Previous_Subaward_ID`); Subaward.Parent_Subaward_ID handles within-prime cascading/amended subawards. The discriminator between Modification, Parent_Award_ID, and Previous_Award_ID is documented in *Semantic conventions*.
 - Organization_Type carries structural classification (Department / College / School / Institute / Center / External). Functional roles (Sponsor, Subrecipient, Vendor, Committee, Prime_Sponsor, Program_Office, Pass_Through_Entity) are recorded as OrganizationCapability rows so a single Organization can play multiple roles across contexts.
