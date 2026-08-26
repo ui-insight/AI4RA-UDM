@@ -42,6 +42,16 @@ ETL or streaming pipelines carry finalized application data from the System of E
 
 **The regeneration test.** Data belongs in UDM only if it is source-of-truth research administration data that cannot be regenerated from other UDM data plus engine logic. Derived data (review findings, requirement-satisfaction checklists, computed aggregates) lives in the System of Insight. Infrastructure data (sessions, submission tooling artifacts, telemetry) lives in the System of Engagement. Row history lives in the storage layer's versioned history; UDM has no audit-log entity for this reason.
 
+**Where logic lives.** Logic follows the same layering as data. The UDM fully specifies the logic the System of Record owns, ships reference implementations for the System of Insight, and deliberately leaves workflow logic to the institution.
+
+| Kind of logic | Examples | Where it lives | How the UDM specifies it |
+|---|---|---|---|
+| Invariants (validation) | Two-FK exclusive-or, lifecycle chain rules, conditional-required columns | System of Record enforcement; mechanism (constraint, trigger, scheduled check) is the institution's choice | Typed cross-row constraints, machine-readable |
+| Derivation | Current_End_Date, Current_Total_Funded, lineage roots | Write-path recompute against the System of Record | Derived-value rules with documented recompute triggers |
+| Business / analytical | Active awards, overdue reports, requirement satisfaction, review findings | System of Insight views over UDM data | Example views as reference implementations; finding and checklist shapes documented as patterns |
+| Workflow / process | Approval gating, reviewer auto-assignment, escalation | System of Engagement application code, reading Insight views | Deliberately unspecified; the spec documents the data the workflow reads, never the workflow itself |
+| Usage conventions | Modification vs new Award, role-bearer changes, submission events | Consumers and integrators | Semantic conventions |
+
 **Conformance tiers.** An implementation is described by what it adopts:
 
 - **Core** — the canonical tables in this document. Required for any UDM implementation.

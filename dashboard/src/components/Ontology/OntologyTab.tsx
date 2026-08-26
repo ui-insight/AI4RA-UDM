@@ -43,9 +43,116 @@ const suffixes = [
   { suffix: '_Number', purpose: 'Sequential or reference number', example: 'Award_Number, Modification_Number' },
 ];
 
+const th: React.CSSProperties = {
+  textAlign: 'left', padding: '0.6rem 0.75rem', background: '#f8f9fa',
+  color: '#2c3e50', borderBottom: '2px solid #e9ecef', fontSize: '0.9rem',
+};
+const td: React.CSSProperties = {
+  padding: '0.6rem 0.75rem', borderBottom: '1px solid #e9ecef',
+  color: '#546e7a', fontSize: '0.9rem', verticalAlign: 'top',
+};
+
+const layers = [
+  { n: '1', name: 'System of Record', holds: 'UDM source-of-truth research administration data', profile: 'Versioned OLAP storage with transaction metadata capture', examples: 'Apache Iceberg + Nessie, Dolt, PostgreSQL temporal tables' },
+  { n: '2', name: 'System of Insight', holds: 'Derived data: review findings, dashboards, reports, computed aggregates', profile: "View / projection layer inside the System of Record's query engine", examples: 'Trino views, materialized views' },
+  { n: '3', name: 'System of Engagement', holds: 'Non-UDM application infrastructure: authentication, session state, submission tooling, in-flight drafts, observability', profile: 'OLTP, transactional, user-facing', examples: 'PostgreSQL or equivalent' },
+];
+
+const logicKinds = [
+  { kind: 'Invariants (validation)', examples: 'Two-FK exclusive-or, lifecycle chain rules, conditional-required columns', home: 'System of Record enforcement; mechanism (constraint, trigger, scheduled check) is the institution’s choice', spec: '71 typed cross-row constraints, machine-readable' },
+  { kind: 'Derivation', examples: 'Award.Current_End_Date, Current_Total_Funded, lineage roots', home: 'Write-path recompute against the System of Record', spec: 'Derived-value rules with documented recompute triggers' },
+  { kind: 'Business / analytical', examples: 'Active awards, overdue reports, requirement satisfaction, review findings', home: 'System of Insight views over UDM data', spec: '12 example views as reference implementations; finding and checklist shapes documented as patterns' },
+  { kind: 'Workflow / process', examples: 'Approval gating, reviewer auto-assignment, escalation', home: 'System of Engagement application code, reading Insight views', spec: 'Deliberately unspecified; the spec documents the data the workflow reads, never the workflow itself' },
+  { kind: 'Usage conventions', examples: 'Modification vs new Award, role-bearer changes, submission events', home: 'Consumers and integrators', spec: '20 semantic conventions' },
+];
+
+const tiers = [
+  { tier: 'Core', contents: 'The 47 canonical tables in the specification', meaning: 'Required for any UDM implementation' },
+  { tier: 'Standard modules', contents: 'Optional, fully specified, versioned extensions. Planned: compliance protocols, governance, research outputs', meaning: 'Adopted per implementation and declared, e.g. "UDM 2.x core + modules: governance, outputs." Two adopters of the same module are interoperable on it' },
+  { tier: 'Local extensions', contents: 'Institution-specific additions outside the specification', meaning: 'Not specified by UDM; the optional-extensions registry documents where common cases belong' },
+];
+
 export default function OntologyTab() {
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto', padding: '2rem' }}>
+      <Section>
+        <SectionTitle>Architecture &amp; Conformance</SectionTitle>
+        <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
+          <strong>The UDM is the data model of the System of Record.</strong> Data belongs in the UDM
+          only if it is source-of-truth research administration data that cannot be regenerated from
+          other UDM data plus engine logic. Derived data lives in the System of Insight; application
+          infrastructure lives in the System of Engagement; row history lives in the storage layer's
+          versioned history.
+        </p>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '1.5rem' }}>
+            <thead>
+              <tr>
+                <th style={th}>Layer</th><th style={th}>Holds</th><th style={th}>Tech profile</th><th style={th}>Examples</th>
+              </tr>
+            </thead>
+            <tbody>
+              {layers.map((l) => (
+                <tr key={l.n}>
+                  <td style={{ ...td, whiteSpace: 'nowrap' }}><strong>{l.n}. {l.name}</strong></td>
+                  <td style={td}>{l.holds}</td>
+                  <td style={td}>{l.profile}</td>
+                  <td style={td}>{l.examples}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <h3 style={{ color: '#2c3e50', marginBottom: '0.75rem' }}>Where logic lives</h3>
+        <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
+          Logic follows the same layering as data. The UDM fully specifies the logic the System of
+          Record owns (invariants, derivation), ships reference implementations for the System of
+          Insight (views), and deliberately leaves workflow logic to the institution.
+        </p>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '1.5rem' }}>
+            <thead>
+              <tr>
+                <th style={th}>Kind of logic</th><th style={th}>Examples</th><th style={th}>Where it lives</th><th style={th}>How the UDM specifies it</th>
+              </tr>
+            </thead>
+            <tbody>
+              {logicKinds.map((l) => (
+                <tr key={l.kind}>
+                  <td style={{ ...td, whiteSpace: 'nowrap' }}><strong>{l.kind}</strong></td>
+                  <td style={td}>{l.examples}</td>
+                  <td style={td}>{l.home}</td>
+                  <td style={td}>{l.spec}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <h3 style={{ color: '#2c3e50', marginBottom: '0.75rem' }}>Conformance tiers</h3>
+        <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
+          An implementation is described by what it adopts. The core stays small; comprehensiveness
+          comes from fully specified optional modules rather than an ever-growing required table set.
+        </p>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                <th style={th}>Tier</th><th style={th}>Contents</th><th style={th}>Conformance meaning</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tiers.map((t) => (
+                <tr key={t.tier}>
+                  <td style={{ ...td, whiteSpace: 'nowrap' }}><strong>{t.tier}</strong></td>
+                  <td style={td}>{t.contents}</td>
+                  <td style={td}>{t.meaning}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Section>
+
       <Section>
         <SectionTitle>Naming Conventions</SectionTitle>
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>

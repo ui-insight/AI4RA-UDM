@@ -288,6 +288,16 @@
       "System of Engagement": {"holds": "Non-UDM application infrastructure: authentication, session state, submission tooling, in-flight drafts, observability", "profile": "OLTP, transactional, user-facing", "examples": "PostgreSQL or equivalent"}
     },
     "data_flow": "ETL or streaming pipelines carry finalized application data from the System of Engagement into the System of Record. The System of Insight is entirely inside the System of Record's query engine.",
+    "logic_placement": {
+      "description": "Logic follows the same layering as data. The UDM fully specifies the logic the System of Record owns, ships reference implementations for the System of Insight, and deliberately leaves workflow logic to the institution.",
+      "kinds": {
+        "invariants": {"examples": "Two-FK exclusive-or, lifecycle chain rules, conditional-required columns", "lives_in": "System of Record enforcement; mechanism is the institution's choice", "specified_by": "cross_row_constraints (typed, machine-readable)"},
+        "derivation": {"examples": "Current_End_Date, Current_Total_Funded, lineage roots", "lives_in": "Write-path recompute against the System of Record", "specified_by": "derived_values with recompute triggers"},
+        "business_analytical": {"examples": "Active awards, overdue reports, requirement satisfaction, review findings", "lives_in": "System of Insight views over UDM data", "specified_by": "example_views as reference implementations; finding and checklist shapes documented as patterns"},
+        "workflow_process": {"examples": "Approval gating, reviewer auto-assignment, escalation", "lives_in": "System of Engagement application code, reading Insight views", "specified_by": "Deliberately unspecified; the spec documents the data the workflow reads, never the workflow itself"},
+        "usage_conventions": {"examples": "Modification vs new Award, role-bearer changes, submission events", "lives_in": "Consumers and integrators", "specified_by": "semantic_conventions"}
+      }
+    },
     "regeneration_test": "Data belongs in UDM only if it is source-of-truth research administration data that cannot be regenerated from other UDM data plus engine logic. Derived data lives in the System of Insight; infrastructure data lives in the System of Engagement; row history lives in the storage layer's versioned history.",
     "conformance_tiers": {
       "core": "The canonical tables in this document. Required for any UDM implementation.",
