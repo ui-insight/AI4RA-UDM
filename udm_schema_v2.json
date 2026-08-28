@@ -301,7 +301,7 @@
     "regeneration_test": "Data belongs in UDM only if it is source-of-truth research administration data that cannot be regenerated from other UDM data plus engine logic. Derived data lives in the System of Insight; infrastructure data lives in the System of Engagement; row history lives in the storage layer's versioned history.",
     "conformance_tiers": {
       "core": "The canonical tables in this document. Required for any UDM implementation.",
-      "standard_modules": "Optional, fully specified, versioned extensions (planned: compliance protocols, governance, research outputs). An implementation declares which modules it adopts.",
+      "standard_modules": "Optional, fully specified, versioned extensions, declared per implementation. Module criterion: a module must be a capability an institution recognizably has or lacks (the adopter can finish the sentence 'we need this module because we do X'). Modules are carved by story, never by abstraction depth. Planned: IP, governance, and a compliance-protocol spine carrying regime modules for animal research, human subjects, and biosafety.",
       "local_extensions": "Institution-specific additions outside the specification. Documented patterns in optional_extensions guide common cases."
     }
   },

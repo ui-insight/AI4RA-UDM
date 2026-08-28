@@ -68,7 +68,7 @@ const logicKinds = [
 
 const tiers = [
   { tier: 'Core', contents: 'The 47 canonical tables in the specification', meaning: 'Required for any UDM implementation' },
-  { tier: 'Standard modules', contents: 'Optional, fully specified, versioned extensions. Planned: compliance protocols, governance, research outputs', meaning: 'Adopted per implementation and declared, e.g. "UDM 2.x core + modules: governance, outputs." Two adopters of the same module are interoperable on it' },
+  { tier: 'Standard modules', contents: 'Optional, fully specified, versioned extensions. Planned: IP, governance, and a compliance-protocol spine carrying regime modules for animal research, human subjects, and biosafety', meaning: 'Adopted per implementation and declared, e.g. "UDM 2.x core + modules: governance, IP." A module must be a capability an institution recognizably has or lacks ("we need this because we do X"); modules are carved by story, never by abstraction depth' },
   { tier: 'Local extensions', contents: 'Institution-specific additions outside the specification', meaning: 'Not specified by UDM; the optional-extensions registry documents where common cases belong' },
 ];
 

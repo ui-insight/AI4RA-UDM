@@ -188,6 +188,46 @@ See the [Infrastructure tab](https://ui-insight.github.io/AI4RA-UDM/) of the das
 
 v2 is a major refactor: 47 tables (from 40), six domains (from ten), unified lifecycle modeling, Award/Subaward symmetry, and rule catalogs for cross-row constraints and semantic conventions. See the [CHANGELOG](vignettes/CHANGELOG.md) for the full delta and migration guidance from v1.
 
+## Roadmap: Core and Standard Modules
+
+The UDM grows by a hub-and-spoke plan. The **core** is required for any implementation; **standard modules** are optional, fully specified, versioned extensions an implementation declares ("UDM core + modules: governance, IP"). The rule that decides what becomes a module: **a module must be a capability an institution recognizably has or lacks** — the adopter can finish the sentence "we need this module because we do X." Modules are carved by story, never by abstraction depth.
+
+```mermaid
+graph TD
+    CORE(["UDM Core — 7 domains<br/>Actors · Funding Cycle · Effort · Money<br/>Compliance · Attachments · Outputs"])
+    CP["Compliance Protocols<br/>shared protocol spine"]
+    AR["Animal Research"]
+    HS["Human Subjects"]
+    BIO["Biosafety"]
+    GOV["Governance<br/>committees & meetings"]
+    IP["IP<br/>invention disclosures & patent filings"]
+    CT["Clinical Trials"]
+    AGR["Agreements<br/>MTA / DUA / NDA"]
+
+    CORE --- CP
+    CP --- AR
+    CP --- HS
+    CP --- BIO
+    CORE --- GOV
+    CORE --- IP
+    CORE -.->|future candidate| CT
+    CORE -.->|future candidate| AGR
+    GOV -.->|bridge entities| CP
+
+    style CORE fill:#667eea,color:#fff,stroke:#4c51bf
+    style CT stroke-dasharray: 5 5
+    style AGR stroke-dasharray: 5 5
+```
+
+| Piece | Contents | Status |
+|---|---|---|
+| **Outputs (core domain 7)** | Output, OutputContributor, AwardOutput, PublicationDetail, DatasetDetail, SoftwareDetail — what funded work produced, reported against awards | Designed ([#71](https://github.com/ui-insight/AI4RA-UDM/issues/71)) |
+| **IP module** | InventionDisclosureDetail, PatentFiling — disclosure events, Bayh-Dole election, filing records | Designed |
+| **Governance module** | Committee, CommitteeMember, Meeting, MeetingAttendance | Designed ([#69](https://github.com/ui-insight/AI4RA-UDM/issues/69)) |
+| **Compliance Protocols (shared spine)** | Protocol, coverage, personnel, review workflow, amendments, continuing review, adverse events, deviations | Designed ([#60](https://github.com/ui-insight/AI4RA-UDM/issues/60)) |
+| **Animal Research / Human Subjects / Biosafety modules** | Per-regime protocol detail on the spine | Designed within [#60](https://github.com/ui-insight/AI4RA-UDM/issues/60) |
+| **Clinical Trials, Agreements** | Registration/enrollment records; MTA / DUA / NDA lifecycles | Future candidates |
+
 ## Contributing
 
 The UDM improves through community input. There are several ways to participate:

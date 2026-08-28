@@ -55,7 +55,7 @@ ETL or streaming pipelines carry finalized application data from the System of E
 **Conformance tiers.** An implementation is described by what it adopts:
 
 - **Core** — the canonical tables in this document. Required for any UDM implementation.
-- **Standard modules** — optional, fully specified, versioned extensions (planned: compliance protocols, governance, research outputs). An implementation declares which modules it adopts, e.g. "UDM 2.x core + modules: governance, outputs."
+- **Standard modules** — optional, fully specified, versioned extensions. An implementation declares which modules it adopts, e.g. "UDM 2.x core + modules: governance, IP." The rule for what becomes a module: **a module must be a capability an institution recognizably has or lacks** — the adopter can finish the sentence "we need this module because we do X" (we have an IACUC, we have a tech transfer operation, we run clinical trials). Modules are carved by story, never by abstraction depth; a "detail pack" is not a module. Planned: IP, governance, and a compliance-protocol spine carrying regime modules for animal research, human subjects, and biosafety.
 - **Local extensions** — institution-specific additions outside the specification. The *Optional extensions* section documents common cases and where they belong.
 
 ---
