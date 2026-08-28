@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import type { DataDictionary, Relationship } from '../../types';
-import { domainGroups, getDomain } from '../../data/domains';
+import { coreModuleGroups, getCoreModule } from '../../data/coreModules';
 
 interface Props {
   dataDictionary: DataDictionary;
@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function TablesTab({ dataDictionary, relationships, reverseRelationships }: Props) {
-  const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
+  const [selectedModule, setSelectedModule] = useState<string | null>(null);
   const [history, setHistory] = useState<string[]>([]);
 
   const currentTable = history.length > 0 ? history[history.length - 1] : null;
@@ -27,11 +27,11 @@ export default function TablesTab({ dataDictionary, relationships, reverseRelati
 
   const showHome = useCallback(() => {
     setHistory([]);
-    setSelectedDomain(null);
+    setSelectedModule(null);
   }, []);
 
-  const showDomain = useCallback((domainName: string) => {
-    setSelectedDomain(domainName);
+  const showModule = useCallback((moduleName: string) => {
+    setSelectedModule(moduleName);
     setHistory([]);
   }, []);
 
@@ -42,8 +42,8 @@ export default function TablesTab({ dataDictionary, relationships, reverseRelati
 
   const table = currentTable ? dataDictionary.tables[currentTable] : null;
   const childTables = currentTable ? (reverseRelationships[currentTable] || []) : [];
-  const activeDomain = selectedDomain ? domainGroups.find(d => d.name === selectedDomain) : null;
-  const showBreadcrumb = selectedDomain !== null || history.length > 0;
+  const activeModule = selectedModule ? coreModuleGroups.find(d => d.name === selectedModule) : null;
+  const showBreadcrumb = selectedModule !== null || history.length > 0;
 
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2rem' }}>
@@ -58,16 +58,16 @@ export default function TablesTab({ dataDictionary, relationships, reverseRelati
             style={{ color: '#667eea', textDecoration: 'none', fontWeight: 500 }}>
             Themes
           </a>
-          {selectedDomain && (
+          {selectedModule && (
             <>
               <span style={{ color: '#95a5a6', userSelect: 'none' }}>&rsaquo;</span>
               {history.length > 0 ? (
                 <a href="#" onClick={e => { e.preventDefault(); setHistory([]); }}
                   style={{ color: '#667eea', textDecoration: 'none', fontWeight: 500 }}>
-                  {selectedDomain}
+                  {selectedModule}
                 </a>
               ) : (
-                <span style={{ color: '#2c3e50', fontWeight: 600 }}>{selectedDomain}</span>
+                <span style={{ color: '#2c3e50', fontWeight: 600 }}>{selectedModule}</span>
               )}
             </>
           )}
@@ -88,25 +88,25 @@ export default function TablesTab({ dataDictionary, relationships, reverseRelati
       )}
 
       {/* Themes Landing */}
-      {!selectedDomain && !currentTable && (
+      {!selectedModule && !currentTable && (
         <div style={{
           background: 'white', padding: '2rem', borderRadius: 8,
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         }}>
-          <h2 style={{ color: '#2c3e50', marginBottom: '0.5rem', fontSize: '1.5rem' }}>Explore by Theme</h2>
+          <h2 style={{ color: '#2c3e50', marginBottom: '0.5rem', fontSize: '1.5rem' }}>Explore by Core Module</h2>
           <p style={{ color: '#546e7a', marginBottom: '1.5rem' }}>
-            The UDM groups tables into {domainGroups.length} themes covering the research-administration
-            lifecycle. Pick a theme to see its tables, then drill into a table to see its columns and
+            The UDM groups tables into {coreModuleGroups.length} core modules covering the research-administration
+            lifecycle. Pick a module to see its tables, then drill into a table to see its columns and
             foreign keys. Use the breadcrumb to navigate back.
           </p>
 
           <div style={{
             display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem',
           }}>
-            {domainGroups.map(d => (
+            {coreModuleGroups.map(d => (
               <div
                 key={d.name}
-                onClick={() => showDomain(d.name)}
+                onClick={() => showModule(d.name)}
                 style={{
                   background: 'white', padding: '1.25rem 1.5rem', borderRadius: 8,
                   boxShadow: '0 2px 8px rgba(0,0,0,0.08)', cursor: 'pointer',
@@ -137,8 +137,8 @@ export default function TablesTab({ dataDictionary, relationships, reverseRelati
         </div>
       )}
 
-      {/* Theme Detail — tables within the selected domain */}
-      {activeDomain && !currentTable && (
+      {/* Module detail: tables within the selected core module */}
+      {activeModule && !currentTable && (
         <div style={{
           background: 'white', padding: '2rem', borderRadius: 8,
           boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
@@ -146,14 +146,14 @@ export default function TablesTab({ dataDictionary, relationships, reverseRelati
           <div style={{
             display: 'inline-block', padding: '0.2rem 0.7rem', borderRadius: 999,
             fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.75rem',
-            background: `${activeDomain.color}18`,
-            color: activeDomain.color,
-            border: `1px solid ${activeDomain.color}40`,
+            background: `${activeModule.color}18`,
+            color: activeModule.color,
+            border: `1px solid ${activeModule.color}40`,
           }}>
-            {activeDomain.name}
+            {activeModule.name}
           </div>
           <h2 style={{ color: '#2c3e50', marginBottom: '0.5rem', fontSize: '1.5rem' }}>
-            {activeDomain.tables.length} {activeDomain.tables.length === 1 ? 'table' : 'tables'} in this theme
+            {activeModule.tables.length} {activeModule.tables.length === 1 ? 'table' : 'tables'} in this theme
           </h2>
           <p style={{ color: '#546e7a', marginBottom: '1.5rem' }}>
             Pick a table to see its column definitions and follow foreign-key relationships into
@@ -163,7 +163,7 @@ export default function TablesTab({ dataDictionary, relationships, reverseRelati
           <div style={{
             display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem',
           }}>
-            {activeDomain.tables.map(tableName => {
+            {activeModule.tables.map(tableName => {
               const t = dataDictionary.tables[tableName];
               if (!t) return null;
               return (
@@ -176,7 +176,7 @@ export default function TablesTab({ dataDictionary, relationships, reverseRelati
                     transition: 'all 0.2s ease', border: '1px solid #e9ecef',
                   }}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLDivElement).style.borderColor = activeDomain.color;
+                    (e.currentTarget as HTMLDivElement).style.borderColor = activeModule.color;
                     (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 10px rgba(0,0,0,0.08)';
                   }}
                   onMouseLeave={e => {
@@ -222,7 +222,7 @@ export default function TablesTab({ dataDictionary, relationships, reverseRelati
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
               <h2 style={{ fontSize: '1.5rem', margin: 0 }}>{table.name}</h2>
               {(() => {
-                const dom = getDomain(table.name);
+                const dom = getCoreModule(table.name);
                 return dom ? (
                   <span style={{
                     padding: '0.15rem 0.6rem', borderRadius: 999,

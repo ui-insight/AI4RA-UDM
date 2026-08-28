@@ -26,7 +26,7 @@ REQUIRED_TOP_LEVEL = [
     "architecture",
     "column_synonyms",
     "scope",
-    "domain_membership",
+    "core_module_membership",
     "universal_patterns",
     "audit_columns",
     "status_taxonomies",
@@ -36,7 +36,7 @@ REQUIRED_TOP_LEVEL = [
     "constraint_vocabulary",
     "cross_row_constraints",
     "tables",
-    "optional_extensions",
+    "local_extensions",
     "example_views",
     "summary",
     "implementation_tables",
@@ -85,7 +85,7 @@ def main():
         if not isinstance(tdef, dict):
             err(f"{tname}: table entry must be an object")
             continue
-        for key in ("domain", "description", "columns"):
+        for key in ("core_module", "description", "columns"):
             if key not in tdef:
                 err(f"{tname}: missing required key '{key}'")
         cols = tdef.get("columns", {})
@@ -129,36 +129,36 @@ def main():
                 elif rc not in tables[rt].get("columns", {}):
                     err(f"{tname}.{cname}: references unknown column '{rt}.{rc}'")
 
-    # --- Referential: domain membership exactly covers the table set ---
-    dm = schema.get("domain_membership", {})
+    # --- Referential: core-module membership exactly covers the table set ---
+    dm = schema.get("core_module_membership", {})
     impl = schema.get("implementation_tables", {}).get("tables", [])
     assigned = []
     for domain, members in dm.items():
         for t in members:
             assigned.append(t)
             if t not in tables:
-                err(f"domain_membership[{domain}]: unknown table '{t}'")
+                err(f"core_module_membership[{domain}]: unknown table '{t}'")
     for t in impl:
         assigned.append(t)
         if t not in tables:
             err(f"implementation_tables: unknown table '{t}'")
     dupes = {t for t in assigned if assigned.count(t) > 1}
     for t in sorted(dupes):
-        err(f"table '{t}' assigned more than once across domain_membership/implementation_tables")
+        err(f"table '{t}' assigned more than once across core_module_membership/implementation_tables")
     for t in tables:
         if t not in assigned:
-            err(f"table '{t}' not assigned to any domain or implementation_tables")
+            err(f"table '{t}' not assigned to any core module or implementation_tables")
 
-    # --- Referential: per-table domain field agrees with domain_membership ---
+    # --- Referential: per-table core_module field agrees with membership ---
     for tname, tdef in tables.items():
-        declared = tdef.get("domain")
+        declared = tdef.get("core_module")
         if tname in impl:
             if declared != "Implementation":
-                err(f"{tname}: in implementation_tables but domain is '{declared}' (expected 'Implementation')")
+                err(f"{tname}: in implementation_tables but core_module is '{declared}' (expected 'Implementation')")
         else:
             home = next((d for d, ms in dm.items() if tname in ms), None)
             if home is not None and declared != home:
-                err(f"{tname}: domain '{declared}' disagrees with domain_membership ('{home}')")
+                err(f"{tname}: core_module '{declared}' disagrees with core_module_membership ('{home}')")
 
     # --- Referential: column_synonyms resolve ---
     syn = schema.get("column_synonyms", {})

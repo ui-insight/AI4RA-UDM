@@ -67,9 +67,14 @@ const logicKinds = [
 ];
 
 const tiers = [
-  { tier: 'Core', contents: 'The 47 canonical tables in the specification', meaning: 'Required for any UDM implementation' },
-  { tier: 'Standard modules', contents: 'Optional, fully specified, versioned extensions. Planned: IP, governance, and a compliance-protocol spine carrying regime modules for animal research, human subjects, and biosafety', meaning: 'Adopted per implementation and declared, e.g. "UDM 2.x core + modules: governance, IP." A module must be a capability an institution recognizably has or lacks ("we need this because we do X"); modules are carved by story, never by abstraction depth' },
-  { tier: 'Local extensions', contents: 'Institution-specific additions outside the specification', meaning: 'Not specified by UDM; the optional-extensions registry documents where common cases belong' },
+  { tier: 'Core modules', contents: 'The universal capabilities, required of every implementation: Actors, Funding Cycle, Effort, Finance, Compliance, Records (and Outputs at its release). Each is named for the sentence every institution can say: "we track the people involved," "we certify effort," "we keep the records"', meaning: 'Required. 47 canonical tables' },
+  { tier: 'Optional modules', contents: 'Capabilities only some institutions exercise, fully specified and versioned. Planned: IP; Governance; a Compliance Protocols spine carrying regime modules for Animal Research, Human Subjects, and Biosafety', meaning: 'Adopted by declaration, e.g. "UDM 2.x core + modules: governance, IP." Two adopters of the same module are interoperable on it' },
+  { tier: 'Local extensions', contents: 'Institution-specific additions outside the specification', meaning: 'Not specified by UDM; the local-extensions registry documents where common cases belong' },
+];
+
+const laws = [
+  { law: 'Capability criterion', text: 'Every module, core or optional, must be a capability an institution recognizably exercises: the adopter can finish the sentence "we do X." Universality decides the tier. Modules are carved by story, never by abstraction depth; a "detail pack" is not a module.' },
+  { law: 'Encapsulation rule', text: 'A module may add its own tables, referencing the core (and declared module dependencies) by foreign key, and nothing else: no new columns on core tables, no altered constraints, no extended closed vocabularies. Two sanctioned extension points: the Records target registry (a module declares which of its tables are attachable) and AllowedValues (a module may define its own value groups). Anything beyond that is a core change in a core minor release, with the module declaring a minimum core version.' },
 ];
 
 export default function OntologyTab() {
@@ -160,10 +165,12 @@ export default function OntologyTab() {
             </tbody>
           </table>
         </div>
-        <h3 style={{ color: '#2c3e50', marginBottom: '0.75rem' }}>Conformance tiers</h3>
+        <h3 style={{ color: '#2c3e50', marginBottom: '0.75rem' }}>The module taxonomy</h3>
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
-          An implementation is described by what it adopts. The core stays small; comprehensiveness
-          comes from fully specified optional modules rather than an ever-growing required table set.
+          Everything specified is a module: a named, fully specified, versioned slice of research
+          administration capability. An implementation is described by what it adopts. The core stays
+          small; comprehensiveness comes from optional modules rather than an ever-growing required
+          table set.
         </p>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -182,6 +189,14 @@ export default function OntologyTab() {
               ))}
             </tbody>
           </table>
+        </div>
+        <h3 style={{ color: '#2c3e50', margin: '1.5rem 0 0.75rem' }}>The module laws</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
+          {laws.map((l) => (
+            <PatternCard key={l.law} title={l.law}>
+              <p style={{ color: '#546e7a', fontSize: '0.88rem', margin: 0 }}>{l.text}</p>
+            </PatternCard>
+          ))}
         </div>
       </Section>
 

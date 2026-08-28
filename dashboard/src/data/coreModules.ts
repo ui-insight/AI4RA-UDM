@@ -1,13 +1,13 @@
-// Canonical domain assignments for each UDM v2 table.
-// Source of truth: domain_membership in udm_schema_v2.json.
+// Canonical core-module assignments for each UDM v2 table.
+// Source of truth: core_module_membership in udm_schema_v2.json.
 
-export interface DomainGroup {
+export interface CoreModuleGroup {
   name: string;
   color: string;
   tables: string[];
 }
 
-export const domainGroups: DomainGroup[] = [
+export const coreModuleGroups: CoreModuleGroup[] = [
   {
     name: 'Actors',
     color: '#0ea5e9',
@@ -45,7 +45,7 @@ export const domainGroups: DomainGroup[] = [
     tables: ['AwardRole', 'Effort'],
   },
   {
-    name: 'Money',
+    name: 'Finance',
     color: '#16a34a',
     tables: [
       'Budget',
@@ -74,7 +74,7 @@ export const domainGroups: DomainGroup[] = [
     ],
   },
   {
-    name: 'Attachments',
+    name: 'Records',
     color: '#7c3aed',
     tables: [
       'Document',
@@ -88,11 +88,11 @@ export const domainGroups: DomainGroup[] = [
   },
 ];
 
-const tableToDomain: Record<string, DomainGroup> = {};
-for (const group of domainGroups) {
-  for (const t of group.tables) tableToDomain[t] = group;
+const tableToCoreModule: Record<string, CoreModuleGroup> = {};
+for (const group of coreModuleGroups) {
+  for (const t of group.tables) tableToCoreModule[t] = group;
 }
 
-export function getDomain(tableName: string): DomainGroup | undefined {
-  return tableToDomain[tableName];
+export function getCoreModule(tableName: string): CoreModuleGroup | undefined {
+  return tableToCoreModule[tableName];
 }

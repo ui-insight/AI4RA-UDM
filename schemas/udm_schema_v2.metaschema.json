@@ -9,7 +9,7 @@
     "architecture",
     "column_synonyms",
     "scope",
-    "domain_membership",
+    "core_module_membership",
     "universal_patterns",
     "audit_columns",
     "status_taxonomies",
@@ -19,7 +19,7 @@
     "constraint_vocabulary",
     "cross_row_constraints",
     "tables",
-    "optional_extensions",
+    "local_extensions",
     "example_views",
     "summary",
     "implementation_tables"
@@ -35,7 +35,7 @@
         "dialect": { "type": "string" }
       }
     },
-    "domain_membership": {
+    "core_module_membership": {
       "type": "object",
       "additionalProperties": {
         "type": "array",
@@ -57,7 +57,7 @@
       "additionalProperties": { "$ref": "#/$defs/table" }
     },
     "cross_row_constraints": { "type": "array" },
-    "optional_extensions": {
+    "local_extensions": {
       "type": "array",
       "items": {
         "type": "object",
@@ -73,9 +73,9 @@
   "$defs": {
     "table": {
       "type": "object",
-      "required": ["domain", "description", "columns"],
+      "required": ["core_module", "description", "columns"],
       "properties": {
-        "domain": { "type": "string" },
+        "core_module": { "type": "string" },
         "description": { "type": "string" },
         "columns": {
           "type": "object",

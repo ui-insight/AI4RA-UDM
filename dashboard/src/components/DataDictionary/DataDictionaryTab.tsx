@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { DataDictionary, Relationship } from '../../types';
-import { domainGroups, getDomain } from '../../data/domains';
+import { coreModuleGroups, getCoreModule } from '../../data/coreModules';
 
 interface Props {
   dataDictionary: DataDictionary;
@@ -14,8 +14,8 @@ interface Row {
   description: string;
   parents: string[];
   children: string[];
-  domain: string | null;
-  domainColor: string | null;
+  coreModule: string | null;
+  coreModuleColor: string | null;
 }
 
 export default function DataDictionaryTab({
@@ -32,22 +32,22 @@ export default function DataDictionaryTab({
 
     const out: Row[] = [];
     for (const [name, tbl] of Object.entries(dataDictionary.tables)) {
-      const domain = getDomain(name);
+      const cm = getCoreModule(name);
       out.push({
         name,
         fieldCount: tbl.columns.length,
         description: tbl.description || '',
         parents: [...(parentsByTable[name] ?? [])].sort(),
         children: [...(reverseRelationships[name] ?? [])].sort(),
-        domain: domain?.name ?? null,
-        domainColor: domain?.color ?? null,
+        coreModule: cm?.name ?? null,
+        coreModuleColor: cm?.color ?? null,
       });
     }
 
-    const domainOrder = new Map(domainGroups.map((d, i) => [d.name, i]));
+    const moduleOrder = new Map(coreModuleGroups.map((d, i) => [d.name, i]));
     out.sort((a, b) => {
-      const da = a.domain ? domainOrder.get(a.domain) ?? 999 : 999;
-      const db = b.domain ? domainOrder.get(b.domain) ?? 999 : 999;
+      const da = a.core_module ? moduleOrder.get(a.core_module) ?? 999 : 999;
+      const db = b.core_module ? moduleOrder.get(b.core_module) ?? 999 : 999;
       if (da !== db) return da - db;
       return a.name.localeCompare(b.name);
     });
@@ -68,7 +68,7 @@ export default function DataDictionaryTab({
           Data Dictionary
         </h2>
         <p style={{ color: '#546e7a', marginBottom: '1.5rem' }}>
-          One row per UDM table, grouped by domain. Columns show the number of fields, a description,
+          One row per UDM table, grouped by core module. Columns show the number of fields, a description,
           and the foreign-key neighbourhoods (parents are tables referenced by this table; children
           reference back into it). For column-level detail and breadcrumb navigation, use the{' '}
           <strong>Explorer</strong> tab.
@@ -93,7 +93,7 @@ export default function DataDictionaryTab({
                   letterSpacing: 0.5,
                 }}
               >
-                <Th width={140}>Domain</Th>
+                <Th width={140}>Core Module</Th>
                 <Th width={180}>Table</Th>
                 <Th width={70} align="right">Fields</Th>
                 <Th>Description</Th>
@@ -112,7 +112,7 @@ export default function DataDictionaryTab({
                   }}
                 >
                   <Td>
-                    {r.domain ? (
+                    {r.core_module ? (
                       <span
                         style={{
                           display: 'inline-block',
@@ -120,12 +120,12 @@ export default function DataDictionaryTab({
                           borderRadius: 999,
                           fontSize: '0.75rem',
                           fontWeight: 600,
-                          background: `${r.domainColor}18`,
-                          color: r.domainColor ?? '#546e7a',
-                          border: `1px solid ${r.domainColor}40`,
+                          background: `${r.coreModuleColor}18`,
+                          color: r.coreModuleColor ?? '#546e7a',
+                          border: `1px solid ${r.coreModuleColor}40`,
                         }}
                       >
-                        {r.domain}
+                        {r.core_module}
                       </span>
                     ) : (
                       <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>—</span>
@@ -155,7 +155,7 @@ export default function DataDictionaryTab({
         </div>
 
         <p style={{ color: '#94a3b8', fontSize: '0.8rem', marginTop: '1rem' }}>
-          {rows.length} tables · sorted by domain, then alphabetically within each domain.
+          {rows.length} tables · sorted by core module, then alphabetically within each domain.
         </p>
       </div>
     </div>

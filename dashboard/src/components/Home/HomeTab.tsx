@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import type { DataDictionary, Relationship, TabName } from '../../types';
-import { domainGroups, getDomain } from '../../data/domains';
+import { coreModuleGroups, getCoreModule } from '../../data/coreModules';
 
 // Temporary survey link (original: https://bit.ly/4b2ruQ3, to be restored later)
 const SURVEY_URL = 'https://bit.ly/4b5b21q';
@@ -15,11 +15,11 @@ interface Props {
 export default function HomeTab({ dataDictionary, relationships, onNavigate }: Props) {
   const tableCount = dataDictionary.table_count;
   const relationshipCount = relationships.length;
-  const domainCount = domainGroups.length;
+  const coreModuleCount = coreModuleGroups.length;
   const columnCount = Object.values(dataDictionary.tables)
     .reduce((n, t) => n + t.columns.length, 0);
 
-  useDomainCoverageWarning(dataDictionary);
+  useCoreModuleCoverageWarning(dataDictionary);
 
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2rem' }}>
@@ -61,17 +61,17 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
           <Stat value={tableCount} label="Tables" accent="#667eea" />
           <Stat value={columnCount} label="Documented Columns" accent="#0ea5e9" />
           <Stat value={relationshipCount} label="Foreign-Key Relationships" accent="#7c3aed" />
-          <Stat value={domainCount} label="Domains" accent="#16a34a" />
+          <Stat value={coreModuleCount} label="Core Modules" accent="#16a34a" />
         </div>
       </Card>
 
       <Card>
         <h3 style={{ color: '#2c3e50', fontSize: '1.3rem', marginBottom: '1rem' }}>
-          Domain Organization
+          Core Modules
         </h3>
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
-          The model is organized into {domainCount} domains. Each covers a distinct slice of the research
-          administration lifecycle.
+          The model is organized into {coreModuleCount} core modules: the universal capabilities of research
+          administration, required of every implementation.
         </p>
         <div
           style={{
@@ -80,7 +80,7 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
             gap: '0.75rem',
           }}
         >
-          {domainGroups.map((d) => (
+          {coreModuleGroups.map((d) => (
             <div
               key={d.name}
               style={{
@@ -214,7 +214,7 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
         >
           <NavCard
             title="Data Dictionary"
-            desc="Summary table of every entity with field counts, descriptions, parents, children, and domain."
+            desc="Summary table of every entity with field counts, descriptions, parents, children, and core module."
             onClick={() => onNavigate('dictionary')}
           />
           <NavCard
@@ -403,17 +403,17 @@ function NavLink({ onClick, children }: { onClick: () => void; children: React.R
   );
 }
 
-// Maintainer aid: if a table in the data dictionary has no domain assignment,
+// Maintainer aid: if a table in the data dictionary has no core-module assignment,
 // warn in the console instead of showing internal plumbing to visitors.
-function useDomainCoverageWarning(dataDictionary: DataDictionary) {
+function useCoreModuleCoverageWarning(dataDictionary: DataDictionary) {
   useEffect(() => {
     const IMPLEMENTATION_TABLES = new Set(['AllowedValues', 'BudgetCategory']);
     const orphan = Object.keys(dataDictionary.tables).filter(
-      (t) => !getDomain(t) && !IMPLEMENTATION_TABLES.has(t),
+      (t) => !getCoreModule(t) && !IMPLEMENTATION_TABLES.has(t),
     );
     if (orphan.length > 0) {
       console.warn(
-        `[UDM Dashboard] Tables missing a domain assignment in dashboard/src/data/domains.ts: ${orphan.join(', ')}`,
+        `[UDM Dashboard] Tables missing a core-module assignment in dashboard/src/data/coreModules.ts: ${orphan.join(', ')}`,
       );
     }
   }, [dataDictionary]);

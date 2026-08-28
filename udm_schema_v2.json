@@ -1,7 +1,7 @@
 {
   "metadata": {
     "name": "UDM",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "released": "2026-08-26",
     "dialect": "MySQL",
     "description": "Vendor-neutral research administration data model, v2. This JSON is a MySQL/MariaDB-flavored example implementation of the abstract specification in vignettes/udm-v2-system-of-record.md. The abstract spec is database-engine agnostic; this JSON picks one dialect for concrete adoption. The prior version (v1) is preserved as udm_schema.json at the repository root.",
@@ -299,14 +299,24 @@
       }
     },
     "regeneration_test": "Data belongs in UDM only if it is source-of-truth research administration data that cannot be regenerated from other UDM data plus engine logic. Derived data lives in the System of Insight; infrastructure data lives in the System of Engagement; row history lives in the storage layer's versioned history.",
-    "conformance_tiers": {
-      "core": "The canonical tables in this document. Required for any UDM implementation.",
-      "standard_modules": "Optional, fully specified, versioned extensions, declared per implementation. Module criterion: a module must be a capability an institution recognizably has or lacks (the adopter can finish the sentence 'we need this module because we do X'). Modules are carved by story, never by abstraction depth. Planned: IP, governance, and a compliance-protocol spine carrying regime modules for animal research, human subjects, and biosafety.",
-      "local_extensions": "Institution-specific additions outside the specification. Documented patterns in optional_extensions guide common cases."
+    "module_taxonomy": {
+      "statement": "Everything specified is a module: a named, fully specified, versioned slice of research administration capability. Core modules are required of every implementation; optional modules are adopted by declaration; local extensions are institution-specific and unspecified; implementation tables are spec machinery outside the capability taxonomy.",
+      "criterion": "Every module, core or optional, must be a capability an institution recognizably exercises: the adopter can finish the sentence 'we do X.' Universality decides the tier: a capability every research institution exercises is a core module; a capability only some institutions exercise is an optional module. Modules are carved by story, never by abstraction depth.",
+      "encapsulation": "A module may add its own tables, which may reference core tables (and declared module dependencies) by foreign key, and nothing else. It may not add columns to, alter constraints of, or extend the closed vocabularies of the core or of other modules. Two sanctioned extension points exist by design: (1) the Records target registry: a module declares which of its tables are attachable, and the core Records tables honor declared targets; (2) AllowedValues: a module may define its own value groups. Anything a module needs beyond that is either a core change (shipped in a core minor release, justified on its own merits, harmless without the module) with the module declaring a minimum core version, or it isn't core's business.",
+      "core_modules": {
+        "Actors": "We track the people and organizations involved",
+        "Funding Cycle": "We pursue and manage funded agreements, opportunity through closeout",
+        "Effort": "We commit and certify effort on funded work",
+        "Finance": "We manage the money: budgets, transactions, rates, payments",
+        "Compliance": "We meet regulatory and policy obligations",
+        "Records": "We keep the records that accumulate around the work"
+      },
+      "optional_modules_planned": "IP; Governance; a Compliance Protocols spine carrying regime modules for Animal Research, Human Subjects, and Biosafety. Outputs joins the core at its release.",
+      "local_extensions": "Institution-specific additions outside the specification. The local_extensions registry documents where common cases belong."
     }
   },
-  "_structure_note": "domain_membership maps domain -> [table names] (shallow index). The deep table definitions live under the tables key. The two are intentionally separate: domain_membership is a navigability aid; tables is the canonical column-level definition. Implementation tables (AllowedValues, BudgetCategory) are listed under implementation_tables, not domain_membership.",
-  "domain_membership": {
+  "_structure_note": "core_module_membership maps core module -> [table names] (shallow index). The deep table definitions live under the tables key; each carries a core_module field. Implementation tables (AllowedValues, BudgetCategory) are listed under implementation_tables, not core_module_membership, and carry core_module = 'Implementation' as a sentinel.",
+  "core_module_membership": {
     "Actors": [
       "Personnel",
       "PersonnelCredential",
@@ -334,7 +344,7 @@
       "AwardRole",
       "Effort"
     ],
-    "Money": [
+    "Finance": [
       "Budget",
       "Fund",
       "Account",
@@ -355,7 +365,7 @@
       "OtherSupportDisclosure",
       "PolicyException"
     ],
-    "Attachments": [
+    "Records": [
       "Document",
       "Communication",
       "Restriction",
@@ -398,7 +408,7 @@
     },
     {
       "name": "Polymorphic attachment",
-      "description": "Seven tables in the Attachments domain attach to any listed parent table via Related_Entity_Type + Related_Entity_ID. The Attachments domain generalizes the everyday RA concept of attaching a document to an award to all the things that accumulate around a record: files, correspondence, restrictions, deadlines, tags, work items, and audit events.",
+      "description": "Seven tables in the Attachments domain attach to any listed parent table via Related_Entity_Type + Related_Entity_ID. The Records core module generalizes the everyday RA concept of attaching a document to an award to all the things that accumulate around a record: files, correspondence, restrictions, deadlines, tags, work items, and audit events.",
       "tables": [
         "Document",
         "Communication",
@@ -535,7 +545,7 @@
     },
     {
       "name": "Extensibility via AllowedValues",
-      "description": "The AllowedValues table holds institution-specific enumerated values. Tables that reference institution-defined enums use a *_Value_ID foreign key. Tables that need universal enumerations use a fixed value list enforced by the database's enumeration mechanism.",
+      "description": "The AllowedValues table holds institution-specific enumerated values. Optional modules may define their own Value_Groups (a sanctioned extension point). Tables that reference institution-defined enums use a *_Value_ID foreign key. Tables that need universal enumerations use a fixed value list enforced by the database's enumeration mechanism.",
       "decision_rule": "A field is a fixed Status enum when (a) the value set is standardized across institutions AND (b) the model's correctness depends on stable, known values. A field is an AllowedValues FK when (a) institutions need to add or retire local values, OR (b) no canonical interop list exists, OR (c) the field is local classification not consulted by the model's constraints."
     },
     {
@@ -944,9 +954,9 @@
     }
   ],
   "polymorphic_attachment_enforcement": {
-    "description": "The six polymorphic Attachment tables use a polymorphic foreign key (Related_Entity_Type + Related_Entity_ID) that no single declarative reference can fully enforce.",
+    "description": "The six polymorphic Records tables use a polymorphic foreign key (Related_Entity_Type + Related_Entity_ID) that no single declarative reference can fully enforce.",
     "required_properties": [
-      "Related_Entity_Type is constrained to a per-attachment allowed list of target table names (enumerated in each attachment's table reference).",
+      "Related_Entity_Type is constrained to a per-attachment allowed list of target table names (enumerated in each attachment's table reference). Optional modules extend a list only through the Records target registry: a module declares which of its tables are attachable, and implementations honor declared targets.",
       "Related_Entity_ID references an existing row in the table named by Related_Entity_Type."
     ],
     "enforcement_options": [
@@ -1502,7 +1512,7 @@
   },
   "tables": {
     "Personnel": {
-      "domain": "Actors",
+      "core_module": "Actors",
       "description": "Individuals involved in research administration: faculty, staff, students, postdocs, fellows, external collaborators, and sponsor-side contacts.",
       "columns": {
         "Personnel_ID": {
@@ -1586,7 +1596,7 @@
       }
     },
     "PersonnelCredential": {
-      "domain": "Actors",
+      "core_module": "Actors",
       "description": "A person-level credential or identifier the institution needs to hold itself. Two scope rules: sponsor-system identifiers (eRA Commons, NSF FastLane) always in scope; HR-domain credentials in scope only for non-employee Personnel where HRIS does not apply.",
       "columns": {
         "PersonnelCredential_ID": {
@@ -1674,7 +1684,7 @@
       }
     },
     "Organization": {
-      "domain": "Actors",
+      "core_module": "Actors",
       "description": "Institutional entities that participate in research funding flows: sponsors, academic units, subrecipients, vendors, committees.",
       "columns": {
         "Organization_ID": {
@@ -1730,7 +1740,7 @@
       }
     },
     "OrganizationCapability": {
-      "domain": "Actors",
+      "core_module": "Actors",
       "description": "The functional roles an Organization plays. An Organization may carry multiple capabilities (NIH is both a Sponsor and, in some contexts, a Committee). The capability set is what cross-table constraints check.",
       "columns": {
         "OrganizationCapability_ID": {
@@ -1797,7 +1807,7 @@
       "table_level_constraint": "A given (Organization, Capability) pair appears at most once with no Effective_End_Date."
     },
     "OrganizationIdentifier": {
-      "domain": "Actors",
+      "core_module": "Actors",
       "description": "External identifiers an Organization carries: UEI, EIN, DUNS, CAGE, IPF, IPEDS_ID, sponsor-issued codes. Parallels PersonnelCredential for people.",
       "columns": {
         "OrganizationIdentifier_ID": {
@@ -1852,7 +1862,7 @@
       }
     },
     "ContactDetails": {
-      "domain": "Actors",
+      "core_module": "Actors",
       "description": "Email, phone, fax, mobile, and address records. Each record attaches to exactly one of a Personnel or an Organization.",
       "columns": {
         "ContactDetails_ID": {
@@ -1908,7 +1918,7 @@
       }
     },
     "OrganizationRole": {
-      "domain": "Actors",
+      "core_module": "Actors",
       "description": "A person's role at an Organization. Generalizes the committee-member and external-party contact patterns. Distinct from AwardRole (institutional staff on an Award) and ProtocolRole (personnel on a compliance protocol).",
       "columns": {
         "OrganizationRole_ID": {
@@ -1984,7 +1994,7 @@
       }
     },
     "RFA": {
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "description": "A funding opportunity announcement (program announcement, solicitation, BAA, RFP).",
       "columns": {
         "RFA_ID": {
@@ -2090,7 +2100,7 @@
       }
     },
     "RFARequirement": {
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "description": "A specific requirement extracted from an RFA. Acts as a template; per-proposal completion is tracked via an Action.",
       "columns": {
         "RFARequirement_ID": {
@@ -2161,7 +2171,7 @@
       }
     },
     "Proposal": {
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "description": "A formal request for funding submitted to a sponsor.",
       "columns": {
         "Proposal_ID": {
@@ -2342,7 +2352,7 @@
       }
     },
     "ProposalApproval": {
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "description": "A step in the institutional approval chain for a Proposal. Most universities require sign-off from PI, department chair, dean, and OSP before a Proposal can be submitted.",
       "columns": {
         "ProposalApproval_ID": {
@@ -2416,7 +2426,7 @@
       }
     },
     "PreAwardAuthorization": {
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "description": "An institutional pre-award authorization to spend at-risk on a Proposal that has been favorably reviewed but not yet officially awarded.",
       "columns": {
         "PreAwardAuthorization_ID": {
@@ -2493,7 +2503,7 @@
       }
     },
     "Award": {
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "description": "A funded grant, contract, or cooperative agreement — also called a 'project' or 'grant' in many institutional systems. The central post-award entity. Award represents inbound funding; Subaward represents the outbound symmetric case.",
       "columns": {
         "Award_ID": {
@@ -2699,7 +2709,7 @@
       }
     },
     "Modification": {
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "description": "A change to an Award or Subaward after initial funding. XOR-attached to either Award or Subaward.",
       "columns": {
         "Modification_ID": {
@@ -2821,7 +2831,7 @@
       }
     },
     "Subaward": {
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "description": "A subaward agreement between the institution and a subrecipient. Subaward exists at two scopes: planned (Proposal-stage) and executed (post-Prime-Award). Same row identity spans both via status change.",
       "columns": {
         "Subaward_ID": {
@@ -2959,7 +2969,7 @@
       }
     },
     "Negotiation": {
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "description": "The contract or agreement bargaining lifecycle between the institution and a counterparty before final terms are accepted. Covers sponsor-on-Proposal (pre-NoA terms), sponsor-on-Award (mid-stream), and subrecipient-on-Subaward.",
       "columns": {
         "Negotiation_ID": {
@@ -3053,7 +3063,7 @@
       }
     },
     "Terms": {
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "description": "The contractual terms and conditions of a funded agreement. One Terms row per parent agreement (Award or Subaward).",
       "columns": {
         "Terms_ID": {
@@ -3150,7 +3160,7 @@
       }
     },
     "Report": {
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "description": "A scheduled or ad hoc deliverable to the sponsor: progress report, RPPR, FFR, final report, invention statement, data-sharing plan update.",
       "columns": {
         "Report_ID": {
@@ -3269,7 +3279,7 @@
       }
     },
     "Closeout": {
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "description": "The closeout workflow object for an Award or Subaward. Coordinates several subworkflows (final report, final invoice, equipment disposition, IP closeout, COI closeout, records retention).",
       "columns": {
         "Closeout_ID": {
@@ -3389,7 +3399,7 @@
       }
     },
     "AwardRole": {
-      "domain": "Effort",
+      "core_module": "Effort",
       "description": "A person's role on an Award (or Subaward), with effort allocation, date range, and credit attribution. Limited to award-side staffing roles.",
       "columns": {
         "AwardRole_ID": {
@@ -3493,7 +3503,7 @@
       "authoritative_source_note": "AwardRole.FTE_Percent is the authoritative committed-effort figure for an Award. The Effort table carries per-period, per-stage detail and is authoritative for actual effort questions (Charged, Certified)."
     },
     "Effort": {
-      "domain": "Effort",
+      "core_module": "Effort",
       "description": "Per-stage effort detail for an AwardRole. The Lifecycle_Stage column distinguishes proposed, approved, charged, and certified effort numbers.",
       "columns": {
         "Effort_ID": {
@@ -3615,7 +3625,7 @@
       }
     },
     "Budget": {
-      "domain": "Money",
+      "core_module": "Finance",
       "description": "Detailed line items for a budget at a specific lifecycle stage. Each Budget row carries Proposal_ID at every stage (stable chain identity) and post-award Award_ID or Subaward_ID at Approved and later stages.",
       "columns": {
         "Budget_ID": {
@@ -3738,7 +3748,7 @@
       }
     },
     "Fund": {
-      "domain": "Money",
+      "core_module": "Finance",
       "description": "Fund codes from the institutional accounting system.",
       "columns": {
         "Fund_ID": {
@@ -3778,7 +3788,7 @@
       }
     },
     "Account": {
-      "domain": "Money",
+      "core_module": "Finance",
       "description": "Chart-of-accounts entry for general ledger coding.",
       "columns": {
         "Account_ID": {
@@ -3817,7 +3827,7 @@
       }
     },
     "FinanceCode": {
-      "domain": "Money",
+      "core_module": "Finance",
       "description": "The institutional accounting string that connects an Award to fund and account codes.",
       "columns": {
         "FinanceCode_ID": {
@@ -3870,7 +3880,7 @@
       }
     },
     "Transaction": {
-      "domain": "Money",
+      "core_module": "Finance",
       "description": "An individual financial entry charged to an Award or Subaward.",
       "columns": {
         "Transaction_ID": {
@@ -3986,7 +3996,7 @@
       }
     },
     "RateAgreement": {
-      "domain": "Money",
+      "core_module": "Finance",
       "description": "The negotiated F&A (indirect cost) rate agreement (NICRA) between an institution and its cognizant federal agency.",
       "columns": {
         "RateAgreement_ID": {
@@ -4047,7 +4057,7 @@
       }
     },
     "IndirectRate": {
-      "domain": "Money",
+      "core_module": "Finance",
       "description": "A single negotiated rate within a RateAgreement (on-campus, off-campus, MTDC, etc.).",
       "columns": {
         "IndirectRate_ID": {
@@ -4109,7 +4119,7 @@
       }
     },
     "Equipment": {
-      "domain": "Money",
+      "core_module": "Finance",
       "description": "A sponsor-purchased or institution-acquired capital asset associated with an Award or Subaward.",
       "columns": {
         "Equipment_ID": {
@@ -4219,7 +4229,7 @@
       }
     },
     "Payment": {
-      "domain": "Money",
+      "core_module": "Finance",
       "description": "Payment records covering scheduled, invoiced, received, and reconciled stages.",
       "columns": {
         "Payment_ID": {
@@ -4332,7 +4342,7 @@
       }
     },
     "CostShare": {
-      "domain": "Money",
+      "core_module": "Finance",
       "description": "Cost-sharing commitments across the lifecycle. Carries Proposal_ID at every stage (stable chain identity) and post-award Award_ID or Subaward_ID at Committed and later stages.",
       "columns": {
         "CostShare_ID": {
@@ -4426,7 +4436,7 @@
       }
     },
     "ComplianceRequirement": {
-      "domain": "Compliance",
+      "core_module": "Compliance",
       "description": "A regulatory approval required for research: IRB, IACUC, IBC, radiation safety, export control, etc. Standalone entity with its own lifecycle, independent of any particular Award. The Awards a requirement covers are recorded in ComplianceCoverage.",
       "columns": {
         "ComplianceRequirement_ID": {
@@ -4536,7 +4546,7 @@
       }
     },
     "ComplianceCoverage": {
-      "domain": "Compliance",
+      "core_module": "Compliance",
       "description": "The M:N relationship between a ComplianceRequirement and the Awards (or Subawards) it covers.",
       "columns": {
         "ComplianceCoverage_ID": {
@@ -4592,7 +4602,7 @@
       "table_level_constraint": "A given (ComplianceRequirement_ID, Award_ID) pair (or (ComplianceRequirement_ID, Subaward_ID) pair) appears at most once with a null Coverage_End_Date."
     },
     "ProtocolRole": {
-      "domain": "Compliance",
+      "core_module": "Compliance",
       "description": "Personnel listed on a specific ComplianceRequirement (the PI on the protocol, IRB study staff, IACUC personnel, IBC investigators, TCP-cleared personnel). Parallels AwardRole and OrganizationRole.",
       "columns": {
         "ProtocolRole_ID": {
@@ -4664,7 +4674,7 @@
       }
     },
     "ConflictOfInterest": {
-      "domain": "Compliance",
+      "core_module": "Compliance",
       "description": "Personal disclosures covering conflicts of interest and conflicts of commitment. Foreign-engagement disclosures and NSPM-33 reporting are out of scope; see Optional Extensions.",
       "columns": {
         "ConflictOfInterest_ID": {
@@ -4766,7 +4776,7 @@
       }
     },
     "OtherSupport": {
-      "domain": "Compliance",
+      "core_module": "Compliance",
       "description": "A Personnel record's external research support (current, pending, in-kind). The fact of outside support, person-anchored.",
       "columns": {
         "OtherSupport_ID": {
@@ -4837,7 +4847,7 @@
       }
     },
     "OtherSupportDisclosure": {
-      "domain": "Compliance",
+      "core_module": "Compliance",
       "description": "A single disclosure event of an OtherSupport row. The same outside appointment is typically disclosed many times across a researcher's career.",
       "columns": {
         "OtherSupportDisclosure_ID": {
@@ -4908,7 +4918,7 @@
       }
     },
     "PolicyException": {
-      "domain": "Compliance",
+      "core_module": "Compliance",
       "description": "An institutionally granted exception to a sponsor or institutional policy rule: PI-eligibility waivers, COI management exceptions, cost-share waivers, indirect-rate exceptions. Scoped to a Personnel record, optionally narrowed to one Proposal, Award, or Subaward; all three scope FKs null means a blanket exception for the person.",
       "columns": {
         "PolicyException_ID": {"type": "VARCHAR(50)", "primary_key": true, "required": true, "description": "PK"},
@@ -4930,7 +4940,7 @@
       }
     },
     "AllowedValues": {
-      "domain": "Implementation",
+      "core_module": "Implementation",
       "description": "Institution-specific controlled vocabularies. The Value_Group column names a family.",
       "columns": {
         "AllowedValue_ID": {
@@ -4967,7 +4977,7 @@
       }
     },
     "BudgetCategory": {
-      "domain": "Implementation",
+      "core_module": "Implementation",
       "description": "Standardized budget line item categories (SF-424 R&R standard).",
       "columns": {
         "BudgetCategory_ID": {
@@ -4999,7 +5009,7 @@
       }
     },
     "Document": {
-      "domain": "Attachments",
+      "core_module": "Records",
       "description": "Files associated with any entity.",
       "columns": {
         "Document_ID": {
@@ -5098,7 +5108,7 @@
       }
     },
     "Communication": {
-      "domain": "Attachments",
+      "core_module": "Records",
       "description": "Inbound or outbound correspondence between the institution and an external party.",
       "columns": {
         "Communication_ID": {
@@ -5208,7 +5218,7 @@
       }
     },
     "CommunicationResponse": {
-      "domain": "Attachments",
+      "core_module": "Records",
       "description": "A per-recipient structured response to a Communication. The Communication carries the message; a Deadline attached to the Communication carries the response window; each recipient's response is one row. Pre-create one Pending row per intended recipient at notification time.",
       "columns": {
         "CommunicationResponse_ID": {"type": "VARCHAR(50)", "primary_key": true, "required": true, "description": "PK"},
@@ -5222,7 +5232,7 @@
       }
     },
     "Restriction": {
-      "domain": "Attachments",
+      "core_module": "Records",
       "description": "Operational constraints attached to an entity (CUI, CMMC, export control, publication holds, foreign-personnel limits).",
       "columns": {
         "Restriction_ID": {
@@ -5301,7 +5311,7 @@
       "active_query_rule": "A restriction is currently active when Restriction_Status = 'Active' and Effective_Start_Date is on or before the query date and (Effective_End_Date is null or on or after the query date)."
     },
     "Deadline": {
-      "domain": "Attachments",
+      "core_module": "Records",
       "description": "Future-dated obligations attached to an entity. Calendar-style: tells you WHEN.",
       "columns": {
         "Deadline_ID": {
@@ -5380,7 +5390,7 @@
       }
     },
     "Classification": {
-      "domain": "Attachments",
+      "core_module": "Records",
       "description": "Subject tags and research-area codes attached to entities.",
       "columns": {
         "Classification_ID": {
@@ -5434,7 +5444,7 @@
       }
     },
     "Action": {
-      "domain": "Attachments",
+      "core_module": "Records",
       "description": "Work items attached to entities: deliverables, checklist items, service requests, modification approvals, compliance renewals, training requirements. Worklist-style: tells you WHAT and WHO.",
       "columns": {
         "Action_ID": {
@@ -5567,7 +5577,7 @@
       }
     }
   },
-  "optional_extensions": [
+  "local_extensions": [
     {
       "name": "Detailed Export Control workflow",
       "description": "ComplianceRequirement.Requirement_Type = 'Export_Control' captures the determination. Not modeled: Technology Control Plans (TCP doc lives as a Document attachment), per-shipment determinations, ECCN / commodity classification details, BIS or DDTC license records, foreign-national screening events, visit-by-visit foreign national clearances."
@@ -5726,12 +5736,12 @@
     ]
   },
   "summary": [
-    "Six domains: Actors, Funding Cycle, Effort, Money, Compliance, Attachments. AllowedValues and BudgetCategory are implementation tables that support the model rather than a domain.",
+    "Six core modules: Actors, Funding Cycle, Effort, Finance, Compliance, Records. AllowedValues and BudgetCategory are implementation tables that support the model rather than a core module.",
     "Eight universal patterns: identifier convention, hierarchy, role-named foreign keys, polymorphic attachment, two-FK exclusive-or attachment, Lifecycle_Stage discriminator, AllowedValues extensibility, boolean naming.",
     "Audit and provenance columns (Created_At, Updated_At, Created_By_Personnel_ID, Updated_By_Personnel_ID, Source_System, Source_Record_ID, Is_Active) are universal across every table.",
     "Hub entities: Personnel, Organization, Proposal, Award, AllowedValues.",
     "Lifecycle_Stage tables: Budget, Effort, CostShare, Payment.",
-    "Polymorphic Attachment tables: Document, Communication, Restriction, Deadline, Classification, Action. CommunicationResponse extends Communication with structured per-recipient responses via a direct foreign key.",
+    "Polymorphic Records tables: Document, Communication, Restriction, Deadline, Classification, Action. CommunicationResponse extends Communication with structured per-recipient responses via a direct foreign key.",
     "Subaward spans pre-award and post-award on a single row identity.",
     "Three parallel 'person-in-role' tables: AwardRole, OrganizationRole, ProtocolRole.",
     "Compliance covers regulatory requirements across regimes via ComplianceRequirement + ComplianceCoverage (M:N) + ProtocolRole (staff roster).",
@@ -5740,7 +5750,7 @@
     "Foreign-engagement disclosures and the full tech-transfer pipeline are out of scope; institutions add local extensions."
   ],
   "implementation_tables": {
-    "description": "Tables that support the model's mechanics rather than a research administration domain: institution-specific controlled vocabularies and shared reference codes. 'Domains' in the UDM refer to research-administration organizational concepts; these tables are implementation infrastructure and are intentionally not counted as a domain.",
+    "description": "Tables that support the model's mechanics rather than a research administration capability: institution-specific controlled vocabularies and shared reference codes. Core modules are research-administration capabilities; these tables are implementation infrastructure and are intentionally not counted as a core module.",
     "tables": [
       "AllowedValues",
       "BudgetCategory"

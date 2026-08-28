@@ -7,6 +7,27 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 - **MINOR** when entities or columns are added in a backward-compatible way
 - **PATCH** for documentation, convention clarifications, or fixes to non-load-bearing rules
 
+## [2.2.0] — 2026-08-28
+
+Taxonomy release. No tables added or removed; the model's organizing structure and vocabulary are unified. Machine-readable and human-readable lingo now match exactly.
+
+### The module taxonomy (normative)
+
+Everything specified is a **module**: a named, fully specified, versioned slice of research administration capability. **Core modules** (formerly "domains") are the universal capabilities, required of every implementation. **Optional modules** (formerly "standard modules") are adopted by declaration. **Local extensions** (formerly "optional extensions") are institution-specific and unspecified. Implementation tables remain outside the capability taxonomy. Two laws govern every module:
+
+1. **Capability criterion.** A module must be a capability an institution recognizably exercises ("we do X"); universality decides the tier; modules are carved by story, never by abstraction depth.
+2. **Encapsulation rule.** A module adds only its own tables, referencing the core by foreign key; it never adds columns to, alters constraints of, or extends the closed vocabularies of the core or other modules. Sanctioned extension points: the Records target registry and AllowedValues value groups. Anything more is a core change in a core minor release, with the module declaring a minimum core version.
+
+### Renamed (breaking for artifact consumers)
+
+- JSON keys: `domain_membership` → `core_module_membership`; per-table `domain` → `core_module`; `optional_extensions` → `local_extensions`; `architecture.conformance_tiers` → `architecture.module_taxonomy`. The generated data-dictionary field `domain` → `core_module`.
+- Core modules: **Money → Finance**; **Attachments → Records** (the records that accumulate around the work).
+- All prose, dashboard, and README language moves from "domain" to "core module."
+
+### Roadmap renumbering
+
+Optional modules (Compliance Protocols spine + Animal Research / Human Subjects / Biosafety regime modules, Governance, IP) target v2.3; the Outputs core module targets v2.4.
+
 ## [2.1.0] — 2026-08-26
 
 Cleanup release: the model sheds infrastructure entities that belong to other architectural layers and gains two small, broadly useful entities. 49 → 47 tables. Implements roadmap issues #66, #67, #68, #61, #65, #63, #64.

@@ -1,6 +1,6 @@
 # UDM v2 Ontology
 
-This document describes the structure, conventions, and purpose of every entity in the AI4RA Unified Data Model, version 2. The UDM contains **47 tables** organized into **6 domains** plus two implementation tables, along with **12 reference views**.
+This document describes the structure, conventions, and purpose of every entity in the AI4RA Unified Data Model, version 2. The UDM contains **47 tables** organized into **6 core modules** plus two implementation tables, along with **12 reference views**.
 
 For the canonical machine-readable specification, see [udm-v2-system-of-record.md](udm-v2-system-of-record.md) (prose) and [udm_schema_v2.json](../udm_schema_v2.json) (MySQL/MariaDB serialization at the repository root, alongside the v1 [udm_schema.json](../udm_schema.json)).
 
@@ -21,7 +21,7 @@ The guiding principle: if a concept is something a research administrator would 
 
 If you read the v1 ontology, the most visible changes:
 
-- **40 tables → 47 tables (v2.1); 10 domains → 6 domains plus implementation tables.** v2 dropped some tables, added more, and reorganized domains. Domains now refer strictly to research-administration organizational concepts; AllowedValues and BudgetCategory are counted as implementation tables rather than a domain.
+- **40 tables → 47 tables (v2.1); 10 domains → 6 core modules plus implementation tables.** v2 dropped some tables, added more, and reorganized the groupings; v2.2 unified the taxonomy (everything specified is a module; core modules are the required universal capabilities). AllowedValues and BudgetCategory are implementation tables, not a core module.
 - **Project as a first-class entity is gone.** Longitudinal-identity grouping is handled by `Proposal.Group_ID` + `Originating_Proposal_ID` (derived chain root) + `Award.Group_ID` (pre-filled from Proposal). See *Lineage mechanisms* below.
 - **ProjectRole became three tables.** `AwardRole` (people on the work), `OrganizationRole` (people at an Organization), `ProtocolRole` (people on a compliance protocol). Each answers a different question.
 - **Budget unified.** `ProposalBudget` + `AwardBudgetPeriod` + `AwardBudget` collapsed into a single `Budget` table with a `Lifecycle_Stage` discriminator (Proposed → Approved → Current → Actual).
@@ -249,16 +249,16 @@ Three mechanisms answer "when did this change?", each at a different scope:
 
 ## Domains
 
-The 47 tables organize into 6 domains plus two implementation tables:
+The 47 tables organize into 6 core modules plus two implementation tables:
 
-| Domain | Tables |
+| Core module | Tables |
 |---|---|
 | **Actors** | Personnel, PersonnelCredential, Organization, OrganizationCapability, OrganizationIdentifier, OrganizationRole, ContactDetails |
 | **Funding Cycle** | RFA, RFARequirement, Proposal, ProposalApproval, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout |
 | **Effort** | AwardRole, Effort |
-| **Money** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment |
+| **Finance** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment |
 | **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure, PolicyException |
-| **Attachments** | Document, Communication, Restriction, Deadline, Classification, Action, CommunicationResponse |
+| **Records** | Document, Communication, Restriction, Deadline, Classification, Action, CommunicationResponse |
 | *Implementation tables (not a domain)* | AllowedValues, BudgetCategory |
 
 Domains refer to research-administration organizational concepts. AllowedValues and BudgetCategory support the model's mechanics — controlled vocabularies and shared reference codes — and are intentionally not counted as a domain.

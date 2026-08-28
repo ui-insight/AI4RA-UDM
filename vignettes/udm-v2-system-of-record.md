@@ -52,26 +52,31 @@ ETL or streaming pipelines carry finalized application data from the System of E
 | Workflow / process | Approval gating, reviewer auto-assignment, escalation | System of Engagement application code, reading Insight views | Deliberately unspecified; the spec documents the data the workflow reads, never the workflow itself |
 | Usage conventions | Modification vs new Award, role-bearer changes, submission events | Consumers and integrators | Semantic conventions |
 
-**Conformance tiers.** An implementation is described by what it adopts:
+**The module taxonomy.** Everything specified is a module: a named, fully specified, versioned slice of research administration capability. An implementation is described by what it adopts.
 
-- **Core** — the canonical tables in this document. Required for any UDM implementation.
-- **Standard modules** — optional, fully specified, versioned extensions. An implementation declares which modules it adopts, e.g. "UDM 2.x core + modules: governance, IP." The rule for what becomes a module: **a module must be a capability an institution recognizably has or lacks** — the adopter can finish the sentence "we need this module because we do X" (we have an IACUC, we have a tech transfer operation, we run clinical trials). Modules are carved by story, never by abstraction depth; a "detail pack" is not a module. Planned: IP, governance, and a compliance-protocol spine carrying regime modules for animal research, human subjects, and biosafety.
-- **Local extensions** — institution-specific additions outside the specification. The *Optional extensions* section documents common cases and where they belong.
+- **Core modules** — the universal capabilities, required of every implementation. Each is named for the sentence every institution can say: Actors ("we track the people and organizations involved"), Funding Cycle ("we pursue and manage funded agreements, opportunity through closeout"), Effort ("we commit and certify effort on funded work"), Finance ("we manage the money"), Compliance ("we meet regulatory and policy obligations"), Records ("we keep the records that accumulate around the work"). Outputs ("we report what the work produced") joins the core at its release.
+- **Optional modules** — capabilities only some institutions exercise, adopted by declaration, e.g. "UDM 2.x core + modules: governance, IP." Planned: IP; Governance; a Compliance Protocols spine carrying regime modules for Animal Research, Human Subjects, and Biosafety.
+- **Local extensions** — institution-specific additions outside the specification. The *Local extensions* section documents common cases and where they belong.
+
+Two laws govern every module, core or optional:
+
+1. **The capability criterion.** A module must be a capability an institution recognizably exercises: the adopter can finish the sentence "we do X." Universality decides the tier. Modules are carved by story, never by abstraction depth; a "detail pack" is not a module.
+2. **The encapsulation rule.** A module may add its own tables, which may reference core tables (and declared module dependencies) by foreign key, and nothing else. It may not add columns to, alter constraints of, or extend the closed vocabularies of the core or of other modules. Two sanctioned extension points exist by design: (1) the Records target registry — a module declares which of its tables are attachable, and the core Records tables honor declared targets; (2) AllowedValues — a module may define its own value groups. Anything a module needs beyond that is either a core change (shipped in a core minor release, justified on its own merits, harmless without the module) with the module declaring a minimum core version, or it isn't core's business.
 
 ---
 
-## Domains
+## Core modules
 
-| Domain | Tables |
+| Core module | Tables |
 |---|---|
 | **Actors** | Personnel, PersonnelCredential, Organization, OrganizationCapability, OrganizationIdentifier, OrganizationRole, ContactDetails |
 | **Funding Cycle** | RFA, RFARequirement, Proposal, ProposalApproval, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout |
 | **Effort** | AwardRole, Effort |
-| **Money** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment |
+| **Finance** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment |
 | **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure |
-| **Attachments** | Document, Communication, Restriction, Deadline, Classification, Action, CommunicationResponse |
+| **Records** | Document, Communication, Restriction, Deadline, Classification, Action, CommunicationResponse |
 
-Domains refer to research-administration organizational concepts. Two additional tables — **AllowedValues** and **BudgetCategory** — are implementation tables that support the model's mechanics (controlled vocabularies and shared reference codes) and are intentionally not counted as a domain. They are documented at the end of the Table reference.
+Core modules are the universal capabilities of research administration; every implementation carries all of them. Two additional tables — **AllowedValues** and **BudgetCategory** — are implementation tables that support the model's mechanics (controlled vocabularies and shared reference codes) and are intentionally not a core module. They are documented at the end of the Table reference.
 
 ---
 
@@ -99,12 +104,12 @@ A foreign key whose name carries the *role* of the relationship rather than just
 
 ### Polymorphic attachment
 
-Seven tables in the Attachments domain can attach to *any* listed parent table via two columns:
+Seven tables in the Records core module can attach to *any* listed parent table via two columns:
 
 - `Related_Entity_Type`: the name of the table being attached to, constrained to a per-attachment list of allowed table names.
 - `Related_Entity_ID`: the primary key value in that table.
 
-The Attachments domain generalizes the everyday RA concept of "attaching a document to an award" to all the things that accumulate around a record: files, correspondence, restrictions, deadlines, tags, work items, and audit events.
+The Records core module generalizes the everyday RA concept of "attaching a document to an award" to all the things that accumulate around a record: files, correspondence, restrictions, deadlines, tags, work items, and structured responses.
 
 The model requires that the referenced record exists. See *Implementation guidance* for enforcement options.
 
@@ -174,7 +179,7 @@ Every table includes the following columns. They are not repeated in the per-tab
 Three mechanisms touch the question "when did this change?" and each answers a different scope:
 
 - `Updated_At` marks the moment of the most recent write to the row. Single timestamp, overwritten on every update; preserves no history.
-- **Versioned storage** (Dolt, Trino on Apache Iceberg, temporal tables in Postgres / SQL Server) handles the raw-column-history layer when needed. Time-travel queries reconstruct any field's prior value at any past point in time without application instrumentation. The UDM assumes this layer for deployments that need full row history (see *Optional extensions > Field-level audit / history tables*).
+- **Versioned storage** (Dolt, Trino on Apache Iceberg, temporal tables in Postgres / SQL Server) handles the raw-column-history layer when needed. Time-travel queries reconstruct any field's prior value at any past point in time without application instrumentation. The UDM assumes this layer for deployments that need full row history (see *Local extensions > Field-level audit / history tables*).
 
 So: `Updated_At` answers "is this row stale." Versioned storage answers "what did column X look like on date D, and which business events touched this row." Any history question deeper than the latest write resolves at the storage layer; the "Audit record shape" pattern (vignettes/udm-v2-patterns.md) documents the canonical projected shape.
 
@@ -276,7 +281,7 @@ An external Co-Investigator at a subrecipient institution is recorded as **both*
 
 A single consulting arrangement or equity holding can be all three: a disclosed conflict (ConflictOfInterest row), active outside support if the engagement provides research funding (OtherSupport row + OtherSupportDisclosure rows as it is reported to sponsors), and an instance under the institutional COI regime (ComplianceRequirement row of type COI). When ConflictOfInterest and OtherSupport describe the same engagement, the `ConflictOfInterest.OtherSupport_ID` FK links them so that "the COI disclosure for this Other Support entry" is a single join rather than a heuristic match by Personnel + Organization. The link is optional; many COI disclosures (royalties, board memberships without active support) have no OtherSupport counterpart, and many OtherSupport rows (purely sponsored work at another institution that the COI policy treats as non-conflicting) have no COI counterpart.
 
-Foreign-engagement disclosures (foreign affiliations, foreign appointments, foreign talent-program participation, foreign funding sources) are not modeled in the canonical ConflictOfInterest table; institutions subject to NSPM-33 or comparable research-security regimes add a local extension (see *Optional extensions*).
+Foreign-engagement disclosures (foreign affiliations, foreign appointments, foreign talent-program participation, foreign funding sources) are not modeled in the canonical ConflictOfInterest table; institutions subject to NSPM-33 or comparable research-security regimes add a local extension (see *Local extensions*).
 
 **Sponsor decision artifacts (NoA, decline letter, modification notice).** Sponsor-issued decision documents have three independent representations:
 
@@ -386,11 +391,11 @@ CostShare has no separate `*_Status` column; CostShare.Lifecycle_Stage is author
 
 ## Polymorphic attachment enforcement
 
-The six polymorphic Attachment tables (Document, Communication, Restriction, Deadline, Classification, Action) use a polymorphic foreign key (`Related_Entity_Type` + `Related_Entity_ID`) that no single declarative reference can fully enforce.
+The six polymorphic Records tables (Document, Communication, Restriction, Deadline, Classification, Action) use a polymorphic foreign key (`Related_Entity_Type` + `Related_Entity_ID`) that no single declarative reference can fully enforce.
 
 The model requires two enforcement properties:
 
-1. **`Related_Entity_Type` is constrained** to a per-attachment allowed list of target table names (enumerated in each attachment's table reference).
+1. **`Related_Entity_Type` is constrained** to a per-attachment allowed list of target table names (enumerated in each attachment's table reference). Optional modules extend a list only through the Records target registry: a module declares which of its tables are attachable, and implementations honor declared targets.
 2. **`Related_Entity_ID` references an existing row** in the table named by `Related_Entity_Type`.
 
 Implementations satisfy (1) using the platform's enumeration mechanism. Implementations satisfy (2) using whatever the platform provides: database triggers, application-layer hooks, scheduled integrity checks, or other mechanisms appropriate to the institution's stack. The *Implementation guidance* section discusses common approaches; the schema does not prescribe one. Removal behavior (what happens to attached rows when the parent is removed) is an institutional choice and is not specified.
@@ -943,7 +948,7 @@ A person's role on an Award (or Subaward), with effort allocation, date range, a
 
 - Committee membership, sponsor program officers, subrecipient AOs, vendor contacts, institutional liaisons → **OrganizationRole**
 - Protocol staff (including the protocol PI) on a compliance protocol → **ProtocolRole**
-- Trainee appointment metadata (slot, eligibility, payback) lives outside this model; see Optional Extensions
+- Trainee appointment metadata (slot, eligibility, payback) lives outside this model; see Local extensions
 
 Roles attach to the funding instrument (Award or Subaward). Cross-Award team queries (the persistent research team across competing renewals) join through `Award.Group_ID` to aggregate AwardRole rows whose parent Awards share a Group.
 
@@ -990,7 +995,7 @@ Per-stage effort detail for a AwardRole. The Lifecycle_Stage column distinguishe
 
 ---
 
-### Money
+### Finance
 
 #### Budget
 
@@ -1215,7 +1220,7 @@ Personnel listed on a specific ComplianceRequirement (the PI on the protocol, IR
 
 #### ConflictOfInterest
 
-Personal disclosures covering conflicts of interest and conflicts of commitment. The Relationship_Type discriminates the disclosure category. Foreign-engagement disclosures and the broader research-security workflow (NSPM-33 reporting, foreign-component flags, foreign-affiliation / talent-program / funding details) are out of scope; see *Optional extensions*.
+Personal disclosures covering conflicts of interest and conflicts of commitment. The Relationship_Type discriminates the disclosure category. Foreign-engagement disclosures and the broader research-security workflow (NSPM-33 reporting, foreign-component flags, foreign-affiliation / talent-program / funding details) are out of scope; see *Local extensions*.
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
@@ -1325,9 +1330,9 @@ Standardized budget line item categories (SF-424 R&R standard).
 
 ---
 
-### Attachments
+### Records
 
-Six of the Attachment tables share the polymorphic columns `Related_Entity_Type` and `Related_Entity_ID`; CommunicationResponse attaches to Communication by direct foreign key. Enforcement rules are described in *Polymorphic attachment enforcement* above. Each table's allowed `Related_Entity_Type` values are listed in its Notes column.
+Six of the Records tables share the polymorphic columns `Related_Entity_Type` and `Related_Entity_ID`; CommunicationResponse attaches to Communication by direct foreign key. Enforcement rules are described in *Polymorphic attachment enforcement* above. Each table's allowed `Related_Entity_Type` values are listed in its Notes column.
 
 **Deadline vs Action.** Both Deadline and Action carry a due date, a responsible person, and a status. They differ in what they primarily describe:
 
@@ -1485,7 +1490,7 @@ Convention: attachments reference other attachments by attaching to the same par
 
 ---
 
-## Optional extensions
+## Local extensions
 
 Areas the UDM deliberately does not model in v2. Institutions that need these capabilities add local extension tables and reference them from the canonical entities listed below. These are not gaps in the model; they are scope decisions.
 
@@ -1539,11 +1544,11 @@ Institutions with substantial ticket volume that need structured analysis beyond
 - Award.Parent_Award_ID groups incremental segments under one award identity; Award.Previous_Award_ID points at the predecessor on a competing renewal (parallel to Proposal.Previous_Proposal_ID). Award.Originating_Award_ID is a derived stored column pointing at the root of the Previous_Award_ID chain (parallel to Proposal.Originating_Proposal_ID), so lineage queries do not require recursive CTE traversal. Subaward renewal lineage flows through the Prime Award chain (no dedicated `Previous_Subaward_ID`); Subaward.Parent_Subaward_ID handles within-prime cascading/amended subawards. The discriminator between Modification, Parent_Award_ID, and Previous_Award_ID is documented in *Semantic conventions*.
 - Organization_Type carries structural classification (Department / College / School / Institute / Center / External). Functional roles (Sponsor, Subrecipient, Vendor, Committee, Prime_Sponsor, Program_Office, Pass_Through_Entity) are recorded as OrganizationCapability rows so a single Organization can play multiple roles across contexts.
 - Three parallel "person-in-role" tables capture personnel relationships: AwardRole (institutional staff on an Award or Subaward), OrganizationRole (anyone playing a role at an Organization: committee member, sponsor program officer, subrecipient AO, vendor contact, institutional liaison), and ProtocolRole (personnel on a compliance protocol, including the responsible PI). Each uses a Role_Value_ID FK to AllowedValues with its own canonical Value_Group.
-- AwardRole is limited to award-side staffing (PI / Co_PI / Co_I / Multi_PI / Coordinator / Key_Personnel / Cohort_Participant / Coach / Mentor / Trainee). Protocol staff and the protocol PI live in ProtocolRole. Sponsor-side, subrecipient-side, vendor-side, and committee roles live in OrganizationRole. Trainee appointment metadata (slot, eligibility, payback obligations) is in Optional Extensions.
-- Compliance covers regulatory requirements across regimes (ComplianceRequirement is intentionally generic across IRB / IACUC / IBC / COI / Radiation / Export_Control / Other, with renewal chaining via Parent_ComplianceRequirement_ID, AllowedValues-backed Review_Pathway and Classification_Level vocabularies that vary by Requirement_Type, separate Issuing_Authority and Reviewing_Authority Organization references, and nullable Expiration_Date for non-expiring determinations). ComplianceCoverage is the M:N junction between requirements and Awards (or Subawards); ProtocolRole is the protocol-scoped roster (the responsible PI plus study staff). Personal disclosures live in ConflictOfInterest (extended for foreign-engagement disclosures). External research support is split into OtherSupport (the *fact* of outside support, person-anchored) and OtherSupportDisclosure (the *event* of disclosing that fact, with optional triggering Proposal or Award). Invention disclosures and the full tech-transfer pipeline are out of scope; institutions running tech-transfer programs add a local extension or attach disclosures as Documents (see Optional Extensions).
+- AwardRole is limited to award-side staffing (PI / Co_PI / Co_I / Multi_PI / Coordinator / Key_Personnel / Cohort_Participant / Coach / Mentor / Trainee). Protocol staff and the protocol PI live in ProtocolRole. Sponsor-side, subrecipient-side, vendor-side, and committee roles live in OrganizationRole. Trainee appointment metadata (slot, eligibility, payback obligations) is in Local extensions.
+- Compliance covers regulatory requirements across regimes (ComplianceRequirement is intentionally generic across IRB / IACUC / IBC / COI / Radiation / Export_Control / Other, with renewal chaining via Parent_ComplianceRequirement_ID, AllowedValues-backed Review_Pathway and Classification_Level vocabularies that vary by Requirement_Type, separate Issuing_Authority and Reviewing_Authority Organization references, and nullable Expiration_Date for non-expiring determinations). ComplianceCoverage is the M:N junction between requirements and Awards (or Subawards); ProtocolRole is the protocol-scoped roster (the responsible PI plus study staff). Personal disclosures live in ConflictOfInterest (extended for foreign-engagement disclosures). External research support is split into OtherSupport (the *fact* of outside support, person-anchored) and OtherSupportDisclosure (the *event* of disclosing that fact, with optional triggering Proposal or Award). Invention disclosures and the full tech-transfer pipeline are out of scope; institutions running tech-transfer programs add a local extension or attach disclosures as Documents (see Local extensions).
 - Award is the fundamental unit of sponsored work. Every Award originates from a Proposal (`Award.Proposal_ID` is required). The PI on an Award is captured in AwardRole (`Role_Value_ID` resolving to PI), not denormalized onto Award; the same applies to Subaward. `Award.Original_End_Date` and `Award.Original_Total_Funded` are frozen at execution; `Award.Current_End_Date` and `Award.Current_Total_Funded` are derived from approved Modifications (see *Derived values*).
 - Grouping of related Awards under one longitudinal identity (a multi-year research line, a center program, a cohort training sequence, alternating-lead joint ventures) is supported by two independent mechanisms on Proposal plus a pre-fill on Award: `Proposal.Originating_Proposal_ID` (derived root of the `Previous_Proposal_ID` chain, auto-updates with lineage edits), `Proposal.Group_ID` (user-maintained label, stable against lineage edits), and `Award.Group_ID` (pre-filled from the originating Proposal's `Group_ID` at Award insert; may be overridden afterward). The two Proposal mechanisms are independent: the disagreement between lineage and Group_ID is informative (it signals a deliberate fork or merge by the institution).
 - Funding Cycle includes structured reporting (Report: per-period sponsor deliverables with submission and acceptance tracking), closeout (Closeout: the multi-subworkflow closeout state object for an Award or Subaward), pre-award authorization (PreAwardAuthorization: the institutional at-risk spending decision before an Award is executed), and proposal routing (ProposalApproval: the institutional sign-off chain on a Proposal). Award and Proposal carry a Mechanism_Value_ID referencing the canonical FundingMechanism vocabulary (R01, R21, P01, T32, Cooperative_Agreement, Contract_BAA, etc.).
-- The Money domain includes RateAgreement (the NICRA) that owns its rate line items (IndirectRate), and Equipment (capital asset attached XOR-style to Award or Subaward for closeout title-disposition tracking).
+- The Finance core module includes RateAgreement (the NICRA) that owns its rate line items (IndirectRate), and Equipment (capital asset attached XOR-style to Award or Subaward for closeout title-disposition tracking).
 - Universal status taxonomies enumerated in *Status taxonomy reference*; institution-specific enums extend via AllowedValues with cross-institution normalization through Canonical_Value_Code.
 - The specification is database-engine agnostic; constraints are stated abstractly and *Implementation guidance* documents the rules that require enforcement mechanisms beyond simple column declarations.

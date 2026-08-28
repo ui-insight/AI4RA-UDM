@@ -2,7 +2,7 @@
 
 A universal data model for research administration. The UDM provides a common schema that any institution can adopt to standardize how research administration data is structured, described, and shared — regardless of what systems they use internally.
 
-**Current version: v2.1.0** (released 2026-08-26; v2.0.0 released 2026-06-11). The v1 model is preserved for reference; see [Versions](#versions) below.
+**Current version: v2.2.0** (released 2026-08-28; v2.0.0 released 2026-06-11). The v1 model is preserved for reference; see [Versions](#versions) below.
 
 ## Mission
 
@@ -26,20 +26,20 @@ The UDM v2 is defined in two complementary artifacts:
 
 The two are kept in exact sync; the prose spec is authoritative on intent, the JSON on machine-consumable detail. An architectural overview lives in [`vignettes/ontology.md`](vignettes/ontology.md), and the version history in [`vignettes/CHANGELOG.md`](vignettes/CHANGELOG.md).
 
-### Domain Organization
+### Core Modules
 
-The model's 47 tables are organized into six research administration domains, plus two implementation tables:
+The model's 47 tables are organized into six core modules (the universal capabilities of research administration), plus two implementation tables:
 
-| Domain | Tables | Purpose |
+| Core module | Tables | Purpose |
 |--------|--------|---------|
 | **Actors** | Personnel, PersonnelCredential, Organization, OrganizationCapability, OrganizationIdentifier, OrganizationRole, ContactDetails | People, organizations, their roles, credentials, and contact information |
 | **Funding Cycle** | RFA, RFARequirement, Proposal, ProposalApproval, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout | The full lifecycle from funding opportunity through proposal, award, and closeout |
 | **Effort** | AwardRole, Effort | Roles on funded work and effort certification |
-| **Money** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment | Budgets, accounting, transactions, rates, and capital assets |
+| **Finance** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment | Budgets, accounting, transactions, rates, and capital assets |
 | **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure, PolicyException | IRB/IACUC protocols, COI, other support, policy exceptions, and regulatory tracking |
-| **Attachments** | Document, Communication, Restriction, Deadline, Classification, Action, CommunicationResponse | Supporting records that attach to entities across all domains |
+| **Records** | Document, Communication, Restriction, Deadline, Classification, Action, CommunicationResponse | The records that accumulate around the work, attached across all core modules |
 
-**Implementation tables** (not a domain): `AllowedValues` (institution-specific controlled vocabularies with cross-institution canonical codes) and `BudgetCategory` (shared budget category reference). Domains refer to research-administration organizational concepts; these two tables support the model's mechanics.
+**Implementation tables** (not a core module): `AllowedValues` (institution-specific controlled vocabularies with cross-institution canonical codes) and `BudgetCategory` (shared budget category reference). Core modules are research-administration capabilities; these two tables support the model's mechanics.
 
 The model also includes **12 example views** (e.g., `vw_Active_Awards`, `vw_Award_Lineage`, `vw_Overdue_Reports`) as reference query implementations that institutions can adopt or adapt for dashboards and reporting.
 
@@ -64,7 +64,7 @@ v2 rests on a small set of universal patterns applied consistently across the mo
 
 - **Lifecycle_Stage discriminator** — one table carries a record through its whole life (Budget: Proposed → Approved → Current → Actual; likewise Effort, CostShare, Payment), with revisions chained through `Parent_*_ID`.
 - **Two-FK exclusive-or attachment** — satellite tables (Modification, Report, Transaction, Terms, Closeout, and others) attach to either an Award or a Subaward via two nullable FKs, keeping inbound and outbound funding symmetric.
-- **Polymorphic attachment** — the seven Attachments tables reference any permitted entity via `Related_Entity_Type` + `Related_Entity_ID`, with documented minimum-conformance enforcement behavior.
+- **Polymorphic attachment** — six Records tables reference any permitted entity via `Related_Entity_Type` + `Related_Entity_ID`, with documented minimum-conformance enforcement behavior.
 - **Flexible vs. fixed enumerations** — institution-specific vocabularies live in the `AllowedValues` table (with `Canonical_Value_Code` for cross-institution normalization); universal standards use CHECK constraints. See [allowedvalues.md](vignettes/allowedvalues.md).
 - **Derived columns with recompute triggers** — convenience columns like `Award.Current_End_Date` are documented as derived, with the rules to recompute them.
 - **Audit and provenance columns** on every table (`Created_At`, `Updated_At`, `Source_System`, `Source_Record_ID`, `Is_Active`).
@@ -79,16 +79,17 @@ The `udm_schema_v2.json` structure (abbreviated):
 {
   "metadata": {
     "name": "UDM",
-    "version": "2.0.0",
+    "version": "2.2.0",
     "dialect": "MySQL",
     "spec_source": "vignettes/udm-v2-system-of-record.md",
     "abstract_type_mapping": { "ID": "VARCHAR(50)", "Money": "DECIMAL(15,2)", "...": "..." }
   },
-  "domain_membership": { "Actors": ["Personnel", "..."], "...": ["..."] },
+  "core_module_membership": { "Actors": ["Personnel", "..."], "...": ["..."] },
+  "architecture": { "module_taxonomy": { "criterion": "...", "encapsulation": "..." }, "...": "..." },
   "column_synonyms": { "values": { "Award.Award_Number": "Sponsor Award Number, NoA Number, Grant Number", "...": "..." } },
   "tables": {
     "Award": {
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "description": "Funded agreements...",
       "columns": {
         "Award_ID": { "type": "VARCHAR(50)", "primary_key": true, "required": true, "description": "PK" },
@@ -183,18 +184,18 @@ See the [Infrastructure tab](https://ui-insight.github.io/AI4RA-UDM/) of the das
 
 | Version | Status | Artifacts |
 |---------|--------|-----------|
-| **v2.1** | Current | [`udm_schema_v2.json`](udm_schema_v2.json), [prose spec](vignettes/udm-v2-system-of-record.md) |
+| **v2.2** | Current | [`udm_schema_v2.json`](udm_schema_v2.json), [prose spec](vignettes/udm-v2-system-of-record.md) |
 | v1.0 | Preserved for reference | [`udm_schema.json`](udm_schema.json) |
 
-v2 is a major refactor: 47 tables (from 40), six domains (from ten), unified lifecycle modeling, Award/Subaward symmetry, and rule catalogs for cross-row constraints and semantic conventions. See the [CHANGELOG](vignettes/CHANGELOG.md) for the full delta and migration guidance from v1.
+v2 is a major refactor: 47 tables (from 40), six core modules (from ten domains), unified lifecycle modeling, Award/Subaward symmetry, and rule catalogs for cross-row constraints and semantic conventions. See the [CHANGELOG](vignettes/CHANGELOG.md) for the full delta and migration guidance from v1.
 
-## Roadmap: Core and Standard Modules
+## Roadmap: Core and Optional Modules
 
-The UDM grows by a hub-and-spoke plan. The **core** is required for any implementation; **standard modules** are optional, fully specified, versioned extensions an implementation declares ("UDM core + modules: governance, IP"). The rule that decides what becomes a module: **a module must be a capability an institution recognizably has or lacks** — the adopter can finish the sentence "we need this module because we do X." Modules are carved by story, never by abstraction depth.
+The UDM grows by a hub-and-spoke plan under one taxonomy: everything specified is a **module**. **Core modules** are the universal capabilities, required of every implementation; **optional modules** are declared per implementation ("UDM core + modules: governance, IP"); **local extensions** are unspecified. Two laws govern every module. The **capability criterion**: a module must be a capability an institution recognizably exercises ("we do X"), with universality deciding the tier; modules are carved by story, never by abstraction depth. The **encapsulation rule**: a module adds only its own tables, referencing the core by foreign key; it never adds columns to, alters constraints of, or extends the closed vocabularies of the core, with two sanctioned extension points (the Records target registry and AllowedValues value groups).
 
 ```mermaid
 graph TD
-    CORE(["UDM Core — 7 domains<br/>Actors · Funding Cycle · Effort · Money<br/>Compliance · Attachments · Outputs"])
+    CORE(["UDM Core — core modules<br/>Actors · Funding Cycle · Effort · Finance<br/>Compliance · Records · Outputs"])
     CP["Compliance Protocols<br/>shared protocol spine"]
     AR["Animal Research"]
     HS["Human Subjects"]
@@ -221,7 +222,7 @@ graph TD
 
 | Piece | Contents | Status |
 |---|---|---|
-| **Outputs (core domain 7)** | Output, OutputContributor, AwardOutput, PublicationDetail, DatasetDetail, SoftwareDetail — what funded work produced, reported against awards | Designed ([#71](https://github.com/ui-insight/AI4RA-UDM/issues/71)) |
+| **Outputs (core module 7)** | Output, OutputContributor, AwardOutput, PublicationDetail, DatasetDetail, SoftwareDetail — what funded work produced, reported against awards | Designed ([#71](https://github.com/ui-insight/AI4RA-UDM/issues/71)) |
 | **IP module** | InventionDisclosureDetail, PatentFiling — disclosure events, Bayh-Dole election, filing records | Designed |
 | **Governance module** | Committee, CommitteeMember, Meeting, MeetingAttendance | Designed ([#69](https://github.com/ui-insight/AI4RA-UDM/issues/69)) |
 | **Compliance Protocols (shared spine)** | Protocol, coverage, personnel, review workflow, amendments, continuing review, adverse events, deviations | Designed ([#60](https://github.com/ui-insight/AI4RA-UDM/issues/60)) |
@@ -233,7 +234,7 @@ graph TD
 The UDM improves through community input. There are several ways to participate:
 
 - **Suggest changes or report issues**: Open a [GitHub Issue](https://github.com/ui-insight/AI4RA-UDM/issues) describing the table, column, or convention you'd like to add, change, or discuss
-- **Join the discussion**: Use [GitHub Discussions](https://github.com/ui-insight/AI4RA-UDM/discussions) for broader questions about the model's direction, new domain coverage, or adoption experiences
+- **Join the discussion**: Use [GitHub Discussions](https://github.com/ui-insight/AI4RA-UDM/discussions) for broader questions about the model's direction, new capability coverage, or adoption experiences
 - **Take the survey**: A short [practitioner survey](https://bit.ly/4b5b21q) on what your institution needs from a shared model
 
 When `udm_schema_v2.json` is updated on `main`, CI automatically regenerates the dashboard data files served via GitHub Pages.

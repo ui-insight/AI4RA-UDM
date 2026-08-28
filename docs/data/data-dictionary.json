@@ -4,7 +4,7 @@
       "name": "Personnel",
       "description": "Individuals involved in research administration: faculty, staff, students, postdocs, fellows, external collaborators, and sponsor-side contacts.",
       "synonyms": null,
-      "domain": "Actors",
+      "core_module": "Actors",
       "columns": [
         {
           "name": "Personnel_ID",
@@ -78,7 +78,7 @@
       "name": "PersonnelCredential",
       "description": "A person-level credential or identifier the institution needs to hold itself. Two scope rules: sponsor-system identifiers (eRA Commons, NSF FastLane) always in scope; HR-domain credentials in scope only for non-employee Personnel where HRIS does not apply.",
       "synonyms": null,
-      "domain": "Actors",
+      "core_module": "Actors",
       "columns": [
         {
           "name": "PersonnelCredential_ID",
@@ -146,7 +146,7 @@
       "name": "Organization",
       "description": "Institutional entities that participate in research funding flows: sponsors, academic units, subrecipients, vendors, committees.",
       "synonyms": null,
-      "domain": "Actors",
+      "core_module": "Actors",
       "columns": [
         {
           "name": "Organization_ID",
@@ -184,7 +184,7 @@
       "name": "OrganizationCapability",
       "description": "The functional roles an Organization plays. An Organization may carry multiple capabilities (NIH is both a Sponsor and, in some contexts, a Committee). The capability set is what cross-table constraints check.",
       "synonyms": null,
-      "domain": "Actors",
+      "core_module": "Actors",
       "columns": [
         {
           "name": "OrganizationCapability_ID",
@@ -240,7 +240,7 @@
       "name": "OrganizationIdentifier",
       "description": "External identifiers an Organization carries: UEI, EIN, DUNS, CAGE, IPF, IPEDS_ID, sponsor-issued codes. Parallels PersonnelCredential for people.",
       "synonyms": null,
-      "domain": "Actors",
+      "core_module": "Actors",
       "columns": [
         {
           "name": "OrganizationIdentifier_ID",
@@ -284,7 +284,7 @@
       "name": "ContactDetails",
       "description": "Email, phone, fax, mobile, and address records. Each record attaches to exactly one of a Personnel or an Organization.",
       "synonyms": null,
-      "domain": "Actors",
+      "core_module": "Actors",
       "columns": [
         {
           "name": "ContactDetails_ID",
@@ -328,7 +328,7 @@
       "name": "OrganizationRole",
       "description": "A person's role at an Organization. Generalizes the committee-member and external-party contact patterns. Distinct from AwardRole (institutional staff on an Award) and ProtocolRole (personnel on a compliance protocol).",
       "synonyms": null,
-      "domain": "Actors",
+      "core_module": "Actors",
       "columns": [
         {
           "name": "OrganizationRole_ID",
@@ -390,7 +390,7 @@
       "name": "RFA",
       "description": "A funding opportunity announcement (program announcement, solicitation, BAA, RFP).",
       "synonyms": null,
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "columns": [
         {
           "name": "RFA_ID",
@@ -500,7 +500,7 @@
       "name": "RFARequirement",
       "description": "A specific requirement extracted from an RFA. Acts as a template; per-proposal completion is tracked via an Action.",
       "synonyms": null,
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "columns": [
         {
           "name": "RFARequirement_ID",
@@ -562,7 +562,7 @@
       "name": "Proposal",
       "description": "A formal request for funding submitted to a sponsor.",
       "synonyms": null,
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "columns": [
         {
           "name": "Proposal_ID",
@@ -714,7 +714,7 @@
       "name": "ProposalApproval",
       "description": "A step in the institutional approval chain for a Proposal. Most universities require sign-off from PI, department chair, dean, and OSP before a Proposal can be submitted.",
       "synonyms": null,
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "columns": [
         {
           "name": "ProposalApproval_ID",
@@ -770,7 +770,7 @@
       "name": "PreAwardAuthorization",
       "description": "An institutional pre-award authorization to spend at-risk on a Proposal that has been favorably reviewed but not yet officially awarded.",
       "synonyms": null,
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "columns": [
         {
           "name": "PreAwardAuthorization_ID",
@@ -838,7 +838,7 @@
       "name": "Award",
       "description": "A funded grant, contract, or cooperative agreement \u2014 also called a 'project' or 'grant' in many institutional systems. The central post-award entity. Award represents inbound funding; Subaward represents the outbound symmetric case.",
       "synonyms": null,
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "columns": [
         {
           "name": "Award_ID",
@@ -1014,7 +1014,7 @@
       "name": "Modification",
       "description": "A change to an Award or Subaward after initial funding. XOR-attached to either Award or Subaward.",
       "synonyms": null,
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "columns": [
         {
           "name": "Modification_ID",
@@ -1118,7 +1118,7 @@
       "name": "Subaward",
       "description": "A subaward agreement between the institution and a subrecipient. Subaward exists at two scopes: planned (Proposal-stage) and executed (post-Prime-Award). Same row identity spans both via status change.",
       "synonyms": null,
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "columns": [
         {
           "name": "Subaward_ID",
@@ -1234,7 +1234,7 @@
       "name": "Negotiation",
       "description": "The contract or agreement bargaining lifecycle between the institution and a counterparty before final terms are accepted. Covers sponsor-on-Proposal (pre-NoA terms), sponsor-on-Award (mid-stream), and subrecipient-on-Subaward.",
       "synonyms": null,
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "columns": [
         {
           "name": "Negotiation_ID",
@@ -1308,7 +1308,7 @@
       "name": "Terms",
       "description": "The contractual terms and conditions of a funded agreement. One Terms row per parent agreement (Award or Subaward).",
       "synonyms": null,
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "columns": [
         {
           "name": "Terms_ID",
@@ -1388,7 +1388,7 @@
       "name": "Report",
       "description": "A scheduled or ad hoc deliverable to the sponsor: progress report, RPPR, FFR, final report, invention statement, data-sharing plan update.",
       "synonyms": null,
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "columns": [
         {
           "name": "Report_ID",
@@ -1474,7 +1474,7 @@
       "name": "Closeout",
       "description": "The closeout workflow object for an Award or Subaward. Coordinates several subworkflows (final report, final invoice, equipment disposition, IP closeout, COI closeout, records retention).",
       "synonyms": null,
-      "domain": "Funding Cycle",
+      "core_module": "Funding Cycle",
       "columns": [
         {
           "name": "Closeout_ID",
@@ -1560,7 +1560,7 @@
       "name": "AwardRole",
       "description": "A person's role on an Award (or Subaward), with effort allocation, date range, and credit attribution. Limited to award-side staffing roles.",
       "synonyms": null,
-      "domain": "Effort",
+      "core_module": "Effort",
       "columns": [
         {
           "name": "AwardRole_ID",
@@ -1646,7 +1646,7 @@
       "name": "Effort",
       "description": "Per-stage effort detail for an AwardRole. The Lifecycle_Stage column distinguishes proposed, approved, charged, and certified effort numbers.",
       "synonyms": null,
-      "domain": "Effort",
+      "core_module": "Effort",
       "columns": [
         {
           "name": "Effort_ID",
@@ -1750,7 +1750,7 @@
       "name": "Budget",
       "description": "Detailed line items for a budget at a specific lifecycle stage. Each Budget row carries Proposal_ID at every stage (stable chain identity) and post-award Award_ID or Subaward_ID at Approved and later stages.",
       "synonyms": null,
-      "domain": "Money",
+      "core_module": "Finance",
       "columns": [
         {
           "name": "Budget_ID",
@@ -1848,7 +1848,7 @@
       "name": "Fund",
       "description": "Fund codes from the institutional accounting system.",
       "synonyms": null,
-      "domain": "Money",
+      "core_module": "Finance",
       "columns": [
         {
           "name": "Fund_ID",
@@ -1886,7 +1886,7 @@
       "name": "Account",
       "description": "Chart-of-accounts entry for general ledger coding.",
       "synonyms": null,
-      "domain": "Money",
+      "core_module": "Finance",
       "columns": [
         {
           "name": "Account_ID",
@@ -1924,7 +1924,7 @@
       "name": "FinanceCode",
       "description": "The institutional accounting string that connects an Award to fund and account codes.",
       "synonyms": null,
-      "domain": "Money",
+      "core_module": "Finance",
       "columns": [
         {
           "name": "FinanceCode_ID",
@@ -1968,7 +1968,7 @@
       "name": "Transaction",
       "description": "An individual financial entry charged to an Award or Subaward.",
       "synonyms": null,
-      "domain": "Money",
+      "core_module": "Finance",
       "columns": [
         {
           "name": "Transaction_ID",
@@ -2054,7 +2054,7 @@
       "name": "RateAgreement",
       "description": "The negotiated F&A (indirect cost) rate agreement (NICRA) between an institution and its cognizant federal agency.",
       "synonyms": null,
-      "domain": "Money",
+      "core_module": "Finance",
       "columns": [
         {
           "name": "RateAgreement_ID",
@@ -2110,7 +2110,7 @@
       "name": "IndirectRate",
       "description": "A single negotiated rate within a RateAgreement (on-campus, off-campus, MTDC, etc.).",
       "synonyms": null,
-      "domain": "Money",
+      "core_module": "Finance",
       "columns": [
         {
           "name": "IndirectRate_ID",
@@ -2160,7 +2160,7 @@
       "name": "Equipment",
       "description": "A sponsor-purchased or institution-acquired capital asset associated with an Award or Subaward.",
       "synonyms": null,
-      "domain": "Money",
+      "core_module": "Finance",
       "columns": [
         {
           "name": "Equipment_ID",
@@ -2246,7 +2246,7 @@
       "name": "Payment",
       "description": "Payment records covering scheduled, invoiced, received, and reconciled stages.",
       "synonyms": null,
-      "domain": "Money",
+      "core_module": "Finance",
       "columns": [
         {
           "name": "Payment_ID",
@@ -2332,7 +2332,7 @@
       "name": "CostShare",
       "description": "Cost-sharing commitments across the lifecycle. Carries Proposal_ID at every stage (stable chain identity) and post-award Award_ID or Subaward_ID at Committed and later stages.",
       "synonyms": null,
-      "domain": "Money",
+      "core_module": "Finance",
       "columns": [
         {
           "name": "CostShare_ID",
@@ -2400,7 +2400,7 @@
       "name": "ComplianceRequirement",
       "description": "A regulatory approval required for research: IRB, IACUC, IBC, radiation safety, export control, etc. Standalone entity with its own lifecycle, independent of any particular Award. The Awards a requirement covers are recorded in ComplianceCoverage.",
       "synonyms": null,
-      "domain": "Compliance",
+      "core_module": "Compliance",
       "columns": [
         {
           "name": "ComplianceRequirement_ID",
@@ -2480,7 +2480,7 @@
       "name": "ComplianceCoverage",
       "description": "The M:N relationship between a ComplianceRequirement and the Awards (or Subawards) it covers.",
       "synonyms": null,
-      "domain": "Compliance",
+      "core_module": "Compliance",
       "columns": [
         {
           "name": "ComplianceCoverage_ID",
@@ -2524,7 +2524,7 @@
       "name": "ProtocolRole",
       "description": "Personnel listed on a specific ComplianceRequirement (the PI on the protocol, IRB study staff, IACUC personnel, IBC investigators, TCP-cleared personnel). Parallels AwardRole and OrganizationRole.",
       "synonyms": null,
-      "domain": "Compliance",
+      "core_module": "Compliance",
       "columns": [
         {
           "name": "ProtocolRole_ID",
@@ -2586,7 +2586,7 @@
       "name": "ConflictOfInterest",
       "description": "Personal disclosures covering conflicts of interest and conflicts of commitment. Foreign-engagement disclosures and NSPM-33 reporting are out of scope; see Optional Extensions.",
       "synonyms": null,
-      "domain": "Compliance",
+      "core_module": "Compliance",
       "columns": [
         {
           "name": "ConflictOfInterest_ID",
@@ -2672,7 +2672,7 @@
       "name": "OtherSupport",
       "description": "A Personnel record's external research support (current, pending, in-kind). The fact of outside support, person-anchored.",
       "synonyms": null,
-      "domain": "Compliance",
+      "core_module": "Compliance",
       "columns": [
         {
           "name": "OtherSupport_ID",
@@ -2740,7 +2740,7 @@
       "name": "OtherSupportDisclosure",
       "description": "A single disclosure event of an OtherSupport row. The same outside appointment is typically disclosed many times across a researcher's career.",
       "synonyms": null,
-      "domain": "Compliance",
+      "core_module": "Compliance",
       "columns": [
         {
           "name": "OtherSupportDisclosure_ID",
@@ -2796,7 +2796,7 @@
       "name": "PolicyException",
       "description": "An institutionally granted exception to a sponsor or institutional policy rule: PI-eligibility waivers, COI management exceptions, cost-share waivers, indirect-rate exceptions. Scoped to a Personnel record, optionally narrowed to one Proposal, Award, or Subaward; all three scope FKs null means a blanket exception for the person.",
       "synonyms": null,
-      "domain": "Compliance",
+      "core_module": "Compliance",
       "columns": [
         {
           "name": "PolicyException_ID",
@@ -2900,7 +2900,7 @@
       "name": "AllowedValues",
       "description": "Institution-specific controlled vocabularies. The Value_Group column names a family.",
       "synonyms": null,
-      "domain": "Implementation",
+      "core_module": "Implementation",
       "columns": [
         {
           "name": "AllowedValue_ID",
@@ -2944,7 +2944,7 @@
       "name": "BudgetCategory",
       "description": "Standardized budget line item categories (SF-424 R&R standard).",
       "synonyms": null,
-      "domain": "Implementation",
+      "core_module": "Implementation",
       "columns": [
         {
           "name": "BudgetCategory_ID",
@@ -2982,7 +2982,7 @@
       "name": "Document",
       "description": "Files associated with any entity.",
       "synonyms": null,
-      "domain": "Attachments",
+      "core_module": "Records",
       "columns": [
         {
           "name": "Document_ID",
@@ -3062,7 +3062,7 @@
       "name": "Communication",
       "description": "Inbound or outbound correspondence between the institution and an external party.",
       "synonyms": null,
-      "domain": "Attachments",
+      "core_module": "Records",
       "columns": [
         {
           "name": "Communication_ID",
@@ -3142,7 +3142,7 @@
       "name": "CommunicationResponse",
       "description": "A per-recipient structured response to a Communication. The Communication carries the message; a Deadline attached to the Communication carries the response window; each recipient's response is one row. Pre-create one Pending row per intended recipient at notification time.",
       "synonyms": null,
-      "domain": "Attachments",
+      "core_module": "Records",
       "columns": [
         {
           "name": "CommunicationResponse_ID",
@@ -3198,7 +3198,7 @@
       "name": "Restriction",
       "description": "Operational constraints attached to an entity (CUI, CMMC, export control, publication holds, foreign-personnel limits).",
       "synonyms": null,
-      "domain": "Attachments",
+      "core_module": "Records",
       "columns": [
         {
           "name": "Restriction_ID",
@@ -3266,7 +3266,7 @@
       "name": "Deadline",
       "description": "Future-dated obligations attached to an entity. Calendar-style: tells you WHEN.",
       "synonyms": null,
-      "domain": "Attachments",
+      "core_module": "Records",
       "columns": [
         {
           "name": "Deadline_ID",
@@ -3328,7 +3328,7 @@
       "name": "Classification",
       "description": "Subject tags and research-area codes attached to entities.",
       "synonyms": null,
-      "domain": "Attachments",
+      "core_module": "Records",
       "columns": [
         {
           "name": "Classification_ID",
@@ -3378,7 +3378,7 @@
       "name": "Action",
       "description": "Work items attached to entities: deliverables, checklist items, service requests, modification approvals, compliance renewals, training requirements. Worklist-style: tells you WHAT and WHO.",
       "synonyms": null,
-      "domain": "Attachments",
+      "core_module": "Records",
       "columns": [
         {
           "name": "Action_ID",

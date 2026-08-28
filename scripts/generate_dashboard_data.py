@@ -47,7 +47,7 @@ def main():
             'name': table_name,
             'description': table_data.get('description', ''),
             'synonyms': None,
-            'domain': table_data.get('domain'),
+            'core_module': table_data.get('core_module'),
             'columns': columns,
         }
 
