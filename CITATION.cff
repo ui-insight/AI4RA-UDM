@@ -12,8 +12,8 @@ repository-code: https://github.com/ui-insight/AI4RA-UDM
 url: https://ui-insight.github.io/AI4RA-UDM/
 identifiers:
   - type: url
-    value: https://www.dolthub.com/repositories/n8layman/AI4RA-UDM
-    description: Canonical schema hosted on DoltHub
+    value: https://ui-insight.github.io/AI4RA-UDM/data/udm_schema_v2.json
+    description: Canonical machine-readable schema (current version)
 abstract: >-
   A canonical schema for research administration covering pre-award
   proposal preparation, sponsor submission, post-award management,
