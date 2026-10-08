@@ -46,8 +46,8 @@ export default function DataDictionaryTab({
 
     const moduleOrder = new Map(coreModuleGroups.map((d, i) => [d.name, i]));
     out.sort((a, b) => {
-      const da = a.core_module ? moduleOrder.get(a.core_module) ?? 999 : 999;
-      const db = b.core_module ? moduleOrder.get(b.core_module) ?? 999 : 999;
+      const da = a.coreModule ? moduleOrder.get(a.coreModule) ?? 999 : 999;
+      const db = b.coreModule ? moduleOrder.get(b.coreModule) ?? 999 : 999;
       if (da !== db) return da - db;
       return a.name.localeCompare(b.name);
     });
@@ -112,7 +112,7 @@ export default function DataDictionaryTab({
                   }}
                 >
                   <Td>
-                    {r.core_module ? (
+                    {r.coreModule ? (
                       <span
                         style={{
                           display: 'inline-block',
@@ -125,7 +125,7 @@ export default function DataDictionaryTab({
                           border: `1px solid ${r.coreModuleColor}40`,
                         }}
                       >
-                        {r.core_module}
+                        {r.coreModule}
                       </span>
                     ) : (
                       <span style={{ color: '#94a3b8', fontStyle: 'italic' }}>—</span>
