@@ -40,6 +40,7 @@ REQUIRED_TOP_LEVEL = [
     "example_views",
     "summary",
     "implementation_tables",
+    "optional_modules",
 ]
 
 # Documented exceptions to the TableName_ID primary-key convention.
@@ -159,6 +160,58 @@ def main():
             home = next((d for d, ms in dm.items() if tname in ms), None)
             if home is not None and declared != home:
                 err(f"{tname}: core_module '{declared}' disagrees with core_module_membership ('{home}')")
+
+    # --- Optional modules: structure, conventions, and encapsulation ---
+    om = schema.get("optional_modules", {}).get("modules", {})
+    core_tables = set(tables)
+    all_module_tables = {}
+    for mkey, mod in om.items():
+        for req in ("name", "story", "requires", "records_targets", "allowed_value_groups", "tables"):
+            if req not in mod:
+                err(f"module {mkey}: missing required key '{req}'")
+        for dep in mod.get("requires", {}).get("modules", []):
+            if dep not in om:
+                err(f"module {mkey}: requires unknown module '{dep}'")
+        for tname in mod.get("tables", {}):
+            if tname in core_tables:
+                err(f"module {mkey}: table '{tname}' collides with a core table (encapsulation violation)")
+            if tname in all_module_tables:
+                err(f"module {mkey}: table '{tname}' also defined by module '{all_module_tables[tname]}'")
+            all_module_tables[tname] = mkey
+        for target in mod.get("records_targets", []):
+            if target not in mod.get("tables", {}):
+                err(f"module {mkey}: records_target '{target}' is not one of the module's own tables")
+    for mkey, mod in om.items():
+        deps = mod.get("requires", {}).get("modules", [])
+        visible = set(core_tables)
+        visible.update(mod.get("tables", {}))
+        for dep in deps:
+            visible.update(om.get(dep, {}).get("tables", {}))
+        for tname, tdef in mod.get("tables", {}).items():
+            cols = tdef.get("columns", {})
+            if not isinstance(cols, dict) or not cols:
+                err(f"module {mkey}.{tname}: columns must be a non-empty object")
+                continue
+            expected_pk = f"{tname}_ID"
+            if expected_pk not in cols or not cols[expected_pk].get("primary_key"):
+                err(f"module {mkey}.{tname}: expected primary-key column '{expected_pk}'")
+            for cname, cdef in cols.items():
+                if "type" not in cdef:
+                    err(f"module {mkey}.{tname}.{cname}: missing 'type'")
+                if not cdef.get("description"):
+                    warn(f"module {mkey}.{tname}.{cname}: empty description")
+                ref = cdef.get("references")
+                if isinstance(ref, dict):
+                    rt, rc = ref.get("table"), ref.get("column")
+                    if rt not in visible:
+                        err(f"module {mkey}.{tname}.{cname}: references '{rt}', which is not core, own-module, or a declared dependency (encapsulation violation)")
+                    else:
+                        rcols = tables.get(rt, {}).get("columns") if rt in tables else None
+                        if rcols is None:
+                            owner = all_module_tables.get(rt)
+                            rcols = om[owner]["tables"][rt]["columns"] if owner else {}
+                        if rc not in rcols:
+                            err(f"module {mkey}.{tname}.{cname}: references unknown column '{rt}.{rc}'")
 
     # --- Referential: column_synonyms resolve ---
     syn = schema.get("column_synonyms", {})

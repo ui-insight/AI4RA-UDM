@@ -66,9 +66,18 @@ const logicKinds = [
   { kind: 'Usage conventions', examples: 'Modification vs new Award, role-bearer changes, submission events', home: 'Consumers and integrators', spec: '20 semantic conventions' },
 ];
 
+const optionalModules = [
+  { name: 'Compliance Protocols', story: 'We run protocol-based compliance review', tables: 8, requires: 'core' },
+  { name: 'Animal Research', story: 'We have an IACUC', tables: 5, requires: 'Compliance Protocols' },
+  { name: 'Human Subjects', story: 'We have an IRB', tables: 3, requires: 'Compliance Protocols' },
+  { name: 'Biosafety', story: 'We have an IBC', tables: 2, requires: 'Compliance Protocols' },
+  { name: 'Governance', story: 'Our committees convene, vote, and keep minutes', tables: 4, requires: 'core' },
+  { name: 'Committee Protocol Review', story: 'We review protocols at convened committee meetings', tables: 2, requires: 'Compliance Protocols + Governance' },
+];
+
 const tiers = [
   { tier: 'Core modules', contents: 'The universal capabilities, required of every implementation: Actors, Funding Cycle, Effort, Finance, Compliance, Records (and Outputs at its release). Each is named for the sentence every institution can say: "we track the people involved," "we certify effort," "we keep the records"', meaning: 'Required. 47 canonical tables' },
-  { tier: 'Optional modules', contents: 'Capabilities only some institutions exercise, fully specified and versioned. Planned: IP; Governance; a Compliance Protocols spine carrying regime modules for Animal Research, Human Subjects, and Biosafety', meaning: 'Adopted by declaration, e.g. "UDM 2.x core + modules: governance, IP." Two adopters of the same module are interoperable on it' },
+  { tier: 'Optional modules', contents: 'Capabilities only some institutions exercise, fully specified and versioned. Available (v2.3): Compliance Protocols, Animal Research, Human Subjects, Biosafety, Governance, Committee Protocol Review. Planned: IP', meaning: 'Adopted by declaration, e.g. "UDM 2.3 core + modules: compliance_protocols, human_subjects, governance." Two adopters of the same module are interoperable on it' },
   { tier: 'Local extensions', contents: 'Institution-specific additions outside the specification', meaning: 'Not specified by UDM; the local-extensions registry documents where common cases belong' },
 ];
 
@@ -190,6 +199,30 @@ export default function OntologyTab() {
             </tbody>
           </table>
         </div>
+        <h3 style={{ color: '#2c3e50', margin: '1.5rem 0 0.75rem' }}>Optional modules (v2.3)</h3>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '0.5rem' }}>
+            <thead>
+              <tr>
+                <th style={th}>Module</th><th style={th}>Story</th><th style={th}>Tables</th><th style={th}>Requires</th>
+              </tr>
+            </thead>
+            <tbody>
+              {optionalModules.map((m) => (
+                <tr key={m.name}>
+                  <td style={{ ...td, whiteSpace: 'nowrap' }}><strong>{m.name}</strong></td>
+                  <td style={td}>"{m.story}"</td>
+                  <td style={td}>{m.tables}</td>
+                  <td style={td}>{m.requires}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p style={{ color: '#94a3b8', fontSize: '0.82rem', marginBottom: '1rem' }}>
+          Full module specifications live in vignettes/modules/ and under the optional_modules key of
+          the schema JSON. Planned: IP (requires the Outputs core module).
+        </p>
         <h3 style={{ color: '#2c3e50', margin: '1.5rem 0 0.75rem' }}>The module laws</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem' }}>
           {laws.map((l) => (

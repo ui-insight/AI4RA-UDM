@@ -22,7 +22,8 @@
     "local_extensions",
     "example_views",
     "summary",
-    "implementation_tables"
+    "implementation_tables",
+    "optional_modules"
   ],
   "properties": {
     "metadata": {
@@ -68,7 +69,53 @@
         }
       }
     },
-    "summary": { "type": "array", "items": { "type": "string" } }
+    "summary": { "type": "array", "items": { "type": "string" } },
+    "optional_modules": {
+      "type": "object",
+      "required": ["description", "modules"],
+      "properties": {
+        "description": { "type": "string" },
+        "modules": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["name", "story", "requires", "records_targets", "allowed_value_groups", "tables"],
+            "properties": {
+              "name": { "type": "string" },
+              "story": { "type": "string" },
+              "requires": {
+                "type": "object",
+                "required": ["core", "modules"],
+                "properties": {
+                  "core": { "type": "string" },
+                  "modules": { "type": "array", "items": { "type": "string" } }
+                }
+              },
+              "records_targets": { "type": "array", "items": { "type": "string" } },
+              "allowed_value_groups": { "type": "array", "items": { "type": "string" } },
+              "notes": { "type": "string" },
+              "tables": {
+                "type": "object",
+                "minProperties": 1,
+                "additionalProperties": {
+                  "type": "object",
+                  "required": ["description", "columns"],
+                  "properties": {
+                    "description": { "type": "string" },
+                    "columns": {
+                      "type": "object",
+                      "minProperties": 1,
+                      "additionalProperties": { "$ref": "#/$defs/column" }
+                    }
+                  }
+                }
+              },
+              "cross_row_constraints": { "type": "array" }
+            }
+          }
+        }
+      }
+    }
   },
   "$defs": {
     "table": {

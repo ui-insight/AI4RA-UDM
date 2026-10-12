@@ -76,32 +76,43 @@ def parse_first_column_table(body):
     return cols if in_table else None
 
 
-def main():
-    schema = json.loads(SCHEMA_PATH.read_text())
-    tables = schema["tables"]
-    prose = PROSE_PATH.read_text()
-
-    prose_sections = parse_prose(prose, set(tables))
-    drift = []
-
+def compare(tables, prose_text, label, drift):
+    """Compare a {table: {columns}} dict against one prose document. Returns matched count."""
+    prose_sections = parse_prose(prose_text, set(tables))
     for tname in sorted(tables):
         json_cols = set(tables[tname]["columns"]) - AUDIT_COLUMNS
         if tname not in prose_sections:
-            drift.append(f"{tname}: no `#### {tname}` column-table section found in prose spec")
+            drift.append(f"[{label}] {tname}: no `#### {tname}` column-table section found")
             continue
         prose_cols = prose_sections[tname] - AUDIT_COLUMNS
-        missing_in_prose = json_cols - prose_cols
-        missing_in_json = prose_cols - json_cols
-        for c in sorted(missing_in_prose):
-            drift.append(f"{tname}.{c}: in JSON, missing from prose spec")
-        for c in sorted(missing_in_json):
-            drift.append(f"{tname}.{c}: in prose spec, missing from JSON")
+        for c in sorted(json_cols - prose_cols):
+            drift.append(f"[{label}] {tname}.{c}: in JSON, missing from prose")
+        for c in sorted(prose_cols - json_cols):
+            drift.append(f"[{label}] {tname}.{c}: in prose, missing from JSON")
+    return len(prose_sections)
+
+
+def main():
+    schema = json.loads(SCHEMA_PATH.read_text())
+    drift = []
+
+    matched = compare(schema["tables"], PROSE_PATH.read_text(), "core", drift)
+    total = len(schema["tables"])
+
+    modules_dir = ROOT / "vignettes" / "modules"
+    for mkey, mod in schema.get("optional_modules", {}).get("modules", {}).items():
+        mpath = modules_dir / (mkey.replace("_", "-") + ".md")
+        if not mpath.exists():
+            drift.append(f"[{mkey}] module vignette missing: {mpath.name}")
+            total += len(mod["tables"])
+            continue
+        matched += compare(mod["tables"], mpath.read_text(), mkey, drift)
+        total += len(mod["tables"])
 
     for d in drift:
         print(f"DRIFT: {d}")
     n = len(drift)
-    matched = len(prose_sections)
-    print(f"\ncheck_spec_sync: {matched}/{len(tables)} tables matched in prose, {n} drift finding(s)")
+    print(f"\ncheck_spec_sync: {matched}/{total} tables matched in prose, {n} drift finding(s)")
     return 1 if n else 0
 
 
