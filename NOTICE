@@ -1,0 +1,58 @@
+AI4RA Unified Data Model (UDM)
+Copyright 2025 Nathan Layman
+
+Author: Nathan Layman, https://github.com/ui-insight/AI4RA-UDM
+
+The AI4RA Unified Data Model is a project of AI4RA (AI for Research
+Administration) at the University of Idaho. https://github.com/ui-insight
+
+This material is based upon work supported by the U.S. National Science
+Foundation under the GRANTED program, award number 2427549, "Crossing the
+Innovation Valley of Death: Democratizing Data and Artificial Intelligence
+for Research Administration". Any opinions, findings, and conclusions or
+recommendations expressed in this material are those of the author and do
+not necessarily reflect the views of the National Science Foundation.
+
+This NOTICE file is an attribution notice under Apache-2.0 Section 4(d)
+and carries the attribution required by CC BY 4.0 Section 3(a). Any
+redistribution of the work or a derivative, under either license, must
+include all four: Nathan Layman as author, AI4RA, the University of
+Idaho, and NSF award 2427549. A suggested credit line:
+
+    AI4RA Unified Data Model, Copyright 2025 Nathan Layman, a project
+    of AI4RA at the University of Idaho, supported by NSF award 2427549.
+    Licensed under CC BY 4.0 (standard) and Apache-2.0 (code).
+    https://github.com/ui-insight/AI4RA-UDM
+
+Indicate if you made changes. A machine-readable citation is in
+CITATION.cff.
+
+LICENSES
+
+  This repository is licensed in two parts.
+
+  1. THE STANDARD: Creative Commons Attribution 4.0 International
+     (CC BY 4.0). The schema definitions, naming conventions and
+     documentation. This covers README.md, everything under vignettes/,
+     and the slides under docs/presentation/. Full text:
+     LICENSE-CC-BY-4.0.
+
+  2. THE CODE: Apache License, Version 2.0. The scripts, the dashboard
+     and the build workflows. This covers scripts/, dashboard/, .github/,
+     and the built dashboard under docs/. Full text: LICENSE-APACHE-2.0.
+
+  The machine-readable schema files are available under either license,
+  at your option. This covers udm_schema_v2.json, udm_schema.json,
+  schemas/, docs/data/, and DDL or other artifacts generated from them.
+
+NAMES
+
+  The names "AI4RA Unified Data Model" and "AI4RA UDM" are reserved for
+  conforming versions. Neither license grants rights in these names. See
+  NAME-POLICY.md.
+
+THIRD-PARTY MATERIAL
+
+  Third-party material keeps its own license. docs/presentation/reveal/
+  is reveal.js, Copyright (C) 2011-2024 Hakim El Hattab, under the MIT
+  License.

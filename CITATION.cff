@@ -2,12 +2,14 @@ cff-version: 1.2.0
 title: AI4RA Unified Data Model (UDM)
 message: >-
   If you use this work, in whole or in part, please cite it as below.
-  Attribution is required by the license (GPL-3.0 with §7(b) additional
-  term; see LICENSE).
+  Attribution is required by the license (CC BY 4.0 for the standard,
+  Apache-2.0 for the code). NOTICE lists which files fall under which
+  license and the attribution each requires.
 type: dataset
 authors:
   - family-names: Layman
     given-names: Nathan
+    affiliation: University of Idaho
 repository-code: https://github.com/ui-insight/AI4RA-UDM
 url: https://ui-insight.github.io/AI4RA-UDM/
 identifiers:
@@ -31,4 +33,6 @@ keywords:
   - post-award
   - medallion architecture
   - lakehouse
-license: GPL-3.0-or-later
+license:
+  - CC-BY-4.0
+  - Apache-2.0

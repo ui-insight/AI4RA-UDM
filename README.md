@@ -392,3 +392,22 @@ graph TD
     Transaction-->Subaward
 ```
 <!-- ERD_END -->
+
+## License
+
+Copyright 2025 Nathan Layman.
+
+The AI4RA Unified Data Model is licensed in two parts:
+
+- **The standard** (the schema, naming conventions and documentation) is licensed under [CC BY 4.0](LICENSE-CC-BY-4.0). Anyone, vendors included, can use it and build it into a product, with attribution required.
+- **The code** (the scripts and dashboard) is licensed under [Apache-2.0](LICENSE-APACHE-2.0).
+
+The machine-readable schema files are available under either license, at your option. [NOTICE](NOTICE) lists which files fall under which license. It is the attribution notice under Apache-2.0 Section 4(d) and carries the attribution CC BY 4.0 requires: any redistribution of the work or a derivative must credit Nathan Layman as author, AI4RA, the University of Idaho, and NSF award 2427549. To cite the project, use [CITATION.cff](CITATION.cff).
+
+The names "AI4RA Unified Data Model" and "AI4RA UDM" are reserved for conforming versions. See [NAME-POLICY.md](NAME-POLICY.md).
+
+## Acknowledgments
+
+The AI4RA Unified Data Model is a project of [AI4RA](https://ai4ra.uidaho.edu/) (AI for Research Administration) at the University of Idaho.
+
+This material is based upon work supported by the U.S. National Science Foundation under the GRANTED program, [award number 2427549](https://www.nsf.gov/awardsearch/showAward?AWD_ID=2427549), "Crossing the Innovation Valley of Death: Democratizing Data and Artificial Intelligence for Research Administration". Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author and do not necessarily reflect the views of the National Science Foundation.
