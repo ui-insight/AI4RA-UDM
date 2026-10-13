@@ -9,8 +9,10 @@ on:
       - 'scripts/generate_dashboard_data.py'
       - 'scripts/validate_schema.py'
       - 'scripts/check_spec_sync.py'
+      - 'scripts/check_conformance.py'
       - 'schemas/**'
       - 'vignettes/udm-v2-system-of-record.md'
+      - 'vignettes/modules/**'
       - 'dashboard/**'
 
 jobs:
@@ -37,6 +39,9 @@ jobs:
 
       - name: Check prose spec / JSON sync
         run: python scripts/check_spec_sync.py
+
+      - name: Check the specification conforms to itself
+        run: python scripts/check_conformance.py --self-check
 
       - name: Generate dashboard data files from udm_schema_v2.json
         run: python scripts/generate_dashboard_data.py

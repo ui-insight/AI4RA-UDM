@@ -2,7 +2,7 @@
 
 A universal data model for research administration. The UDM provides a common schema that any institution can adopt to standardize how research administration data is structured, described, and shared — regardless of what systems they use internally.
 
-**Current version: v2.2.0** (released 2026-08-28; v2.0.0 released 2026-06-11). The v1 model is preserved for reference; see [Versions](#versions) below.
+**Current version: v2.3.0** (released 2026-08-28; v2.0.0 released 2026-06-11). The v1 model is preserved for reference; see [Versions](#versions) below.
 
 ## Mission
 
@@ -25,6 +25,8 @@ The UDM v2 is defined in two complementary artifacts:
 - [`udm_schema_v2.json`](udm_schema_v2.json) — a machine-readable MySQL/MariaDB-dialect serialization of the spec: tables, columns, types, foreign keys, allowed values, PII flags, column synonyms, cross-row constraints, derived-value rules, and example views. Use this to generate DDL, build crosswalk tooling, or feed schema context to LLMs.
 
 The two are kept in exact sync; the prose spec is authoritative on intent, the JSON on machine-consumable detail. An architectural overview lives in [`vignettes/ontology.md`](vignettes/ontology.md), and the version history in [`vignettes/CHANGELOG.md`](vignettes/CHANGELOG.md).
+
+The UDM is a normalized model, in the Inmon tradition: the standard defines the integrated System of Record, and star schemas are derived from it by each adopter as views ([why](vignettes/udm-v2-architecture.md#16-a-normalized-core-is-the-standard-star-schemas-are-the-adopters-choice)).
 
 ### Core Modules
 
@@ -180,11 +182,15 @@ In a medallion lakehouse, the crosswalk *is* the Silver layer: each source gets 
 
 See the [Infrastructure tab](https://ui-insight.github.io/AI4RA-UDM/) of the dashboard for diagrams of both the Silver crosswalk layer and the surrounding medallion architecture.
 
+### Conformance
+
+An implementation or a vendor product shows that it follows the UDM with a conformance declaration that passes [`scripts/check_conformance.py`](scripts/check_conformance.py). There are two profiles: **implementation**, for a System of Record carrying the core plus its declared modules, and **provider**, for a source system that delivers a subset of tables in UDM form. See [Conformance](vignettes/udm-v2-conformance.md) for the rules, and [Procurement Language](vignettes/udm-v2-procurement-language.md) for model contract clauses an institution can use to ask vendors for it.
+
 ## Versions
 
 | Version | Status | Artifacts |
 |---------|--------|-----------|
-| **v2.2** | Current | [`udm_schema_v2.json`](udm_schema_v2.json), [prose spec](vignettes/udm-v2-system-of-record.md) |
+| **v2.3** | Current | [`udm_schema_v2.json`](udm_schema_v2.json), [prose spec](vignettes/udm-v2-system-of-record.md) |
 | v1.0 | Preserved for reference | [`udm_schema.json`](udm_schema.json) |
 
 v2 is a major refactor: 47 tables (from 40), six core modules (from ten domains), unified lifecycle modeling, Award/Subaward symmetry, and rule catalogs for cross-row constraints and semantic conventions. See the [CHANGELOG](vignettes/CHANGELOG.md) for the full delta and migration guidance from v1.
@@ -224,9 +230,9 @@ graph TD
 |---|---|---|
 | **Outputs (core module 7)** | Output, OutputContributor, AwardOutput, PublicationDetail, DatasetDetail, SoftwareDetail — what funded work produced, reported against awards | Designed ([#71](https://github.com/ui-insight/AI4RA-UDM/issues/71)) |
 | **IP module** | InventionDisclosureDetail, PatentFiling — disclosure events, Bayh-Dole election, filing records | Designed |
-| **Governance module** | Committee, CommitteeMember, Meeting, MeetingAttendance | Designed ([#69](https://github.com/ui-insight/AI4RA-UDM/issues/69)) |
-| **Compliance Protocols (shared spine)** | Protocol, coverage, personnel, review workflow, amendments, continuing review, adverse events, deviations | Designed ([#60](https://github.com/ui-insight/AI4RA-UDM/issues/60)) |
-| **Animal Research / Human Subjects / Biosafety modules** | Per-regime protocol detail on the spine | Designed within [#60](https://github.com/ui-insight/AI4RA-UDM/issues/60) |
+| **Governance module** | Committee, CommitteeMember, Meeting, MeetingAttendance, plus the Committee Protocol Review bridge | **Released v2.3** ([spec](vignettes/modules/governance.md)) |
+| **Compliance Protocols (shared spine)** | Protocol, coverage, personnel, review workflow, amendments, continuing review, adverse events, deviations | **Released v2.3** ([spec](vignettes/modules/compliance-protocols.md)) |
+| **Animal Research / Human Subjects / Biosafety modules** | Per-regime protocol detail on the spine | **Released v2.3** ([specs](vignettes/modules/)) |
 | **Clinical Trials, Agreements** | Registration/enrollment records; MTA / DUA / NDA lifecycles | Future candidates |
 
 ## Contributing
@@ -386,3 +392,22 @@ graph TD
     Transaction-->Subaward
 ```
 <!-- ERD_END -->
+
+## License
+
+Copyright 2025 Nathan Layman.
+
+The AI4RA Unified Data Model is licensed in two parts:
+
+- **The standard** (the schema, naming conventions and documentation) is licensed under [CC BY 4.0](LICENSE-CC-BY-4.0). Anyone, vendors included, can use it and build it into a product, with attribution required.
+- **The code** (the scripts and dashboard) is licensed under [Apache-2.0](LICENSE-APACHE-2.0).
+
+The machine-readable schema files are available under either license, at your option. [NOTICE](NOTICE) lists which files fall under which license. It is the attribution notice under Apache-2.0 Section 4(d) and carries the attribution CC BY 4.0 requires: any redistribution of the work or a derivative must credit Nathan Layman as author, AI4RA, the University of Idaho, and NSF award 2427549. To cite the project, use [CITATION.cff](CITATION.cff).
+
+The names "AI4RA Unified Data Model" and "AI4RA UDM" are reserved for conforming versions. See [NAME-POLICY.md](NAME-POLICY.md).
+
+## Acknowledgments
+
+The AI4RA Unified Data Model is a project of [AI4RA](https://ai4ra.uidaho.edu/) (AI for Research Administration) at the University of Idaho.
+
+This material is based upon work supported by the U.S. National Science Foundation under the GRANTED program, [award number 2427549](https://www.nsf.gov/awardsearch/showAward?AWD_ID=2427549), "Crossing the Innovation Valley of Death: Democratizing Data and Artificial Intelligence for Research Administration". Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author and do not necessarily reflect the views of the National Science Foundation.

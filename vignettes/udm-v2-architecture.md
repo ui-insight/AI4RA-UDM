@@ -49,6 +49,19 @@ If a piece of the model uses something else, it should be rewritten to fit one o
 
 If the data is a record of work an OSP or research office does, it belongs. If it's metadata about an IT system or a workflow engine, it doesn't. ServiceRequest belongs because OSP tickets are operational records of work; the underlying ticketing-system schema does not.
 
+### 1.6 A normalized core is the standard; star schemas are the adopter's choice
+
+The UDM takes the Inmon position in the warehouse design argument: an integrated, normalized model is the System of Record, and dimensional structures are derived from it. Star schemas belong in the System of Insight, as views or marts, and each adopter builds the ones its questions need.
+
+A standard should be the normalized layer and not the star schemas, for four reasons:
+
+- **One place for each fact.** A normalized model gives every fact one home. That is what makes it a stable target for crosswalks from many source systems and a checkable target for conformance.
+- **Star schemas encode questions.** A fact table's grain and its dimensions are choices about what will be asked. Those choices vary by institution, so standardizing them would standardize everyone's reporting decisions along with their data.
+- **Modularity.** In a normalized model a module adds entities that reference the core by foreign key, and the core is untouched. In a dimensional model, adding a capability means widening shared dimensions or changing a fact grain, which reaches into structures other modules depend on. The core-and-modules design depends on the normalized core.
+- **Adopters lose nothing.** Anyone who wants Kimball-style marts builds them over the UDM. Shared metric definitions are published the same way, as views over the core, so institutions compute the same numbers without rebuilding each other's marts.
+
+Deliberate departures from third normal form (a stored total, a repeated key) are allowed when they earn their place, and each one is recorded with its reason.
+
 ---
 
 ## 2. Hub topology

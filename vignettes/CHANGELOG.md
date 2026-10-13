@@ -7,6 +7,25 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 - **MINOR** when entities or columns are added in a backward-compatible way
 - **PATCH** for documentation, convention clarifications, or fixes to non-load-bearing rules
 
+## [2.3.0] — 2026-08-28
+
+The optional-modules debut: the first release where the module taxonomy is exercised. The core is unchanged at 47 tables; six optional modules specify 24 additional tables, adopted by declaration. Implements roadmap issues #60, #69, #70.
+
+### Added
+
+- **`optional_modules`** top-level key in the JSON artifact: each module self-describes its story, dependencies (`requires`), Records target registry declarations, AllowedValues group declarations, tables, and cross-row constraints. Module prose specifications live in `vignettes/modules/`, one file per module, generated from and sync-checked against the artifact.
+- **Compliance Protocols** (spine, 8 tables): Protocol, ProtocolCoverage, ProtocolPersonnel, the polymorphic ProtocolReviewStep, and four peer event entities (Amendment, ContinuingReview, AdverseEvent, Deviation), each with its own approval lifecycle. Notification cycles compose from core Communication + Deadline + CommunicationResponse.
+- **Animal Research** (5 tables, requires the spine): species with USDA pain categories, procedures, hazards, 3Rs alternatives searches, closure reports.
+- **Human Subjects** (3 tables, requires the spine): populations with vulnerable-population flags, interventions, consent approaches.
+- **Biosafety** (2 tables, requires the spine): biological agents with risk groups, containment procedures.
+- **Governance** (4 tables): Committee, CommitteeMember, Meeting, MeetingAttendance. Member classifications attach as core Classification rows; quorum logic is application code.
+- **Committee Protocol Review** (2 tables, requires spine + Governance): MeetingProtocolReview with per-review vote tallies, MemberRecusal with permanent or per-meeting scope.
+- Validator now enforces the encapsulation rule structurally: module FKs may target only the core, the module's own tables, or declared dependencies; module tables may not collide with core; records_targets must be module-owned. Sync checker covers module vignettes.
+
+### Conformance
+
+An implementation declares its modules, e.g. "UDM 2.3 core + modules: compliance_protocols, human_subjects, governance." An IRB-only institution never carries an animal-use table.
+
 ## [2.2.0] — 2026-08-28
 
 Taxonomy release. No tables added or removed; the model's organizing structure and vocabulary are unified. Machine-readable and human-readable lingo now match exactly.

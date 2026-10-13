@@ -286,7 +286,8 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
         </h3>
         <p style={{ color: '#546e7a', lineHeight: 1.7, marginBottom: '0.75rem' }}>
           The UDM is developed by <strong>AI4RA</strong> (AI for Research Administration) at the
-          University of Idaho. It is open source under GPL-3.0 and improves through community
+          University of Idaho. It is openly licensed (CC BY 4.0 for the standard, Apache-2.0 for
+          the code) and improves through community
           input — suggest changes, report issues, or join the discussion on GitHub.
         </p>
         <ul style={{ paddingLeft: '1.25rem', color: '#546e7a', lineHeight: 1.8 }}>

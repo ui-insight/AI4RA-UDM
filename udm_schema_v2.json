@@ -1,7 +1,7 @@
 {
   "metadata": {
     "name": "UDM",
-    "version": "2.2.0",
+    "version": "2.3.0",
     "released": "2026-08-26",
     "dialect": "MySQL",
     "description": "Vendor-neutral research administration data model, v2. This JSON is a MySQL/MariaDB-flavored example implementation of the abstract specification in vignettes/udm-v2-system-of-record.md. The abstract spec is database-engine agnostic; this JSON picks one dialect for concrete adoption. The prior version (v1) is preserved as udm_schema.json at the repository root.",
@@ -311,7 +311,7 @@
         "Compliance": "We meet regulatory and policy obligations",
         "Records": "We keep the records that accumulate around the work"
       },
-      "optional_modules_planned": "IP; Governance; a Compliance Protocols spine carrying regime modules for Animal Research, Human Subjects, and Biosafety. Outputs joins the core at its release.",
+      "optional_modules_available": "Compliance Protocols (the spine), Animal Research, Human Subjects, Biosafety, Governance, Committee Protocol Review. See the top-level optional_modules key. Planned: IP (requires the Outputs core module, v2.4).",
       "local_extensions": "Institution-specific additions outside the specification. The local_extensions registry documents where common cases belong."
     }
   },
@@ -1509,6 +1509,423 @@
       "ComplianceReviewPathway",
       "ComplianceClassificationLevel"
     ]
+  },
+  "optional_modules": {
+    "description": "Fully specified, versioned modules adopted by declaration (e.g. 'UDM 2.3 core + modules: compliance_protocols, human_subjects, governance'). Governed by the module taxonomy's two laws. Each module lists its story, its dependencies (requires), its Records target registry declarations (records_targets), and its AllowedValues group declarations (allowed_value_groups). Module tables follow every core convention (identifier, audit columns, boolean naming).",
+    "modules": {
+      "compliance_protocols": {
+        "name": "Compliance Protocols",
+        "story": "We run protocol-based compliance review.",
+        "requires": {"core": ">=2.3.0", "modules": []},
+        "records_targets": ["Protocol", "ProtocolAmendment", "ProtocolContinuingReview", "ProtocolAdverseEvent", "ProtocolDeviation"],
+        "allowed_value_groups": ["ProtocolPersonnelRole", "ProtocolReviewPathway", "ProtocolClassificationLevel", "ProtocolReviewStepName", "AdverseEventType", "AdverseEventDetermination"],
+        "notes": "The shared protocol spine. One Protocol carries exactly one Regime and one reviewing authority; multi-regime work is multiple Protocols covering the same funding instruments. The four event entities (Amendment, ContinuingReview, AdverseEvent, Deviation) have their own approval lifecycles and are all reviewed via the shared polymorphic ProtocolReviewStep. Notification cycles (e.g. designated-member-review polling) compose from core Communication + Deadline + CommunicationResponse attached to the Protocol; this module adds no notification entities. With this module adopted, protocol rosters live in ProtocolPersonnel; the core ProtocolRole remains for requirement-scoped staffing where the module is not in play.",
+        "tables": {
+          "Protocol": {
+            "description": "The standing regulatory record. Exists independently of any single funded project; one approved Protocol can cover many awards over time and persists across renewal cycles.",
+            "columns": {
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Parent_Protocol_ID": {"type": "VARCHAR(50)", "required": false, "description": "Self-referencing renewal chain; a renewal points to its predecessor, null for the first instance", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Regime": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: Animal_Use / Human_Subjects / Biosafety / Other"},
+              "Protocol_Number": {"type": "VARCHAR(50)", "required": false, "description": "The authority-issued identifier (IACUC number, IRB number, IBC registration). Unique within (Reviewing_Authority_Organization_ID, Regime) when not null"},
+              "Title": {"type": "VARCHAR(500)", "required": true, "description": "Human-readable title"},
+              "Reviewing_Authority_Organization_ID": {"type": "VARCHAR(50)", "required": true, "description": "The body that reviews and approves this protocol (the IACUC, the IRB, the IBC)", "references": {"table": "Organization", "column": "Organization_ID"}},
+              "Review_Pathway_Value_ID": {"type": "VARCHAR(50)", "required": false, "description": "AllowedValues Value_Group = 'ProtocolReviewPathway'. Regime-specific: Animal_Use uses USDA pain category for the protocol as a whole; Human_Subjects uses Exempt / Expedited / Full_Board / Not_Human_Subjects; Biosafety uses BL1-BL4", "references": {"table": "AllowedValues", "column": "AllowedValue_ID"}},
+              "Classification_Level_Value_ID": {"type": "VARCHAR(50)", "required": false, "description": "AllowedValues Value_Group = 'ProtocolClassificationLevel'. Regime-specific risk classification distinct from Review_Pathway (e.g. Human_Subjects: Minimal / More_Than_Minimal / High)", "references": {"table": "AllowedValues", "column": "AllowedValue_ID"}},
+              "Submitted_Date": {"type": "DATE", "required": false, "description": "When the protocol was submitted for review"},
+              "Approved_Date": {"type": "DATE", "required": false, "description": "Required when Protocol_Status = 'Approved' or later approval states"},
+              "Expiration_Date": {"type": "DATE", "required": false, "description": "When the approval expires; null means non-expiring"},
+              "Protocol_Status": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: Draft / Submitted / Under_Review / Approved / Active / Suspended / Expired / Closed / Withdrawn / Rejected"}
+            }
+          },
+          "ProtocolCoverage": {
+            "description": "M:N junction between a Protocol and the funding instruments it covers. One protocol may cover many funded projects; one project may need several protocols (one per regime).",
+            "columns": {
+              "ProtocolCoverage_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "The covering protocol", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Award_ID": {"type": "VARCHAR(50)", "required": false, "description": "Exactly one of Award_ID / Subaward_ID is non-null", "references": {"table": "Award", "column": "Award_ID"}},
+              "Subaward_ID": {"type": "VARCHAR(50)", "required": false, "description": "Exactly one of Award_ID / Subaward_ID is non-null", "references": {"table": "Subaward", "column": "Subaward_ID"}},
+              "Coverage_Start_Date": {"type": "DATE", "required": false, "description": "When coverage began"},
+              "Coverage_End_Date": {"type": "DATE", "required": false, "description": "Null while coverage is still in effect"}
+            }
+          },
+          "ProtocolPersonnel": {
+            "description": "A person listed on a Protocol with a role and training status. Optionally scoped to one covered Award or Subaward when the Protocol covers several.",
+            "columns": {
+              "ProtocolPersonnel_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "The parent protocol", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Personnel_ID": {"type": "VARCHAR(50)", "required": true, "description": "The person", "references": {"table": "Personnel", "column": "Personnel_ID"}},
+              "Award_ID": {"type": "VARCHAR(50)", "required": false, "description": "At most one of Award_ID / Subaward_ID non-null; both null means responsibility spans all covered instruments", "references": {"table": "Award", "column": "Award_ID"}},
+              "Subaward_ID": {"type": "VARCHAR(50)", "required": false, "description": "At most one of Award_ID / Subaward_ID is non-null", "references": {"table": "Subaward", "column": "Subaward_ID"}},
+              "Role_Value_ID": {"type": "VARCHAR(50)", "required": true, "description": "AllowedValues Value_Group = 'ProtocolPersonnelRole'. Recommended values: Primary_Investigator / Co_Investigator / Study_Coordinator / Research_Staff / Consenting_Personnel / Lab_Manager / Veterinary_Staff / Biosafety_Officer / Other", "references": {"table": "AllowedValues", "column": "AllowedValue_ID"}},
+              "Training_Completion_Date": {"type": "DATE", "required": false, "description": "Date required compliance training was completed"},
+              "Start_Date": {"type": "DATE", "required": true, "description": "When this row takes effect"},
+              "End_Date": {"type": "DATE", "required": false, "description": "Null while still active"}
+            }
+          },
+          "ProtocolReviewStep": {
+            "description": "A single step in a review chain. One polymorphic entity models the steps of initial protocol review, amendment review, continuing review, adverse-event determination, and deviation determination. Exactly one parent FK is non-null per row.",
+            "columns": {
+              "ProtocolReviewStep_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": false, "description": "Set when reviewing the initial protocol", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "ProtocolAmendment_ID": {"type": "VARCHAR(50)", "required": false, "description": "Set when reviewing an amendment", "references": {"table": "ProtocolAmendment", "column": "ProtocolAmendment_ID"}},
+              "ProtocolContinuingReview_ID": {"type": "VARCHAR(50)", "required": false, "description": "Set when reviewing a continuing review", "references": {"table": "ProtocolContinuingReview", "column": "ProtocolContinuingReview_ID"}},
+              "ProtocolAdverseEvent_ID": {"type": "VARCHAR(50)", "required": false, "description": "Set when reviewing an adverse-event report", "references": {"table": "ProtocolAdverseEvent", "column": "ProtocolAdverseEvent_ID"}},
+              "ProtocolDeviation_ID": {"type": "VARCHAR(50)", "required": false, "description": "Set when reviewing a protocol deviation", "references": {"table": "ProtocolDeviation", "column": "ProtocolDeviation_ID"}},
+              "Step_Order": {"type": "INT", "required": true, "description": "Sequence within the chain (1, 2, 3, ...)"},
+              "Step_Name_Value_ID": {"type": "VARCHAR(50)", "required": true, "description": "AllowedValues Value_Group = 'ProtocolReviewStepName'. Regime-specific: e.g. Vet_Pre_Review / Coordinator_Triage / DMR / FCR / Committee_Decision (Animal_Use); Coordinator_Review / Designated_Member_Review / Full_Board / Committee_Decision (Human_Subjects)", "references": {"table": "AllowedValues", "column": "AllowedValue_ID"}},
+              "Assigned_Personnel_ID": {"type": "VARCHAR(50)", "required": false, "description": "The reviewer for this step", "references": {"table": "Personnel", "column": "Personnel_ID"}},
+              "Step_Status": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: Pending / In_Review / Approved / Rejected / Returned / Withdrawn"},
+              "Action_Date": {"type": "DATE", "required": false, "description": "When the step's reviewer acted"},
+              "Comments": {"type": "TEXT", "required": false, "description": "Reviewer comments"}
+            }
+          },
+          "ProtocolAmendment": {
+            "description": "A request to modify an approved Protocol, with its own approval lifecycle and its own review chain via ProtocolReviewStep.",
+            "columns": {
+              "ProtocolAmendment_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "The protocol being amended", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Amendment_Number": {"type": "VARCHAR(50)", "required": false, "description": "Authority-assigned identifier when applicable"},
+              "Submitted_Date": {"type": "DATE", "required": false, "description": "When submitted to the reviewing authority"},
+              "Approved_Date": {"type": "DATE", "required": false, "description": "Required when Amendment_Status = 'Approved'"},
+              "Effective_Date": {"type": "DATE", "required": false, "description": "Date the amendment takes effect once approved"},
+              "Amendment_Status": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: Draft / Submitted / Under_Review / Approved / Rejected / Withdrawn"},
+              "Summary": {"type": "VARCHAR(500)", "required": true, "description": "Brief description of what is changing"},
+              "Justification": {"type": "TEXT", "required": false, "description": "Why the change is needed"}
+            }
+          },
+          "ProtocolContinuingReview": {
+            "description": "A periodic (typically annual) continuing-review event on an approved Protocol. Reviewed via ProtocolReviewStep.",
+            "columns": {
+              "ProtocolContinuingReview_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "The parent protocol", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Review_Cycle_Number": {"type": "INT", "required": true, "description": "Sequence (1 = first continuing review)"},
+              "Reporting_Period_Start_Date": {"type": "DATE", "required": true, "description": "Start of the period this review covers"},
+              "Reporting_Period_End_Date": {"type": "DATE", "required": true, "description": "End of the period this review covers"},
+              "Submitted_Date": {"type": "DATE", "required": false, "description": "When submitted to the reviewing authority"},
+              "Decision_Date": {"type": "DATE", "required": false, "description": "Required when Review_Status reaches a terminal value"},
+              "Review_Status": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: Pending_Submission / Submitted / Under_Review / Approved / Approved_With_Modifications / Suspended / Closed"},
+              "Adverse_Events_Reported": {"type": "BOOLEAN", "required": false, "description": "Whether adverse events occurred during the reporting period"},
+              "Adverse_Events_Description": {"type": "TEXT", "required": false, "description": "Required when Adverse_Events_Reported = true"}
+            }
+          },
+          "ProtocolAdverseEvent": {
+            "description": "A reported adverse event, unanticipated problem, or incident on an approved Protocol: an unanticipated problem involving risk to subjects, an unexpected mortality event, a containment breach. Reviewed via ProtocolReviewStep.",
+            "columns": {
+              "ProtocolAdverseEvent_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "The parent protocol", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Event_Date": {"type": "DATE", "required": true, "description": "When the event occurred; drives the regulator-mandated reporting clock"},
+              "Event_Type_Value_ID": {"type": "VARCHAR(50)", "required": true, "description": "AllowedValues Value_Group = 'AdverseEventType'. Regime-specific: e.g. Unanticipated_Problem / Serious_Adverse_Event (Human_Subjects); Unexpected_Mortality / Morbidity (Animal_Use); Exposure / Spill / Release (Biosafety)", "references": {"table": "AllowedValues", "column": "AllowedValue_ID"}},
+              "Event_Description": {"type": "TEXT", "required": true, "description": "Narrative of what happened"},
+              "Severity": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: Minor / Moderate / Serious / Life_Threatening"},
+              "Relatedness": {"type": "VARCHAR(30)", "required": false, "description": "Constrained: Related / Possibly_Related / Unrelated / Indeterminate. Required when the protocol's Regime = 'Human_Subjects'"},
+              "Affected_Count": {"type": "INT", "required": false, "description": "Number of subjects, animals, or personnel affected"},
+              "Affected_Description": {"type": "TEXT", "required": false, "description": "Free-text detail on who was affected"},
+              "Reported_Date": {"type": "DATE", "required": true, "description": "When the event was reported to the reviewing authority"},
+              "Reported_By_Personnel_ID": {"type": "VARCHAR(50)", "required": true, "description": "Who filed the report", "references": {"table": "Personnel", "column": "Personnel_ID"}},
+              "Event_Status": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: Reported / Under_Review / Determination_Made / Corrective_Action_In_Progress / Closed / Withdrawn"},
+              "Determination_Value_ID": {"type": "VARCHAR(50)", "required": false, "description": "AllowedValues Value_Group = 'AdverseEventDetermination'. Required when Event_Status reaches 'Determination_Made' or later. Recommended values: No_Action_Required / Continuing_Review_Required / Modification_Required / Protocol_Suspension / Protocol_Termination / Reporting_Only", "references": {"table": "AllowedValues", "column": "AllowedValue_ID"}},
+              "Determination_Date": {"type": "DATE", "required": false, "description": "Required when Determination_Value_ID is set"},
+              "Determination_Notes": {"type": "TEXT", "required": false, "description": "Committee rationale"},
+              "Closed_Date": {"type": "DATE", "required": false, "description": "Required when Event_Status = 'Closed'"}
+            }
+          },
+          "ProtocolDeviation": {
+            "description": "A departure from the approved Protocol procedure. Major deviations affect safety, welfare, containment, or data integrity and require committee review; minor deviations are administrative.",
+            "columns": {
+              "ProtocolDeviation_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "The parent protocol", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Deviation_Date": {"type": "DATE", "required": true, "description": "When the deviation occurred"},
+              "Deviation_Description": {"type": "TEXT", "required": true, "description": "What deviated from the approved procedure"},
+              "Reason": {"type": "TEXT", "required": true, "description": "Why the deviation happened"},
+              "Category": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: Major / Minor"},
+              "Affected_Subjects_Or_Animals": {"type": "BOOLEAN", "required": true, "description": "Whether the deviation affected research subjects or animals"},
+              "Affected_Data_Integrity": {"type": "BOOLEAN", "required": true, "description": "Whether the deviation potentially affected data integrity"},
+              "Reported_Date": {"type": "DATE", "required": true, "description": "When reported to the reviewing authority"},
+              "Reported_By_Personnel_ID": {"type": "VARCHAR(50)", "required": true, "description": "Reported By Personnel ID", "references": {"table": "Personnel", "column": "Personnel_ID"}},
+              "Deviation_Status": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: Reported / Under_Review / Acknowledged / Corrective_Action_Required / Corrective_Action_In_Progress / Closed"},
+              "Determination_Date": {"type": "DATE", "required": false, "description": "When the committee acknowledged or required action"},
+              "Corrective_Action_Description": {"type": "TEXT", "required": false, "description": "Required when Deviation_Status involves corrective action"},
+              "Closed_Date": {"type": "DATE", "required": false, "description": "Required when Deviation_Status = 'Closed'"}
+            }
+          }
+        },
+        "cross_row_constraints": [
+          {"location": "ProtocolCoverage", "rule": "Exactly one of Award_ID, Subaward_ID is non-null.", "structured": {"type": "xor", "columns": ["Award_ID", "Subaward_ID"]}},
+          {"location": "ProtocolCoverage", "rule": "A given (Protocol_ID, Award_ID) or (Protocol_ID, Subaward_ID) pair appears at most once with a null Coverage_End_Date.", "structured": {"type": "at_most_one_true_in_partition", "partition": ["Protocol_ID", "Award_ID", "Subaward_ID"], "condition": "Coverage_End_Date IS NULL"}},
+          {"location": "ProtocolPersonnel", "rule": "At most one of Award_ID, Subaward_ID is non-null.", "structured": {"type": "at_most_one_of", "columns": ["Award_ID", "Subaward_ID"]}},
+          {"location": "ProtocolReviewStep", "rule": "Exactly one of Protocol_ID, ProtocolAmendment_ID, ProtocolContinuingReview_ID, ProtocolAdverseEvent_ID, ProtocolDeviation_ID is non-null.", "structured": {"type": "xor", "columns": ["Protocol_ID", "ProtocolAmendment_ID", "ProtocolContinuingReview_ID", "ProtocolAdverseEvent_ID", "ProtocolDeviation_ID"]}},
+          {"location": "Protocol", "rule": "Protocol_Number is unique within (Reviewing_Authority_Organization_ID, Regime) when not null.", "structured": {"type": "unique_scope", "columns": ["Reviewing_Authority_Organization_ID", "Regime", "Protocol_Number"]}},
+          {"location": "Protocol", "rule": "Approved_Date is required when Protocol_Status is 'Approved', 'Active', 'Suspended', 'Expired', or 'Closed'.", "structured": {"type": "conditional_required", "condition_column": "Protocol_Status", "condition_values": ["Approved", "Active", "Suspended", "Expired", "Closed"], "required_columns": ["Approved_Date"]}}
+        ]
+      },
+      "animal_research": {
+        "name": "Animal Research",
+        "story": "We have an IACUC.",
+        "requires": {"core": ">=2.3.0", "modules": ["compliance_protocols"]},
+        "records_targets": [],
+        "allowed_value_groups": [],
+        "notes": "Per-regime sub-resources for Regime = 'Animal_Use', hung flat off Protocol_ID. Shapes follow what the regulator requires (Animal Welfare Act, PHS Policy); no columns are shared with other regimes by design.",
+        "tables": {
+          "AnimalUseSpecies": {
+            "description": "A species approved on an animal-use protocol, with count and USDA pain category.",
+            "columns": {
+              "AnimalUseSpecies_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "The parent protocol", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Species_Common_Name": {"type": "VARCHAR(255)", "required": true, "description": "e.g. 'Mouse', 'Zebrafish'"},
+              "Species_Scientific_Name": {"type": "VARCHAR(255)", "required": false, "description": "e.g. 'Mus musculus'"},
+              "Strain": {"type": "VARCHAR(255)", "required": false, "description": "Strain designation when applicable"},
+              "Animal_Count": {"type": "INT", "required": true, "description": "Number of animals approved"},
+              "USDA_Pain_Category": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: B / C / D / E"},
+              "Justification": {"type": "TEXT", "required": false, "description": "Scientific justification for species choice"}
+            }
+          },
+          "AnimalUseProcedure": {
+            "description": "A procedure performed on animals under the protocol.",
+            "columns": {
+              "AnimalUseProcedure_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "The parent protocol", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Procedure_Description": {"type": "TEXT", "required": true, "description": "What the procedure involves"},
+              "Pain_Category": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: B / C / D / E"},
+              "Is_Survival": {"type": "BOOLEAN", "required": true, "description": "Survival or non-survival procedure"},
+              "Anesthesia_Description": {"type": "TEXT", "required": false, "description": "Required when Pain_Category is 'D' or 'E'"},
+              "Analgesia_Description": {"type": "TEXT", "required": false, "description": "Analgesia provided, when applicable"}
+            }
+          },
+          "AnimalUseHazard": {
+            "description": "A hazard used in conjunction with animals under the protocol.",
+            "columns": {
+              "AnimalUseHazard_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "The parent protocol", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Hazard_Type": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: Biological / Chemical / Physical / Radiation"},
+              "Agent_Or_Substance": {"type": "VARCHAR(255)", "required": true, "description": "The hazardous agent or substance"},
+              "Exposure_Control_Description": {"type": "TEXT", "required": true, "description": "How personnel exposure is controlled"}
+            }
+          },
+          "AnimalUseAlternativesSearch": {
+            "description": "The 3Rs literature search required by the Animal Welfare Act for any procedure with Pain_Category 'D' or 'E'.",
+            "columns": {
+              "AnimalUseAlternativesSearch_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "The parent protocol", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Search_Date": {"type": "DATE", "required": true, "description": "When the literature search was run"},
+              "Databases_Searched": {"type": "TEXT", "required": true, "description": "e.g. 'PubMed, AGRICOLA, Web of Science'"},
+              "Keywords_Used": {"type": "TEXT", "required": true, "description": "Search keywords used"},
+              "Years_Covered": {"type": "VARCHAR(50)", "required": true, "description": "e.g. '2015-2025'"},
+              "Alternatives_Found_Description": {"type": "TEXT", "required": true, "description": "Findings narrative"}
+            }
+          },
+          "AnimalUseClosureReport": {
+            "description": "The final report submitted when a protocol closes. One per closed protocol (Protocol_ID unique).",
+            "columns": {
+              "AnimalUseClosureReport_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "Unique: one closure report per protocol", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Submitted_Date": {"type": "DATE", "required": true, "description": "When submitted to the reviewing authority"},
+              "Animals_Approved_Count": {"type": "INT", "required": true, "description": "Total approved across the protocol's lifetime"},
+              "Animals_Used_Count": {"type": "INT", "required": true, "description": "Total actually used"},
+              "Disposition_Description": {"type": "TEXT", "required": true, "description": "What happened to remaining animals"},
+              "Outcomes_Description": {"type": "TEXT", "required": false, "description": "Scientific outcomes generated"}
+            }
+          }
+        },
+        "cross_row_constraints": [
+          {"location": "AnimalUseClosureReport", "rule": "Protocol_ID is unique: one closure report per protocol.", "structured": {"type": "unique_scope", "columns": ["Protocol_ID"]}},
+          {"location": "AnimalUseProcedure", "rule": "Anesthesia_Description is required when Pain_Category is 'D' or 'E'.", "structured": {"type": "conditional_required", "condition_column": "Pain_Category", "condition_values": ["D", "E"], "required_columns": ["Anesthesia_Description"]}}
+        ]
+      },
+      "human_subjects": {
+        "name": "Human Subjects",
+        "story": "We have an IRB.",
+        "requires": {"core": ">=2.3.0", "modules": ["compliance_protocols"]},
+        "records_targets": [],
+        "allowed_value_groups": ["HumanSubjectsInterventionType"],
+        "notes": "Per-regime sub-resources for Regime = 'Human_Subjects', hung flat off Protocol_ID.",
+        "tables": {
+          "HumanSubjectsPopulation": {
+            "description": "A study population on a human-subjects protocol, with vulnerable-population flags and enrollment criteria.",
+            "columns": {
+              "HumanSubjectsPopulation_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "The parent protocol", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Population_Description": {"type": "TEXT", "required": true, "description": "Who the study population is"},
+              "Age_Range_Description": {"type": "VARCHAR(50)", "required": true, "description": "e.g. '18-65', 'Children 5-17'"},
+              "Includes_Children": {"type": "BOOLEAN", "required": true, "description": "Vulnerable-population flag"},
+              "Includes_Pregnant_Women": {"type": "BOOLEAN", "required": true, "description": "Vulnerable-population flag"},
+              "Includes_Prisoners": {"type": "BOOLEAN", "required": true, "description": "Vulnerable-population flag"},
+              "Includes_Cognitively_Impaired": {"type": "BOOLEAN", "required": true, "description": "Vulnerable-population flag"},
+              "Inclusion_Criteria": {"type": "TEXT", "required": true, "description": "Criteria for including subjects"},
+              "Exclusion_Criteria": {"type": "TEXT", "required": true, "description": "Criteria for excluding subjects"},
+              "Recruitment_Method": {"type": "TEXT", "required": true, "description": "How subjects are recruited"},
+              "Estimated_Enrollment_Count": {"type": "INT", "required": false, "description": "Expected number of subjects enrolled"}
+            }
+          },
+          "HumanSubjectsIntervention": {
+            "description": "An intervention or interaction with subjects under the protocol.",
+            "columns": {
+              "HumanSubjectsIntervention_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "The parent protocol", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Intervention_Description": {"type": "TEXT", "required": true, "description": "What the intervention involves"},
+              "Intervention_Type_Value_ID": {"type": "VARCHAR(50)", "required": true, "description": "AllowedValues Value_Group = 'HumanSubjectsInterventionType'. Recommended values: Survey / Interview / Observation / Drug / Device / Behavioral / Surgical / Biospecimen / Other", "references": {"table": "AllowedValues", "column": "AllowedValue_ID"}},
+              "Risk_Description": {"type": "TEXT", "required": true, "description": "Risks the intervention poses to subjects"}
+            }
+          },
+          "HumanSubjectsConsent": {
+            "description": "The consent approach for a protocol population.",
+            "columns": {
+              "HumanSubjectsConsent_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "The parent protocol", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Consent_Method": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: Written / Verbal / Waiver / Short_Form / Assent_Only"},
+              "Documentation_Required": {"type": "BOOLEAN", "required": true, "description": "Whether signed documentation is required"},
+              "Waiver_Justification": {"type": "TEXT", "required": false, "description": "Required when Consent_Method = 'Waiver'"},
+              "Special_Population_Accommodations": {"type": "TEXT", "required": false, "description": "Accommodations for children, non-English speakers, etc."},
+              "Consent_Language_Description": {"type": "TEXT", "required": false, "description": "Reading level, translations available"}
+            }
+          }
+        },
+        "cross_row_constraints": [
+          {"location": "HumanSubjectsConsent", "rule": "Waiver_Justification is required when Consent_Method = 'Waiver'.", "structured": {"type": "conditional_required", "condition_column": "Consent_Method", "condition_values": ["Waiver"], "required_columns": ["Waiver_Justification"]}}
+        ]
+      },
+      "biosafety": {
+        "name": "Biosafety",
+        "story": "We have an IBC.",
+        "requires": {"core": ">=2.3.0", "modules": ["compliance_protocols"]},
+        "records_targets": [],
+        "allowed_value_groups": [],
+        "notes": "Per-regime sub-resources for Regime = 'Biosafety', hung flat off Protocol_ID.",
+        "tables": {
+          "BiologicalAgent": {
+            "description": "A biological agent in use under a biosafety protocol.",
+            "columns": {
+              "BiologicalAgent_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "The parent protocol", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Agent_Name": {"type": "VARCHAR(255)", "required": true, "description": "Name of the biological agent"},
+              "Agent_Type": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: Organism / Toxin / Recombinant_DNA / Cell_Line"},
+              "Risk_Group": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: RG1 / RG2 / RG3 / RG4"},
+              "Source_Description": {"type": "VARCHAR(255)", "required": false, "description": "Where the agent comes from"},
+              "Quantity_Description": {"type": "VARCHAR(255)", "required": false, "description": "Volumes, titers, or counts in use"}
+            }
+          },
+          "BiosafetyProcedure": {
+            "description": "A procedure performed with biological agents, with containment and decontamination requirements.",
+            "columns": {
+              "BiosafetyProcedure_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "The parent protocol", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Procedure_Description": {"type": "TEXT", "required": true, "description": "What the procedure involves"},
+              "Required_Containment_Level": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: BL1 / BL2 / BL3 / BL4"},
+              "Required_PPE_Description": {"type": "TEXT", "required": true, "description": "Personal protective equipment required"},
+              "Decontamination_Protocol": {"type": "TEXT", "required": true, "description": "How work surfaces and waste are decontaminated"}
+            }
+          }
+        },
+        "cross_row_constraints": [
+        ]
+      },
+      "governance": {
+        "name": "Governance",
+        "story": "Our committees convene, vote, and keep minutes.",
+        "requires": {"core": ">=2.3.0", "modules": []},
+        "records_targets": ["Committee", "CommitteeMember", "Meeting"],
+        "allowed_value_groups": ["CommitteeMemberRole"],
+        "notes": "Convened-body infrastructure reused by any capability that needs committees: compliance review, COI deliberation, internal-award panels. Regime-specific member classifications (e.g. PHS Policy IV.A.3 scientist / nonscientist / unaffiliated flags) attach as core Classification rows rather than columns, keeping CommitteeMember generic. Quorum logic is application code: the data records Quorum_Required and attendance; the application computes whether the meeting is quorate.",
+        "tables": {
+          "Committee": {
+            "description": "A convened body: an IACUC, an IRB, an IBC, a COI committee, a research-security review board, an internal-award review panel.",
+            "columns": {
+              "Committee_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Committee_Name": {"type": "VARCHAR(255)", "required": true, "description": "Human-readable name"},
+              "Organization_ID": {"type": "VARCHAR(50)", "required": true, "description": "The institution or unit that convenes this committee", "references": {"table": "Organization", "column": "Organization_ID"}},
+              "Committee_Type": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: IACUC / IRB / IBC / COI / Research_Security / Internal_Award_Review / Policy_Board / Other"},
+              "Charter_Description": {"type": "TEXT", "required": false, "description": "The committee's mandate"},
+              "Established_Date": {"type": "DATE", "required": false, "description": "When the committee was established"},
+              "Committee_Status": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: Active / Suspended / Disbanded"}
+            }
+          },
+          "CommitteeMember": {
+            "description": "A person serving on a Committee with a role and appointment term.",
+            "columns": {
+              "CommitteeMember_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Committee_ID": {"type": "VARCHAR(50)", "required": true, "description": "The committee", "references": {"table": "Committee", "column": "Committee_ID"}},
+              "Personnel_ID": {"type": "VARCHAR(50)", "required": true, "description": "The person", "references": {"table": "Personnel", "column": "Personnel_ID"}},
+              "Role_Value_ID": {"type": "VARCHAR(50)", "required": true, "description": "AllowedValues Value_Group = 'CommitteeMemberRole'. Recommended values: Chair / Vice_Chair / Member / Ex_Officio_Member / Observer", "references": {"table": "AllowedValues", "column": "AllowedValue_ID"}},
+              "Appointment_Term_Start": {"type": "DATE", "required": true, "description": "Start of the member's appointment term"},
+              "Appointment_Term_End": {"type": "DATE", "required": false, "description": "Null for indefinite appointments"},
+              "Member_Status": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: Active / On_Leave / Terminated"}
+            }
+          },
+          "Meeting": {
+            "description": "A convened meeting of a Committee with quorum tracking and minutes.",
+            "columns": {
+              "Meeting_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Committee_ID": {"type": "VARCHAR(50)", "required": true, "description": "The committee", "references": {"table": "Committee", "column": "Committee_ID"}},
+              "Meeting_Date": {"type": "DATE", "required": true, "description": "Scheduled date"},
+              "Meeting_Type": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: Regular / Special / Emergency / Subcommittee"},
+              "Meeting_Status": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: Scheduled / Convened / Cancelled / Adjourned"},
+              "Quorum_Required": {"type": "INT", "required": true, "description": "Members required for a quorum"},
+              "Quorum_Met": {"type": "BOOLEAN", "required": false, "description": "Required when Meeting_Status reaches 'Convened' or later"},
+              "Location_Description": {"type": "VARCHAR(255)", "required": false, "description": "Physical, video, or hybrid"},
+              "Convened_Time": {"type": "DATETIME", "required": false, "description": "When the meeting actually started"},
+              "Adjourned_Time": {"type": "DATETIME", "required": false, "description": "When the meeting ended"},
+              "Minutes_Document_ID": {"type": "VARCHAR(50)", "required": false, "description": "Approved meeting minutes when available", "references": {"table": "Document", "column": "Document_ID"}}
+            }
+          },
+          "MeetingAttendance": {
+            "description": "Per-member attendance for a Meeting, with arrival and departure for quorum verification. Unique per (Meeting_ID, CommitteeMember_ID).",
+            "columns": {
+              "MeetingAttendance_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Meeting_ID": {"type": "VARCHAR(50)", "required": true, "description": "The meeting", "references": {"table": "Meeting", "column": "Meeting_ID"}},
+              "CommitteeMember_ID": {"type": "VARCHAR(50)", "required": true, "description": "The committee member", "references": {"table": "CommitteeMember", "column": "CommitteeMember_ID"}},
+              "Attendance_Status": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: Present / Absent / Excused / Partial"},
+              "Arrival_Time": {"type": "DATETIME", "required": false, "description": "Required when Attendance_Status is 'Present' or 'Partial'"},
+              "Departure_Time": {"type": "DATETIME", "required": false, "description": "Recorded when a member leaves before adjournment"}
+            }
+          }
+        },
+        "cross_row_constraints": [
+          {"location": "MeetingAttendance", "rule": "One attendance row per member per meeting: (Meeting_ID, CommitteeMember_ID) is unique.", "structured": {"type": "unique_scope", "columns": ["Meeting_ID", "CommitteeMember_ID"]}},
+          {"location": "Meeting", "rule": "Quorum_Met is required when Meeting_Status is 'Convened' or 'Adjourned'.", "structured": {"type": "conditional_required", "condition_column": "Meeting_Status", "condition_values": ["Convened", "Adjourned"], "required_columns": ["Quorum_Met"]}}
+        ]
+      },
+      "committee_protocol_review": {
+        "name": "Committee Protocol Review",
+        "story": "We review protocols at convened committee meetings.",
+        "requires": {"core": ">=2.3.0", "modules": ["compliance_protocols", "governance"]},
+        "records_targets": [],
+        "allowed_value_groups": [],
+        "notes": "The bridge between Governance and Compliance Protocols: which Protocols were reviewed at which Meetings, with vote tallies, and which members were recused. Vote tallies live per review row, not on the Meeting, because one meeting reviews many protocols. Recusal rows feed the application's effective-quorum computation for a specific protocol's review.",
+        "tables": {
+          "MeetingProtocolReview": {
+            "description": "A Protocol reviewed at a Meeting, with agenda position, vote tally, and committee decision. Unique per (Meeting_ID, Protocol_ID).",
+            "columns": {
+              "MeetingProtocolReview_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "Meeting_ID": {"type": "VARCHAR(50)", "required": true, "description": "The meeting", "references": {"table": "Meeting", "column": "Meeting_ID"}},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "The parent protocol", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Agenda_Sort_Order": {"type": "INT", "required": true, "description": "Position on the meeting agenda"},
+              "Review_Decision": {"type": "VARCHAR(30)", "required": true, "description": "Constrained: Approved / Approved_With_Modifications / Tabled / Returned / Disapproved / Deferred"},
+              "Decision_Date": {"type": "DATE", "required": true, "description": "Typically the meeting date; later for tabled-and-resumed reviews"},
+              "Decision_Notes": {"type": "TEXT", "required": false, "description": "Committee rationale, required modifications"},
+              "Vote_For_Count": {"type": "INT", "required": false, "description": "Members voting in favor"},
+              "Vote_Against_Count": {"type": "INT", "required": false, "description": "Members voting against"},
+              "Vote_Abstain_Count": {"type": "INT", "required": false, "description": "Members abstaining"}
+            }
+          },
+          "MemberRecusal": {
+            "description": "A CommitteeMember recused from review of a specific Protocol, permanently or for one meeting.",
+            "columns": {
+              "MemberRecusal_ID": {"type": "VARCHAR(50)", "required": true, "description": "PK", "primary_key": true},
+              "CommitteeMember_ID": {"type": "VARCHAR(50)", "required": true, "description": "The committee member", "references": {"table": "CommitteeMember", "column": "CommitteeMember_ID"}},
+              "Protocol_ID": {"type": "VARCHAR(50)", "required": true, "description": "The parent protocol", "references": {"table": "Protocol", "column": "Protocol_ID"}},
+              "Recusal_Reason": {"type": "TEXT", "required": true, "description": "Why the member is recused"},
+              "Recused_Date": {"type": "DATE", "required": true, "description": "When the recusal was declared"},
+              "Is_Permanent": {"type": "BOOLEAN", "required": true, "description": "True: recused from every meeting reviewing this Protocol; false: recused for one meeting only"},
+              "Meeting_ID": {"type": "VARCHAR(50)", "required": false, "description": "Required when Is_Permanent = false; null when true", "references": {"table": "Meeting", "column": "Meeting_ID"}}
+            }
+          }
+        },
+        "cross_row_constraints": [
+          {"location": "MeetingProtocolReview", "rule": "A Protocol appears at most once on a given Meeting's review agenda: (Meeting_ID, Protocol_ID) is unique.", "structured": {"type": "unique_scope", "columns": ["Meeting_ID", "Protocol_ID"]}},
+          {"location": "MemberRecusal", "rule": "Meeting_ID is required when Is_Permanent = false and must be null when Is_Permanent = true.", "structured": {"type": "conditional_required", "condition_column": "Is_Permanent", "condition_values": [false], "required_columns": ["Meeting_ID"]}}
+        ]
+      }
+    }
   },
   "tables": {
     "Personnel": {
