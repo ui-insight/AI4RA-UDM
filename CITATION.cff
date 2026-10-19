@@ -20,10 +20,10 @@ abstract: >-
   A canonical schema for research administration covering pre-award
   proposal preparation, sponsor submission, post-award management,
   financial accounting, personnel effort, compliance, and operational
-  systems. The UDM is a specification — institutions implement it in
-  whatever database technology fits their environment — and is published
-  as machine-readable JSON to support direct integration, ERD generation,
-  and schema-aware tooling.
+  systems. The UDM is a specification. Institutions implement it in
+  whatever database technology fits their environment, and it is
+  published as machine-readable JSON to support direct integration, ERD
+  generation, and schema-aware tooling.
 keywords:
   - research administration
   - data model

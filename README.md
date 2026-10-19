@@ -237,13 +237,7 @@ graph TD
 
 ## Contributing
 
-The UDM improves through community input. There are several ways to participate:
-
-- **Suggest changes or report issues**: Open a [GitHub Issue](https://github.com/ui-insight/AI4RA-UDM/issues) describing the table, column, or convention you'd like to add, change, or discuss
-- **Join the discussion**: Use [GitHub Discussions](https://github.com/ui-insight/AI4RA-UDM/discussions) for broader questions about the model's direction, new capability coverage, or adoption experiences
-- **Take the survey**: A short [practitioner survey](https://bit.ly/4b5b21q) on what your institution needs from a shared model
-
-When `udm_schema_v2.json` is updated on `main`, CI automatically regenerates the dashboard data files served via GitHub Pages.
+The UDM improves through community input: open a [GitHub Issue](https://github.com/ui-insight/AI4RA-UDM/issues) to suggest a change, use [GitHub Discussions](https://github.com/ui-insight/AI4RA-UDM/discussions) for broader questions, or take the short [practitioner survey](https://bit.ly/4b5b21q). See [CONTRIBUTING.md](CONTRIBUTING.md) for how to make a change and the license terms that apply to contributions.
 
 <!-- ERD_START -->
 ## Entity Relationship Diagram
@@ -400,7 +394,7 @@ Copyright 2025 Nathan Layman.
 The AI4RA Unified Data Model is licensed in two parts:
 
 - **The standard** (the schema, naming conventions and documentation) is licensed under [CC BY 4.0](LICENSE-CC-BY-4.0). Anyone, vendors included, can use it and build it into a product, with attribution required.
-- **The code** (the scripts and dashboard) is licensed under [Apache-2.0](LICENSE-APACHE-2.0).
+- **The code** (the scripts, the dashboard and the build workflows) is licensed under [Apache-2.0](LICENSE-APACHE-2.0).
 
 The machine-readable schema files are available under either license, at your option. [NOTICE](NOTICE) lists which files fall under which license. It is the attribution notice under Apache-2.0 Section 4(d) and carries the attribution CC BY 4.0 requires: any redistribution of the work or a derivative must credit Nathan Layman as author, AI4RA, the University of Idaho, and NSF award 2427549. To cite the project, use [CITATION.cff](CITATION.cff).
 

@@ -4,7 +4,7 @@ Copyright 2025 Nathan Layman
 Author: Nathan Layman, https://github.com/ui-insight/AI4RA-UDM
 
 The AI4RA Unified Data Model is a project of AI4RA (AI for Research
-Administration) at the University of Idaho. https://github.com/ui-insight
+Administration) at the University of Idaho. https://github.com/AI4RA
 
 This material is based upon work supported by the U.S. National Science
 Foundation under the GRANTED program, award number 2427549, "Crossing the
@@ -39,7 +39,8 @@ LICENSES
 
   2. THE CODE: Apache License, Version 2.0. The scripts, the dashboard
      and the build workflows. This covers scripts/, dashboard/, .github/,
-     and the built dashboard under docs/. Full text: LICENSE-APACHE-2.0.
+     and the built dashboard (docs/index.html, docs/ontology.html and
+     docs/assets/). Full text: LICENSE-APACHE-2.0.
 
   The machine-readable schema files are available under either license,
   at your option. This covers udm_schema_v2.json, udm_schema.json,
