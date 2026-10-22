@@ -109,19 +109,20 @@
     },
     "polymorphic_attachment": {
       "name": "Polymorphic attachment",
-      "description": "Six tables in the Attachments domain attach to any listed parent table via Related_Entity_Type + Related_Entity_ID. The Records core module generalizes the everyday RA concept of attaching a document to an award to all the things that accumulate around a record: files, correspondence, restrictions, deadlines, tags, work items, and audit events.",
+      "description": "Seven tables in the Attachments domain attach to any listed parent table via Related_Entity_Type + Related_Entity_ID. The Records core module generalizes the everyday RA concept of attaching a document to an award to all the things that accumulate around a record: files, correspondence, restrictions, deadlines, tags, work items, and audit events.",
       "tables": [
         "Document",
         "Communication",
         "Restriction",
         "Deadline",
         "Classification",
-        "Action"
+        "Action",
+        "Approval"
       ],
       "enforcement": {
-        "description": "The six polymorphic Records tables use a polymorphic foreign key (Related_Entity_Type + Related_Entity_ID) that no single declarative reference can fully enforce.",
+        "description": "The seven polymorphic Records tables use a polymorphic foreign key (Related_Entity_Type + Related_Entity_ID) that no single declarative reference can fully enforce.",
         "required_properties": [
-          "Related_Entity_Type is constrained to a per-attachment allowed list of target table names (enumerated in each attachment's table reference). Optional modules extend a list only through the Records target registry: a module declares which of its tables are attachable, and implementations honor declared targets. A declared target is accepted by every Records attachment table (Document, Communication, Restriction, Deadline, Classification, Action).",
+          "Related_Entity_Type is constrained to a per-attachment allowed list of target table names (enumerated in each attachment's table reference). Optional modules extend a list only through the Records target registry: a module declares which of its tables are attachable, and implementations honor declared targets. A declared target is accepted by every Records attachment table (Document, Communication, Restriction, Deadline, Classification, Action, Approval).",
           "Related_Entity_ID references an existing row in the table named by Related_Entity_Type."
         ],
         "enforcement_options": [
@@ -372,7 +373,9 @@
         "ComplianceClassificationLevel",
         "CommunicationResponseType",
         "CommunicationResponseValue",
-        "SubmissionChannel"
+        "SubmissionChannel",
+        "ApprovalStepType",
+        "ReviewTopic"
       ]
     },
     "lifecycle_closure": {
@@ -1683,14 +1686,14 @@
                 "value_definitions": {
                   "Draft": {
                     "definition": "Being prepared; not yet routed for approval",
-                    "set_by": "The proposal team",
+                    "set_by": "Derived: no Approval rows exist yet",
                     "next": [
                       "In_Review"
                     ]
                   },
                   "In_Review": {
                     "definition": "Routed; one or more approval steps are pending",
-                    "set_by": "Routing",
+                    "set_by": "Derived from the Approval rows of the current round",
                     "next": [
                       "Returned",
                       "Approved",
@@ -1699,26 +1702,30 @@
                   },
                   "Returned": {
                     "definition": "An approval step sent it back for revision; it must be rerouted",
-                    "set_by": "An approver",
+                    "set_by": "Derived from the Approval rows of the current round",
                     "next": [
                       "In_Review"
                     ]
                   },
                   "Approved": {
                     "definition": "Every approval step has approved; the proposal may be submitted",
-                    "set_by": "Derived; the system computes it",
+                    "set_by": "Derived from the Approval rows of the current round",
                     "next": [
                       "In_Review"
                     ]
                   },
                   "Rejected": {
                     "definition": "An approval step refused it; the proposal does not proceed",
-                    "set_by": "An approver",
+                    "set_by": "Derived from the Approval rows of the current round",
                     "next": []
                   }
                 },
                 "description": "Where the proposal stands in the institution's internal approval chain. Draft until routed; In_Review while steps are pending; Returned when a step sent it back for revision; Approved once every step has approved; Rejected when a step refused it. A proposal is submitted only once this is Approved",
-                "synonyms": "Internal Routing Status, OSP Approval"
+                "synonyms": "Internal Routing Status, OSP Approval",
+                "derived": {
+                  "rule": "Draft when no Approval row exists for the Proposal; otherwise, over the rows of the highest Approval_Round: Rejected if any row is Rejected; Returned if any row is Returned_for_Revision; Approved if every row is Approved or Bypassed; In_Review otherwise.",
+                  "recompute_triggers": "On insert/update of any Approval row whose Related_Entity_Type is Proposal and Related_Entity_ID is the Proposal."
+                }
               },
               "Submission_Status": {
                 "type": "Status",
@@ -2147,146 +2154,6 @@
                 }
               }
             ]
-          },
-          "ProposalApproval": {
-            "description": "A step in the institutional approval chain for a Proposal. Most universities require sign-off from PI, department chair, dean, and OSP before a Proposal can be submitted.",
-            "columns": {
-              "ProposalApproval_ID": {
-                "type": "ID",
-                "primary_key": true,
-                "required": true,
-                "description": "PK"
-              },
-              "Proposal_ID": {
-                "type": "ID",
-                "required": true,
-                "references": {
-                  "table": "Proposal",
-                  "column": "Proposal_ID"
-                },
-                "description": "The Proposal being routed for approval"
-              },
-              "Approval_Step_Order": {
-                "type": "Count",
-                "required": true,
-                "description": "Sequence within the routing chain (1 = first signature)",
-                "synonyms": "Routing Step, Signature Order"
-              },
-              "Approval_Role": {
-                "type": "Status",
-                "required": true,
-                "allowed_values": [
-                  "PI",
-                  "Co_Investigator",
-                  "Department_Chair",
-                  "College_Dean",
-                  "Center_Director",
-                  "OSP_Pre_Award",
-                  "Compliance_Office",
-                  "VPR",
-                  "Authorized_Organizational_Representative",
-                  "Other"
-                ],
-                "value_definitions": {
-                  "PI": {
-                    "definition": "The principal investigator"
-                  },
-                  "Co_Investigator": {
-                    "definition": "A co-investigator"
-                  },
-                  "Department_Chair": {
-                    "definition": "The chair of a department on the team"
-                  },
-                  "College_Dean": {
-                    "definition": "The dean of a college on the team"
-                  },
-                  "Center_Director": {
-                    "definition": "The director of a center on the team"
-                  },
-                  "OSP_Pre_Award": {
-                    "definition": "The sponsored programs office's pre-award review"
-                  },
-                  "Compliance_Office": {
-                    "definition": "A compliance office review"
-                  },
-                  "VPR": {
-                    "definition": "The vice president for research or delegate"
-                  },
-                  "Authorized_Organizational_Representative": {
-                    "definition": "The authorized organizational representative's sign-off, the act that binds the institution to the submission"
-                  },
-                  "Other": {
-                    "definition": "A role not listed"
-                  }
-                },
-                "description": "The institutional role that performs this step"
-              },
-              "Approver_Personnel_ID": {
-                "type": "ID",
-                "required": true,
-                "references": {
-                  "table": "Personnel",
-                  "column": "Personnel_ID"
-                },
-                "description": "The specific person who performs (or is expected to perform) this step",
-                "synonyms": "Approver, Signoff Authority"
-              },
-              "Approval_Status": {
-                "type": "Status",
-                "required": true,
-                "allowed_values": [
-                  "Pending",
-                  "Approved",
-                  "Rejected",
-                  "Bypassed",
-                  "Returned_for_Revision"
-                ],
-                "value_definitions": {
-                  "Pending": {
-                    "definition": "Awaiting the approver's action",
-                    "set_by": "Routing",
-                    "next": [
-                      "Approved",
-                      "Rejected",
-                      "Bypassed",
-                      "Returned_for_Revision"
-                    ]
-                  },
-                  "Approved": {
-                    "definition": "The approver signed off",
-                    "set_by": "The approver",
-                    "next": []
-                  },
-                  "Rejected": {
-                    "definition": "The approver refused; the proposal does not proceed",
-                    "set_by": "The approver",
-                    "next": []
-                  },
-                  "Bypassed": {
-                    "definition": "Skipped by an administrator with authority to do so; every bypass is logged",
-                    "set_by": "A system administrator",
-                    "next": []
-                  },
-                  "Returned_for_Revision": {
-                    "definition": "Sent back to the team for changes; the step is rerun after revision",
-                    "set_by": "The approver",
-                    "next": []
-                  }
-                },
-                "description": "Constrained: Pending / Approved / Rejected / Bypassed / Returned_for_Revision"
-              },
-              "Action_Date": {
-                "type": "Date",
-                "required": false,
-                "conditional_required": "Required when Approval_Status is not Pending",
-                "description": "Required when Approval_Status is not Pending"
-              },
-              "Notes": {
-                "type": "LongText",
-                "required": false,
-                "description": "Free-text notes recorded at this approval step"
-              }
-            }
           },
           "PreAwardAuthorization": {
             "description": "An institutional pre-award authorization to spend at-risk on a Proposal that has been favorably reviewed but not yet officially awarded.",
@@ -6951,7 +6818,7 @@
                   "Subaward",
                   "Proposal",
                   "SubmissionAttempt",
-                  "ProposalApproval",
+                  "Approval",
                   "PreAwardAuthorization",
                   "Personnel",
                   "PersonnelCredential",
@@ -6979,8 +6846,8 @@
                   "SubmissionAttempt": {
                     "definition": "A submission attempt"
                   },
-                  "ProposalApproval": {
-                    "definition": "A proposal approval step"
+                  "Approval": {
+                    "definition": "An approval step"
                   },
                   "PreAwardAuthorization": {
                     "definition": "A pre-award authorization"
@@ -7022,7 +6889,7 @@
                     "definition": "An equipment item"
                   }
                 },
-                "description": "Constrained: Award / Subaward / Proposal / SubmissionAttempt / ProposalApproval / PreAwardAuthorization / Personnel / PersonnelCredential / ComplianceRequirement / Modification / Action / Restriction / Budget / Negotiation / Terms / Report / Closeout / Equipment"
+                "description": "Constrained: Award / Subaward / Proposal / SubmissionAttempt / Approval / PreAwardAuthorization / Personnel / PersonnelCredential / ComplianceRequirement / Modification / Action / Restriction / Budget / Negotiation / Terms / Report / Closeout / Equipment"
               },
               "Related_Entity_ID": {
                 "type": "ID",
@@ -7461,7 +7328,7 @@
                   "Award",
                   "Subaward",
                   "Proposal",
-                  "ProposalApproval",
+                  "Approval",
                   "ComplianceRequirement",
                   "Modification",
                   "RFA",
@@ -7479,8 +7346,8 @@
                   "Proposal": {
                     "definition": "A proposal"
                   },
-                  "ProposalApproval": {
-                    "definition": "A proposal approval step"
+                  "Approval": {
+                    "definition": "An approval step"
                   },
                   "ComplianceRequirement": {
                     "definition": "A compliance requirement"
@@ -7501,7 +7368,7 @@
                     "definition": "A communication"
                   }
                 },
-                "description": "Constrained: Award / Subaward / Proposal / ProposalApproval / ComplianceRequirement / Modification / RFA / Closeout / Report / Communication"
+                "description": "Constrained: Award / Subaward / Proposal / Approval / ComplianceRequirement / Modification / RFA / Closeout / Report / Communication"
               },
               "Related_Entity_ID": {
                 "type": "ID",
@@ -7695,7 +7562,7 @@
                   "Award",
                   "Subaward",
                   "Proposal",
-                  "ProposalApproval",
+                  "Approval",
                   "PreAwardAuthorization",
                   "Personnel",
                   "ComplianceRequirement",
@@ -7716,8 +7583,8 @@
                   "Proposal": {
                     "definition": "A proposal"
                   },
-                  "ProposalApproval": {
-                    "definition": "A proposal approval step"
+                  "Approval": {
+                    "definition": "An approval step"
                   },
                   "PreAwardAuthorization": {
                     "definition": "A pre-award authorization"
@@ -7747,7 +7614,7 @@
                     "definition": "An equipment item"
                   }
                 },
-                "description": "Constrained: Award / Subaward / Proposal / ProposalApproval / PreAwardAuthorization / Personnel / ComplianceRequirement / Modification / Negotiation / Terms / Closeout / Report / Equipment"
+                "description": "Constrained: Award / Subaward / Proposal / Approval / PreAwardAuthorization / Personnel / ComplianceRequirement / Modification / Negotiation / Terms / Closeout / Report / Equipment"
               },
               "Related_Entity_ID": {
                 "type": "ID",
@@ -7951,6 +7818,317 @@
               }
             }
           },
+          "Approval": {
+            "description": "One step in an approval chain on a record: who was asked to decide what, in which block and round, and what they decided. Each step names what is decided (its step type), never only the office. Steps sharing an order number form a block and run in parallel; a block waits on the previous one. A return reruns the affected steps as new rows in the next round. A sign-off records the hash of the package it approved and is Voided when that package changes. Replaces the former ProposalApproval and serves any record that is routed for approval.",
+            "columns": {
+              "Approval_ID": {
+                "type": "ID",
+                "required": true,
+                "primary_key": true,
+                "description": "PK"
+              },
+              "Related_Entity_Type": {
+                "type": "Status",
+                "required": true,
+                "allowed_values": [
+                  "Proposal",
+                  "Modification",
+                  "Subaward",
+                  "PreAwardAuthorization",
+                  "Closeout",
+                  "Report"
+                ],
+                "value_definitions": {
+                  "Proposal": {
+                    "definition": "The proposal's routing chain before submission"
+                  },
+                  "Modification": {
+                    "definition": "Internal routing of a modification request; the sponsor's decision stays on Modification.Approval_Status"
+                  },
+                  "Subaward": {
+                    "definition": "Internal approvals before a subaward is issued"
+                  },
+                  "PreAwardAuthorization": {
+                    "definition": "Approvals of at-risk spending"
+                  },
+                  "Closeout": {
+                    "definition": "Closeout sign-offs"
+                  },
+                  "Report": {
+                    "definition": "Internal sign-off on a report before submission"
+                  }
+                },
+                "description": "Constrained: Proposal / Modification / Subaward / PreAwardAuthorization / Closeout / Report. The kind of record being routed"
+              },
+              "Related_Entity_ID": {
+                "type": "ID",
+                "required": true,
+                "description": "The row in the table named by Related_Entity_Type"
+              },
+              "Step_Type_Value_ID": {
+                "type": "ID",
+                "required": true,
+                "references": {
+                  "table": "AllowedValues",
+                  "column": "AllowedValue_ID"
+                },
+                "value_group": "ApprovalStepType",
+                "recommended_values": [
+                  "Budget_Review",
+                  "Compliance_Review",
+                  "Supplementary_Review",
+                  "PI_Certification",
+                  "Co_PI_Certification",
+                  "Department_Review",
+                  "College_Review",
+                  "Pre_Award_Review",
+                  "Final_Sign_off",
+                  "Release_to_Submit",
+                  "Post_Award_Review",
+                  "Other"
+                ],
+                "description": "What is decided at this step. Final_Sign_off is the authorized organizational representative's approval of an assembled package; Release_to_Submit releases a signed package to a named person to transmit",
+                "synonyms": "Review Step, Routing Step, Sign-off Type"
+              },
+              "Approval_Role": {
+                "type": "Status",
+                "required": true,
+                "allowed_values": [
+                  "PI",
+                  "Co_Investigator",
+                  "Department_Chair",
+                  "College_Dean",
+                  "Center_Director",
+                  "OSP_Pre_Award",
+                  "Compliance_Office",
+                  "VPR",
+                  "Authorized_Organizational_Representative",
+                  "Other"
+                ],
+                "value_definitions": {
+                  "PI": {
+                    "definition": "The principal investigator"
+                  },
+                  "Co_Investigator": {
+                    "definition": "A co-investigator"
+                  },
+                  "Department_Chair": {
+                    "definition": "The chair of a department on the team"
+                  },
+                  "College_Dean": {
+                    "definition": "The dean of a college on the team"
+                  },
+                  "Center_Director": {
+                    "definition": "The director of a center on the team"
+                  },
+                  "OSP_Pre_Award": {
+                    "definition": "The sponsored programs office's pre-award review"
+                  },
+                  "Compliance_Office": {
+                    "definition": "A compliance office review"
+                  },
+                  "VPR": {
+                    "definition": "The vice president for research or delegate"
+                  },
+                  "Authorized_Organizational_Representative": {
+                    "definition": "The authorized organizational representative's sign-off, the act that binds the institution to the submission"
+                  },
+                  "Other": {
+                    "definition": "A role not listed"
+                  }
+                },
+                "description": "The institutional role that performs this step. Type says what is decided; role says who decides it",
+                "synonyms": "Approver Role, Signatory"
+              },
+              "Reviewing_Organization_ID": {
+                "type": "ID",
+                "required": false,
+                "references": {
+                  "table": "Organization",
+                  "column": "Organization_ID"
+                },
+                "description": "The unit performing the step: the department for a Department_Review, the college for a College_Review. A proposal with a team across units carries one such step per unit"
+              },
+              "Review_Topic_Value_ID": {
+                "type": "ID",
+                "required": false,
+                "references": {
+                  "table": "AllowedValues",
+                  "column": "AllowedValue_ID"
+                },
+                "value_group": "ReviewTopic",
+                "recommended_values": [
+                  "Export_Control",
+                  "Cost_Share",
+                  "Indirect_Rate_Waiver",
+                  "Conflict_Of_Interest",
+                  "Human_Subjects",
+                  "Animal_Use",
+                  "Biosafety",
+                  "Data_Management",
+                  "Subrecipient",
+                  "Other"
+                ],
+                "conditional_required": "Required when Step_Type resolves to Supplementary_Review",
+                "description": "The topic of a Supplementary_Review: one step per topic that applies"
+              },
+              "Approval_Step_Order": {
+                "type": "Count",
+                "required": true,
+                "description": "Position in the chain. Rows sharing an order number form a block and run in parallel; no step leaves Pending while a lower-numbered step of the same round is Pending",
+                "synonyms": "Step Number, Routing Order"
+              },
+              "Approval_Round": {
+                "type": "Count",
+                "required": true,
+                "default": 1,
+                "description": "1 for the first routing. A return reruns the affected steps as new rows in the next round; rows are never overwritten, so a record returned twice shows it"
+              },
+              "Assigned_Personnel_ID": {
+                "type": "ID",
+                "required": false,
+                "references": {
+                  "table": "Personnel",
+                  "column": "Personnel_ID"
+                },
+                "description": "The person expected to act. A label for the queue, not a gate: anyone holding the step's role for the reviewing unit may act",
+                "synonyms": "Assigned Reviewer, Expected Approver"
+              },
+              "Approver_Personnel_ID": {
+                "type": "ID",
+                "required": false,
+                "references": {
+                  "table": "Personnel",
+                  "column": "Personnel_ID"
+                },
+                "conditional_required": "Required when Approval_Status is Approved, Rejected, Bypassed, or Returned_for_Revision",
+                "description": "Who acted. Null while Pending; the administrator for a Bypassed step",
+                "synonyms": "Approver, Signer"
+              },
+              "Delegate_Personnel_ID": {
+                "type": "ID",
+                "required": false,
+                "references": {
+                  "table": "Personnel",
+                  "column": "Personnel_ID"
+                },
+                "conditional_required": "Required when Step_Type resolves to Release_to_Submit and Approval_Status is Approved",
+                "description": "For Release_to_Submit: the person the signed package was released to, who may then transmit it"
+              },
+              "Approval_Status": {
+                "type": "Status",
+                "required": true,
+                "allowed_values": [
+                  "Pending",
+                  "Approved",
+                  "Rejected",
+                  "Bypassed",
+                  "Returned_for_Revision",
+                  "Voided"
+                ],
+                "value_definitions": {
+                  "Pending": {
+                    "definition": "Awaiting the approver's action",
+                    "set_by": "Routing",
+                    "next": [
+                      "Approved",
+                      "Rejected",
+                      "Bypassed",
+                      "Returned_for_Revision",
+                      "Voided"
+                    ]
+                  },
+                  "Approved": {
+                    "definition": "The approver signed off",
+                    "set_by": "The approver",
+                    "next": [
+                      "Voided"
+                    ]
+                  },
+                  "Rejected": {
+                    "definition": "The approver refused; the record does not proceed",
+                    "set_by": "The approver",
+                    "next": []
+                  },
+                  "Bypassed": {
+                    "definition": "Skipped by an administrator with authority to do so; the administrator is the approver and every bypass is logged",
+                    "set_by": "A system administrator",
+                    "next": [
+                      "Voided"
+                    ]
+                  },
+                  "Returned_for_Revision": {
+                    "definition": "Sent back for changes; the step is rerun in the next round",
+                    "set_by": "The approver",
+                    "next": []
+                  },
+                  "Voided": {
+                    "definition": "No longer valid because the thing approved changed: a sign-off whose package hash no longer matches, or a release that rode on it",
+                    "set_by": "Derived when the package changes",
+                    "next": []
+                  }
+                },
+                "description": "The step's state. Voided is distinct from Rejected and Returned: the decision stood, but what it approved changed"
+              },
+              "Signed_Package_Hash": {
+                "type": "Hash",
+                "required": false,
+                "conditional_required": "Required when Step_Type resolves to Final_Sign_off and Approval_Status is Approved",
+                "description": "SHA-256 of the assembled package the sign-off approved, the same convention as Document.File_Hash. A Final_Sign_off is Voided when the current package hash no longer matches"
+              },
+              "Action_Date": {
+                "type": "Date",
+                "required": false,
+                "conditional_required": "Required when Approval_Status is not Pending",
+                "description": "When the step was acted on"
+              },
+              "Notes": {
+                "type": "LongText",
+                "required": false,
+                "description": "The approver's note: conditions, the reason for a return or rejection"
+              }
+            },
+            "constraints": [
+              {
+                "rule": "Approver_Personnel_ID and Action_Date are required when Approval_Status is Approved, Rejected, Bypassed, or Returned_for_Revision.",
+                "structured": {
+                  "type": "conditional_required",
+                  "condition_column": "Approval_Status",
+                  "condition_values": [
+                    "Approved",
+                    "Rejected",
+                    "Bypassed",
+                    "Returned_for_Revision"
+                  ],
+                  "required_columns": [
+                    "Approver_Personnel_ID",
+                    "Action_Date"
+                  ]
+                }
+              },
+              {
+                "rule": "Review_Topic_Value_ID is required when Step_Type resolves to Supplementary_Review."
+              },
+              {
+                "rule": "Signed_Package_Hash is required when Step_Type resolves to Final_Sign_off and Approval_Status is Approved."
+              },
+              {
+                "rule": "Delegate_Personnel_ID is required when Step_Type resolves to Release_to_Submit and Approval_Status is Approved."
+              },
+              {
+                "rule": "Blocks: within one (Related_Entity_Type, Related_Entity_ID, Approval_Round), no row leaves Pending while a row with a lower Approval_Step_Order is Pending."
+              },
+              {
+                "rule": "Rounds: a step that is Returned_for_Revision is not reopened; the rerun steps are new rows with Approval_Round one higher. Approval_Round is consecutive from 1 within the record."
+              },
+              {
+                "rule": "Voiding: a Final_Sign_off row whose Signed_Package_Hash no longer equals the hash of the record's current package becomes Voided, and any Release_to_Submit row that followed it in the same round becomes Voided with it."
+              },
+              {
+                "rule": "Related_Entity_ID references an existing row in the table named by Related_Entity_Type (polymorphic attachment enforcement)."
+              }
+            ]
+          },
           "CommunicationResponse": {
             "description": "A per-recipient structured response to a Communication. The Communication carries the message; a Deadline attached to the Communication carries the response window; each recipient's response is one row. Pre-create one Pending row per intended recipient at notification time.",
             "columns": {
@@ -8105,6 +8283,18 @@
           {
             "name": "Action.Outcome_Description",
             "description": "When an Action records a structured workflow with a substantive result (Subrecipient_Risk_Review, Modification_Approval, Cost_Transfer_Approval), the outcome lives in Outcome_Description plus an optional Linked_Document_ID for the formal report."
+          },
+          {
+            "name": "Approval chains",
+            "description": "How a record is routed for approval, on any record type Approval attaches to.",
+            "rules": [
+              "Each step names what is decided (Step_Type) and who decides it (Approval_Role). An institution's chain is a row template the application applies at routing time; the order of blocks is institutional configuration, not the standard's.",
+              "A Department_Review is one row per department represented on the team, a College_Review one per college; Reviewing_Organization_ID names the unit. A Supplementary_Review is one row per topic that applies.",
+              "Rows sharing Approval_Step_Order form a block and run in parallel. A block waits on the previous one.",
+              "A return does not reopen rows: the rerun steps are new rows in the next Approval_Round.",
+              "Final_Sign_off is the authorized organizational representative's approval of an assembled package and records its hash. Release_to_Submit releases the signed package to a named person. Any change to the package voids both. Transmitting the package is a SubmissionAttempt, not an approval.",
+              "Internal routing of a Modification request is Approval rows on the Modification; Modification.Approval_Status remains the sponsor's decision. Automated pre-submission checks are not approvals and do not get rows."
+            ]
           }
         ],
         "example_views": [

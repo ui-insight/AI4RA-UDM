@@ -254,7 +254,7 @@ The 47 tables organize into 6 core modules plus two implementation tables:
 | Core module | Tables |
 |---|---|
 | **Actors** | Personnel, PersonnelCredential, Organization, OrganizationCapability, OrganizationIdentifier, OrganizationRole, ContactDetails |
-| **Funding Cycle** | RFA, RFARequirement, Proposal, ProposalApproval, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout |
+| **Funding Cycle** | RFA, RFARequirement, Proposal, SubmissionAttempt, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout |
 | **Effort** | TeamRole, Effort |
 | **Finance** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment |
 | **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure, PolicyException |
@@ -311,13 +311,13 @@ Specific requirements extracted from an RFA. Acts as a template; per-proposal co
 
 ### Proposal
 
-A formal request for funding submitted to a sponsor. Tracks the full lifecycle: drafting, internal routing (via ProposalApproval), submission (recorded as SubmissionAttempt rows), and decision. Links to three distinct Organization roles: Sponsor, Submitting, Administering.
+A formal request for funding submitted to a sponsor. Tracks the full lifecycle: drafting, internal routing (via Approval rows), submission (recorded as SubmissionAttempt rows), and decision. Links to three distinct Organization roles: Sponsor, Submitting, Administering.
 
 Carries lineage columns: `Previous_Proposal_ID` (resubmission/renewal/continuation), `Originating_Proposal_ID` (derived chain root), `Group_ID` (user-maintained grouping).
 
-### ProposalApproval
+### Approval (Records)
 
-A step in the institutional approval chain for a Proposal. PI, department chair, dean, OSP — each layer's signature is a row with an Approver_Personnel_ID and Approval_Status.
+One step in an approval chain on a Proposal, Modification, Subaward, PreAwardAuthorization, Closeout, or Report. Each step names what is decided and who decides it; steps sharing an order run in parallel as a block; a return reruns steps in a new round; a sign-off records the package hash it approved and is voided when the package changes.
 
 ### PreAwardAuthorization
 

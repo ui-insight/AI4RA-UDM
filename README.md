@@ -35,11 +35,11 @@ The model's 48 tables are 46 in six core modules (the universal capabilities of 
 | Core module | Tables | Purpose |
 |--------|--------|---------|
 | **Actors** | Personnel, PersonnelCredential, Organization, OrganizationCapability, OrganizationIdentifier, OrganizationRole, ContactDetails | People, organizations, their roles, credentials, and contact information |
-| **Funding Cycle** | RFA, RFARequirement, Proposal, SubmissionAttempt, ProposalApproval, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout | The full lifecycle from funding opportunity through proposal, award, and closeout |
+| **Funding Cycle** | RFA, RFARequirement, Proposal, SubmissionAttempt, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout | The full lifecycle from funding opportunity through proposal, award, and closeout |
 | **Effort** | TeamRole, Effort | Who is on a proposal or award, and effort certification |
 | **Finance** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment | Budgets, accounting, transactions, rates, and capital assets |
 | **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure, PolicyException | IRB/IACUC protocols, COI, other support, policy exceptions, and regulatory tracking |
-| **Records** | Document, Communication, Restriction, Deadline, Classification, Action, CommunicationResponse | The records that accumulate around the work, attached across all core modules |
+| **Records** | Document, Communication, Restriction, Deadline, Classification, Action, Approval, CommunicationResponse | The records that accumulate around the work, attached across all core modules |
 
 **Implementation tables** (not a core module): `AllowedValues` (institution-specific controlled vocabularies with cross-institution canonical codes) and `BudgetCategory` (shared budget category reference). Core modules are research-administration capabilities; these two tables support the model's mechanics.
 
@@ -356,8 +356,9 @@ graph TD
     Proposal-->Organization
     Proposal-->Proposal
     Proposal-->RFA
-    ProposalApproval-->Personnel
-    ProposalApproval-->Proposal
+    Approval-->Personnel
+    Approval-->Organization
+    Approval-->AllowedValues
     ProtocolRole-->AllowedValues
     ProtocolRole-->Award
     ProtocolRole-->ComplianceRequirement

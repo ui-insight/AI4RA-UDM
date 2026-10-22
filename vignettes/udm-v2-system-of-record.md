@@ -70,11 +70,11 @@ Two laws govern every module, core or optional:
 | Core module | Tables |
 |---|---|
 | **Actors** | Personnel, PersonnelCredential, Organization, OrganizationCapability, OrganizationIdentifier, OrganizationRole, ContactDetails |
-| **Funding Cycle** | RFA, RFARequirement, Proposal, SubmissionAttempt, ProposalApproval, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout |
+| **Funding Cycle** | RFA, RFARequirement, Proposal, SubmissionAttempt, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout |
 | **Effort** | TeamRole, Effort |
 | **Finance** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment |
 | **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure, PolicyException |
-| **Records** | Document, Communication, Restriction, Deadline, Classification, Action, CommunicationResponse |
+| **Records** | Document, Communication, Restriction, Deadline, Classification, Action, Approval, CommunicationResponse |
 
 Core modules are the universal capabilities of research administration; every implementation carries all of them. Two additional tables — **AllowedValues** and **BudgetCategory** — are implementation tables that support the model's mechanics (controlled vocabularies and shared reference codes) and are intentionally not a core module. They are documented at the end of the Table reference.
 
@@ -104,7 +104,7 @@ A foreign key whose name carries the *role* of the relationship rather than just
 
 ### Polymorphic attachment
 
-Six tables in the Records core module can attach to *any* listed parent table via two columns:
+Seven tables in the Records core module can attach to *any* listed parent table via two columns:
 
 - `Related_Entity_Type`: the name of the table being attached to, constrained to a per-attachment list of allowed table names.
 - `Related_Entity_ID`: the primary key value in that table.
@@ -395,11 +395,11 @@ CostShare has no separate `*_Status` column; CostShare.Lifecycle_Stage is author
 
 ## Polymorphic attachment enforcement
 
-The six polymorphic Records tables (Document, Communication, Restriction, Deadline, Classification, Action) use a polymorphic foreign key (`Related_Entity_Type` + `Related_Entity_ID`) that no single declarative reference can fully enforce.
+The seven polymorphic Records tables (Document, Communication, Restriction, Deadline, Classification, Action, Approval) use a polymorphic foreign key (`Related_Entity_Type` + `Related_Entity_ID`) that no single declarative reference can fully enforce.
 
 The model requires two enforcement properties:
 
-1. **`Related_Entity_Type` is constrained** to a per-attachment allowed list of target table names (enumerated in each attachment's table reference). Optional modules extend a list only through the Records target registry: a module declares which of its tables are attachable, and implementations honor declared targets. A declared target is accepted by every Records attachment table (Document, Communication, Restriction, Deadline, Classification, Action).
+1. **`Related_Entity_Type` is constrained** to a per-attachment allowed list of target table names (enumerated in each attachment's table reference). Optional modules extend a list only through the Records target registry: a module declares which of its tables are attachable, and implementations honor declared targets. A declared target is accepted by every Records attachment table (Document, Communication, Restriction, Deadline, Classification, Action, Approval).
 2. **`Related_Entity_ID` references an existing row** in the table named by `Related_Entity_Type`.
 
 Implementations satisfy (1) using the platform's enumeration mechanism. Implementations satisfy (2) using whatever the platform provides: database triggers, application-layer hooks, scheduled integrity checks, or other mechanisms appropriate to the institution's stack. The *Implementation guidance* section discusses common approaches; the schema does not prescribe one. Removal behavior (what happens to attached rows when the parent is removed) is an institutional choice and is not specified.
@@ -443,6 +443,7 @@ Some columns are derived from other data. The model specifies the rule; the impl
 | `Proposal.Submission_Status` | Unapproved while `Internal_Approval_Status` is not Approved; Unsent when Approved and no SubmissionAttempt exists; otherwise the `Attempt_Status` of the SubmissionAttempt with the highest `Attempt_Number` | On insert/update of `Proposal.Internal_Approval_Status`; on insert/update of any SubmissionAttempt for the Proposal |
 | `Proposal.Submission_Version` | The count of SubmissionAttempt rows for the Proposal; 0 before the first attempt | On insert/delete of a SubmissionAttempt for the Proposal |
 | `Proposal.Submission_Date` | The date of `Submitted_At` on the newest SubmissionAttempt whose `Attempt_Status` is Submitted, Received, Validated, Invalid, or Accepted; null when no attempt has reached Submitted | On insert/update of any SubmissionAttempt for the Proposal |
+| `Proposal.Internal_Approval_Status` | Draft when no Approval row exists for the Proposal; otherwise, over the rows of the highest `Approval_Round`: Rejected if any row is Rejected; Returned if any is Returned_for_Revision; Approved if every row is Approved or Bypassed; In_Review otherwise | On insert/update of any Approval row on the Proposal |
 
 Common implementation choices: generated column, trigger that maintains the value, view that computes it, or application-layer compute on read. The model accepts any approach that produces the correct value at the moment a consumer reads it.
 
@@ -467,6 +468,11 @@ The following rules require enforcement beyond what a single column declaration 
 | SubmissionAttempt | At most one SubmissionAttempt per Proposal has `Attempt_Status` Unsent or Submitting: one attempt is in flight at a time |
 | SubmissionAttempt | SubmissionAttempt rows exist only for a Proposal whose `Internal_Approval_Status` is Approved |
 | PreAwardAuthorization | The Proposal referenced by `Proposal_ID` has `Decision_Status` Pending or Intent_to_Award |
+| Approval | `Approver_Personnel_ID` and `Action_Date` are required when `Approval_Status` is Approved, Rejected, Bypassed, or Returned_for_Revision |
+| Approval | `Review_Topic_Value_ID` is required when `Step_Type` resolves to Supplementary_Review; `Signed_Package_Hash` when it resolves to Final_Sign_off and the step is Approved; `Delegate_Personnel_ID` when it resolves to Release_to_Submit and the step is Approved |
+| Approval | Blocks: within one (`Related_Entity_Type`, `Related_Entity_ID`, `Approval_Round`), no row leaves Pending while a row with a lower `Approval_Step_Order` is Pending |
+| Approval | Rounds: a step that is Returned_for_Revision is not reopened; the rerun steps are new rows with `Approval_Round` one higher, consecutive from 1 within the record |
+| Approval | Voiding: a Final_Sign_off whose `Signed_Package_Hash` no longer equals the record's current package hash becomes Voided, and any Release_to_Submit that followed it in the same round becomes Voided with it |
 | Proposal | The `Previous_Proposal_ID` chain is acyclic: following it from any row reaches a row whose `Previous_Proposal_ID` is null |
 | Award | `FAIN` is required when the Sponsor's `Sponsor_Type = 'Federal'`; `FAIN` is unique within the institution when not null |
 | Award | Referenced `Sponsor_Organization_ID` has an OrganizationCapability with Capability resolving to `Sponsor` |
@@ -798,21 +804,6 @@ One transmission of a proposal to a sponsor's submission system. The newest atte
 | Sponsor_Acknowledged_At | Timestamp | optional | When the sponsor's system acknowledged receipt |
 | Package_Hash | Hash | optional | SHA-256 of the assembled package as transmitted, so a sign-off can be matched to what went out |
 | Notes | LongText | optional | Validation messages, the reason for a withdrawal |
-
-#### ProposalApproval
-
-A step in the institutional approval chain for a Proposal. Most universities require sign-off from PI, department chair, dean, and OSP (and sometimes additional layers) before a Proposal can be submitted to the sponsor. ProposalApproval rows capture each step's approver, action, and timing as a structured chain.
-
-| Column | Type | Required | Notes |
-|---|---|---|---|
-| ProposalApproval_ID | ID | required | PK |
-| Proposal_ID | ID | required | → Proposal |
-| Approval_Step_Order | Count | required | Sequence within the routing chain (1 = first signature, etc.) |
-| Approval_Role | Status | required | Constrained: PI / Co_Investigator / Department_Chair / College_Dean / Center_Director / OSP_Pre_Award / Compliance_Office / VPR / Authorized_Organizational_Representative / Other. The institutional role that performs this step |
-| Approver_Personnel_ID | ID | required | → Personnel. The specific person who performs (or is expected to perform) this step |
-| Approval_Status | Status | required | Constrained: Pending / Approved / Rejected / Bypassed / Returned_for_Revision |
-| Action_Date | Date | conditional | Required when Approval_Status is not Pending |
-| Notes | LongText | optional | |
 
 #### PreAwardAuthorization
 
@@ -1348,7 +1339,7 @@ An institutionally granted exception to a sponsor or institutional policy rule: 
 | Effective_Start_Date | Date | optional | Often equals Decision_Date |
 | Effective_End_Date | Date | optional | Null means indefinite or until policy changes |
 
-A policy exception is a substantive regulatory event, not a work item: `Action`'s assigned / completed lifecycle does not map to requested / approved / denied / withdrawn / expired. Exception grants are also independent of proposal-routing approvals; an exception may be granted before any proposal exists. Multi-step exception review, where wanted, uses the `ProposalApproval` pattern; supporting letters attach as Documents.
+A policy exception is a substantive regulatory event, not a work item: `Action`'s assigned / completed lifecycle does not map to requested / approved / denied / withdrawn / expired. Exception grants are also independent of proposal-routing approvals; an exception may be granted before any proposal exists. Multi-step exception review, where wanted, attaches `Approval` rows; supporting letters attach as Documents.
 
 ### Implementation tables
 
@@ -1368,7 +1359,7 @@ Institution-specific controlled vocabularies. The `Value_Group` column names a f
 | Parent_AllowedValue_ID | ID | optional | → AllowedValues. Self-referencing. Set when the vocabulary is two-level: this row is a member of the value set that its parent row defines. CommunicationResponseValue rows carry the CommunicationResponseType row they answer as parent |
 | Canonical_Value_Code | ShortCode | optional | The canonical code (across institutions) that this local code maps to. Null when the local code has no canonical equivalent. Used by cross-institution queries to normalize values |
 
-**Canonical Value_Group names:** ContactType, OrganizationCapability, TeamRole, OrganizationRole, ProtocolRole, FundType, TransactionType, ModificationEventType, ActionType, DocumentType, FinanceCodePurpose, COIRelationshipType, CostShareCommitmentType, RestrictionType, DeadlineType, ProposalType, FundingMechanism, ComplianceReviewPathway, ComplianceClassificationLevel, CommunicationResponseType, CommunicationResponseValue, SubmissionChannel.
+**Canonical Value_Group names:** ContactType, OrganizationCapability, TeamRole, OrganizationRole, ProtocolRole, FundType, TransactionType, ModificationEventType, ActionType, DocumentType, FinanceCodePurpose, COIRelationshipType, CostShareCommitmentType, RestrictionType, DeadlineType, ProposalType, FundingMechanism, ComplianceReviewPathway, ComplianceClassificationLevel, CommunicationResponseType, CommunicationResponseValue, SubmissionChannel, ApprovalStepType, ReviewTopic.
 
 #### BudgetCategory
 
@@ -1401,7 +1392,7 @@ Files associated with any entity.
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | Document_ID | ID | required | PK |
-| Related_Entity_Type | Status | required | Constrained: Award / Subaward / Proposal / SubmissionAttempt / ProposalApproval / PreAwardAuthorization / Personnel / PersonnelCredential / ComplianceRequirement / Modification / Action / Restriction / Budget / Negotiation / Terms / Report / Closeout / Equipment |
+| Related_Entity_Type | Status | required | Constrained: Award / Subaward / Proposal / SubmissionAttempt / Approval / PreAwardAuthorization / Personnel / PersonnelCredential / ComplianceRequirement / Modification / Action / Restriction / Budget / Negotiation / Terms / Report / Closeout / Equipment |
 | Related_Entity_ID | ID | required | The PK value in the table named by Related_Entity_Type |
 | Document_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'DocumentType'`. Recommended values: NOA / Biosketch / DMP / Budget_Justification / Other_Support / Public_Access_Plan / LOI / Sponsor_Agreement / Subaward_Agreement / Modification_Notice / Approved_Items_Schedule / Closeout_Document / Compliance_Approval_Letter / Restriction_Authority_Document / Training_Certificate |
 | File_Name | MediumName | required | |
@@ -1431,6 +1422,29 @@ Inbound or outbound correspondence between the institution and an external party
 | External_Personnel_ID | ID | optional | → Personnel. The external participant when tracked in Personnel. Use this whenever the external party already exists as a Personnel row; prefer this over `External_Party_Name` |
 | External_Party_Name | MediumName | optional | Free-text name of the external party when no Personnel record exists. Use only when the external party is a one-off contact, a sponsor mailbox / correspondence team (e.g., "NIH Grants Management"), or someone the institution does not maintain as a Personnel row. When the external party is later promoted to a Personnel row, the institution may update prior Communication rows to set `External_Personnel_ID` and null `External_Party_Name` |
 | External_Organization_ID | ID | optional | → Organization. The external party's organization |
+
+#### Approval
+
+One step in an approval chain on a record: who was asked to decide what, in which block and round, and what they decided. Each step names what is decided (its step type), never only the office. Steps sharing an order number form a block and run in parallel; a block waits on the previous one. A return reruns the affected steps as new rows in the next round. A sign-off records the hash of the package it approved and is Voided when that package changes. Attaches to Proposal, Modification, Subaward, PreAwardAuthorization, Closeout, and Report; replaces the former ProposalApproval.
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| Approval_ID | ID | required | PK |
+| Related_Entity_Type | Status | required | Constrained: Proposal / Modification / Subaward / PreAwardAuthorization / Closeout / Report |
+| Related_Entity_ID | ID | required | The row in the table named by Related_Entity_Type |
+| Step_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'ApprovalStepType'`. Recommended values: Budget_Review / Compliance_Review / Supplementary_Review / PI_Certification / Co_PI_Certification / Department_Review / College_Review / Pre_Award_Review / Final_Sign_off / Release_to_Submit / Post_Award_Review / Other. What is decided at this step |
+| Approval_Role | Status | required | Constrained: PI / Co_Investigator / Department_Chair / College_Dean / Center_Director / OSP_Pre_Award / Compliance_Office / VPR / Authorized_Organizational_Representative / Other. Who decides it |
+| Reviewing_Organization_ID | ID | optional | → Organization. The unit performing the step; one Department_Review per department on the team, one College_Review per college |
+| Review_Topic_Value_ID | ID | conditional | → AllowedValues with `Value_Group = 'ReviewTopic'`. Required when Step_Type resolves to Supplementary_Review: one step per topic that applies |
+| Approval_Step_Order | Count | required | Position in the chain. Rows sharing an order number form a block and run in parallel |
+| Approval_Round | Count | required | 1 for the first routing; a return reruns the affected steps as new rows in the next round |
+| Assigned_Personnel_ID | ID | optional | → Personnel. The person expected to act; a queue label, not a gate |
+| Approver_Personnel_ID | ID | conditional | → Personnel. Who acted. Required when Approval_Status is Approved, Rejected, Bypassed, or Returned_for_Revision |
+| Delegate_Personnel_ID | ID | conditional | → Personnel. For Release_to_Submit: the person the signed package was released to. Required when that step is Approved |
+| Approval_Status | Status | required | Constrained: Pending / Approved / Rejected / Bypassed / Returned_for_Revision / Voided |
+| Signed_Package_Hash | Hash | conditional | SHA-256 of the package a Final_Sign_off approved. Required when that step is Approved; the step is Voided when the current package hash no longer matches |
+| Action_Date | Date | conditional | Required when Approval_Status is not Pending |
+| Notes | LongText | optional | Conditions, or the reason for a return or rejection |
 
 #### CommunicationResponse
 
@@ -1475,7 +1489,7 @@ Future-dated obligations attached to an entity.
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | Deadline_ID | ID | required | PK |
-| Related_Entity_Type | Status | required | Constrained: Award / Subaward / Proposal / ProposalApproval / ComplianceRequirement / Modification / RFA / Closeout / Report / Communication |
+| Related_Entity_Type | Status | required | Constrained: Award / Subaward / Proposal / Approval / ComplianceRequirement / Modification / RFA / Closeout / Report / Communication |
 | Related_Entity_ID | ID | required | |
 | Deadline_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'DeadlineType'` |
 | Due_Date | Date | required | |
@@ -1505,7 +1519,7 @@ Work items attached to entities: deliverables, checklist items, service requests
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | Action_ID | ID | required | PK |
-| Related_Entity_Type | Status | required | Constrained: Award / Subaward / Proposal / ProposalApproval / PreAwardAuthorization / Personnel / ComplianceRequirement / Modification / Negotiation / Terms / Closeout / Report / Equipment |
+| Related_Entity_Type | Status | required | Constrained: Award / Subaward / Proposal / Approval / PreAwardAuthorization / Personnel / ComplianceRequirement / Modification / Negotiation / Terms / Closeout / Report / Equipment |
 | Related_Entity_ID | ID | required | |
 | Action_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'ActionType'`. Recommended values: Deliverable / Checklist_Item / Service_Request / Modification_Approval / Compliance_Renewal / Training_Required / Training_Completion / Subrecipient_Risk_Review / Cost_Transfer_Approval / JIT_Request / Other |
 | Title | MediumName | required | |
@@ -1522,14 +1536,16 @@ Work items attached to entities: deliverables, checklist items, service requests
 
 ## Worked examples
 
-### Encoding a fixed approval chain on ProposalApproval
+### Encoding an approval chain on Approval
 
-`ProposalApproval` is a configurable sign-off sequence, not a fixed chain. An institution whose routing is always PI Certification → Department Chair → College Dean → OSP encodes it as:
+`Approval` is a configurable chain, not a fixed one. An institution whose routing is: central office finalizes (Budget_Review and Compliance_Review in parallel), then signatures (PI_Certification, one Department_Review per department, one College_Review per college, in parallel), then Pre_Award_Review, then Final_Sign_off by the AOR, encodes it as:
 
-- Four `ProposalApproval` rows per Proposal, created at routing time, with `Approval_Step_Order` = 1-4 and `Approval_Role` drawn from an AllowedValues group (`PI_Certification`, `Department_Approval`, `College_Approval`, `OSP_Approval`).
-- Auto-assignment policy is application logic: the application resolves each role to a Personnel via OrganizationRole (who chairs the PI's department, who is the dean of the college) and sets `Approver_Personnel_ID` at row creation.
-- "This step is always third" is data, not schema: the fixed chain is a row-template the application applies. An institution with per-RFA or per-sponsor variation applies a different template; the schema does not change.
-- A step is complete when `Approval_Status` reaches a terminal value with `Action_Date` set; the proposal may not advance while any row with a lower `Approval_Step_Order` is non-terminal. That gate is institutional workflow logic reading the rows.
+- Rows per Proposal created at routing time, with `Approval_Step_Order` 1 for the central block, 2 for the signature block, 3 for Pre_Award_Review, 4 for Final_Sign_off. Rows sharing an order run in parallel; a block waits on the previous one.
+- `Step_Type_Value_ID` names what is decided; `Approval_Role` names who; `Reviewing_Organization_ID` names the department or college for the per-unit steps.
+- Auto-assignment is application logic: the application resolves each role and unit to a person via OrganizationRole (who chairs the department, who is the dean) and sets `Assigned_Personnel_ID`. Whoever holds the role may act; `Approver_Personnel_ID` records who did.
+- A return reruns the affected steps as new rows in `Approval_Round` 2; nothing is overwritten.
+- Final_Sign_off records `Signed_Package_Hash`. If the package changes afterward, that row and any Release_to_Submit that followed it become Voided, and a new sign-off is needed. Transmitting the package is a SubmissionAttempt.
+- "This step is always third" is data, not schema: the chain is a row template the application applies. Which block comes first is institutional configuration; the standard does not prescribe it.
 
 ### Correspondence with follow-up: Communication + Action
 
@@ -1602,7 +1618,7 @@ Institutions with substantial ticket volume that need structured analysis beyond
 - Compliance covers regulatory requirements across regimes (ComplianceRequirement is intentionally generic across IRB / IACUC / IBC / COI / Radiation / Export_Control / Other, with renewal chaining via Previous_ComplianceRequirement_ID, AllowedValues-backed Review_Pathway and Classification_Level vocabularies that vary by Requirement_Type, separate Issuing_Authority and Reviewing_Authority Organization references, and nullable Expiration_Date for non-expiring determinations). ComplianceCoverage is the M:N junction between requirements and Awards (or Subawards); ProtocolRole is the protocol-scoped roster (the responsible PI plus study staff). Personal disclosures live in ConflictOfInterest (extended for foreign-engagement disclosures). External research support is split into OtherSupport (the *fact* of outside support, person-anchored) and OtherSupportDisclosure (the *event* of disclosing that fact, with optional triggering Proposal or Award). Invention disclosures and the full tech-transfer pipeline are out of scope; institutions running tech-transfer programs add a local extension or attach disclosures as Documents (see Local extensions).
 - Award is the fundamental unit of sponsored work. Every Award originates from a Proposal (`Award.Proposal_ID` is required). The PI on an Award is captured in TeamRole (`Role_Value_ID` resolving to PI), not denormalized onto Award; the same applies to Subaward. `Award.Original_End_Date` and `Award.Original_Total_Funded` are frozen at execution; `Award.Current_End_Date` and `Award.Current_Total_Funded` are derived from approved Modifications (see *Derived values*).
 - Grouping of related Awards under one longitudinal identity (a multi-year research line, a center program, a cohort training sequence, alternating-lead joint ventures) is supported by two independent mechanisms on Proposal plus a pre-fill on Award: `Proposal.Originating_Proposal_ID` (derived root of the `Previous_Proposal_ID` chain, auto-updates with lineage edits), `Proposal.Group_ID` (user-maintained label, stable against lineage edits), and `Award.Group_ID` (pre-filled from the originating Proposal's `Group_ID` at Award insert; may be overridden afterward). The two Proposal mechanisms are independent: the disagreement between lineage and Group_ID is informative (it signals a deliberate fork or merge by the institution).
-- Funding Cycle includes structured reporting (Report: per-period sponsor deliverables with submission and acceptance tracking), closeout (Closeout: the multi-subworkflow closeout state object for an Award or Subaward), pre-award authorization (PreAwardAuthorization: the institutional at-risk spending decision before an Award is executed), and proposal routing (ProposalApproval: the institutional sign-off chain on a Proposal). Award and Proposal carry a Mechanism_Value_ID referencing the canonical FundingMechanism vocabulary (R01, R21, P01, T32, Cooperative_Agreement, Contract_BAA, etc.).
+- Funding Cycle includes structured reporting (Report: per-period sponsor deliverables with submission and acceptance tracking), closeout (Closeout: the multi-subworkflow closeout state object for an Award or Subaward), pre-award authorization (PreAwardAuthorization: the institutional at-risk spending decision before an Award is executed), and the records of routing live in the Records module (Approval: the step-by-step sign-off chain on a Proposal, Modification, Subaward, PreAwardAuthorization, Closeout, or Report). Award and Proposal carry a Mechanism_Value_ID referencing the canonical FundingMechanism vocabulary (R01, R21, P01, T32, Cooperative_Agreement, Contract_BAA, etc.).
 - The Finance core module includes RateAgreement (the NICRA) that owns its rate line items (IndirectRate), and Equipment (capital asset attached XOR-style to Award or Subaward for closeout title-disposition tracking).
 - Universal status taxonomies enumerated in *Status taxonomy reference*; institution-specific enums extend via AllowedValues with cross-institution normalization through Canonical_Value_Code.
 - The specification is database-engine agnostic; constraints are stated abstractly and *Implementation guidance* documents the rules that require enforcement mechanisms beyond simple column declarations.

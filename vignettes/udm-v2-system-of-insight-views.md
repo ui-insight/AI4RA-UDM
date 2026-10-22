@@ -262,31 +262,37 @@ Consumed by: audit reconstruction queries ("what did we report to NIH on the RPP
 
 ```sql
 CREATE VIEW v_submission_pipeline AS
-WITH current_step AS (
+WITH current_round AS (
+  SELECT Related_Entity_ID AS Proposal_ID, MAX(Approval_Round) AS Approval_Round
+  FROM Approval
+  WHERE Related_Entity_Type = 'Proposal'
+  GROUP BY Related_Entity_ID
+),
+open_step AS (
   SELECT
-    pa.Proposal_ID,
-    pa.Step_Order,
-    pa.Step_Name,
-    pa.Assignee_Personnel_ID,
-    pa.Action_Date AS Assigned_Date,
-    pa.Step_Status,
-    ROW_NUMBER() OVER (PARTITION BY pa.Proposal_ID ORDER BY pa.Step_Order ASC) AS rn
-  FROM ProposalApproval pa
-  WHERE pa.Step_Status IN ('Pending', 'In_Review', 'Returned')
+    a.Related_Entity_ID AS Proposal_ID,
+    a.Approval_Step_Order,
+    a.Step_Type_Value_ID,
+    a.Assigned_Personnel_ID,
+    a.Created_At AS Assigned_At,
+    ROW_NUMBER() OVER (PARTITION BY a.Related_Entity_ID ORDER BY a.Approval_Step_Order ASC, a.Created_At ASC) AS rn
+  FROM Approval a
+  JOIN current_round cr ON cr.Proposal_ID = a.Related_Entity_ID AND cr.Approval_Round = a.Approval_Round
+  WHERE a.Related_Entity_Type = 'Proposal' AND a.Approval_Status = 'Pending'
 )
 SELECT
   p.Proposal_ID,
   p.Proposal_Number,
   p.Proposal_Title,
-  cs.Step_Name AS Current_Step,
-  cs.Assignee_Personnel_ID,
-  cs.Step_Status,
-  cs.Assigned_Date,
-  CURRENT_DATE - cs.Assigned_Date AS Days_At_Current_Step,
+  v.Value_Code AS Current_Step,
+  os.Assigned_Personnel_ID,
+  os.Assigned_At,
+  CURRENT_DATE - CAST(os.Assigned_At AS DATE) AS Days_At_Current_Step,
   p.Internal_Approval_Status
 FROM Proposal p
-JOIN current_step cs ON cs.Proposal_ID = p.Proposal_ID AND cs.rn = 1
-WHERE p.Internal_Approval_Status = 'In Review';
+JOIN open_step os ON os.Proposal_ID = p.Proposal_ID AND os.rn = 1
+JOIN AllowedValues v ON v.AllowedValue_ID = os.Step_Type_Value_ID
+WHERE p.Internal_Approval_Status = 'In_Review';
 ```
 
 Consumed by: OSP pipeline dashboards, bottleneck analysis, reviewer workload reports, automated reminders for stalled proposals.
