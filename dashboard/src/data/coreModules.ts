@@ -43,7 +43,7 @@ export const coreModuleGroups: CoreModuleGroup[] = [
   {
     name: 'Effort',
     color: '#d97706',
-    tables: ['AwardRole', 'Effort'],
+    tables: ['TeamRole', 'Effort'],
   },
   {
     name: 'Finance',

@@ -78,7 +78,7 @@
     },
     "hierarchy": {
       "name": "Hierarchy",
-      "description": "Self-referencing parent/child relationships use a Parent_TableName_ID column: an organization's parent unit, an account's parent, an award's prime segment, a cascading subaward's parent, a two-level vocabulary's parent value. A chain to an earlier row of the same table uses Previous_TableName_ID instead: the earlier-stage row (Budget, Effort, CostShare, Payment), the predecessor in a renewal cycle (ComplianceRequirement), the prior version (Document), or the predecessor in a lineage (Proposal, Award). A hierarchy and a chain are different relationships and carry different names.",
+      "description": "Self-referencing parent/child relationships use a Parent_TableName_ID column: an organization's parent unit, an account's parent, an award's prime segment, a cascading subaward's parent, a two-level vocabulary's parent value. A chain to an earlier row of the same table uses Previous_TableName_ID instead: the earlier-stage row (Budget, Effort, CostShare, Payment), the predecessor in a renewal cycle (ComplianceRequirement), the prior version (Document), the proposal-stage role an award-stage role was copied from (TeamRole), or the predecessor in a lineage (Proposal, Award). A hierarchy and a chain are different relationships and carry different names.",
       "tables": [
         "Organization",
         "Account",
@@ -92,7 +92,8 @@
         "CostShare",
         "Payment",
         "ComplianceRequirement",
-        "Document"
+        "Document",
+        "TeamRole"
       ]
     },
     "role_named_foreign_keys": {
@@ -180,11 +181,12 @@
           ]
         },
         {
-          "table": "AwardRole",
+          "table": "TeamRole",
           "fks": [
             "Award_ID",
             "Subaward_ID"
-          ]
+          ],
+          "note": "Only once the proposal is funded; both null on a proposal-stage row"
         },
         {
           "table": "ComplianceCoverage",
@@ -351,7 +353,7 @@
       "canonical_value_groups": [
         "ContactType",
         "OrganizationCapability",
-        "AwardRole",
+        "TeamRole",
         "OrganizationRole",
         "ProtocolRole",
         "FundType",
@@ -378,7 +380,7 @@
       "rules": [
         {
           "when": "Award_Status or Subaward_Status becomes Closed or Terminated",
-          "then": "Open AwardRole rows on the agreement (End_Date null) are end-dated on the date of the status change."
+          "then": "Open TeamRole rows on the agreement (End_Date null) are end-dated on the date of the status change."
         },
         {
           "when": "Award_Status or Subaward_Status becomes Closed or Terminated",
@@ -411,16 +413,16 @@
         "bare_status_use": "Used when the row carries the same columns at every state (Award_Status, Subaward_Status, Requirement_Status, Report_Status, Modification.Approval_Status). No chain immutability is required because corrections at a status point don't conflict with later rows of different shape."
       },
       {
-        "name": "AwardRole vs OrganizationRole vs ProtocolRole",
+        "name": "TeamRole vs OrganizationRole vs ProtocolRole",
         "description": "Three parallel person-in-role tables, each answering a different question.",
         "tables": {
-          "AwardRole": "Who is on the team performing this Award (PI, Co_I, Coordinator, etc., with effort and credit allocation).",
+          "TeamRole": "Who is on the team performing this Award (PI, Co_I, Coordinator, etc., with effort and credit allocation).",
           "OrganizationRole": "Who holds a role at this Organization (committee member, program officer at the sponsor, Authorized Official at the subrecipient, financial contact at the vendor, institutional Sponsored Programs liaison). Optionally scoped to an Award, Subaward, or RFA.",
           "ProtocolRole": "Who is on the team for this compliance protocol (Primary_Investigator, Co_Investigator, study coordinator, lab manager, TCP-cleared personnel)."
         },
         "cross_table_examples": [
-          "An external Co-Investigator at a subrecipient institution is recorded as BOTH an AwardRole row (their scientific role on the Award/Subaward, with credit allocation) AND an OrganizationRole row scoped to the Subaward (their administrative role at the subrecipient organization for that subaward).",
-          "A person who is the responsible PI on an IRB protocol covering an Award has both an AwardRole row (PI on the Award) and a ProtocolRole row (Primary_Investigator on the protocol)."
+          "An external Co-Investigator at a subrecipient institution is recorded as BOTH an TeamRole row (their scientific role on the Award/Subaward, with credit allocation) AND an OrganizationRole row scoped to the Subaward (their administrative role at the subrecipient organization for that subaward).",
+          "A person who is the responsible PI on an IRB protocol covering an Award has both an TeamRole row (PI on the Award) and a ProtocolRole row (Primary_Investigator on the protocol)."
         ]
       }
     ]
@@ -565,7 +567,7 @@
             ]
           },
           "PersonnelCredential": {
-            "description": "A person-level credential or identifier the institution needs to hold itself. Two scope rules: sponsor-system identifiers (eRA Commons, NSF FastLane) always in scope; HR-domain credentials in scope only for non-employee Personnel where HRIS does not apply.",
+            "description": "A person-level credential or identifier the institution needs to hold itself. Two scope rules: sponsor-system identifiers (eRA Commons, NSF FastLane) always in scope; HR-domain credentials in scope only for non-employee Personnel where HRIS does not apply. Standing authorities (authorized organizational representative, signatory delegate, empowered official) are credentials too: what a person is registered or certified to do, independent of any record.",
             "columns": {
               "PersonnelCredential_ID": {
                 "type": "ID",
@@ -599,6 +601,9 @@
                   "Export_Control_Training",
                   "Security_Clearance",
                   "Background_Check",
+                  "Authorized_Organizational_Representative",
+                  "Signatory_Delegate",
+                  "Empowered_Official",
                   "Other"
                 ],
                 "value_definitions": {
@@ -641,11 +646,20 @@
                   "Background_Check": {
                     "definition": "Completed background check"
                   },
+                  "Authorized_Organizational_Representative": {
+                    "definition": "Registered with a sponsor system as empowered to bind the institution; Credential_Value is the registry identifier and Issuing_Authority_Organization_ID the sponsor system's organization"
+                  },
+                  "Signatory_Delegate": {
+                    "definition": "Delegated signature authority under institutional policy; Credential_Value names the delegation"
+                  },
+                  "Empowered_Official": {
+                    "definition": "The export-control empowered official designation"
+                  },
                   "Other": {
                     "definition": "A credential not listed"
                   }
                 },
-                "description": "Constrained: Citizenship / Visa_Status / Permanent_Resident_Status / eRA_Commons_ID / NSF_FastLane_ID / Sponsor_Login_ID / CITI_Training / IRB_Training / IACUC_Training / Biosafety_Training / Export_Control_Training / Security_Clearance / Background_Check / Other",
+                "description": "What the credential is: a citizenship or visa fact, a sponsor-system identity, a training completion, a clearance, or a standing authority such as the authorized organizational representative registration. Being central pre-award staff does not make someone an AOR; the registration does",
                 "synonyms": "Identifier Type, Credential Category"
               },
               "Credential_Value": {
@@ -1052,7 +1066,7 @@
             ]
           },
           "OrganizationRole": {
-            "description": "A person's role at an Organization. Generalizes the committee-member and external-party contact patterns. Distinct from AwardRole (institutional staff on an Award) and ProtocolRole (personnel on a compliance protocol).",
+            "description": "A person's role at an Organization. Generalizes the committee-member and external-party contact patterns. Distinct from TeamRole (institutional staff on an Award) and ProtocolRole (personnel on a compliance protocol). Also carries staff assignments: which person at the institution's office is responsible for a proposal, award, or subaward, as a role at that office scoped to the record.",
             "columns": {
               "OrganizationRole_ID": {
                 "type": "ID",
@@ -1102,9 +1116,12 @@
                   "Financial_Contact",
                   "Compliance_Contact",
                   "Subrecipient_PI_Contact",
-                  "Subrecipient_Project_Lead"
+                  "Subrecipient_Project_Lead",
+                  "Sponsored_Programs_Administrator",
+                  "Award_Administrator",
+                  "Administrative_Contact"
                 ],
-                "description": "The person's role at the organization: a committee seat, or the external contact role they fill for a sponsor or subrecipient",
+                "description": "The person's role at the organization: a committee seat, the external contact role they fill for a sponsor or subrecipient, or a staff assignment at the institution's own office (the sponsored programs administrator on a proposal, the award administrator on an award, the department's administrative contact)",
                 "synonyms": "Role, Position, Title at Org"
               },
               "Award_ID": {
@@ -1134,6 +1151,15 @@
                 },
                 "description": "Scoping when the role applies to a specific funding opportunity"
               },
+              "Proposal_ID": {
+                "type": "ID",
+                "required": false,
+                "references": {
+                  "table": "Proposal",
+                  "column": "Proposal_ID"
+                },
+                "description": "Scoping when the role applies to a specific proposal: the sponsored programs administrator shepherding it, the department's administrative contact"
+              },
               "Start_Date": {
                 "type": "Date",
                 "required": false,
@@ -1147,13 +1173,14 @@
             },
             "constraints": [
               {
-                "rule": "At most one of Award_ID, Subaward_ID, RFA_ID is non-null. All null indicates a role at the Organization not scoped to a specific funding artifact.",
+                "rule": "At most one of Award_ID, Subaward_ID, RFA_ID, Proposal_ID is non-null. All null indicates a role at the Organization not scoped to a specific record.",
                 "structured": {
                   "type": "at_most_one_of",
                   "columns": [
                     "Award_ID",
                     "Subaward_ID",
-                    "RFA_ID"
+                    "RFA_ID",
+                    "Proposal_ID"
                   ]
                 }
               }
@@ -2157,6 +2184,7 @@
                   "OSP_Pre_Award",
                   "Compliance_Office",
                   "VPR",
+                  "Authorized_Organizational_Representative",
                   "Other"
                 ],
                 "value_definitions": {
@@ -2184,11 +2212,14 @@
                   "VPR": {
                     "definition": "The vice president for research or delegate"
                   },
+                  "Authorized_Organizational_Representative": {
+                    "definition": "The authorized organizational representative's sign-off, the act that binds the institution to the submission"
+                  },
                   "Other": {
                     "definition": "A role not listed"
                   }
                 },
-                "description": "Constrained: PI / Co_Investigator / Department_Chair / College_Dean / Center_Director / OSP_Pre_Award / Compliance_Office / VPR / Other. The institutional role that performs this step"
+                "description": "The institutional role that performs this step"
               },
               "Approver_Personnel_ID": {
                 "type": "ID",
@@ -2573,11 +2604,11 @@
                   "table": "Personnel",
                   "column": "Personnel_ID"
                 },
-                "description": "The current PI when in single-PI mode; null when in Multi_PI mode or when no PI is active. Query-convenience denormalization parallel to Current_End_Date and Current_Total_Funded. AwardRole remains canonical for full team membership.",
+                "description": "The current PI when in single-PI mode; null when in Multi_PI mode or when no PI is active. Query-convenience denormalization parallel to Current_End_Date and Current_Total_Funded. TeamRole remains canonical for full team membership.",
                 "synonyms": "Lead Investigator, Principal Investigator, PI",
                 "derived": {
-                  "rule": "The Personnel_ID of the unique active AwardRole row on this Award where Role_Value_ID resolves to canonical 'PI' and the row is active on today's date (Start_Date <= today AND (End_Date IS NULL OR End_Date >= today)). Null when no such row exists — either the Award is in Multi_PI mode or no PI/Multi_PI rows are active (community-partner Subaward case). The exclusivity rule on AwardRole guarantees at most one active PI row in single-PI mode.",
-                  "recompute_triggers": "On insert/update of any AwardRole row on this Award; on the daily rollover that may change which rows are active on today's date."
+                  "rule": "The Personnel_ID of the unique active TeamRole row on this Award where Role_Value_ID resolves to canonical 'PI' and the row is active on today's date (Start_Date <= today AND (End_Date IS NULL OR End_Date >= today)). Null when no such row exists — either the Award is in Multi_PI mode or no PI/Multi_PI rows are active (community-partner Subaward case). The exclusivity rule on TeamRole guarantees at most one active PI row in single-PI mode.",
+                  "recompute_triggers": "On insert/update of any TeamRole row on this Award; on the daily rollover that may change which rows are active on today's date."
                 }
               },
               "Total_Anticipated_Funding": {
@@ -3063,8 +3094,8 @@
                 "description": "Current PI in single-PI mode; null in Multi_PI mode or community-partner case",
                 "synonyms": "Subrecipient PI, Sub Lead Investigator",
                 "derived": {
-                  "rule": "Symmetric to Award.Current_PI_Personnel_ID but scoped to AwardRole rows where Subaward_ID equals this Subaward.",
-                  "recompute_triggers": "On insert/update of any AwardRole row on this Subaward; on the daily rollover."
+                  "rule": "Symmetric to Award.Current_PI_Personnel_ID but scoped to TeamRole rows where Subaward_ID equals this Subaward.",
+                  "recompute_triggers": "On insert/update of any TeamRole row on this Subaward; on the daily rollover."
                 }
               },
               "Risk_Level": {
@@ -4118,11 +4149,11 @@
         "name": "Effort",
         "story": "We commit and certify effort on funded work",
         "tables": {
-          "AwardRole": {
-            "description": "A person's role on an Award (or Subaward), with effort allocation, date range, and credit attribution. Limited to award-side staffing roles.",
-            "authoritative_source_note": "AwardRole.FTE_Percent is the authoritative committed-effort figure for an Award. The Effort table carries per-period, per-stage detail and is authoritative for actual effort questions (Charged, Certified).",
+          "TeamRole": {
+            "description": "A person's role on a proposal and, once funded, on the award or subaward, with effort allocation, date range, and credit attribution. Anchored like Budget: Proposal_ID is always set; Award_ID or Subaward_ID is set once the proposal is funded. On award creation the proposal-stage rows are copied as new rows that carry the agreement and point back through Previous_TeamRole_ID; the proposal-stage rows remain as the record of the proposed team. Limited to team staffing roles.",
+            "authoritative_source_note": "TeamRole.FTE_Percent is the authoritative committed-effort figure for an Award. The Effort table carries per-period, per-stage detail and is authoritative for actual effort questions (Charged, Certified).",
             "columns": {
-              "AwardRole_ID": {
+              "TeamRole_ID": {
                 "type": "ID",
                 "primary_key": true,
                 "required": true,
@@ -4138,6 +4169,15 @@
                 },
                 "description": "The person holding the role"
               },
+              "Proposal_ID": {
+                "type": "ID",
+                "required": true,
+                "references": {
+                  "table": "Proposal",
+                  "column": "Proposal_ID"
+                },
+                "description": "The proposal the role was proposed on. Always set; stable across the proposal-stage row and the award-stage rows copied from it"
+              },
               "Award_ID": {
                 "type": "ID",
                 "required": false,
@@ -4148,7 +4188,7 @@
                 "xor_with": [
                   "Subaward_ID"
                 ],
-                "description": "Exactly one of Award_ID or Subaward_ID is non-null"
+                "description": "The Award the role is on once the proposal is funded. At most one of Award_ID or Subaward_ID is non-null; both null while the row is proposal-stage"
               },
               "Subaward_ID": {
                 "type": "ID",
@@ -4160,7 +4200,16 @@
                 "xor_with": [
                   "Award_ID"
                 ],
-                "description": "Exactly one of Award_ID or Subaward_ID is non-null"
+                "description": "The Subaward the role is on once the proposal is funded. At most one of Award_ID or Subaward_ID is non-null; both null while the row is proposal-stage"
+              },
+              "Previous_TeamRole_ID": {
+                "type": "ID",
+                "required": false,
+                "references": {
+                  "table": "TeamRole",
+                  "column": "TeamRole_ID"
+                },
+                "description": "Chain pointer. An award-stage row points at the proposal-stage row it was copied from; null on proposal-stage rows and on roles added after funding"
               },
               "Role_Value_ID": {
                 "type": "ID",
@@ -4169,7 +4218,7 @@
                   "table": "AllowedValues",
                   "column": "AllowedValue_ID"
                 },
-                "value_group": "AwardRole",
+                "value_group": "TeamRole",
                 "recommended_values": [
                   "PI",
                   "Co_PI",
@@ -4198,7 +4247,7 @@
               "FTE_Percent": {
                 "type": "Percent",
                 "required": false,
-                "description": "Committed effort percentage (0.00-100.00). Authoritative 'what was promised' figure. Institutions typically arrange a person's concurrent FTE commitments not to exceed 100%, but this is a data invariant; spec does not enforce a per-person sum.",
+                "description": "Committed effort percentage (0.00-100.00). On a proposal-stage row the proposed commitment; on an award-stage row the committed one. Authoritative 'what was promised' figure. Institutions typically arrange a person's concurrent FTE commitments not to exceed 100%, but this is a data invariant; spec does not enforce a per-person sum.",
                 "synonyms": "Effort Percentage, Committed Effort, Time Allocation"
               },
               "Credit_Percent": {
@@ -4243,14 +4292,27 @@
             },
             "constraints": [
               {
-                "rule": "Exactly one of Award_ID or Subaward_ID is non-null."
+                "rule": "At most one of Award_ID or Subaward_ID is non-null; both are null while the row is proposal-stage.",
+                "structured": {
+                  "type": "at_most_one_of",
+                  "columns": [
+                    "Award_ID",
+                    "Subaward_ID"
+                  ]
+                }
               },
               {
-                "rule": "For a given (parent agreement, Personnel_ID, Role_Value_ID), the (Start_Date, End_Date) ranges are non-overlapping (null End_Date is treated as +infinity).",
+                "rule": "When Award_ID is set, Award.Proposal_ID equals this row's Proposal_ID; when Subaward_ID is set, Subaward.Proposal_ID equals it. A role moves to the agreement its proposal became."
+              },
+              {
+                "rule": "Previous_TeamRole_ID, when set, references a row with the same Proposal_ID whose Award_ID and Subaward_ID are both null: an award-stage row descends from a proposal-stage row."
+              },
+              {
+                "rule": "For a given (proposal or agreement, Personnel_ID, Role_Value_ID), the (Start_Date, End_Date) ranges are non-overlapping (null End_Date is treated as +infinity).",
                 "structured": {
                   "type": "non_overlap_ranges",
                   "partition_by": [
-                    "COALESCE(Award_ID, Subaward_ID)",
+                    "COALESCE(Award_ID, Subaward_ID, Proposal_ID)",
                     "Personnel_ID",
                     "Role_Value_ID"
                   ],
@@ -4263,11 +4325,11 @@
                 "rule": "FTE_Percent is between 0.00 and 100.00."
               },
               {
-                "rule": "PI vs Multi_PI mode is exclusive. For a given parent agreement at any active date, either exactly one active AwardRole row has Role_Value_ID resolving to canonical PI (single-PI mode), or two-or-more active rows have Role_Value_ID resolving to canonical Multi_PI (multi-PI mode), or zero of either (community-partner Subaward). An Award or Subaward cannot simultaneously have an active PI row and active Multi_PI rows.",
+                "rule": "PI vs Multi_PI mode is exclusive. For a given proposal or agreement at any active date, either exactly one active TeamRole row has Role_Value_ID resolving to canonical PI (single-PI mode), or two-or-more active rows have Role_Value_ID resolving to canonical Multi_PI (multi-PI mode), or zero of either (community-partner Subaward). An Award or Subaward cannot simultaneously have an active PI row and active Multi_PI rows.",
                 "structured": {
                   "type": "mutual_exclusion_by_canonical_role",
                   "partition_by": [
-                    "COALESCE(Award_ID, Subaward_ID)"
+                    "COALESCE(Award_ID, Subaward_ID, Proposal_ID)"
                   ],
                   "canonical_role_a": "PI",
                   "canonical_role_b": "Multi_PI",
@@ -4281,12 +4343,12 @@
                 }
               },
               {
-                "rule": "At most one Contact PI per Multi_PI agreement. For a given parent agreement in Multi_PI mode and any date D, at most one row covering D has Is_Contact_PI = true.",
+                "rule": "At most one Contact PI per Multi_PI agreement. For a given proposal or agreement in Multi_PI mode and any date D, at most one row covering D has Is_Contact_PI = true.",
                 "structured": {
                   "type": "at_most_one_true_in_partition",
                   "column": "Is_Contact_PI",
                   "partition_by": [
-                    "COALESCE(Award_ID, Subaward_ID)"
+                    "COALESCE(Award_ID, Subaward_ID, Proposal_ID)"
                   ],
                   "active_filter": "Is_Active = true AND Role_Value_ID resolves to Multi_PI AND Start_Date <= D AND (End_Date IS NULL OR End_Date >= D)",
                   "for_every": "date D"
@@ -4295,7 +4357,7 @@
             ]
           },
           "Effort": {
-            "description": "Per-stage effort detail for an AwardRole. The Lifecycle_Stage column distinguishes proposed, approved, charged, and certified effort numbers.",
+            "description": "Per-stage effort detail for an TeamRole. The Lifecycle_Stage column distinguishes proposed, approved, charged, and certified effort numbers.",
             "columns": {
               "Effort_ID": {
                 "type": "ID",
@@ -4303,14 +4365,14 @@
                 "required": true,
                 "description": "PK"
               },
-              "AwardRole_ID": {
+              "TeamRole_ID": {
                 "type": "ID",
                 "required": true,
                 "references": {
-                  "table": "AwardRole",
-                  "column": "AwardRole_ID"
+                  "table": "TeamRole",
+                  "column": "TeamRole_ID"
                 },
-                "description": "References AwardRole (the assignment)"
+                "description": "References TeamRole (the assignment). Proposed-stage Effort references the proposal-stage row; Approved and later stages reference the award-stage row"
               },
               "Lifecycle_Stage": {
                 "type": "Status",
@@ -4500,55 +4562,59 @@
                 "rule": "Person_Months equals Effort_Percent / 100 multiplied by 12 when Calendar_Type = 'Calendar', by 9 when 'Academic', by 3 when 'Summer'."
               },
               {
-                "rule": "For a given (AwardRole_ID, Lifecycle_Stage) and active rows only (Is_Active = true), the (Period_Start_Date, Period_End_Date) ranges are non-overlapping.",
+                "rule": "For a given (TeamRole_ID, Lifecycle_Stage) and active rows only (Is_Active = true), the (Period_Start_Date, Period_End_Date) ranges are non-overlapping.",
                 "structured": {
                   "type": "non_overlap_ranges",
                   "partition_by": [
-                    "AwardRole_ID",
+                    "TeamRole_ID",
                     "Lifecycle_Stage"
                   ],
                   "start": "Period_Start_Date",
                   "end": "Period_End_Date",
                   "active_filter": "Is_Active = true"
                 }
+              },
+              {
+                "rule": "Effort at Lifecycle_Stage Proposed references a TeamRole row whose Award_ID and Subaward_ID are null; Effort at Approved, Charged, or Certified references a TeamRole row with an agreement."
               }
             ]
           }
         },
         "conventions": [
           {
-            "name": "AwardRole role-bearer changes",
-            "description": "When a role-bearer on an Award or Subaward changes (a PI_Change Modification, a coordinator handoff, an off-boarding), the predecessor's AwardRole row is end-dated and a new AwardRole row is inserted for the successor.",
+            "name": "TeamRole role-bearer changes",
+            "description": "When a role-bearer on an Award or Subaward changes (a PI_Change Modification, a coordinator handoff, an off-boarding), the predecessor's TeamRole row is end-dated and a new TeamRole row is inserted for the successor.",
             "rules": [
               "The predecessor's End_Date is the day BEFORE the successor's Start_Date (no day-of-transition overlap).",
               "The successor's Start_Date is the first day in role.",
-              "AwardRole rows are not mutated in place; the row history is the canonical record of 'who held this role on date D' (Start_Date <= D AND (End_Date IS NULL OR End_Date >= D)).",
+              "TeamRole rows are not mutated in place; the row history is the canonical record of 'who held this role on date D' (Start_Date <= D AND (End_Date IS NULL OR End_Date >= D)).",
               "Because predecessor.End_Date < successor.Start_Date, exactly one row matches a given date and the active-rows sum-to-100 constraint holds across the transition without double-counting.",
-              "AwardRole is the canonical source for the PI on an Award; the same insert-and-end-date pattern applies to PI changes."
+              "TeamRole is the canonical source for the PI on an Award; the same insert-and-end-date pattern applies to PI changes.",
+              "On award creation every active proposal-stage TeamRole row for the proposal is copied as a new row carrying Award_ID or Subaward_ID and pointing back through Previous_TeamRole_ID; the proposal-stage row is not mutated and remains the record of the proposed team. A role that appears only after funding has no Previous_TeamRole_ID."
             ],
-            "pi_change_modification": "A PI_Change Modification documents the sponsor-side approval or notice of a PI change when required. Not required for every PI change; AwardRole row history remains authoritative. When both exist, the Modification's Effective_Date should equal the successor AwardRole's Start_Date.",
-            "nce_extends_open_roles": "When an end-date-changing Modification (NCE, etc.) advances Award.Current_End_Date, open AwardRole rows (End_Date null) remain open and are not modified. End-dating happens only at explicit role-bearer changes or at Award_Status closure."
+            "pi_change_modification": "A PI_Change Modification documents the sponsor-side approval or notice of a PI change when required. Not required for every PI change; TeamRole row history remains authoritative. When both exist, the Modification's Effective_Date should equal the successor TeamRole's Start_Date.",
+            "nce_extends_open_roles": "When an end-date-changing Modification (NCE, etc.) advances Award.Current_End_Date, open TeamRole rows (End_Date null) remain open and are not modified. End-dating happens only at explicit role-bearer changes or at Award_Status closure."
           }
         ],
         "example_views": [
           {
             "name": "vw_Award_PI_Timeline",
-            "purpose": "Full PI history per Award via AwardRole; one row per (Award, Personnel, role-stint). Use the active-on-date predicate at query time to filter to a specific point in time.",
+            "purpose": "Full PI history per Award via TeamRole; one row per (Award, Personnel, role-stint). Use the active-on-date predicate at query time to filter to a specific point in time.",
             "dialect": "mysql",
-            "sql": "CREATE VIEW vw_Award_PI_Timeline AS\nSELECT\n  ar.AwardRole_ID,\n  ar.Award_ID,\n  ar.Subaward_ID,\n  ar.Personnel_ID,\n  ar.Start_Date,\n  ar.End_Date,\n  av.Value_Code AS Role_Code,\n  av.Canonical_Value_Code AS Canonical_Role_Code,\n  ar.Is_Contact_PI\nFROM AwardRole ar\nJOIN AllowedValues av ON ar.Role_Value_ID = av.AllowedValue_ID\nWHERE av.Canonical_Value_Code IN ('PI', 'Multi_PI')\n  AND ar.Is_Active = true;",
+            "sql": "CREATE VIEW vw_Award_PI_Timeline AS\nSELECT\n  ar.TeamRole_ID,\n  ar.Award_ID,\n  ar.Subaward_ID,\n  ar.Personnel_ID,\n  ar.Start_Date,\n  ar.End_Date,\n  av.Value_Code AS Role_Code,\n  av.Canonical_Value_Code AS Canonical_Role_Code,\n  ar.Is_Contact_PI\nFROM TeamRole ar\nJOIN AllowedValues av ON ar.Role_Value_ID = av.AllowedValue_ID\nWHERE av.Canonical_Value_Code IN ('PI', 'Multi_PI')\n  AND ar.Is_Active = true;",
             "usage_example": "SELECT Personnel_ID FROM vw_Award_PI_Timeline WHERE Award_ID = :x AND Start_Date <= :date_d AND (End_Date IS NULL OR End_Date >= :date_d);"
           },
           {
             "name": "vw_Effort_Certification_Status",
             "purpose": "Per (Award/Subaward, period) summary of effort rows by Lifecycle_Stage. Highlights periods where Charged effort has not been Certified.",
             "dialect": "mysql",
-            "sql": "CREATE VIEW vw_Effort_Certification_Status AS\nSELECT\n  ar.Award_ID,\n  ar.Subaward_ID,\n  e.Period_Start_Date,\n  e.Period_End_Date,\n  COUNT(*) AS Total_Effort_Rows,\n  SUM(CASE WHEN e.Lifecycle_Stage = 'Charged' THEN 1 ELSE 0 END) AS Charged_Count,\n  SUM(CASE WHEN e.Lifecycle_Stage = 'Certified' THEN 1 ELSE 0 END) AS Certified_Count,\n  SUM(CASE WHEN e.Lifecycle_Stage = 'Charged'\n          AND NOT EXISTS (\n            SELECT 1 FROM Effort e2\n            WHERE e2.Previous_Effort_ID = e.Effort_ID\n              AND e2.Lifecycle_Stage = 'Certified'\n              AND e2.Is_Active = true)\n          THEN 1 ELSE 0 END) AS Uncertified_Charged_Count\nFROM Effort e\nJOIN AwardRole ar ON e.AwardRole_ID = ar.AwardRole_ID\nWHERE e.Is_Active = true\nGROUP BY ar.Award_ID, ar.Subaward_ID, e.Period_Start_Date, e.Period_End_Date;"
+            "sql": "CREATE VIEW vw_Effort_Certification_Status AS\nSELECT\n  ar.Award_ID,\n  ar.Subaward_ID,\n  e.Period_Start_Date,\n  e.Period_End_Date,\n  COUNT(*) AS Total_Effort_Rows,\n  SUM(CASE WHEN e.Lifecycle_Stage = 'Charged' THEN 1 ELSE 0 END) AS Charged_Count,\n  SUM(CASE WHEN e.Lifecycle_Stage = 'Certified' THEN 1 ELSE 0 END) AS Certified_Count,\n  SUM(CASE WHEN e.Lifecycle_Stage = 'Charged'\n          AND NOT EXISTS (\n            SELECT 1 FROM Effort e2\n            WHERE e2.Previous_Effort_ID = e.Effort_ID\n              AND e2.Lifecycle_Stage = 'Certified'\n              AND e2.Is_Active = true)\n          THEN 1 ELSE 0 END) AS Uncertified_Charged_Count\nFROM Effort e\nJOIN TeamRole ar ON e.TeamRole_ID = ar.TeamRole_ID\nWHERE e.Is_Active = true\nGROUP BY ar.Award_ID, ar.Subaward_ID, e.Period_Start_Date, e.Period_End_Date;"
           },
           {
             "name": "vw_Active_Personnel_Roles",
-            "purpose": "Currently-active AwardRole rows on currently-active Awards or Subawards. Captures the operational 'who is on the team right now' query without per-consumer date filtering.",
+            "purpose": "Currently-active TeamRole rows on currently-active Awards or Subawards. Captures the operational 'who is on the team right now' query without per-consumer date filtering.",
             "dialect": "mysql",
-            "sql": "CREATE VIEW vw_Active_Personnel_Roles AS\nSELECT\n  ar.AwardRole_ID,\n  ar.Personnel_ID,\n  CONCAT(p.First_Name, ' ', p.Last_Name) AS Personnel_Name,\n  ar.Award_ID,\n  ar.Subaward_ID,\n  COALESCE(a.Award_Number, s.Subaward_Number) AS Agreement_Number,\n  rv.Value_Code AS Role_Code,\n  rv.Canonical_Value_Code AS Canonical_Role,\n  ar.FTE_Percent,\n  ar.Credit_Percent,\n  ar.Is_Key_Personnel,\n  ar.Is_Contact_PI,\n  ar.Start_Date,\n  ar.End_Date\nFROM AwardRole ar\nJOIN Personnel p ON ar.Personnel_ID = p.Personnel_ID\nLEFT JOIN Award a ON ar.Award_ID = a.Award_ID\nLEFT JOIN Subaward s ON ar.Subaward_ID = s.Subaward_ID\nJOIN AllowedValues rv ON ar.Role_Value_ID = rv.AllowedValue_ID\nWHERE ar.Is_Active = true\n  AND ar.Start_Date <= CURRENT_DATE\n  AND (ar.End_Date IS NULL OR ar.End_Date >= CURRENT_DATE)\n  AND (\n    (ar.Award_ID IS NOT NULL AND a.Award_Status = 'Active' AND a.Is_Active = true)\n    OR (ar.Subaward_ID IS NOT NULL AND s.Subaward_Status = 'Active' AND s.Is_Active = true)\n  );"
+            "sql": "CREATE VIEW vw_Active_Personnel_Roles AS\nSELECT\n  ar.TeamRole_ID,\n  ar.Personnel_ID,\n  CONCAT(p.First_Name, ' ', p.Last_Name) AS Personnel_Name,\n  ar.Award_ID,\n  ar.Subaward_ID,\n  COALESCE(a.Award_Number, s.Subaward_Number) AS Agreement_Number,\n  rv.Value_Code AS Role_Code,\n  rv.Canonical_Value_Code AS Canonical_Role,\n  ar.FTE_Percent,\n  ar.Credit_Percent,\n  ar.Is_Key_Personnel,\n  ar.Is_Contact_PI,\n  ar.Start_Date,\n  ar.End_Date\nFROM TeamRole ar\nJOIN Personnel p ON ar.Personnel_ID = p.Personnel_ID\nLEFT JOIN Award a ON ar.Award_ID = a.Award_ID\nLEFT JOIN Subaward s ON ar.Subaward_ID = s.Subaward_ID\nJOIN AllowedValues rv ON ar.Role_Value_ID = rv.AllowedValue_ID\nWHERE ar.Is_Active = true\n  AND ar.Start_Date <= CURRENT_DATE\n  AND (ar.End_Date IS NULL OR ar.End_Date >= CURRENT_DATE)\n  AND (\n    (ar.Award_ID IS NOT NULL AND a.Award_Status = 'Active' AND a.Is_Active = true)\n    OR (ar.Subaward_ID IS NOT NULL AND s.Subaward_Status = 'Active' AND s.Is_Active = true)\n  );"
           }
         ]
       },
@@ -5897,7 +5963,7 @@
                   "PI_Change",
                   "Scope_Change"
                 ],
-                "behavior": "Change no Budget column. Do not create a new Budget row; change Award/Subaward state only (AwardRole row history for PI_Change, Award metadata for Scope_Change)."
+                "behavior": "Change no Budget column. Do not create a new Budget row; change Award/Subaward state only (TeamRole row history for PI_Change, Award metadata for Scope_Change)."
               }
             },
             "version_number_rule": "Version_Number increments per revision on the same (Proposal_ID, post-award anchor, Period_Start_Date) key for both funding-changing and end-date-changing events.",
@@ -6202,7 +6268,7 @@
             ]
           },
           "ProtocolRole": {
-            "description": "Personnel listed on a specific ComplianceRequirement (the PI on the protocol, IRB study staff, IACUC personnel, IBC investigators, TCP-cleared personnel). Parallels AwardRole and OrganizationRole.",
+            "description": "Personnel listed on a specific ComplianceRequirement (the PI on the protocol, IRB study staff, IACUC personnel, IBC investigators, TCP-cleared personnel). Parallels TeamRole and OrganizationRole.",
             "columns": {
               "ProtocolRole_ID": {
                 "type": "ID",

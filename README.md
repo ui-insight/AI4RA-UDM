@@ -36,7 +36,7 @@ The model's 48 tables are 46 in six core modules (the universal capabilities of 
 |--------|--------|---------|
 | **Actors** | Personnel, PersonnelCredential, Organization, OrganizationCapability, OrganizationIdentifier, OrganizationRole, ContactDetails | People, organizations, their roles, credentials, and contact information |
 | **Funding Cycle** | RFA, RFARequirement, Proposal, SubmissionAttempt, ProposalApproval, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout | The full lifecycle from funding opportunity through proposal, award, and closeout |
-| **Effort** | AwardRole, Effort | Roles on funded work and effort certification |
+| **Effort** | TeamRole, Effort | Who is on a proposal or award, and effort certification |
 | **Finance** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment | Budgets, accounting, transactions, rates, and capital assets |
 | **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure, PolicyException | IRB/IACUC protocols, COI, other support, policy exceptions, and regulatory tracking |
 | **Records** | Document, Communication, Restriction, Deadline, Classification, Action, CommunicationResponse | The records that accumulate around the work, attached across all core modules |
@@ -51,7 +51,7 @@ Browse the full model interactively at the [UDM Dashboard](https://ui-insight.gi
 
 The UDM follows consistent, predictable naming patterns:
 
-- **Tables**: PascalCase, singular — `AwardRole`, `ComplianceCoverage`, `Personnel`
+- **Tables**: PascalCase, singular — `TeamRole`, `ComplianceCoverage`, `Personnel`
 - **Columns**: Snake_Case — `Award_Number`, `Start_Date`, `Is_Active`
 - **Primary keys**: `TableName_ID` — `Personnel_ID`, `Award_ID`, `Organization_ID` (one deliberate exception: `AllowedValues` uses the singular `AllowedValue_ID`)
 - **Foreign keys**: Named by role, not generically — `Sponsor_Organization_ID`, `Administering_Organization_ID`, `Subrecipient_Organization_ID` (not just `Organization_ID`)
@@ -257,11 +257,12 @@ graph TD
     Award-->Personnel
     Award-->Proposal
     Award-->RFA
-    AwardRole-->AllowedValues
-    AwardRole-->Award
-    AwardRole-->Organization
-    AwardRole-->Personnel
-    AwardRole-->Subaward
+    TeamRole-->AllowedValues
+    TeamRole-->Award
+    TeamRole-->Proposal
+    TeamRole-->Organization
+    TeamRole-->Personnel
+    TeamRole-->Subaward
     Budget-->Award
     Budget-->Budget
     Budget-->BudgetCategory
@@ -299,7 +300,7 @@ graph TD
     Document-->AllowedValues
     Document-->Document
     Document-->Personnel
-    Effort-->AwardRole
+    Effort-->TeamRole
     Effort-->Effort
     Effort-->Personnel
     Equipment-->Award

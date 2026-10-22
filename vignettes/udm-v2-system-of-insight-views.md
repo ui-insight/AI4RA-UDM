@@ -34,7 +34,7 @@ SELECT
   ar.Role_Value_ID,
   ar.FTE_Percent
 FROM Personnel p
-JOIN AwardRole ar ON ar.Personnel_ID = p.Personnel_ID
+JOIN TeamRole ar ON ar.Personnel_ID = p.Personnel_ID
 JOIN Award a ON a.Award_ID = ar.Award_ID
 JOIN Organization org ON org.Organization_ID = a.Sponsor_Organization_ID
 JOIN AllowedValues av ON av.AllowedValue_ID = ar.Role_Value_ID
@@ -90,7 +90,7 @@ Consumed by: compliance officer dashboards, pre-spending gate checks, award-acti
 CREATE VIEW v_personnel_eligibility_findings AS
 WITH role_eligibility AS (
   SELECT
-    ar.AwardRole_ID,
+    ar.TeamRole_ID,
     ar.Personnel_ID,
     ar.Award_ID,
     p.Appointment_Type,
@@ -101,7 +101,7 @@ WITH role_eligibility AS (
       THEN 'apm_category_ineligible'
       ELSE NULL
     END AS Check_Code
-  FROM AwardRole ar
+  FROM TeamRole ar
   JOIN Personnel p ON p.Personnel_ID = ar.Personnel_ID
   JOIN AllowedValues av ON av.AllowedValue_ID = ar.Role_Value_ID
 ),
@@ -116,8 +116,8 @@ active_exceptions AS (
     AND (Effective_End_Date IS NULL OR Effective_End_Date > CURRENT_DATE)
 )
 SELECT
-  re.AwardRole_ID AS Subject_ID,
-  'AwardRole' AS Subject_Type,
+  re.TeamRole_ID AS Subject_ID,
+  'TeamRole' AS Subject_Type,
   'personnel_eligibility' AS Check_Category,
   re.Check_Code,
   CASE

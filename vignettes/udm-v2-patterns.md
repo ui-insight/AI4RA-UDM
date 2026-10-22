@@ -91,7 +91,7 @@ Not applicable as a lifecycle pattern; this is a structural pattern. The child e
 - **Negotiation** (Funding Cycle domain). `Proposal_ID` XOR `Award_ID` XOR `Subaward_ID`. A negotiation attaches to whichever funding stage it concerns.
 - **ContactDetails** (Actors domain). `Personnel_ID` XOR `Organization_ID`. Contact info belongs to either a person or an institution.
 - **ProtocolReviewStep** (Compliance module). `Protocol_ID` XOR `ProtocolAmendment_ID` XOR `ProtocolContinuingReview_ID`. The same review-step entity is used for initial protocol review, amendment review, and continuing review.
-- **AwardRole** (Effort domain). `Award_ID` XOR `Subaward_ID`. A role exists on either the prime award or a subaward but not both.
+- **TeamRole** (Effort domain). `Award_ID` XOR `Subaward_ID`. A role exists on either the prime award or a subaward but not both.
 
 ### Notes
 

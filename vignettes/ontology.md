@@ -23,7 +23,7 @@ If you read the v1 ontology, the most visible changes:
 
 - **40 tables → 47 tables (v2.1); 10 domains → 6 core modules plus implementation tables.** v2 dropped some tables, added more, and reorganized the groupings; v2.2 unified the taxonomy (everything specified is a module; core modules are the required universal capabilities). AllowedValues and BudgetCategory are implementation tables, not a core module.
 - **Project as a first-class entity is gone.** Longitudinal-identity grouping is handled by `Proposal.Group_ID` + `Originating_Proposal_ID` (derived chain root) + `Award.Group_ID` (pre-filled from Proposal). See *Lineage mechanisms* below.
-- **ProjectRole became three tables.** `AwardRole` (people on the work), `OrganizationRole` (people at an Organization), `ProtocolRole` (people on a compliance protocol). Each answers a different question.
+- **ProjectRole became three tables.** `TeamRole` (people on the work), `OrganizationRole` (people at an Organization), `ProtocolRole` (people on a compliance protocol). Each answers a different question.
 - **Budget unified.** `ProposalBudget` + `AwardBudgetPeriod` + `AwardBudget` collapsed into a single `Budget` table with a `Lifecycle_Stage` discriminator (Proposed → Approved → Current → Actual).
 - **Invoice became a Payment Lifecycle_Stage.** Same data, more disciplined modeling.
 - **AwardDeliverable → Report.** Scope clarified.
@@ -40,7 +40,7 @@ If you read the v1 ontology, the most visible changes:
 Table names use PascalCase with no separators. Tables are named as singular nouns.
 
 ```
-Organization    AwardRole    ComplianceRequirement    OrganizationCapability
+Organization    TeamRole    ComplianceRequirement    OrganizationCapability
 ```
 
 ### Columns: Snake_Case
@@ -148,7 +148,7 @@ Chains to an earlier row of the same table use `Previous_TableName_ID` instead, 
 Some tables attach to one of two possible parents using two nullable FK columns with a constraint that exactly one is non-null. Used to keep Award and Subaward symmetrical without duplicating satellite tables.
 
 Tables using this pattern:
-- `Modification`, `Terms`, `Payment`, `Transaction`, `Equipment`, `Report`, `Closeout`, `AwardRole`, `ComplianceCoverage` — Award_ID XOR Subaward_ID
+- `Modification`, `Terms`, `Payment`, `Transaction`, `Equipment`, `Report`, `Closeout`, `TeamRole`, `ComplianceCoverage` — Award_ID XOR Subaward_ID
 - `Budget`, `CostShare` — Award_ID XOR Subaward_ID at later Lifecycle_Stages
 - `ContactDetails` — Personnel_ID XOR Organization_ID
 - `Negotiation` — at-least-one of Proposal_ID / Award_ID / Subaward_ID
@@ -188,22 +188,22 @@ Later-stage rows store a `Previous_*_ID` pointing at the earlier-stage row they 
 
 Many-to-many relationships use bridge tables that carry their own attributes:
 
-- `AwardRole` — Personnel × (Award/Subaward) with role, FTE, credit allocation, dates
+- `TeamRole` — Personnel × (Award/Subaward) with role, FTE, credit allocation, dates
 - `OrganizationRole` — Personnel × Organization with role and optional Award/Subaward/RFA scope
 - `ProtocolRole` — Personnel × ComplianceRequirement with role and optional Award/Subaward scope
 - `ComplianceCoverage` — ComplianceRequirement × (Award/Subaward) coverage periods
-- `Effort` — AwardRole × time period × Lifecycle_Stage with certification data
+- `Effort` — TeamRole × time period × Lifecycle_Stage with certification data
 - `OtherSupportDisclosure` — OtherSupport × Proposal/Award disclosure events
 
 ### Three parallel "person-in-role" tables
 
 A core architectural decision in v2: three role tables, each answering a different question.
 
-- **AwardRole** — "who is on the team performing this Award" (PI, Co_I, Coordinator, etc., with effort and credit allocation).
+- **TeamRole** — "who is on the team performing this Award" (PI, Co_I, Coordinator, etc., with effort and credit allocation).
 - **OrganizationRole** — "who holds a role at this Organization" (committee member, program officer at sponsor, Authorized Official at subrecipient, financial contact at vendor, institutional liaison). Optionally scoped to an Award, Subaward, or RFA.
 - **ProtocolRole** — "who is on the team for this compliance protocol" (Primary_Investigator, Co_Investigator, study coordinator, lab manager, TCP-cleared personnel).
 
-An external Co-Investigator at a subrecipient institution is recorded as both an AwardRole row (scientific role) and an OrganizationRole row (administrative role at the subrecipient). A person who is the responsible PI on an IRB protocol covering an Award has both an AwardRole row and a ProtocolRole row.
+An external Co-Investigator at a subrecipient institution is recorded as both an TeamRole row (scientific role) and an OrganizationRole row (administrative role at the subrecipient). A person who is the responsible PI on an IRB protocol covering an Award has both an TeamRole row and a ProtocolRole row.
 
 ### Lineage mechanisms
 
@@ -232,7 +232,7 @@ Some columns are computed from other data. The model specifies the rule; the imp
 Derivations include:
 - `Award.Current_End_Date` — Original_End_Date adjusted by latest approved end-date-changing Modification
 - `Award.Current_Total_Funded` — Original_Total_Funded plus sum of approved Funding_Change_Amounts
-- `Award.Current_PI_Personnel_ID` — the active PI from AwardRole (null when in Multi_PI mode)
+- `Award.Current_PI_Personnel_ID` — the active PI from TeamRole (null when in Multi_PI mode)
 - `Award.Originating_Award_ID` — root of Previous_Award_ID chain
 - `Award.Subject_To_Federal_Funding` — derived from Sponsor.Sponsor_Type and Prime Sponsor
 - `Proposal.Originating_Proposal_ID` — root of Previous_Proposal_ID chain
@@ -255,7 +255,7 @@ The 47 tables organize into 6 core modules plus two implementation tables:
 |---|---|
 | **Actors** | Personnel, PersonnelCredential, Organization, OrganizationCapability, OrganizationIdentifier, OrganizationRole, ContactDetails |
 | **Funding Cycle** | RFA, RFARequirement, Proposal, ProposalApproval, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout |
-| **Effort** | AwardRole, Effort |
+| **Effort** | TeamRole, Effort |
 | **Finance** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment |
 | **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure, PolicyException |
 | **Records** | Document, Communication, Restriction, Deadline, Classification, Action, CommunicationResponse |
@@ -327,7 +327,7 @@ An institutional authorization to spend at-risk on a Proposal that has been favo
 
 The central post-award entity. Funded grants, contracts, cooperative agreements. Every Award originates from a Proposal (`Proposal_ID` required). Carries:
 - `Original_End_Date`, `Original_Total_Funded` (frozen at execution)
-- `Current_End_Date`, `Current_Total_Funded`, `Current_PI_Personnel_ID` (derived from approved Modifications and active AwardRoles)
+- `Current_End_Date`, `Current_Total_Funded`, `Current_PI_Personnel_ID` (derived from approved Modifications and active TeamRoles)
 - Lineage: `Parent_Award_ID` (incremental segments), `Previous_Award_ID` (competing renewals), `Originating_Award_ID` (derived chain root), `Group_ID`
 
 Status: Pending → Active → Closing → Closed / Suspended / Terminated.
@@ -362,7 +362,7 @@ The closeout workflow object for an Award or Subaward. Coordinates several subwo
 
 ## Effort
 
-### AwardRole
+### TeamRole
 
 A person's role on an Award or Subaward (XOR-attached) with effort allocation, date range, credit attribution, and Multi_PI / Contact PI flags. Recommended Role values: PI / Co_PI / Co_I / Multi_PI / Coordinator / Key_Personnel / Cohort_Participant / Coach / Mentor / Trainee.
 
@@ -372,7 +372,7 @@ Constraints worth noting:
 
 ### Effort
 
-Per-period, per-stage effort detail for an AwardRole. The `Lifecycle_Stage` column distinguishes Proposed / Approved / Charged / Certified. Certified rows carry the verbatim `Certification_Statement_Text` because the legal force of effort certification depends on what the certifier saw and accepted.
+Per-period, per-stage effort detail for an TeamRole. The `Lifecycle_Stage` column distinguishes Proposed / Approved / Charged / Certified. Certified rows carry the verbatim `Certification_Statement_Text` because the legal force of effort certification depends on what the certifier saw and accepted.
 
 ## Money
 
@@ -456,7 +456,7 @@ Not a domain: these tables support the model's mechanics rather than a research-
 
 ### AllowedValues
 
-Institution-specific controlled vocabularies. The `Value_Group` column names a family (e.g., `AwardRole`, `ContactType`, `TransactionType`); tables that reference institution-defined enums point at rows in this table via `*_Value_ID` foreign keys with an implicit filter on the appropriate Value_Group.
+Institution-specific controlled vocabularies. The `Value_Group` column names a family (e.g., `TeamRole`, `ContactType`, `TransactionType`); tables that reference institution-defined enums point at rows in this table via `*_Value_ID` foreign keys with an implicit filter on the appropriate Value_Group.
 
 `Canonical_Value_Code` lets institutions map their local codes to a canonical cross-institution code; aggregating queries group on the canonical code to normalize across deployments.
 
@@ -503,12 +503,12 @@ Worklist items attached to entities: deliverables, checklist items, service requ
 Beyond the universal patterns, the schema documents 20 semantic conventions covering rules that no column constraint can express. Highlights:
 
 - **Modification vs Parent_Award_ID vs Previous_Award_ID** — when sponsor action issues a new Award_Number, it's a new Award; otherwise it's a Modification.
-- **AwardRole role-bearer changes** — when a PI (or other role-bearer) changes, end-date the prior row and insert a new one. No mutation in place.
+- **TeamRole role-bearer changes** — when a PI (or other role-bearer) changes, end-date the prior row and insert a new one. No mutation in place.
 - **Group_ID and Originating_Proposal_ID** — independent grouping mechanisms; disagreement is informative.
 - **JIT cycle** — composed of Action + Communication + OtherSupportDisclosure + Budget Proposed-stage revision + optional ComplianceRequirement.
 - **Sponsor decision artifacts (NoA, decline letter, modification notice)** — three independent representations: Document + status update + Communication.
 - **Lifecycle_Stage vs *_Status** — the criterion is whether the row's shape changes between states.
-- **AwardRole vs OrganizationRole vs ProtocolRole** — distinct questions, distinct tables.
+- **TeamRole vs OrganizationRole vs ProtocolRole** — distinct questions, distinct tables.
 - **ConflictOfInterest vs OtherSupport vs ComplianceRequirement(COI)** — three tables touch outside-relationship facts; each answers a different question.
 - **Internal funding represented as an Award** — the funding instrument is always an Award (or Subaward) regardless of internal vs external sponsor.
 
@@ -531,7 +531,7 @@ The companion JSON ships 12 worked CREATE VIEW examples, written against the MyS
 | `vw_Subaward_With_Prime` | Subaward joined to its Prime Award (NULL when pre-award) |
 | `vw_Active_IRB_Coverage` | Awards currently covered by an active IRB protocol |
 | `vw_Overdue_Reports` | Reports past due, with days-overdue calculation |
-| `vw_Award_PI_Timeline` | Full PI history per Award via AwardRole + AllowedValues |
+| `vw_Award_PI_Timeline` | Full PI history per Award via TeamRole + AllowedValues |
 | `vw_Award_Budget_Summary` | Original vs Current funding and end-date per Award |
 | `vw_Effort_Certification_Status` | Per-period effort completeness, flagging Charged-but-not-Certified |
 | `vw_Approved_Modifications` | Approved Modifications with resolved Event_Type (excludes Reversed) |

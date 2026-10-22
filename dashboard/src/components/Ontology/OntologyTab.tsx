@@ -242,7 +242,7 @@ export default function OntologyTab() {
         <h3 style={{ color: '#2c3e50', marginTop: '1.5rem', marginBottom: '0.75rem' }}>Tables</h3>
         <ul style={{ listStyle: 'none', padding: 0 }}>
           <ConventionItem><strong style={{ fontFamily: 'monospace' }}>PascalCase</strong> - All table names use PascalCase with no underscores</ConventionItem>
-          <ConventionItem>Examples: <code>Organization</code>, <code>AwardRole</code>, <code>ComplianceCoverage</code></ConventionItem>
+          <ConventionItem>Examples: <code>Organization</code>, <code>TeamRole</code>, <code>ComplianceCoverage</code></ConventionItem>
           <ConventionItem>Singular nouns (e.g., <code>Personnel</code> not <code>People</code>, <code>Organization</code> not <code>Organizations</code>)</ConventionItem>
         </ul>
 
@@ -341,7 +341,7 @@ export default function OntologyTab() {
             </p>
             <p style={{ color: '#546e7a', fontSize: '0.9rem' }}>
               <strong>Used by:</strong> Payment, Modification, Transaction, Equipment, Report,
-              Closeout, Terms, AwardRole, ComplianceCoverage, and (stage-conditionally) Budget and
+              Closeout, Terms, TeamRole, ComplianceCoverage, and (stage-conditionally) Budget and
               CostShare. ContactDetails and Negotiation use the same mechanics with different parents.
             </p>
           </PatternCard>
