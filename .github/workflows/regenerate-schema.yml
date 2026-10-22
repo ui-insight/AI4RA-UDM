@@ -1,4 +1,4 @@
-name: Regenerate dashboard data and build
+name: Build and deploy the dashboard
 
 on:
   push:
@@ -14,13 +14,24 @@ on:
       - 'vignettes/udm-v2-system-of-record.md'
       - 'vignettes/modules/**'
       - 'dashboard/**'
+      - 'docs/**'
+      - '.github/workflows/regenerate-schema.yml'
+  workflow_dispatch:
+
+# The site is deployed from this workflow, not from a branch. Nothing is
+# committed: the build output is uploaded as a Pages artifact.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
     steps:
       - uses: actions/checkout@v4
 
@@ -52,10 +63,18 @@ jobs:
       - name: Build dashboard
         run: cd dashboard && npm run build
 
-      - name: Commit updated files if changed
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/
-          git diff --staged --quiet || git commit -m "Auto-regenerate dashboard from udm_schema_v2.json"
-          git push
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

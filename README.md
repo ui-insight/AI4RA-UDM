@@ -26,7 +26,7 @@ The UDM v2 is defined in two complementary artifacts:
 
 The two are kept in exact sync; the prose spec is authoritative on intent, the JSON on machine-consumable detail. An architectural overview lives in [`vignettes/ontology.md`](vignettes/ontology.md), and the version history in [`vignettes/CHANGELOG.md`](vignettes/CHANGELOG.md).
 
-The UDM is a normalized model, in the Inmon tradition: the standard defines the integrated System of Record, and star schemas are derived from it by each adopter as views ([why](vignettes/udm-v2-architecture.md#16-a-normalized-core-is-the-standard-star-schemas-are-the-adopters-choice)).
+The UDM is a normalized model, in the Inmon tradition: the standard defines the integrated System of Record, and star schemas are derived from it by each adopter as views ([why](vignettes/udm-v2-architecture.md#16-a-normalized-core-is-the-standard-star-schemas-are-the-adopters-choice)). Modules extend the standard and are conformance-checked; marts are deployment specific and are not part of it.
 
 ### Core Modules
 

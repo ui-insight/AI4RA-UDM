@@ -33,18 +33,16 @@ LICENSES
 
   1. THE STANDARD: Creative Commons Attribution 4.0 International
      (CC BY 4.0). The schema definitions, naming conventions and
-     documentation. This covers README.md, everything under vignettes/,
-     and the slides under docs/presentation/. Full text:
-     LICENSE-CC-BY-4.0.
+     documentation. This covers everything in the repository that is
+     not listed under the code below. Full text: LICENSE-CC-BY-4.0.
 
   2. THE CODE: Apache License, Version 2.0. The scripts, the dashboard
      and the build workflows. This covers scripts/, dashboard/, .github/,
-     and the built dashboard (docs/index.html, docs/ontology.html and
-     docs/assets/). Full text: LICENSE-APACHE-2.0.
+     and docs/ontology.html. Full text: LICENSE-APACHE-2.0.
 
   The machine-readable schema files are available under either license,
   at your option. This covers udm_schema_v2.json, udm_schema.json,
-  schemas/, docs/data/, and DDL or other artifacts generated from them.
+  schemas/, and DDL or other artifacts generated from them.
 
 NAMES
 
