@@ -2489,9 +2489,10 @@
                 "allowed_values": [
                   "Pending",
                   "Active",
+                  "Suspended",
                   "Closing",
                   "Closed",
-                  "Suspended",
+                  "Terminating",
                   "Terminated"
                 ],
                 "value_definitions": {
@@ -2500,7 +2501,7 @@
                     "set_by": "Sponsored programs office",
                     "next": [
                       "Active",
-                      "Terminated"
+                      "Terminating"
                     ]
                   },
                   "Active": {
@@ -2509,7 +2510,16 @@
                     "next": [
                       "Suspended",
                       "Closing",
-                      "Terminated"
+                      "Terminating"
+                    ]
+                  },
+                  "Suspended": {
+                    "definition": "Spending stopped by the sponsor or the institution; may resume",
+                    "set_by": "Sponsored programs office",
+                    "next": [
+                      "Active",
+                      "Closing",
+                      "Terminating"
                     ]
                   },
                   "Closing": {
@@ -2527,22 +2537,20 @@
                       "Closing"
                     ]
                   },
-                  "Suspended": {
-                    "definition": "Spending stopped by the sponsor or the institution; may resume",
+                  "Terminating": {
+                    "definition": "A termination notice has been received and is being processed; spending stops, closeout of the terminated scope begins",
                     "set_by": "Sponsored programs office",
                     "next": [
-                      "Active",
-                      "Closing",
                       "Terminated"
                     ]
                   },
                   "Terminated": {
-                    "definition": "Ended before its period of performance by the sponsor or the institution",
+                    "definition": "Ended before its period of performance; termination processing complete",
                     "set_by": "Sponsored programs office",
                     "next": []
                   }
                 },
-                "description": "The award's lifecycle state. Pending until setup completes; Closing once closeout has begun; Suspended and Terminated for sponsor or institutional stop actions. Authoritative for the award's state; Is_Active only hides rows"
+                "description": "The award's lifecycle state. Pending until setup completes; Closing once closeout has begun; Suspended and Terminating for sponsor or institutional stop actions, Terminated once the termination is processed. Authoritative for the award's state; Is_Active only hides rows"
               },
               "Risk_Level": {
                 "type": "Status",
@@ -2564,6 +2572,33 @@
                   }
                 },
                 "description": "Institutional risk rating for the award, set at setup and revised on material change, used to set monitoring intensity"
+              },
+              "Priority": {
+                "type": "Status",
+                "required": true,
+                "default": "Medium",
+                "allowed_values": [
+                  "Low",
+                  "Medium",
+                  "High",
+                  "Critical"
+                ],
+                "value_definitions": {
+                  "Low": {
+                    "definition": "Low priority"
+                  },
+                  "Medium": {
+                    "definition": "Normal priority"
+                  },
+                  "High": {
+                    "definition": "High priority"
+                  },
+                  "Critical": {
+                    "definition": "Rush: processed ahead of other work under the office's rush criteria"
+                  }
+                },
+                "description": "Processing priority the office assigned, Medium unless set. Critical is a rush under the office's rush criteria; turnaround reporting groups by it",
+                "synonyms": "Rush, Rush Processing, Processing Priority"
               },
               "Is_Flow_Through": {
                 "type": "Boolean",
@@ -2691,9 +2726,10 @@
                   "Rebudget",
                   "Sponsor_Transfer",
                   "Supplement",
-                  "Cost_Transfer_Authorization"
+                  "Cost_Transfer_Authorization",
+                  "Advance_Funding"
                 ],
-                "description": "What kind of change the modification makes",
+                "description": "What kind of change the modification makes. Advance_Funding records the institution's approval of spending ahead of a sponsor amendment; a prior-approval request is a Modification in Pending, not a kind of modification",
                 "synonyms": "Modification Type, Amendment Type, Change Type"
               },
               "Continuation_Type": {
@@ -2728,6 +2764,7 @@
                   "Pending",
                   "Approved",
                   "Rejected",
+                  "Withdrawn",
                   "Not_Required",
                   "Reversed"
                 ],
@@ -2738,6 +2775,7 @@
                     "next": [
                       "Approved",
                       "Rejected",
+                      "Withdrawn",
                       "Not_Required",
                       "Reversed"
                     ]
@@ -2754,6 +2792,11 @@
                     "set_by": "Recorded from the sponsor's communication",
                     "next": []
                   },
+                  "Withdrawn": {
+                    "definition": "The request was withdrawn before a decision",
+                    "set_by": "The requester or the sponsored programs office",
+                    "next": []
+                  },
                   "Not_Required": {
                     "definition": "Recorded for the record; no approval was needed",
                     "set_by": "Sponsored programs office",
@@ -2767,8 +2810,35 @@
                     "next": []
                   }
                 },
-                "description": "Reversed = an approved Modification later withdrawn by sponsor or invalidated; excluded from derivations of Award.Current_End_Date and Award.Current_Total_Funded",
+                "description": "The decision on the modification. Withdrawn before a decision; Reversed after approval, by the sponsor or by correction, and excluded from the derivations of Award.Current_End_Date and Award.Current_Total_Funded",
                 "synonyms": "Mod Status, Sponsor Approval"
+              },
+              "Priority": {
+                "type": "Status",
+                "required": true,
+                "default": "Medium",
+                "allowed_values": [
+                  "Low",
+                  "Medium",
+                  "High",
+                  "Critical"
+                ],
+                "value_definitions": {
+                  "Low": {
+                    "definition": "Low priority"
+                  },
+                  "Medium": {
+                    "definition": "Normal priority"
+                  },
+                  "High": {
+                    "definition": "High priority"
+                  },
+                  "Critical": {
+                    "definition": "Rush: processed ahead of other work under the office's rush criteria"
+                  }
+                },
+                "description": "Processing priority the office assigned, Medium unless set. Critical is a rush under the office's rush criteria",
+                "synonyms": "Rush, Rush Processing, Processing Priority"
               },
               "Requires_Prior_Approval": {
                 "type": "Boolean",
@@ -2993,9 +3063,10 @@
                   "Proposed",
                   "Pending",
                   "Active",
+                  "Suspended",
+                  "Closing",
                   "Closed",
-                  "Terminated",
-                  "Suspended"
+                  "Terminated"
                 ],
                 "value_definitions": {
                   "Proposed": {
@@ -3019,8 +3090,25 @@
                     "set_by": "Sponsored programs office",
                     "next": [
                       "Suspended",
-                      "Closed",
+                      "Closing",
                       "Terminated"
+                    ]
+                  },
+                  "Suspended": {
+                    "definition": "Work stopped by the institution or the sponsor; may resume",
+                    "set_by": "Sponsored programs office",
+                    "next": [
+                      "Active",
+                      "Closing",
+                      "Terminated"
+                    ]
+                  },
+                  "Closing": {
+                    "definition": "The period of performance has ended; closeout is under way, including the final invoice",
+                    "set_by": "Sponsored programs office",
+                    "next": [
+                      "Closed",
+                      "Active"
                     ]
                   },
                   "Closed": {
@@ -3032,18 +3120,9 @@
                     "definition": "Ended before its period of performance",
                     "set_by": "Sponsored programs office",
                     "next": []
-                  },
-                  "Suspended": {
-                    "definition": "Work stopped by the institution or the sponsor; may resume",
-                    "set_by": "Sponsored programs office",
-                    "next": [
-                      "Active",
-                      "Closed",
-                      "Terminated"
-                    ]
                   }
                 },
-                "description": "Subaward_Status = 'Proposed' indicates pre-award planned subaward",
+                "description": "The subaward's lifecycle state. Proposed while planned in the proposal; Pending once the prime award exists and the agreement is being issued; Closing once closeout has begun",
                 "synonyms": "Sub Status, Subcontract State"
               },
               "Monitoring_Frequency_Months": {

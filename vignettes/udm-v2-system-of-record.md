@@ -368,15 +368,15 @@ Universal status taxonomies are listed here in one place. The JSON artifact carr
 
 | Field | Allowed values |
 |---|---|
-| `Award_Status` | Pending, Active, Closing, Closed, Suspended, Terminated |
-| `Subaward_Status` | Proposed, Pending, Active, Closed, Terminated, Suspended |
+| `Award_Status` | Pending, Active, Suspended, Closing, Closed, Terminating, Terminated |
+| `Subaward_Status` | Proposed, Pending, Active, Suspended, Closing, Closed, Terminated |
 | `Proposal.Internal_Approval_Status` | Draft, In_Review, Returned, Approved, Rejected |
 | `Proposal.Submission_Status` | Unapproved, Unsent, Submitting, Submitted, Received, Validated, Invalid, Accepted, Failed, Withdrawn (derived) |
 | `Proposal.Decision_Status` | Unsubmitted, Pending, Intent_to_Award, Awarded, Declined |
 | `SubmissionAttempt.Attempt_Status` | Unsent, Submitting, Submitted, Received, Validated, Invalid, Accepted, Failed, Withdrawn |
 | `RFA_Status` | Active, Closed, Superseded, Cancelled |
 | `Negotiation_Status` | Pending, Active, On_Hold, Resolved, Abandoned |
-| `Modification.Approval_Status` | Pending, Approved, Rejected, Not_Required, Reversed (an approved Modification that was later withdrawn by sponsor or invalidated by institutional correction; excluded from derivations of `Award.Current_End_Date` and `Award.Current_Total_Funded`) |
+| `Modification.Approval_Status` | Pending, Approved, Rejected, Withdrawn, Not_Required, Reversed (an approved Modification that was later withdrawn by sponsor or invalidated by institutional correction; excluded from derivations of `Award.Current_End_Date` and `Award.Current_Total_Funded`) |
 | `Modification.Continuation_Type` (optional) | Competing, Non_Competing, Supplement, Other |
 | `Payment_Status` | Open, Submitted, Paid, Disputed, Cancelled (dispositional; see note below) |
 | `Requirement_Status` (Compliance) | Draft, Submitted, In_Review, Approved, Expired, Conditional_Approval, Disapproved, Terminated, Suspended, Not_Applicable |
@@ -852,8 +852,9 @@ A funded grant, contract, or cooperative agreement. The central post-award entit
 | Current_Total_Funded | Money | derived | Originally funded amount plus the sum of approved funding-changing Modifications. Derivation rule documented in *Derived values* |
 | Current_PI_Personnel_ID | ID | derived | → Personnel. The current PI on this Award when the agreement is in single-PI mode; null when in Multi_PI mode (multiple Multi_PI rows are active) or when no PI is active (community-partner Subaward case). Derivation rule documented in *Derived values*. The canonical source for "who is on this team" remains TeamRole; this column is a query-convenience denormalization parallel to Current_End_Date and Current_Total_Funded |
 | Total_Anticipated_Funding | Money | optional | |
-| Award_Status | Status | required | See Status taxonomy |
+| Award_Status | Status | required | The award's lifecycle state: Pending, Active, Suspended, Closing, Closed, Terminating, Terminated. Terminating is a termination notice being processed |
 | Risk_Level | Status | optional | See Status taxonomy |
+| Priority | Status | required | Constrained: Low / Medium / High / Critical. Processing priority the office assigned, Medium unless set; Critical is a rush under the office's rush criteria |
 | Is_Flow_Through | Boolean | required | True when money flows from a prime sponsor through the direct sponsor |
 | Subject_To_Federal_Funding | Boolean | derived | Whether federal funding rules apply to the award, either because the sponsor is federal or because a federal prime funds it through a pass-through. Derivation rule and recomputation triggers in *Implementation guidance* |
 
@@ -868,9 +869,10 @@ A change to an Award or Subaward after initial funding. Modification is XOR-atta
 | Subaward_ID | ID | optional | → Subaward. Exactly one of `Award_ID` or `Subaward_ID` is non-null |
 | Modification_Number | ShortCode | required | Unique within the parent agreement |
 | Effective_Date | Date | required | |
-| Event_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'ModificationEventType'`. Recommended values: Incremental_Funding / No_Cost_Extension / Budget_Revision / PI_Change / Scope_Change / Carryover / Rebudget / Sponsor_Transfer / Supplement / Cost_Transfer_Authorization |
+| Event_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'ModificationEventType'`. Recommended values: Incremental_Funding / No_Cost_Extension / Budget_Revision / PI_Change / Scope_Change / Carryover / Rebudget / Sponsor_Transfer / Supplement / Cost_Transfer_Authorization / Advance_Funding |
 | Continuation_Type | Status | optional | Constrained when present: Competing / Non_Competing / Supplement / Other |
-| Approval_Status | Status | required | See Status taxonomy |
+| Approval_Status | Status | required | Pending, Approved, Rejected, Withdrawn, Not_Required, Reversed. Withdrawn before a decision; Reversed after approval and excluded from the derived award totals and dates |
+| Priority | Status | required | Constrained: Low / Medium / High / Critical. Processing priority the office assigned, Medium unless set; Critical is a rush |
 | Requires_Prior_Approval | Boolean | required | |
 | Prior_Approval_Granted_Date | Date | conditional | Required when Requires_Prior_Approval is true and Approval_Status is Approved |
 | Funding_Change_Amount | Money | conditional | Positive for adds, negative for reductions. Required for funding-changing event types; null for non-financial event types |
@@ -902,7 +904,7 @@ A subaward agreement between the institution and a subrecipient. Subaward exists
 | Current_End_Date | Date | derived | Current end after modifications. Derivation rule documented in *Derived values* |
 | Current_PI_Personnel_ID | ID | derived | → Personnel. The current PI on this Subaward when the agreement is in single-PI mode; null when in Multi_PI mode or when no PI is active (community-partner Subaward case). Derivation rule documented in *Derived values*. Parallels Award.Current_PI_Personnel_ID |
 | Risk_Level | Status | required | See Status taxonomy |
-| Subaward_Status | Status | required | See Status taxonomy. Subaward_Status = 'Proposed' indicates a pre-award planned subaward |
+| Subaward_Status | Status | required | Proposed, Pending, Active, Suspended, Closing, Closed, Terminated. Proposed while planned in the proposal; Closing once closeout has begun |
 | Monitoring_Frequency_Months | Count | optional | How often subrecipient monitoring is performed |
 
 #### Negotiation
@@ -1377,7 +1379,7 @@ Standardized budget line item categories (SF-424 R&R standard).
 
 ### Records
 
-Six of the Records tables share the polymorphic columns `Related_Entity_Type` and `Related_Entity_ID`; CommunicationResponse attaches to Communication by direct foreign key. Enforcement rules are described in *Polymorphic attachment enforcement* above. Each table's allowed `Related_Entity_Type` values are listed in its Notes column.
+Seven of the Records tables share the polymorphic columns `Related_Entity_Type` and `Related_Entity_ID`; CommunicationResponse attaches to Communication by direct foreign key. Enforcement rules are described in *Polymorphic attachment enforcement* above. Each table's allowed `Related_Entity_Type` values are listed in its Notes column.
 
 **Deadline vs Action.** Both Deadline and Action carry a due date, a responsible person, and a status. They differ in what they primarily describe:
 
@@ -1609,7 +1611,7 @@ Institutions with substantial ticket volume that need structured analysis beyond
 - Audit and provenance columns (Created_At, Updated_At, Created_By_Personnel_ID, Updated_By_Personnel_ID, Source_System, Source_Record_ID, Is_Active) are universal across every table.
 - Hub entities: Personnel, Organization, Proposal, Award, AllowedValues.
 - Lifecycle_Stage tables: Budget, Effort, CostShare, Payment. Lifecycle_Stage is authoritative for these tables' state; once a row has a later-stage descendant, its primary fields are immutable.
-- Polymorphic Attachment tables: Document, Communication, Restriction, Deadline, Classification, Action. These generalize the everyday "attach a document to an award" idea to all the records that accumulate around an entity. Deadline tracks *when* an obligation is due; Action tracks *what* work to do.
+- Polymorphic Attachment tables: Document, Communication, Restriction, Deadline, Classification, Action, Approval. These generalize the everyday "attach a document to an award" idea to all the records that accumulate around an entity. Deadline tracks *when* an obligation is due; Action tracks *what* work to do.
 - Subaward spans pre-award (Proposal_ID, Subaward_Status='Proposed') and post-award (Prime_Award_ID, any Subaward_Status other than Proposed) on a single row identity. Subaward is a first-class parent for Terms, Budget, Payment, Modification, Transaction, CostShare, Equipment, Report, Closeout, and all Attachment tables via the two-FK exclusive-or attachment pattern. Subaward carries Administering_Organization_ID and Parent_Subaward_ID to match Award's structure.
 - Award.Parent_Award_ID groups incremental segments under one award identity; Award.Previous_Award_ID points at the predecessor on a competing renewal (parallel to Proposal.Previous_Proposal_ID). Award.Originating_Award_ID is a derived stored column pointing at the root of the Previous_Award_ID chain (parallel to Proposal.Originating_Proposal_ID), so lineage queries do not require recursive CTE traversal. Subaward renewal lineage flows through the Prime Award chain (no dedicated `Previous_Subaward_ID`); Subaward.Parent_Subaward_ID handles within-prime cascading/amended subawards. The discriminator between Modification, Parent_Award_ID, and Previous_Award_ID is documented in *Semantic conventions*.
 - Organization_Type carries structural classification (Department / College / School / Institute / Center / External). Functional roles (Sponsor, Subrecipient, Vendor, Committee, Prime_Sponsor, Program_Office, Pass_Through_Entity) are recorded as OrganizationCapability rows so a single Organization can play multiple roles across contexts.

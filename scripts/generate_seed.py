@@ -79,9 +79,7 @@ def recommended_rows(schema, modules):
     for mod in schema["modules"]["core"].values():
         tables.extend(mod["tables"].values())
     om = schema["modules"]["optional"]
-    for mkey in modules:
-        if mkey not in om:
-            raise SystemExit(f"FATAL: '{mkey}' is not a specified optional module (have: {', '.join(om)})")
+    for mkey in declared_modules(schema, modules):
         tables.extend(om[mkey]["tables"].values())
     for tdef in tables:
         for cdef in tdef["columns"].values():
@@ -91,6 +89,22 @@ def recommended_rows(schema, modules):
                     seen.add((group, code))
                     rows.append((group, code))
     return rows
+
+
+def declared_modules(schema, modules):
+    """The declared optional modules, checked against each one's declared dependencies.
+
+    A module whose required module is not declared is an error: its vocabularies
+    would be seeded without the tables that reference them. Declare the dependency too."""
+    om = schema["modules"]["optional"]
+    for mkey in modules:
+        if mkey not in om:
+            raise SystemExit(f"FATAL: '{mkey}' is not a specified optional module (have: {', '.join(om)})")
+    for mkey in modules:
+        for dep in om[mkey].get("requires", {}).get("modules", []):
+            if dep not in modules:
+                raise SystemExit(f"FATAL: module '{mkey}' requires module '{dep}'; add it with --modules")
+    return modules
 
 
 def insert(syn, table, columns, values):

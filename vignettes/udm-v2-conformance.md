@@ -37,7 +37,7 @@ A declaration is a JSON file describing the shape a consumer reads: tables, colu
 }
 ```
 
-The example is abbreviated. `tables` mirrors the `tables` key of `udm_schema.json`, with the universal audit columns written out on every table. Each column carries `type`, `required`, and, where the specification has them, `primary_key`, `references`, and `allowed_values`. The checker prints a complete starting file with `--template`.
+The example is abbreviated. `tables` is flat: one entry per table, named as the table appears under `modules.core.<module>.tables` or `implementation_tables.tables` in `udm_schema.json`, with the universal audit columns written out on every table. Each column carries `type`, `required`, and, where the specification has them, `primary_key`, `references`, and `allowed_values`. The checker prints a complete starting file with `--template`.
 
 Types may be written in the specification's abstract vocabulary (`ID`, `Money`, `Date`) or as native type names (`VARCHAR(50)`, `NUMERIC(18,2)`).
 

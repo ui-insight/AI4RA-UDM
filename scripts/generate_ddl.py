@@ -62,12 +62,26 @@ def specified_tables(schema, modules):
     for tname, tdef in schema["implementation_tables"]["tables"].items():
         out.append((tname, tdef, "implementation table"))
     om = schema["modules"]["optional"]
-    for mkey in modules:
-        if mkey not in om:
-            raise SystemExit(f"FATAL: '{mkey}' is not a specified optional module (have: {', '.join(om)})")
+    for mkey in declared_modules(schema, modules):
         for tname, tdef in om[mkey]["tables"].items():
             out.append((tname, tdef, f"optional module {om[mkey]['name']}"))
     return out
+
+
+def declared_modules(schema, modules):
+    """The declared optional modules, checked against each one's declared dependencies.
+
+    A module whose required module is not declared is an error: the DDL would
+    carry foreign keys into tables that do not exist. Declare the dependency too."""
+    om = schema["modules"]["optional"]
+    for mkey in modules:
+        if mkey not in om:
+            raise SystemExit(f"FATAL: '{mkey}' is not a specified optional module (have: {', '.join(om)})")
+    for mkey in modules:
+        for dep in om[mkey].get("requires", {}).get("modules", []):
+            if dep not in modules:
+                raise SystemExit(f"FATAL: module '{mkey}' requires module '{dep}'; add it with --modules")
+    return modules
 
 
 def resolve(mapping, abstract):
@@ -175,7 +189,10 @@ def table_ddl(tname, tdef, origin, audit, mapping, syn, dialect, owed):
 
 
 def foreign_keys(tables, audit, syn):
-    """One ALTER TABLE per foreign key, emitted after every table exists, so creation order and cycles do not matter."""
+    """One ALTER TABLE per foreign key, emitted after every table exists, so creation order and cycles do not matter.
+
+    Every referenced table is in the output: module dependencies are checked
+    before generation, so a missing target is a defect in the schema."""
     q = syn["quote"]
     names = {t for t, _, _ in tables}
     out = []
@@ -186,8 +203,7 @@ def foreign_keys(tables, audit, syn):
             if not ref:
                 continue
             if ref["table"] not in names:
-                out.append(f"-- {tname}.{c} references {ref['table']}.{ref['column']}, which is not in this output (undeclared module); no constraint emitted")
-                continue
+                raise SystemExit(f"FATAL: {tname}.{c} references {ref['table']}, which is not in this output; the schema's module dependencies do not cover it")
             out.append(f"ALTER TABLE {q(tname)} ADD CONSTRAINT {q('fk_' + tname + '_' + c)} "
                        f"FOREIGN KEY ({q(c)}) REFERENCES {q(ref['table'])} ({q(ref['column'])});")
     return "\n".join(out)

@@ -94,7 +94,7 @@ The `udm_schema.json` structure (abbreviated). Everything specified is a module,
             "columns": {
               "Award_ID": { "type": "ID", "primary_key": true, "required": true, "description": "PK" },
               "Sponsor_Organization_ID": { "type": "ID", "references": { "table": "Organization", "column": "Organization_ID" }, "description": "..." },
-              "Award_Status": { "type": "Status", "allowed_values": ["Pending", "Active", "Closing", "Closed", "Suspended", "Terminated"], "synonyms": "Grant Status, Status", "description": "..." },
+              "Award_Status": { "type": "Status", "allowed_values": ["Pending", "Active", "Suspended", "Closing", "Closed", "Terminating", "Terminated"], "synonyms": "Grant Status, Status", "description": "..." },
               "Current_End_Date": { "type": "DATE", "derived": { "rule": "...", "recompute_triggers": "..." }, "description": "..." }
             },
             "constraints": [ { "rule": "...", "structured": { "type": "referenced_status_is", "...": "..." } } ]
