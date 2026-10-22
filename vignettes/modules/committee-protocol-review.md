@@ -5,7 +5,7 @@
 **Records targets declared:** none
 **AllowedValues groups declared:** none
 
-This module is governed by the module taxonomy's two laws (capability criterion, encapsulation rule); see the Architecture section of the core specification. Canonical machine-readable definition: `optional_modules.committee_protocol_review` in `udm_schema.json`. Module tables carry the universal audit columns; they are omitted below as in the core spec.
+This module is governed by the module taxonomy's two laws (capability criterion, encapsulation rule); see the Architecture section of the core specification. Canonical machine-readable definition: `modules.optional.committee_protocol_review` in `udm_schema.json`. Module tables carry the universal audit columns; they are omitted below as in the core spec.
 
 The bridge between Governance and Compliance Protocols: which Protocols were reviewed at which Meetings, with agenda position, vote tallies, and decisions, plus member recusals. Vote tallies live per review row because one meeting reviews many protocols. Recusal rows feed the application's effective-quorum computation for a specific protocol's review.
 

@@ -166,7 +166,7 @@ Budget
 ├── Budget_ID
 ├── Lifecycle_Stage        (Proposed / Approved / Current / Actual)
 ├── Budget_Mode            (Itemized / Modular)
-├── Parent_Budget_ID       (revisions chain)
+├── Previous_Budget_ID       (revisions chain)
 ├── Project_ID
 ├── Proposal_ID            (nullable; required if Lifecycle_Stage='Proposed')
 ├── Award_ID               (nullable; required if Lifecycle_Stage in 'Approved','Current','Actual')
@@ -241,7 +241,7 @@ These four can all be different numbers for the same person on the same project 
 Effort
 ├── Effort_ID
 ├── Lifecycle_Stage        (Proposed / Approved / Charged / Certified)
-├── Parent_Effort_ID       (revisions chain)
+├── Previous_Effort_ID       (revisions chain)
 ├── ProjectRole_ID         (the assignment)
 ├── Period_Start_Date / Period_End_Date
 ├── Effort_Percent
@@ -278,7 +278,7 @@ Committed-vs-actual queries become single-table aggregations. Other Support / Cu
 Payment
 ├── Payment_ID
 ├── Lifecycle_Stage       (Scheduled / Invoiced / Received / Reconciled)
-├── Parent_Payment_ID     (revisions chain; later stages chain back to earlier ones)
+├── Previous_Payment_ID     (revisions chain; later stages chain back to earlier ones)
 ├── Award_ID
 ├── Budget_ID             (optional period reference after Budget collapse)
 ├── Scheduled_Date / Scheduled_Amount
@@ -298,7 +298,7 @@ Payment
 CostShare
 ├── CostShare_ID
 ├── Lifecycle_Stage           (Proposed / Committed / Met / Waived)
-├── Parent_CostShare_ID
+├── Previous_CostShare_ID
 ├── Proposal_ID               (nullable; required when Lifecycle_Stage='Proposed')
 ├── Award_ID                  (nullable; required for later stages)
 ├── Project_ID

@@ -6,18 +6,26 @@ Reads the authoritative udm_schema.json and produces the JSON files
 that the dashboard (docs/index.html) needs:
   - docs/data/data-dictionary.json: table/column descriptions for browsing
   - docs/data/relationships.json: foreign key relationships for navigation
-  - docs/data/udm_schema.json: copy of full v2 schema for API endpoint
+  - docs/data/udm_schema.json: copy of full schema for API endpoint
   - docs/schemas/udm_schema.metaschema.json: copy of the metaschema, so its $id URL resolves
 
-Per-column synonyms in v2 live in the top-level column_synonyms.values map
-keyed by "TableName.Column_Name"; this script merges that sidecar back into
-each column row so the dashboard's existing UI (which expects a per-column
-"synonyms" field) keeps working without code changes.
+The dictionary covers the core modules and the implementation tables.
+Each table row carries the name of its core module ("Implementation" for
+the implementation tables); each column row carries the column's synonyms.
 """
 
 import json
 import shutil
 from pathlib import Path
+
+
+def core_tables(schema):
+    """Yield (table_name, table_def, module_display_name) for every core and implementation table."""
+    for mod in schema['modules']['core'].values():
+        for tname, tdef in mod['tables'].items():
+            yield tname, tdef, mod['name']
+    for tname, tdef in schema['implementation_tables']['tables'].items():
+        yield tname, tdef, 'Implementation'
 
 
 def main():
@@ -29,35 +37,17 @@ def main():
     with open(schema_file) as f:
         schema = json.load(f)
 
-    synonyms_map = schema.get('column_synonyms', {}).get('values', {})
-
     dd_tables = {}
-    for table_name, table_data in schema['tables'].items():
+    relationships = []
+    for table_name, table_data, module_name in core_tables(schema):
         columns = []
         for col_name, col_def in table_data['columns'].items():
-            syn_key = f'{table_name}.{col_name}'
             columns.append({
                 'name': col_name,
                 'description': col_def.get('description', ''),
-                'synonyms': synonyms_map.get(syn_key),
+                'synonyms': col_def.get('synonyms'),
                 'pii': col_def.get('pii', False),
             })
-        dd_tables[table_name] = {
-            'name': table_name,
-            'description': table_data.get('description', ''),
-            'synonyms': None,
-            'core_module': table_data.get('core_module'),
-            'columns': columns,
-        }
-
-    dd_output = {'tables': dd_tables, 'table_count': len(dd_tables)}
-    with open(output_dir / 'data-dictionary.json', 'w') as f:
-        json.dump(dd_output, f, indent=2)
-    print(f"Generated data-dictionary.json ({len(dd_tables)} tables)")
-
-    relationships = []
-    for table_name, table_data in schema['tables'].items():
-        for col_name, col_def in table_data['columns'].items():
             if 'references' in col_def:
                 relationships.append({
                     'from_table': table_name,
@@ -65,6 +55,18 @@ def main():
                     'to_table': col_def['references']['table'],
                     'to_column': col_def['references']['column'],
                 })
+        dd_tables[table_name] = {
+            'name': table_name,
+            'description': table_data.get('description', ''),
+            'synonyms': None,
+            'core_module': module_name,
+            'columns': columns,
+        }
+
+    dd_output = {'tables': dd_tables, 'table_count': len(dd_tables)}
+    with open(output_dir / 'data-dictionary.json', 'w') as f:
+        json.dump(dd_output, f, indent=2)
+    print(f"Generated data-dictionary.json ({len(dd_tables)} tables)")
 
     rel_output = {'relationships': relationships, 'relationship_count': len(relationships)}
     with open(output_dir / 'relationships.json', 'w') as f:

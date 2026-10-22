@@ -5,7 +5,7 @@
 **Records targets declared:** Protocol, ProtocolAmendment, ProtocolContinuingReview, ProtocolAdverseEvent, ProtocolDeviation
 **AllowedValues groups declared:** ProtocolPersonnelRole, ProtocolReviewPathway, ProtocolClassificationLevel, ProtocolReviewStepName, AdverseEventType, AdverseEventDetermination
 
-This module is governed by the module taxonomy's two laws (capability criterion, encapsulation rule); see the Architecture section of the core specification. Canonical machine-readable definition: `optional_modules.compliance_protocols` in `udm_schema.json`. Module tables carry the universal audit columns; they are omitted below as in the core spec.
+This module is governed by the module taxonomy's two laws (capability criterion, encapsulation rule); see the Architecture section of the core specification. Canonical machine-readable definition: `modules.optional.compliance_protocols` in `udm_schema.json`. Module tables carry the universal audit columns; they are omitted below as in the core spec.
 
 The shared protocol spine: the standing regulatory record (Protocol), its funding linkage (ProtocolCoverage), its roster (ProtocolPersonnel), and the workflow entities every regime shares: a single polymorphic review step plus four peer event entities (amendments, continuing reviews, adverse events, deviations), each with its own approval lifecycle.
 

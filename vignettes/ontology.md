@@ -138,9 +138,9 @@ Several tables reference themselves to model hierarchies via a `Parent_TableName
 - `Account.Parent_Account_Code` — chart-of-accounts hierarchy
 - `Award.Parent_Award_ID` — incremental segments under one prime award
 - `Subaward.Parent_Subaward_ID` — cascading or amended subawards under one prime
-- `ComplianceRequirement.Parent_ComplianceRequirement_ID` — renewal chain
-- `Document.Parent_Document_ID` — document version chain
-- `Budget.Parent_Budget_ID`, `Effort.Parent_Effort_ID`, `CostShare.Parent_CostShare_ID`, `Payment.Parent_Payment_ID` — Lifecycle_Stage chain (see below)
+
+Chains to an earlier row of the same table use `Previous_TableName_ID` instead, and are not hierarchies: `Previous_Budget_ID`, `Previous_Effort_ID`, `Previous_CostShare_ID`, `Previous_Payment_ID` (lifecycle stages), `Previous_ComplianceRequirement_ID` (renewal cycle), `Previous_Document_ID` (version), `Previous_Proposal_ID` and `Previous_Award_ID` (lineage).
+- `Budget.Previous_Budget_ID`, `Effort.Previous_Effort_ID`, `CostShare.Previous_CostShare_ID`, `Payment.Previous_Payment_ID` — Lifecycle_Stage chain (see below)
 - `Proposal.Previous_Proposal_ID`, `Award.Previous_Award_ID` — competing-renewal lineage
 
 ### Two-FK exclusive-or attachment
@@ -178,7 +178,7 @@ Four tables carry a `Lifecycle_Stage` column that distinguishes records of the s
 | CostShare | Proposed → Committed → Met → Waived |
 | Payment | Scheduled → Invoiced → Received → Reconciled |
 
-Later-stage rows store a `Parent_*_ID` pointing at the earlier-stage row they descend from. Stages may be skipped; when a stage is skipped, the later row points at the nearest existing earlier row.
+Later-stage rows store a `Previous_*_ID` pointing at the earlier-stage row they descend from. Stages may be skipped; when a stage is skipped, the later row points at the nearest existing earlier row.
 
 **Chain immutability.** Once a row at stage S has a later-stage descendant, the row at stage S is immutable in the business sense. Corrections insert a new row at the same stage with its own descendant chain forward; the superseded row is marked `Is_Active = false`.
 
@@ -380,7 +380,7 @@ Per-period, per-stage effort detail for an AwardRole. The `Lifecycle_Stage` colu
 
 Detailed line items for a budget at a specific lifecycle stage. The `Lifecycle_Stage` discriminator (Proposed → Approved → Current → Actual) replaces v1's separate `ProposalBudget`, `AwardBudgetPeriod`, and `AwardBudget` tables.
 
-`Proposal_ID` is required at every stage (stable chain identity); `Award_ID` or `Subaward_ID` (XOR) is added at Approved+ for the post-award anchor. The `Parent_Budget_ID` chain spans all stages.
+`Proposal_ID` is required at every stage (stable chain identity); `Award_ID` or `Subaward_ID` (XOR) is added at Approved+ for the post-award anchor. The `Previous_Budget_ID` chain spans all stages.
 
 Modification effect on the Budget chain is documented as a semantic convention: funding-changing events create a new Current row chained from the prior Current; end-date-changing events (NCE etc.) create a new Current row on the last period to extend `Period_End_Date`; award-state-only events (PI_Change, Scope_Change) create no new Budget row.
 
@@ -422,7 +422,7 @@ A sponsor-purchased or institution-acquired capital asset associated with an Awa
 
 A regulatory approval required for research: IRB, IACUC, IBC, radiation safety, export control, COI. A standalone entity with its own lifecycle (submission, approval, expiration, renewal), independent of any particular Award. The Awards a requirement covers are recorded in the `ComplianceCoverage` junction.
 
-Renewal chaining via `Parent_ComplianceRequirement_ID`. Distinct Issuing Authority and Reviewing Authority Organization references. AllowedValues-backed Review_Pathway and Classification_Level vocabularies vary by Requirement_Type.
+Renewal chaining via `Previous_ComplianceRequirement_ID`. Distinct Issuing Authority and Reviewing Authority Organization references. AllowedValues-backed Review_Pathway and Classification_Level vocabularies vary by Requirement_Type.
 
 `Reviewing_Authority_Organization_ID` is required for IRB/IACUC/IBC (board-reviewed by definition), optional otherwise (self-certifications, etc.).
 
@@ -470,7 +470,7 @@ Six Attachment tables share polymorphic `Related_Entity_Type` + `Related_Entity_
 
 ### Document
 
-Files associated with any entity. `Document_Type_Value_ID` resolves to AllowedValues with recommended types (NOA / Biosketch / DMP / Budget_Justification / Other_Support / etc.). `Parent_Document_ID` supports a per-logical-document version chain.
+Files associated with any entity. `Document_Type_Value_ID` resolves to AllowedValues with recommended types (NOA / Biosketch / DMP / Budget_Justification / Other_Support / etc.). `Previous_Document_ID` supports a per-logical-document version chain.
 
 ### Communication
 
@@ -522,7 +522,7 @@ Cross-institution analytics happen at a federation layer above the database, not
 
 ## Reference Views
 
-The companion JSON ships 10 worked CREATE VIEW examples in MySQL/MariaDB dialect.
+The companion JSON ships 12 worked CREATE VIEW examples, written against the MySQL dialect mapping.
 
 | View | Purpose |
 |---|---|

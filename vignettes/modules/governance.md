@@ -5,7 +5,7 @@
 **Records targets declared:** Committee, CommitteeMember, Meeting
 **AllowedValues groups declared:** CommitteeMemberRole
 
-This module is governed by the module taxonomy's two laws (capability criterion, encapsulation rule); see the Architecture section of the core specification. Canonical machine-readable definition: `optional_modules.governance` in `udm_schema.json`. Module tables carry the universal audit columns; they are omitted below as in the core spec.
+This module is governed by the module taxonomy's two laws (capability criterion, encapsulation rule); see the Architecture section of the core specification. Canonical machine-readable definition: `modules.optional.governance` in `udm_schema.json`. Module tables carry the universal audit columns; they are omitted below as in the core spec.
 
 Convened-body infrastructure reused by any capability that needs committees: compliance review, COI deliberation, internal-award review panels. Regime-specific member classifications (PHS Policy IV.A.3 scientist / nonscientist / unaffiliated designations, IRB community-member status) attach as core Classification rows rather than columns, keeping CommitteeMember generic. Quorum data lives here; quorum logic is application code.
 

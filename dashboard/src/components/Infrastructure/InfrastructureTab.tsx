@@ -179,7 +179,7 @@ export default function InfrastructureTab() {
         <div style={{ marginTop: '2rem' }}>
           <h3 style={{ color: '#2c3e50', marginBottom: '1rem', fontSize: '1.3rem' }}>Where the UDM Fits</h3>
           <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
-            The UDM defines the target schema for the Silver and Gold layers. Use the <code>column_synonyms</code> sidecar in{' '}
+            The UDM defines the target schema for the Silver and Gold layers. Use the <code>synonyms</code> field on each column in{' '}
             <a href="https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json" style={{ color: '#667eea' }}>
               udm_schema.json
             </a>{' '}
@@ -231,7 +231,7 @@ export default function InfrastructureTab() {
               <CrosswalkRow src="pi_email" tgt={'ContactDetails.Contact_Value\u00A0(Contact_Type=Email)'} note="pivot to ContactDetails row" />
               <CrosswalkRow src="STATUS_CD = 'A'" tgt="Award.Award_Status = 'Active'" note="value lookup via AllowedValues" />
               <CrosswalkRow src="proj_start (MM/DD/YYYY)" tgt="Proposal.Proposed_Start_Date" note="parse to DATE" />
-              <CrosswalkRow src="FOA_NUM" tgt="RFA.RFA_Number" note="synonym match (column_synonyms sidecar)" />
+              <CrosswalkRow src="FOA_NUM" tgt="RFA.RFA_Number" note="synonym match (column synonyms)" />
             </tbody>
           </table>
         </div>
@@ -241,8 +241,8 @@ export default function InfrastructureTab() {
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
-          <LayerCard title="column_synonyms sidecar" color={colors.silver}
-            desc={'Top-level map in udm_schema.json keyed by TableName.Column_Name → comma-separated list of common alternative names (e.g., Personnel.Personnel_ID → "Person ID, Employee ID, Researcher ID, Faculty ID, User ID"). Matchers and LLMs use these to identify equivalent concepts without a hand-built dictionary.'} />
+          <LayerCard title="column synonyms" color={colors.silver}
+            desc={'The synonyms field on each column in udm_schema.json: a comma-separated list of common alternative names (e.g., Personnel.Personnel_ID → "Person ID, Employee ID, Researcher ID, Faculty ID, User ID"). Matchers and LLMs use these to identify equivalent concepts without a hand-built dictionary.'} />
           <LayerCard title="description" color={colors.silver}
             desc="Plain-language description on every table and column. Combined with the column name, gives LLM/ML matchers enough semantic context to disambiguate near-duplicates like Sponsor vs. Submitting vs. Administering Organization." />
         </div>
@@ -252,7 +252,7 @@ export default function InfrastructureTab() {
           background: '#eef2ff', border: '1px solid #c7d2fe', color: '#3730a3', fontSize: '0.9rem',
         }}>
           <strong>In progress:</strong> AI-assisted / dynamic crosswalk generation — using the{' '}
-          <code>column_synonyms</code> and <code>description</code> fields plus table context to auto-propose
+          <code>synonyms</code> and <code>description</code> fields plus table context to auto-propose
           mappings from a source schema to UDM columns, with confidence scores and human review. See{' '}
           <a href="https://github.com/ui-insight/AI4RA-UDM/issues/33" style={{ color: '#4f46e5' }}>
             issue #33
@@ -571,7 +571,7 @@ export default function InfrastructureTab() {
         </h3>
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
           For institutions that want a simpler approach, the UDM can be implemented directly as database tables.
-          Use <code>udm_schema.json</code> to generate CREATE TABLE statements for your platform
+          Run <code>scripts/generate_ddl.py --dialect &lt;engine&gt;</code> to generate CREATE TABLE statements for your platform, or map the abstract types yourself
           (MySQL, PostgreSQL, SQLite, SQL Server) and load data via ETL.
         </p>
         <div style={{ background: '#f8f9fa', borderRadius: 8, height: 200 }}>

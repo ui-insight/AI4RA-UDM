@@ -1,47 +1,81 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ui-insight.github.io/AI4RA-UDM/schemas/udm_schema.metaschema.json",
-  "title": "UDM v2 schema artifact metaschema",
-  "description": "Structural contract for udm_schema.json. Referential rules (foreign keys resolve, domain membership covers the table set, primary-key naming) are enforced by scripts/validate_schema.py and cannot be expressed in JSON Schema.",
+  "title": "UDM schema artifact metaschema",
+  "description": "Structural contract for udm_schema.json. Everything specified is a module; a rule lives on the thing it governs: constraints on their table, derivation rules and synonyms on their column, module conventions and example views on their module. Referential rules (foreign keys resolve, primary-key naming, the module laws) are enforced by scripts/validate_schema.py and cannot be expressed in JSON Schema.",
   "type": "object",
-  "required": [
-    "metadata",
-    "architecture",
-    "column_synonyms",
-    "scope",
-    "core_module_membership",
-    "universal_patterns",
-    "audit_columns",
-    "status_taxonomies",
-    "semantic_conventions",
-    "polymorphic_attachment_enforcement",
-    "derived_values",
-    "constraint_vocabulary",
-    "cross_row_constraints",
-    "tables",
-    "local_extensions",
-    "example_views",
-    "summary",
-    "implementation_tables",
-    "optional_modules"
-  ],
+  "required": ["metadata", "types", "conventions", "modules", "implementation_tables"],
   "properties": {
     "metadata": {
       "type": "object",
-      "required": ["name", "version", "released", "dialect"],
+      "required": ["name", "version", "released"],
       "properties": {
         "name": { "type": "string" },
         "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
         "released": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
-        "dialect": { "type": "string" }
+        "description": { "type": "string" },
+        "spec_source": { "type": "string" },
+        "changelog": { "type": "string" }
       }
     },
-    "core_module_membership": {
+    "types": {
       "type": "object",
-      "additionalProperties": {
-        "type": "array",
-        "items": { "type": "string" },
-        "minItems": 1
+      "required": ["abstract", "dialects"],
+      "properties": {
+        "abstract": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "description": { "type": "string" },
+        "dialects": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          }
+        }
+      }
+    },
+    "conventions": {
+      "type": "object",
+      "required": [
+        "identifier", "hierarchy", "role_named_foreign_keys", "polymorphic_attachment",
+        "lifecycle_stage", "two_fk_exclusive_or", "allowed_values", "boolean_naming",
+        "audit_columns", "audit_authority", "is_active_vs_status", "constraint_vocabulary",
+        "value_normalization", "lifecycle_closure", "semantic"
+      ],
+      "properties": {
+        "audit_columns": {
+          "type": "object",
+          "required": ["description", "columns"],
+          "properties": {
+            "description": { "type": "string" },
+            "columns": { "type": "object", "additionalProperties": { "$ref": "#/$defs/column" } }
+          }
+        },
+        "semantic": { "type": "array", "items": { "$ref": "#/$defs/convention" } }
+      }
+    },
+    "modules": {
+      "type": "object",
+      "required": ["description", "laws", "core", "optional"],
+      "properties": {
+        "description": { "type": "string" },
+        "laws": {
+          "type": "object",
+          "required": ["capability_criterion", "encapsulation_rule"],
+          "properties": {
+            "capability_criterion": { "type": "string" },
+            "encapsulation_rule": { "type": "string" }
+          }
+        },
+        "core": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "$ref": "#/$defs/core_module" }
+        },
+        "optional": {
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/optional_module" }
+        }
       }
     },
     "implementation_tables": {
@@ -49,86 +83,51 @@
       "required": ["description", "tables"],
       "properties": {
         "description": { "type": "string" },
-        "tables": { "type": "array", "items": { "type": "string" } }
-      }
-    },
-    "tables": {
-      "type": "object",
-      "minProperties": 1,
-      "additionalProperties": { "$ref": "#/$defs/table" }
-    },
-    "cross_row_constraints": { "type": "array" },
-    "local_extensions": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["name", "description"],
-        "properties": {
-          "name": { "type": "string" },
-          "description": { "type": "string" }
-        }
-      }
-    },
-    "summary": { "type": "array", "items": { "type": "string" } },
-    "optional_modules": {
-      "type": "object",
-      "required": ["description", "modules"],
-      "properties": {
-        "description": { "type": "string" },
-        "modules": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "required": ["name", "story", "requires", "records_targets", "allowed_value_groups", "tables"],
-            "properties": {
-              "name": { "type": "string" },
-              "story": { "type": "string" },
-              "requires": {
-                "type": "object",
-                "required": ["core", "modules"],
-                "properties": {
-                  "core": { "type": "string" },
-                  "modules": { "type": "array", "items": { "type": "string" } }
-                }
-              },
-              "records_targets": { "type": "array", "items": { "type": "string" } },
-              "allowed_value_groups": { "type": "array", "items": { "type": "string" } },
-              "notes": { "type": "string" },
-              "tables": {
-                "type": "object",
-                "minProperties": 1,
-                "additionalProperties": {
-                  "type": "object",
-                  "required": ["description", "columns"],
-                  "properties": {
-                    "description": { "type": "string" },
-                    "columns": {
-                      "type": "object",
-                      "minProperties": 1,
-                      "additionalProperties": { "$ref": "#/$defs/column" }
-                    }
-                  }
-                }
-              },
-              "cross_row_constraints": { "type": "array" }
-            }
-          }
-        }
+        "tables": { "type": "object", "minProperties": 1, "additionalProperties": { "$ref": "#/$defs/table" } }
       }
     }
   },
   "$defs": {
+    "core_module": {
+      "type": "object",
+      "required": ["name", "story", "tables"],
+      "properties": {
+        "name": { "type": "string" },
+        "story": { "type": "string" },
+        "tables": { "type": "object", "minProperties": 1, "additionalProperties": { "$ref": "#/$defs/table" } },
+        "conventions": { "type": "array", "items": { "$ref": "#/$defs/convention" } },
+        "example_views": { "type": "array", "items": { "$ref": "#/$defs/view" } }
+      }
+    },
+    "optional_module": {
+      "type": "object",
+      "required": ["name", "story", "requires", "records_targets", "allowed_value_groups", "tables"],
+      "properties": {
+        "name": { "type": "string" },
+        "story": { "type": "string" },
+        "requires": {
+          "type": "object",
+          "required": ["core", "modules"],
+          "properties": {
+            "core": { "type": "string" },
+            "modules": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "records_targets": { "type": "array", "items": { "type": "string" } },
+        "allowed_value_groups": { "type": "array", "items": { "type": "string" } },
+        "notes": { "type": "string" },
+        "tables": { "type": "object", "minProperties": 1, "additionalProperties": { "$ref": "#/$defs/table" } },
+        "conventions": { "type": "array", "items": { "$ref": "#/$defs/convention" } },
+        "example_views": { "type": "array", "items": { "$ref": "#/$defs/view" } }
+      }
+    },
     "table": {
       "type": "object",
-      "required": ["core_module", "description", "columns"],
+      "required": ["description", "columns"],
       "properties": {
-        "core_module": { "type": "string" },
         "description": { "type": "string" },
-        "columns": {
-          "type": "object",
-          "minProperties": 1,
-          "additionalProperties": { "$ref": "#/$defs/column" }
-        },
+        "columns": { "type": "object", "minProperties": 1, "additionalProperties": { "$ref": "#/$defs/column" } },
+        "constraints": { "type": "array", "items": { "$ref": "#/$defs/constraint" } },
         "notes": {}
       }
     },
@@ -141,6 +140,11 @@
         "primary_key": { "type": "boolean" },
         "description": { "type": "string" },
         "pii": { "type": "boolean" },
+        "synonyms": { "type": "string" },
+        "value_group": { "type": "string" },
+        "recommended_values": { "type": "array", "items": { "type": "string" } },
+        "allowed_values": { "type": "array", "items": { "type": "string" } },
+        "conditional_required": { "type": "string" },
         "references": {
           "type": "object",
           "required": ["table", "column"],
@@ -148,7 +152,38 @@
             "table": { "type": "string" },
             "column": { "type": "string" }
           }
+        },
+        "derived": {
+          "type": "object",
+          "required": ["rule", "recompute_triggers"],
+          "properties": {
+            "rule": { "type": "string" },
+            "recompute_triggers": { "type": "string" }
+          }
         }
+      }
+    },
+    "constraint": {
+      "type": "object",
+      "required": ["rule"],
+      "properties": {
+        "rule": { "type": "string" },
+        "structured": { "type": "object" }
+      }
+    },
+    "convention": {
+      "type": "object",
+      "required": ["name"],
+      "properties": { "name": { "type": "string" } }
+    },
+    "view": {
+      "type": "object",
+      "required": ["name", "purpose", "sql"],
+      "properties": {
+        "name": { "type": "string" },
+        "purpose": { "type": "string" },
+        "dialect": { "type": "string" },
+        "sql": { "type": "string" }
       }
     }
   }

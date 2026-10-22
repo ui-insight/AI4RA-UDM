@@ -8,8 +8,11 @@ Compares vignettes/udm-v2-system-of-record.md against udm_schema.json:
 2. Column sets match per table: the first markdown column table in each
    prose section lists the same column names as the JSON entry.
 
-Universal audit columns are excluded from the comparison on both sides
-(the prose documents them once, centrally). Dependency-free.
+Core tables are the tables of every core module plus the implementation
+tables; each optional module is compared against its own vignette under
+vignettes/modules/. Universal audit columns are excluded from the
+comparison on both sides (the prose documents them once, centrally).
+Dependency-free.
 
 Exit status: 0 = in sync, 1 = drift found.
 """
@@ -32,6 +35,15 @@ AUDIT_COLUMNS = {
     "Source_Record_ID",
     "Is_Active",
 }
+
+
+def core_tables(schema):
+    """Every core module's tables plus the implementation tables."""
+    out = {}
+    for mod in schema["modules"]["core"].values():
+        out.update(mod["tables"])
+    out.update(schema["implementation_tables"]["tables"])
+    return out
 
 
 def parse_prose(text, table_names):
@@ -96,11 +108,12 @@ def main():
     schema = json.loads(SCHEMA_PATH.read_text())
     drift = []
 
-    matched = compare(schema["tables"], PROSE_PATH.read_text(), "core", drift)
-    total = len(schema["tables"])
+    core = core_tables(schema)
+    matched = compare(core, PROSE_PATH.read_text(), "core", drift)
+    total = len(core)
 
     modules_dir = ROOT / "vignettes" / "modules"
-    for mkey, mod in schema.get("optional_modules", {}).get("modules", {}).items():
+    for mkey, mod in schema["modules"]["optional"].items():
         mpath = modules_dir / (mkey.replace("_", "-") + ".md")
         if not mpath.exists():
             drift.append(f"[{mkey}] module vignette missing: {mpath.name}")

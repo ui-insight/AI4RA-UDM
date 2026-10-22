@@ -5,7 +5,7 @@
 **Records targets declared:** none
 **AllowedValues groups declared:** HumanSubjectsInterventionType
 
-This module is governed by the module taxonomy's two laws (capability criterion, encapsulation rule); see the Architecture section of the core specification. Canonical machine-readable definition: `optional_modules.human_subjects` in `udm_schema.json`. Module tables carry the universal audit columns; they are omitted below as in the core spec.
+This module is governed by the module taxonomy's two laws (capability criterion, encapsulation rule); see the Architecture section of the core specification. Canonical machine-readable definition: `modules.optional.human_subjects` in `udm_schema.json`. Module tables carry the universal audit columns; they are omitted below as in the core spec.
 
 Per-regime detail for `Regime = 'Human_Subjects'`: study populations with vulnerable-population flags, interventions, and consent approaches. All rows hang flat off Protocol_ID.
 

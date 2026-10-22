@@ -220,7 +220,7 @@ export default function OntologyTab() {
           </table>
         </div>
         <p style={{ color: '#94a3b8', fontSize: '0.82rem', marginBottom: '1rem' }}>
-          Full module specifications live in vignettes/modules/ and under the optional_modules key of
+          Full module specifications live in vignettes/modules/ and under modules.optional in
           the schema JSON. Planned: IP (requires the Outputs core module).
         </p>
         <h3 style={{ color: '#2c3e50', margin: '1.5rem 0 0.75rem' }}>The module laws</h3>
@@ -325,7 +325,7 @@ export default function OntologyTab() {
           <PatternCard title="Lifecycle_Stage Discriminator">
             <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
               One table carries multiple lifecycle stages distinguished by a <code>Lifecycle_Stage</code> column.
-              Revisions chain through <code>Parent_*_ID</code>; chains are immutable and never branch.
+              Revisions chain through <code>Previous_*_ID</code>; chains are immutable and never branch.
             </p>
             <p style={{ color: '#546e7a', fontSize: '0.9rem' }}>
               <strong>Used by:</strong> Budget (Proposed/Approved/Current/Actual),

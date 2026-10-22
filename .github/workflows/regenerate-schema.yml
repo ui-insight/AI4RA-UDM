@@ -56,6 +56,16 @@ jobs:
       - name: Generate dashboard data files from udm_schema.json
         run: python scripts/generate_dashboard_data.py
 
+      - name: Generate DDL and seed rows for every mapped dialect
+        run: |
+          mkdir -p docs/ddl
+          for d in $(python scripts/generate_ddl.py --list-dialects); do
+            python scripts/generate_ddl.py --dialect "$d" > "docs/ddl/udm.$d.sql"
+            python scripts/generate_ddl.py --dialect "$d" --all-modules > "docs/ddl/udm.$d.all-modules.sql"
+            python scripts/generate_seed.py --dialect "$d" > "docs/ddl/udm.$d.seed.sql"
+            python scripts/generate_seed.py --dialect "$d" --all-modules > "docs/ddl/udm.$d.all-modules.seed.sql"
+          done
+
       - name: Install dashboard dependencies
         run: cd dashboard && npm ci
 

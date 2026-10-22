@@ -65,9 +65,9 @@ A declaration names a UDM version and is checked against the schema file of the 
 
 Some rules cannot be read from a declaration. Setting `rules_attested` to `true` is the declarer's statement that they hold:
 
-- the cross-row constraints (`cross_row_constraints` in the schema file);
-- derived values are correct at the moment a consumer reads them (`derived_values`);
-- for implementations, the minimum conformance behavior for polymorphic attachments (`polymorphic_attachment_enforcement`).
+- the constraints listed on each table (`constraints` in the schema file);
+- derived values are correct at the moment a consumer reads them (the `derived` rule on a column);
+- for implementations, the minimum conformance behavior for polymorphic attachments (`conventions.polymorphic_attachment.enforcement`).
 
 The checker requires the attestation and does not verify it. A template starts with `rules_attested` set to `false`, so it does not pass until the declarer sets it.
 

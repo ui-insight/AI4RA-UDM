@@ -21,9 +21,10 @@ Checks, for every specified table the declaration carries:
    table carried without declaring its module, Related_Entity_Type lists
    extended only through declared Records targets.
 
-Rules a declaration cannot show (cross-row constraints, derived values,
-minimum conformance behavior for polymorphic attachments) are attested by
-the declarer through `rules_attested`; they are not verified here.
+Rules a declaration cannot show (the constraints on each table, the
+derivation rules on columns, the minimum conformance behavior under
+conventions.polymorphic_attachment.enforcement) are attested by the
+declarer through `rules_attested`; they are not verified here.
 
 Usage:
   check_conformance.py DECLARATION.json [--schema PATH]
@@ -55,9 +56,9 @@ TYPE_FAMILIES = {
     "timestamp": ("TIMESTAMP", "DATETIME", "DATETIME2", "DATETIMEOFFSET", "TIMESTAMPTZ",
                   "TIMESTAMP_NTZ", "TIMESTAMP_LTZ", "TIMESTAMP_TZ"),
     "date": ("DATE",),
-    "decimal": ("MONEY", "PERCENT", "DECIMAL", "NUMERIC", "NUMBER"),
+    "decimal": ("MONEY", "PERCENT", "QUANTITY", "DECIMAL", "NUMERIC", "NUMBER"),
     "integer": ("COUNT", "LARGECOUNT", "INT", "INTEGER", "BIGINT", "SMALLINT", "TINYINT"),
-    "string": ("SHORTCODE", "SHORTNAME", "MEDIUMNAME", "URL", "LONGTEXT", "STATUS", "HASH",
+    "string": ("SHORTCODE", "SHORTNAME", "MEDIUMNAME", "LONGNAME", "URL", "LONGTEXT", "STATUS", "HASH",
                "VARCHAR", "NVARCHAR", "VARCHAR2", "NVARCHAR2", "CHAR", "NCHAR", "TEXT",
                "STRING", "CLOB", "NCLOB", "MEDIUMTEXT"),
 }
@@ -105,10 +106,19 @@ def reference_pair(cdef):
     return None
 
 
+def optional_modules(schema):
+    return schema["modules"]["optional"]
+
+
 def specified_tables(schema, modules):
     """Tables a declaration is checked against: core, implementation, declared modules."""
-    out = {tname: (tdef, "core") for tname, tdef in schema["tables"].items()}
-    om = schema.get("optional_modules", {}).get("modules", {})
+    out = {}
+    for mkey, mod in schema["modules"]["core"].items():
+        for tname, tdef in mod["tables"].items():
+            out[tname] = (tdef, f"core {mkey}")
+    for tname, tdef in schema["implementation_tables"]["tables"].items():
+        out[tname] = (tdef, "implementation")
+    om = optional_modules(schema)
     for mkey in modules:
         for tname, tdef in om.get(mkey, {}).get("tables", {}).items():
             out[tname] = (tdef, f"module {mkey}")
@@ -224,7 +234,7 @@ def check(decl, schema):
         err(f"declaration targets UDM {info.get('udm_version')}; checked against {spec_version}")
 
     # --- Modules: existence, dependencies, minimum core version ---
-    om = schema.get("optional_modules", {}).get("modules", {})
+    om = optional_modules(schema)
     modules = info.get("modules", [])
     if not isinstance(modules, list):
         err("modules must be a list")
@@ -245,7 +255,7 @@ def check(decl, schema):
 
     module_owner = {t: mkey for mkey, mod in om.items() for t in mod.get("tables", {})}
     records_targets = {t for mkey in modules for t in om[mkey].get("records_targets", [])}
-    audit = schema["audit_columns"]["columns"]
+    audit = schema["conventions"]["audit_columns"]["columns"]
     spec = specified_tables(schema, modules)
 
     # --- Tables ---
@@ -299,7 +309,7 @@ def check(decl, schema):
 
 def template(schema, profile, modules, table_names):
     """A declaration that mirrors the specification, for the declarer to edit."""
-    audit = schema["audit_columns"]["columns"]
+    audit = schema["conventions"]["audit_columns"]["columns"]
     spec = specified_tables(schema, modules)
     names = table_names if profile == "provider" else list(spec)
     tables = {}
@@ -328,7 +338,7 @@ def template(schema, profile, modules, table_names):
 
 def self_check(schema):
     """The specification must conform to itself under both profiles."""
-    all_modules = list(schema.get("optional_modules", {}).get("modules", {}))
+    all_modules = list(optional_modules(schema))
     cases = [
         ("implementation, core only", "implementation", [], None),
         ("implementation, all modules", "implementation", all_modules, None),
