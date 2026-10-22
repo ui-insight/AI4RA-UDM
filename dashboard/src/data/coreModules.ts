@@ -1,4 +1,4 @@
-// Canonical core-module assignments for each UDM v2 table.
+// Canonical core-module assignments for each UDM table.
 // Source of truth: modules.core in udm_schema.json (each core module lists its tables).
 
 export interface CoreModuleGroup {

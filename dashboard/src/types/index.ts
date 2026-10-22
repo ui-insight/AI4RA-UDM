@@ -13,6 +13,8 @@ export interface Table {
 }
 
 export interface DataDictionary {
+  version: string;
+  released: string;
   tables: Record<string, Table>;
   table_count: number;
 }

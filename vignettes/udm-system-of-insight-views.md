@@ -2,14 +2,14 @@
 
 The System of Insight is the layer of derived data built on top of the UDM System of Record. Findings, dashboards, reports, computed aggregates, and any other projection of UDM data live here, materialized as views in the query engine rather than as physical tables in UDM.
 
-This document shows sample views to illustrate what the Insight layer looks like in practice. The views are not part of the UDM specification; they are reference examples. Adopters write their own views to serve their specific reporting, review-engine, and dashboard needs, conforming to the patterns documented in `vignettes/udm-v2-patterns.md` where relevant (e.g., the "Automated finding shape" pattern for review-engine views).
+This document shows sample views to illustrate what the Insight layer looks like in practice. The views are not part of the UDM specification; they are reference examples. Adopters write their own views to serve their specific reporting, review-engine, and dashboard needs, conforming to the patterns documented in `vignettes/udm-patterns.md` where relevant (e.g., the "Automated finding shape" pattern for review-engine views).
 
 ---
 
 ## Conventions for examples
 
 - Examples are written in SQL-flavored pseudocode portable to any query engine supporting SQL (Trino, Postgres, DuckDB, etc.). The UDM specification itself is engine-agnostic; the choice of SQL syntax here is illustrative.
-- Table and column names follow the UDM v2 convention (PascalCase with underscores).
+- Table and column names follow the UDM convention (PascalCase with underscores).
 - Views are named with a `v_` prefix to distinguish them from UDM source tables.
 - Time-travel syntax assumes the storage layer supports it (`FOR VERSION AS OF`, `FOR TIMESTAMP AS OF`, or equivalent). Engines without time-travel can implement the same views against current state only.
 
@@ -145,7 +145,7 @@ Consumed by: personnel review workspace in the front-end, OSP pre-award screenin
 
 ## Sample 4: Award current state (canonical derivation)
 
-**Purpose:** Project the current funded amount and current end date for each Award from the cumulative Modification chain. UDM v2 already exposes `Award.Current_Total_Funded` and `Award.Current_End_Date` as derived columns; this view shows the engine logic that maintains them and serves as the source of truth when those columns are not yet populated or when verifying their consistency.
+**Purpose:** Project the current funded amount and current end date for each Award from the cumulative Modification chain. The UDM already exposes `Award.Current_Total_Funded` and `Award.Current_End_Date` as derived columns; this view shows the engine logic that maintains them and serves as the source of truth when those columns are not yet populated or when verifying their consistency.
 
 ```sql
 CREATE VIEW v_award_current_state AS
@@ -373,4 +373,4 @@ A "block setup transition" workflow reads this view: `SELECT 1 FROM v_proposal_r
 - These views are illustrative. Adopters write the views their specific reporting and engine needs require, conforming to the patterns where applicable.
 - Materialized views (where the engine supports them) are acceptable when query latency requires it; the source-of-truth still lives in UDM and the materialized view is refreshed.
 - Engine logic in view definitions can be version-controlled and reviewed like any code artifact. This is the recommended location for review-engine logic; do not persist findings as physical tables.
-- Some views combine UDM source tables with patterns documented in `vignettes/udm-v2-patterns.md` (notably the automated-finding view in Sample 3). Aligning view output to the documented shapes makes the view's output portable across consumers.
+- Some views combine UDM source tables with patterns documented in `vignettes/udm-patterns.md` (notably the automated-finding view in Sample 3). Aligning view output to the documented shapes makes the view's output portable across consumers.

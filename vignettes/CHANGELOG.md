@@ -9,7 +9,13 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 
 ## [Unreleased]
 
-### Sponsored project lifecycle (3.0, breaking)
+Nothing yet.
+
+## [3.0.0] - 2026-10-22
+
+The sponsored-project lifecycle release. Breaking: `AwardRole` becomes `TeamRole` anchored on the proposal, `ProposalApproval` becomes the polymorphic `Approval`, and `Proposal_Status` splits into three stages. Adds `SubmissionAttempt`, per-value definitions on every closed vocabulary, abstract column types with per-engine mappings, the DDL and seed generators, and the reorganized schema file. Core: 46 tables plus 2 implementation tables; 6 optional modules, 24 tables. Implements issues #87, #88, #89.
+
+### Sponsored project lifecycle (breaking)
 
 - **A proposal has three status stages.** `Internal_Approval_Status` (Draft, In_Review, Returned, Approved, Rejected), the new derived `Submission_Status` (Unapproved, Unsent, then the newest attempt's status), and `Decision_Status` (Unsubmitted, Pending, Intent_to_Award, Awarded, Declined). Each stage's floor names the gate it waits on. `Decision_Status` loses Submitted, Under_Review, and Withdrawn, which were submission states; `Internal_Approval_Status` loses Withdrawn and gains Returned. Migration: Submitted and Under_Review become Pending with the corresponding attempt; a withdrawn proposal becomes Unsubmitted with a Withdrawn attempt.
 - **`SubmissionAttempt`** (Funding Cycle) records each transmission of a proposal: attempt number, channel, who sent it, when, the sponsor's reported status, tracking identifier, acknowledgement, and the package hash. It supersedes the "Sponsor submission events" convention; `Sponsor_Submission` leaves the ActionType values. Migration: each such Action row becomes one attempt (Completed → Submitted, Failed → Failed, `Completed_Date` → `Submitted_At`, `Outcome_Description` → `Tracking_Identifier` or `Notes`).
@@ -17,20 +23,20 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 - **The optional modules' 24 closed vocabularies are allowed values, not description text.** Their lists lived only in "Constrained: ..." sentences, so the conformance checker treated them as open and no DDL CHECK was emitted. They now carry `allowed_values` and `value_definitions` like the core.
 - `Proposal.Submission_Version` and `Submission_Date` are derived from the attempts. A `PreAwardAuthorization` requires the Proposal's `Decision_Status` to be Pending or Intent_to_Award. Documents and Communications attach to a SubmissionAttempt. `SubmissionChannel` is a canonical value group.
 
-### Roles (3.0, breaking)
+### Roles (breaking)
 
 - **`AwardRole` becomes `TeamRole`, anchored on the proposal.** `Proposal_ID` is required and stable; `Award_ID` or `Subaward_ID` is set once funded, both null at the proposal stage. On award creation the proposal-stage rows are copied as award-stage rows that point back through `Previous_TeamRole_ID`. The UDM could not say who was on an unfunded proposal, and the Effort `Proposed` stage was unreachable; both are fixed. Migration: every `AwardRole` row becomes a `TeamRole` row with `Proposal_ID` taken from its agreement's `Proposal_ID`; the `AwardRole` value group becomes `TeamRole`; `Effort.AwardRole_ID` becomes `Effort.TeamRole_ID`.
 - **Staff assignments live on `OrganizationRole`**, which gains a `Proposal_ID` scope and the recommended roles `Sponsored_Programs_Administrator`, `Award_Administrator`, `Administrative_Contact`. Which person at the office is responsible for a record is a role at that office scoped to the record.
 - **Standing authority is a credential.** `PersonnelCredential.Credential_Type` gains `Authorized_Organizational_Representative`, `Signatory_Delegate`, `Empowered_Official`. `ProposalApproval.Approval_Role` gains `Authorized_Organizational_Representative`: the sign-off that binds the institution is the AOR's act, and being central pre-award staff does not make someone an AOR.
 
-### Approval chain (3.0, breaking)
+### Approval chain (breaking)
 
 - **`ProposalApproval` is retired and replaced by `Approval`, a polymorphic Records table** attached to Proposal, Modification, Subaward, PreAwardAuthorization, Closeout, or Report. Each step carries what is decided (`Step_Type_Value_ID`, new group `ApprovalStepType`), who decides (`Approval_Role`), the reviewing unit, a topic for supplementary reviews (new group `ReviewTopic`), a block order, a round, the assigned and acting persons, a delegate for release to submit, a status that includes `Voided`, the signed package hash, and the action date. Blocks run in parallel, returns rerun steps in a new round, and a sign-off is voided when the package it approved changes. The core had two approval-step shapes and a worked example that contradicted its own closed list; it now has one.
 - `Proposal.Internal_Approval_Status` is derived from the Approval rows of the current round. Internal routing of a Modification is Approval rows; `Modification.Approval_Status` stays the sponsor's decision.
 - Migration: every `ProposalApproval` row becomes one `Approval` row with `Related_Entity_Type = Proposal`, `Approval_Round = 1`, `Approval_Role` unchanged, and `Step_Type` from the role: PI → PI_Certification; Co_Investigator → Co_PI_Certification; Department_Chair and Center_Director → Department_Review; College_Dean → College_Review; Compliance_Office → Compliance_Review; OSP_Pre_Award → Pre_Award_Review; Authorized_Organizational_Representative → Final_Sign_off; VPR and Other → Supplementary_Review. `Related_Entity_Type` values `ProposalApproval` on Document, Deadline, and Action become `Approval`.
 - `ProtocolReviewStep` stays in the compliance module for this release; a core release cannot change a module table. A later module release can retire it by declaring its parents as Records targets.
 
-### Award statuses and enumerations (3.0)
+### Award statuses and enumerations
 
 - **`Award_Status` gains `Terminating`**, parallel to `Closing`: a termination notice received and being processed, before `Terminated`.
 - **`Priority` on Award and Modification** (`Low` / `Medium` / `High` / `Critical`, default `Medium`): someone records a rush, and turnaround reporting needs it.
@@ -38,6 +44,7 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 
 ### Changed
 
+- **The vignettes drop the `v2` from their names and titles.** `udm-v2-system-of-record.md` is `udm-system-of-record.md`, and likewise for architecture, conformance, patterns, procurement language, system of engagement, and system of insight views. `metadata.spec_source` and `metadata.conformance` point at the new names. The dashboard shows the version from the schema metadata instead of a hard-coded one.
 - **The DDL and seed generators enforce module dependencies.** Declaring a module without one it requires (for example `animal_research` without `compliance_protocols`) stops with an error naming the missing module. The DDL generator used to emit the tables with a comment where the cross-module foreign key should have been.
 - **Seven polymorphic Records tables again.** Approval attaches polymorphically, and the prose section introducing the Records tables and the summary list now say so; the README example of `Award_Status` lists the current values; the conformance specification describes the declaration's flat `tables` key by where a table sits in the schema file.
 - **The schema file is reorganized.** Everything specified is a module, and a rule lives on the thing it governs. Five top-level keys replace twenty-five: `metadata`, `types` (the abstract vocabulary and one mapping per engine), `conventions`, `modules` (`core` and `optional`, every module the same shape: name, story, tables, conventions, example views), and `implementation_tables`. Constraints sit on their table, derivation rules and synonyms on their column, status vocabularies only on the column that carries them. The narrative blocks (scope, architecture prose, summary, local-extension guidance) leave the JSON; the prose specification is authoritative on intent and already carries them. The file is written in canonical machine layout. No table, column, constraint, rule, synonym, convention, or view is added, removed, or changed in meaning. Consumers of the old layout must update their paths; the validator, the sync checker, the conformance checker, the data generator, and the metaschema are updated.
@@ -85,7 +92,7 @@ Five fixes from a cold read of the schema file, each at the cause. No table is r
 - **`AllowedValues.Parent_AllowedValue_ID`** (new, self-referencing) carries two-level vocabularies. `CommunicationResponse.Response_Value_Value_ID` now references a `CommunicationResponseValue` row whose parent is the `CommunicationResponseType` row it answers. The type-to-value-set mapping was previously left to the host system with no specification.
 - **Canonical value groups** gain `CommunicationResponseType` and `CommunicationResponseValue`.
 
-## [2.3.0] — 2026-08-28
+## [2.3.0] - 2026-08-28
 
 The optional-modules debut: the first release where the module taxonomy is exercised. The core is unchanged at 47 tables; six optional modules specify 24 additional tables, adopted by declaration. Implements roadmap issues #60, #69, #70.
 
@@ -104,7 +111,7 @@ The optional-modules debut: the first release where the module taxonomy is exerc
 
 An implementation declares its modules, e.g. "UDM 2.3 core + modules: compliance_protocols, human_subjects, governance." An IRB-only institution never carries an animal-use table.
 
-## [2.2.0] — 2026-08-28
+## [2.2.0] - 2026-08-28
 
 Taxonomy release. No tables added or removed; the model's organizing structure and vocabulary are unified. Machine-readable and human-readable lingo now match exactly.
 
@@ -125,7 +132,7 @@ Everything specified is a **module**: a named, fully specified, versioned slice 
 
 Optional modules (Compliance Protocols spine + Animal Research / Human Subjects / Biosafety regime modules, Governance, IP) target v2.3; the Outputs core module targets v2.4.
 
-## [2.1.0] — 2026-08-26
+## [2.1.0] - 2026-08-26
 
 Cleanup release: the model sheds infrastructure entities that belong to other architectural layers and gains two small, broadly useful entities. 49 → 47 tables. Implements roadmap issues #66, #67, #68, #61, #65, #63, #64.
 
@@ -151,7 +158,7 @@ Cleanup release: the model sheds infrastructure entities that belong to other ar
 - Audit-authority guidance simplified to two mechanisms (Updated_At, versioned storage).
 - Cross-row constraints for the new entities; 71 constraints total.
 
-## [2.0.1] — 2026-08-26
+## [2.0.1] - 2026-08-26
 
 Documentation and hygiene release. No structural changes to tables, columns, or constraints.
 
@@ -168,11 +175,11 @@ Documentation and hygiene release. No structural changes to tables, columns, or 
 - `Unfunded agreements` entry in the optional-extensions registry (MTA, DUA, NDA, teaming agreements, MOUs).
 - Validation tooling: a formal metaschema for the JSON artifact (`schemas/udm_schema.metaschema.json`), a structural and referential validator (`scripts/validate_schema.py`), and a prose/JSON sync checker (`scripts/check_spec_sync.py`), all wired into CI.
 
-## [2.0.0] — 2026-06-11
+## [2.0.0] - 2026-06-11
 
 UDM v2 is a major refactor of the model. It supersedes UDM v1.
 
-The JSON serialization lives at the repository root as [udm_schema.json](../udm_schema.json). (The v1 file carried that name beside `udm_schema_v2.json` until 2026-10-21, when the current schema took the name; v1 is read from the v2.0.0 release.) The canonical prose specification lives in [udm-v2-system-of-record.md](udm-v2-system-of-record.md); the architectural overview is in [ontology.md](ontology.md).
+The JSON serialization lives at the repository root as [udm_schema.json](../udm_schema.json). (The v1 file carried that name beside `udm_schema_v2.json` until 2026-10-21, when the current schema took the name; v1 is read from the v2.0.0 release.) The canonical prose specification lives in [udm-system-of-record.md](udm-system-of-record.md); the architectural overview is in [ontology.md](ontology.md).
 
 ### Architectural changes
 
@@ -245,7 +252,7 @@ Moved to Optional Extensions:
 
 ### Documentation deliverables
 
-- [vignettes/udm-v2-system-of-record.md](udm-v2-system-of-record.md) — canonical prose specification.
+- [vignettes/udm-system-of-record.md](udm-system-of-record.md) — canonical prose specification.
 - [udm_schema.json](../udm_schema.json) — MySQL/MariaDB serialization at the repository root with structured constraints, derived values, 12 example views, ~200-entry column synonyms sidecar.
 - [vignettes/ontology.md](ontology.md) — architectural overview describing v2.
 

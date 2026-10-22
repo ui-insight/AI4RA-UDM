@@ -1,6 +1,6 @@
-# UDM v2 Schema Specification
+# UDM Schema Specification
 
-**Version:** 2.3.0. See [CHANGELOG.md](CHANGELOG.md) for the full version history. The companion JSON serialization lives at the repository root as [udm_schema.json](../udm_schema.json); its `metadata.version` is the version of record.
+**Version:** 3.0.0. See [CHANGELOG.md](CHANGELOG.md) for the full version history. The companion JSON serialization lives at the repository root as [udm_schema.json](../udm_schema.json); its `metadata.version` is the version of record.
 
 ## Goal
 
@@ -180,7 +180,7 @@ Two mechanisms touch the question "when did this change?" and each answers a dif
 - `Updated_At` marks the moment of the most recent write to the row. Single timestamp, overwritten on every update; preserves no history.
 - **Versioned storage** (Dolt, Trino on Apache Iceberg, temporal tables in Postgres / SQL Server) handles the raw-column-history layer when needed. Time-travel queries reconstruct any field's prior value at any past point in time without application instrumentation. The UDM assumes this layer for deployments that need full row history (see *Local extensions > Field-level audit / history tables*).
 
-So: `Updated_At` answers "is this row stale." Versioned storage answers "what did column X look like on date D, and which business events touched this row." Any history question deeper than the latest write resolves at the storage layer; the "Audit record shape" pattern (vignettes/udm-v2-patterns.md) documents the canonical projected shape.
+So: `Updated_At` answers "is this row stale." Versioned storage answers "what did column X look like on date D, and which business events touched this row." Any history question deeper than the latest write resolves at the storage layer; the "Audit record shape" pattern (vignettes/udm-patterns.md) documents the canonical projected shape.
 
 ### Is_Active vs status-field authority
 

@@ -2,7 +2,7 @@
 
 A universal data model for research administration. The UDM provides a common schema that any institution can adopt to standardize how research administration data is structured, described, and shared — regardless of what systems they use internally.
 
-**Current version: v2.3.0** (released 2026-08-28). Earlier versions are fixed commits under [GitHub Releases](https://github.com/ui-insight/AI4RA-UDM/releases); see [Versions](#versions).
+**Current version: v3.0.0** (released 2026-10-22). Earlier versions are fixed commits under [GitHub Releases](https://github.com/ui-insight/AI4RA-UDM/releases); see [Versions](#versions).
 
 ## Mission
 
@@ -19,14 +19,14 @@ The UDM is a **specification**, not a database. It defines what tables, columns,
 
 ### Sources of Truth
 
-The UDM v2 is defined in two complementary artifacts:
+The UDM is defined in two complementary artifacts:
 
-- [`vignettes/udm-v2-system-of-record.md`](vignettes/udm-v2-system-of-record.md) — the canonical prose specification: every entity, column, constraint, semantic convention, and design rationale, written database-engine agnostic.
+- [`vignettes/udm-system-of-record.md`](vignettes/udm-system-of-record.md) — the canonical prose specification: every entity, column, constraint, semantic convention, and design rationale, written database-engine agnostic.
 - [`udm_schema.json`](udm_schema.json) — the machine-readable serialization of the spec, in an engine-neutral type vocabulary: tables, columns, types, foreign keys, allowed values, PII flags, column synonyms, cross-row constraints, derived-value rules, and example views. Use this to generate DDL, build crosswalk tooling, or feed schema context to LLMs.
 
 The two are kept in exact sync; the prose spec is authoritative on intent, the JSON on machine-consumable detail. An architectural overview lives in [`vignettes/ontology.md`](vignettes/ontology.md), and the version history in [`vignettes/CHANGELOG.md`](vignettes/CHANGELOG.md).
 
-The UDM is a normalized model, in the Inmon tradition: the standard defines the integrated System of Record, and star schemas are derived from it by each adopter as views ([why](vignettes/udm-v2-architecture.md#16-a-normalized-core-is-the-standard-star-schemas-are-the-adopters-choice)). Modules extend the standard and are conformance-checked; marts are deployment specific and are not part of it.
+The UDM is a normalized model, in the Inmon tradition: the standard defines the integrated System of Record, and star schemas are derived from it by each adopter as views ([why](vignettes/udm-architecture.md#16-a-normalized-core-is-the-standard-star-schemas-are-the-adopters-choice)). Modules extend the standard and are conformance-checked; marts are deployment specific and are not part of it.
 
 ### Core Modules
 
@@ -62,7 +62,7 @@ For full ontology documentation, see [`vignettes/ontology.md`](vignettes/ontolog
 
 ### Design Patterns
 
-v2 rests on a small set of universal patterns applied consistently across the model:
+The UDM rests on a small set of universal patterns applied consistently across the model:
 
 - **Lifecycle_Stage discriminator** — one table carries a record through its whole life (Budget: Proposed → Approved → Current → Actual; likewise Effort, CostShare, Payment), with revisions chained through `Previous_*_ID`.
 - **Two-FK exclusive-or attachment** — satellite tables (Modification, Report, Transaction, Terms, Closeout, and others) attach to either an Award or a Subaward via two nullable FKs, keeping inbound and outbound funding symmetric.
@@ -71,7 +71,7 @@ v2 rests on a small set of universal patterns applied consistently across the mo
 - **Derived columns with recompute triggers** — convenience columns like `Award.Current_End_Date` are documented as derived, with the rules to recompute them.
 - **Audit and provenance columns** on every table (`Created_At`, `Updated_At`, `Source_System`, `Source_Record_ID`, `Is_Active`).
 
-For a detailed explanation of every table, pattern, and design decision, see the [prose specification](vignettes/udm-v2-system-of-record.md).
+For a detailed explanation of every table, pattern, and design decision, see the [prose specification](vignettes/udm-system-of-record.md).
 
 ### JSON Format
 
@@ -79,7 +79,7 @@ The `udm_schema.json` structure (abbreviated). Everything specified is a module,
 
 ```json
 {
-  "metadata": { "name": "UDM", "version": "2.3.0", "spec_source": "vignettes/udm-v2-system-of-record.md" },
+  "metadata": { "name": "UDM", "version": "3.0.0", "spec_source": "vignettes/udm-system-of-record.md" },
   "types": { "abstract": ["ID", "Money", "..."], "dialects": { "mysql": { "ID": "VARCHAR(50)", "Money": "DECIMAL(18,2)", "...": "..." }, "postgresql": { "...": "..." } } },
   "conventions": { "identifier": {}, "hierarchy": {}, "polymorphic_attachment": {}, "lifecycle_stage": {}, "audit_columns": {}, "constraint_vocabulary": {}, "semantic": [], "...": {} },
   "modules": {
@@ -116,14 +116,14 @@ The UDM is served as static JSON via GitHub Pages. These endpoints define the **
 
 | Endpoint | Description |
 |----------|-------------|
-| [`/data/udm_schema.json`](https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json) | **Complete v2 schema (current)** — tables, columns, types, constraints, descriptions, synonyms, PII flags, cross-row constraints, example views |
+| [`/data/udm_schema.json`](https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json) | **Complete schema (current)** — tables, columns, types, constraints, descriptions, synonyms, PII flags, cross-row constraints, example views |
 | [`/data/data-dictionary.json`](https://ui-insight.github.io/AI4RA-UDM/data/data-dictionary.json) | Human-readable descriptions, synonyms, and PII flags |
 | [`/data/relationships.json`](https://ui-insight.github.io/AI4RA-UDM/data/relationships.json) | Foreign key relationships |
 
 Most consumers only need the primary endpoint (`udm_schema.json`) — it contains everything.
 
 ```javascript
-// Fetch the full UDM v2 schema
+// Fetch the full UDM schema
 const response = await fetch('https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json');
 const udm = await response.json();
 
@@ -190,13 +190,13 @@ See the [Infrastructure tab](https://ui-insight.github.io/AI4RA-UDM/) of the das
 
 ### Conformance
 
-An implementation or a vendor product shows that it follows the UDM with a conformance declaration that passes [`scripts/check_conformance.py`](scripts/check_conformance.py). There are two profiles: **implementation**, for a System of Record carrying the core plus its declared modules, and **provider**, for a source system that delivers a subset of tables in UDM form. See [Conformance](vignettes/udm-v2-conformance.md) for the rules, and [Procurement Language](vignettes/udm-v2-procurement-language.md) for model contract clauses an institution can use to ask vendors for it.
+An implementation or a vendor product shows that it follows the UDM with a conformance declaration that passes [`scripts/check_conformance.py`](scripts/check_conformance.py). There are two profiles: **implementation**, for a System of Record carrying the core plus its declared modules, and **provider**, for a source system that delivers a subset of tables in UDM form. See [Conformance](vignettes/udm-conformance.md) for the rules, and [Procurement Language](vignettes/udm-procurement-language.md) for model contract clauses an institution can use to ask vendors for it.
 
 ## Versions
 
 The repository carries one version of the schema, the current one. Its version is in the `metadata` block of [`udm_schema.json`](udm_schema.json) and in the prose spec. Every release is a fixed commit published under [GitHub Releases](https://github.com/ui-insight/AI4RA-UDM/releases); an earlier version is read or cited from its release.
 
-v2 is a major refactor: 47 tables (from 40), six core modules (from ten domains), unified lifecycle modeling, Award/Subaward symmetry, and rule catalogs for cross-row constraints and semantic conventions. See the [CHANGELOG](vignettes/CHANGELOG.md) for the full delta and migration guidance from v1.
+The version follows semantic versioning: a major release may rename or remove tables and columns, a minor release only adds. See the [CHANGELOG](vignettes/CHANGELOG.md) for each release's delta and migration guidance.
 
 ## Roadmap: Core and Optional Modules
 
@@ -233,9 +233,9 @@ graph TD
 |---|---|---|
 | **Outputs (core module 7)** | Output, OutputContributor, AwardOutput, PublicationDetail, DatasetDetail, SoftwareDetail — what funded work produced, reported against awards | Designed ([#71](https://github.com/ui-insight/AI4RA-UDM/issues/71)) |
 | **IP module** | InventionDisclosureDetail, PatentFiling — disclosure events, Bayh-Dole election, filing records | Designed |
-| **Governance module** | Committee, CommitteeMember, Meeting, MeetingAttendance, plus the Committee Protocol Review bridge | **Released v2.3** ([spec](vignettes/modules/governance.md)) |
-| **Compliance Protocols (shared spine)** | Protocol, coverage, personnel, review workflow, amendments, continuing review, adverse events, deviations | **Released v2.3** ([spec](vignettes/modules/compliance-protocols.md)) |
-| **Animal Research / Human Subjects / Biosafety modules** | Per-regime protocol detail on the spine | **Released v2.3** ([specs](vignettes/modules/)) |
+| **Governance module** | Committee, CommitteeMember, Meeting, MeetingAttendance, plus the Committee Protocol Review bridge | **Released in 2.3.0** ([spec](vignettes/modules/governance.md)) |
+| **Compliance Protocols (shared spine)** | Protocol, coverage, personnel, review workflow, amendments, continuing review, adverse events, deviations | **Released in 2.3.0** ([spec](vignettes/modules/compliance-protocols.md)) |
+| **Animal Research / Human Subjects / Biosafety modules** | Per-regime protocol detail on the spine | **Released in 2.3.0** ([specs](vignettes/modules/)) |
 | **Clinical Trials, Agreements** | Registration/enrollment records; MTA / DUA / NDA lifecycles | Future candidates |
 
 ## Contributing

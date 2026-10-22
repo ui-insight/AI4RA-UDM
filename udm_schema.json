@@ -1,12 +1,12 @@
 {
   "metadata": {
     "name": "UDM",
-    "version": "2.3.0",
-    "released": "2026-08-28",
-    "description": "Vendor-neutral research administration data model. This JSON is the machine-readable serialization of the specification in vignettes/udm-v2-system-of-record.md: modules, tables, columns in the abstract type vocabulary, constraints, conventions, and derivation rules. It names no database engine; types.dialects maps the abstract types to native ones per engine.",
-    "spec_source": "vignettes/udm-v2-system-of-record.md",
+    "version": "3.0.0",
+    "released": "2026-10-22",
+    "description": "Vendor-neutral research administration data model. This JSON is the machine-readable serialization of the specification in vignettes/udm-system-of-record.md: modules, tables, columns in the abstract type vocabulary, constraints, conventions, and derivation rules. It names no database engine; types.dialects maps the abstract types to native ones per engine.",
+    "spec_source": "vignettes/udm-system-of-record.md",
     "changelog": "vignettes/CHANGELOG.md",
-    "conformance": "vignettes/udm-v2-conformance.md",
+    "conformance": "vignettes/udm-conformance.md",
     "conformance_checker": "scripts/check_conformance.py"
   },
   "types": {
@@ -319,7 +319,7 @@
         "Updated_At": "Marks the moment of the most recent write to the row. Single timestamp, overwritten on every update; preserves no history. Answers: is this row stale.",
         "Versioned storage": "Dolt, Trino on Apache Iceberg, temporal tables in Postgres / SQL Server — the storage layer captures full row history with transaction metadata (actor, timestamp). Time-travel queries reconstruct any field's prior value at any past point in time without application instrumentation. Answers: what did column X look like on date D, and which business events touched this row."
       },
-      "conflict_resolution": "Updated_At marks the latest write; any history question deeper than that resolves at the storage layer. The 'Audit record shape' pattern (vignettes/udm-v2-patterns.md) documents the canonical projected shape."
+      "conflict_resolution": "Updated_At marks the latest write; any history question deeper than that resolves at the storage layer. The 'Audit record shape' pattern (vignettes/udm-patterns.md) documents the canonical projected shape."
     },
     "is_active_vs_status": "Tables that carry their own primary lifecycle/status field (Award_Status, Subaward_Status, Requirement_Status, Action_Status, Restriction_Status, Deadline_Status, Payment_Status, Negotiation_Status, RFA_Status) treat that status field as authoritative for what state this record is in, and use Is_Active only to hide rows from operational queries (without losing them). A row may be Is_Active = false while its status field still records a meaningful state. When the two conflict, operational consumers use Is_Active; auditors use the status field.",
     "constraint_vocabulary": {

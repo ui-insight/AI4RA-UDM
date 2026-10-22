@@ -65,7 +65,8 @@ def main():
             'columns': columns,
         }
 
-    dd_output = {'tables': dd_tables, 'table_count': len(dd_tables)}
+    meta = schema['metadata']
+    dd_output = {'version': meta['version'], 'released': meta['released'], 'tables': dd_tables, 'table_count': len(dd_tables)}
     with open(output_dir / 'data-dictionary.json', 'w') as f:
         json.dump(dd_output, f, indent=2)
     print(f"Generated data-dictionary.json ({len(dd_tables)} tables)")

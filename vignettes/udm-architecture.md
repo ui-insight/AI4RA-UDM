@@ -1,4 +1,4 @@
-# UDM v2 Architecture
+# UDM Architecture
 
 A ground-up design document for the next iteration of the Unified Data Model. Captures principles, structural decisions, and the consolidation moves that keep the schema lean while expanding what it can express.
 

@@ -1,4 +1,4 @@
-export default function Header() {
+export default function Header({ version, released }: { version?: string; released?: string }) {
   return (
     <header style={{
       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -12,8 +12,9 @@ export default function Header() {
             <h1 style={{ fontSize: '1.8rem', fontWeight: 600, margin: 0 }}>
               UDM Dashboard
             </h1>
+            {version && (
             <span
-              title="UDM v2.1.0 released 2026-08-26"
+              title={`UDM ${version}${released ? ` released ${released}` : ''}`}
               style={{
                 padding: '0.2rem 0.6rem',
                 borderRadius: 999,
@@ -24,8 +25,9 @@ export default function Header() {
                 letterSpacing: 0.5,
               }}
             >
-              v2.1.0
+              {version}
             </span>
+            )}
           </div>
           <p style={{ opacity: 0.9, fontSize: '1rem' }}>
             Unified Data Model for Research Administration

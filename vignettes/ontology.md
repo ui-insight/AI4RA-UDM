@@ -1,8 +1,8 @@
-# UDM v2 Ontology
+# UDM Ontology
 
 This document describes the structure, conventions, and purpose of every entity in the AI4RA Unified Data Model, version 2. The UDM contains **47 tables** organized into **6 core modules** plus two implementation tables, along with **12 reference views**.
 
-For the canonical machine-readable specification, see [udm-v2-system-of-record.md](udm-v2-system-of-record.md) (prose) and [udm_schema.json](../udm_schema.json) (MySQL/MariaDB serialization at the repository root).
+For the canonical machine-readable specification, see [udm-system-of-record.md](udm-system-of-record.md) (prose) and [udm_schema.json](../udm_schema.json) (MySQL/MariaDB serialization at the repository root).
 
 ## Scope
 
@@ -128,7 +128,7 @@ The schema uses two approaches for controlling enumerated values.
 
 **The decision rule:** a field is a fixed Status enum when (a) the value set is standardized across institutions (regulatory, GAAP, or industry standard), AND (b) the model's correctness depends on stable, known values. Otherwise it's an AllowedValues FK.
 
-Recommended values are documented per column in the JSON. The complete status taxonomy reference is in [udm-v2-system-of-record.md](udm-v2-system-of-record.md#status-taxonomy-reference).
+Recommended values are documented per column in the JSON. The complete status taxonomy reference is in [udm-system-of-record.md](udm-system-of-record.md#status-taxonomy-reference).
 
 ### Self-Referencing Hierarchies
 
@@ -512,11 +512,11 @@ Beyond the universal patterns, the schema documents 20 semantic conventions cove
 - **ConflictOfInterest vs OtherSupport vs ComplianceRequirement(COI)** — three tables touch outside-relationship facts; each answers a different question.
 - **Internal funding represented as an Award** — the funding instrument is always an Award (or Subaward) regardless of internal vs external sponsor.
 
-The full convention list is in [udm-v2-system-of-record.md](udm-v2-system-of-record.md#semantic-conventions).
+The full convention list is in [udm-system-of-record.md](udm-system-of-record.md#semantic-conventions).
 
 ## Deployment scope
 
-UDM v2 is **single-tenant per institution by default**: each deployment serves one operating Organization. The word "institution" in scoped-uniqueness annotations (Award_Number, FAIN, Asset_Tag, Fund_Code, etc.) refers to that operating Organization.
+The UDM is **single-tenant per institution by default**: each deployment serves one operating Organization. The word "institution" in scoped-uniqueness annotations (Award_Number, FAIN, Asset_Tag, Fund_Code, etc.) refers to that operating Organization.
 
 Cross-institution analytics happen at a federation layer above the database, not in shared physical storage. Each participating deployment publishes its data through the same UDM schema; aggregators query across deployments and reconcile values through `Canonical_Value_Code` on AllowedValues.
 

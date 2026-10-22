@@ -1,4 +1,4 @@
-# UDM v2 Conformance
+# UDM Conformance
 
 **Status:** Draft.
 
@@ -20,7 +20,7 @@ A declaration is a JSON file describing the shape a consumer reads: tables, colu
 ```json
 {
   "conformance_declaration": {
-    "udm_version": "2.3.0",
+    "udm_version": "3.0.0",
     "profile": "provider",
     "declarer": "Example Vendor",
     "product": "Example eRA 12",

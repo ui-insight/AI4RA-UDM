@@ -108,7 +108,7 @@ function buildMedallionDiagram(): { nodes: Node[]; edges: Edge[] } {
 function buildDirectDiagram(): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = [
     makeNode('sources', 'Source Systems', '', 0, 0, colors.sources),
-    makeNode('schema', 'udm_schema.json', 'UDM v2 Definition', 0, 80, colors.udm),
+    makeNode('schema', 'udm_schema.json', 'UDM Definition', 0, 80, colors.udm),
     makeNode('db', 'Your Database', 'MySQL, PostgreSQL, etc.', 280, 40, colors.gold),
     makeNode('apps', 'Dashboards & Reports', '', 560, 40, colors.apps),
   ];
@@ -237,7 +237,7 @@ export default function InfrastructureTab() {
         </div>
 
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
-          UDM v2 supports crosswalk authoring with two first-class metadata sources:
+          The UDM supports crosswalk authoring with two first-class metadata sources:
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
@@ -312,7 +312,7 @@ export default function InfrastructureTab() {
               <VocabRow
                 term="Award"
                 tags={['Research Admin']}
-                def={'The formal instrument by which a sponsor commits funds to an institution for a specific project — the transition from "we proposed this" to "we are doing this with their money." Awards take multiple legal forms with different expectations about sponsor control and reporting: a grant (sponsor funds the work but does not direct it day-to-day), a cooperative agreement (sponsor is substantially involved in the work), a contract (sponsor specifies deliverables and accepts work product), and a subaward (a portion of an award passed through from a prime recipient). Every award has a project period — the overall funded window — and is typically broken into budget periods (usually annual) within which the PI can move money among categories. Sponsors often obligate funds period-by-period rather than releasing the entire commitment up front, which is why the distinction between total awarded and currently available matters for financial management. In UDM v2, Award is the central post-award entity: it links back to the Proposal it originated from, out to Personnel via TeamRole, and down to Budget / Transaction / Payment records for the money. Budget rows carry a Lifecycle_Stage (Proposed → Approved → Current → Actual) so the proposed, approved, and actual numbers all live in one table.'}
+                def={'The formal instrument by which a sponsor commits funds to an institution for a specific project — the transition from "we proposed this" to "we are doing this with their money." Awards take multiple legal forms with different expectations about sponsor control and reporting: a grant (sponsor funds the work but does not direct it day-to-day), a cooperative agreement (sponsor is substantially involved in the work), a contract (sponsor specifies deliverables and accepts work product), and a subaward (a portion of an award passed through from a prime recipient). Every award has a project period — the overall funded window — and is typically broken into budget periods (usually annual) within which the PI can move money among categories. Sponsors often obligate funds period-by-period rather than releasing the entire commitment up front, which is why the distinction between total awarded and currently available matters for financial management. In the UDM, Award is the central post-award entity: it links back to the Proposal it originated from, out to Personnel via TeamRole, and down to Budget / Transaction / Payment records for the money. Budget rows carry a Lifecycle_Stage (Proposed → Approved → Current → Actual) so the proposed, approved, and actual numbers all live in one table.'}
               />
               <VocabRow
                 term="Sponsored Projects"
@@ -417,7 +417,7 @@ export default function InfrastructureTab() {
               <VocabRow
                 term="Foreign key / parent-child relationship"
                 tags={['Data Fundamentals']}
-                def={'A foreign key is a column (or combination of columns) in one table whose value must match an existing primary-key value in another table — it is the mechanism that enforces a relationship between two tables at the database level. The parent/child terminology follows from which side of the relationship each row sits on: the table being referenced is the parent, the table carrying the foreign-key column is the child. Example in UDM v2: Budget.Proposal_ID references Proposal.Proposal_ID, so Proposal is the parent and Budget is the child — one proposal has many budget rows (Proposed-stage, then Approved-stage as the award is made), every budget row belongs to a specific Proposal or Award/Subaward, and the database will refuse to create a budget row pointing at a non-existent proposal. Foreign keys are also what make joins meaningful — without them, two tables are just side-by-side lists. The "Parents" and "Children" columns on the Data Dictionary tab are derived directly from the foreign keys declared in udm_schema.json. Delete-time behavior (CASCADE, SET NULL, RESTRICT) controls what happens when a parent row is removed and is part of the relationship contract, not an afterthought.'}
+                def={'A foreign key is a column (or combination of columns) in one table whose value must match an existing primary-key value in another table — it is the mechanism that enforces a relationship between two tables at the database level. The parent/child terminology follows from which side of the relationship each row sits on: the table being referenced is the parent, the table carrying the foreign-key column is the child. Example in the UDM: Budget.Proposal_ID references Proposal.Proposal_ID, so Proposal is the parent and Budget is the child — one proposal has many budget rows (Proposed-stage, then Approved-stage as the award is made), every budget row belongs to a specific Proposal or Award/Subaward, and the database will refuse to create a budget row pointing at a non-existent proposal. Foreign keys are also what make joins meaningful — without them, two tables are just side-by-side lists. The "Parents" and "Children" columns on the Data Dictionary tab are derived directly from the foreign keys declared in udm_schema.json. Delete-time behavior (CASCADE, SET NULL, RESTRICT) controls what happens when a parent row is removed and is part of the relationship contract, not an afterthought.'}
               />
               <VocabRow
                 term="Stored procedure"
@@ -517,7 +517,7 @@ export default function InfrastructureTab() {
               <VocabRow
                 term="Closeout"
                 tags={['Research Admin']}
-                def={'The set of activities required to formally end an award: submitting the final technical / progress report, the final financial report (typically a Federal Financial Report for federal awards), the final invention / IP report, and any sponsor-specific deliverables, then disposing of equipment per sponsor terms and reconciling any cost share commitments. Federal Uniform Guidance requires closeout within 120 days of the end date for most awards — but in practice closeouts routinely slip because final invoices arrive late, subrecipient closeouts haven\u2019t completed, and effort certifications lag. Late closeout is an audit risk and can jeopardize the institution\u2019s ability to draw down on other awards from the same sponsor. In UDM v2, closeout is modeled as a multi-subworkflow Closeout entity attached to Award/Subaward, tracking individual subworkflows (financial, technical, equipment disposition, invention statement) plus the Report rows that get resolved.'}
+                def={'The set of activities required to formally end an award: submitting the final technical / progress report, the final financial report (typically a Federal Financial Report for federal awards), the final invention / IP report, and any sponsor-specific deliverables, then disposing of equipment per sponsor terms and reconciling any cost share commitments. Federal Uniform Guidance requires closeout within 120 days of the end date for most awards — but in practice closeouts routinely slip because final invoices arrive late, subrecipient closeouts haven\u2019t completed, and effort certifications lag. Late closeout is an audit risk and can jeopardize the institution\u2019s ability to draw down on other awards from the same sponsor. In the UDM, closeout is modeled as a multi-subworkflow Closeout entity attached to Award/Subaward, tracking individual subworkflows (financial, technical, equipment disposition, invention statement) plus the Report rows that get resolved.'}
               />
               <VocabRow
                 term="Uniform Guidance (2 CFR 200)"
@@ -547,7 +547,7 @@ export default function InfrastructureTab() {
               <VocabRow
                 term="PI eligibility"
                 tags={['Research Admin']}
-                def={'The institutional policy that defines who is allowed to serve as Principal Investigator on a sponsored award — typically tenure-track faculty by default, with pathways to extend eligibility to research faculty, clinical faculty, emeriti, staff scientists, postdocs, and graduate students under documented criteria (often requiring department chair, dean, or VPR approval). PI-eligibility policy is an institutional governance artifact, not a sponsor rule: sponsors have their own PI-role expectations, but the institution decides whom it will allow to lead awards it administers. Divergence between sponsor-accepted PIs and institutionally eligible PIs is precisely why Sponsor PI vs. Internal PI (see entry) matters — PI-eligibility policy is the lever that forces the distinction. In an eRA implementation this can be an explicit workflow with override tracking; in UDM v2, the data surface is TeamRole metadata (Role_Value_ID + Start_Date / End_Date) and any institution-specific extension layered on top.'}
+                def={'The institutional policy that defines who is allowed to serve as Principal Investigator on a sponsored award — typically tenure-track faculty by default, with pathways to extend eligibility to research faculty, clinical faculty, emeriti, staff scientists, postdocs, and graduate students under documented criteria (often requiring department chair, dean, or VPR approval). PI-eligibility policy is an institutional governance artifact, not a sponsor rule: sponsors have their own PI-role expectations, but the institution decides whom it will allow to lead awards it administers. Divergence between sponsor-accepted PIs and institutionally eligible PIs is precisely why Sponsor PI vs. Internal PI (see entry) matters — PI-eligibility policy is the lever that forces the distinction. In an eRA implementation this can be an explicit workflow with override tracking; in the UDM, the data surface is TeamRole metadata (Role_Value_ID + Start_Date / End_Date) and any institution-specific extension layered on top.'}
               />
               <VocabRow
                 term="Data silo"
@@ -632,7 +632,7 @@ export default function InfrastructureTab() {
           background: '#1e1e1e', borderRadius: 8, padding: '1.25rem', marginBottom: '1rem',
           fontFamily: 'monospace', fontSize: '0.85rem', color: '#d4d4d4', overflowX: 'auto',
         }}>
-          <div style={{ color: '#6a9955', marginBottom: '0.5rem' }}># Fetch the UDM v2 schema</div>
+          <div style={{ color: '#6a9955', marginBottom: '0.5rem' }}># Fetch the UDM schema</div>
           <div>curl https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json</div>
           <div style={{ color: '#6a9955', marginTop: '1rem', marginBottom: '0.5rem' }}># Python — load as a dictionary</div>
           <div><span style={{ color: '#c586c0' }}>import</span> requests</div>
@@ -642,12 +642,12 @@ export default function InfrastructureTab() {
           <div>{'  '}.then(r =&gt; r.json());</div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
-          <LayerCard title="Schema Endpoint (v2)" color={colors.udm}
-            desc="ui-insight.github.io/AI4RA-UDM/data/udm_schema.json — the complete v2 UDM definition: tables, columns, types, foreign keys, semantic conventions, cross-row constraints, derived values, column synonyms, and example views." />
+          <LayerCard title="Schema Endpoint" color={colors.udm}
+            desc="ui-insight.github.io/AI4RA-UDM/data/udm_schema.json — the complete UDM definition: tables, columns, types, foreign keys, semantic conventions, cross-row constraints, derived values, column synonyms, and example views." />
           <LayerCard title="Data Dictionary" color={colors.udm}
-            desc="ui-insight.github.io/AI4RA-UDM/data/data-dictionary.json — pre-processed v2 table and column metadata for building tools and documentation." />
+            desc="ui-insight.github.io/AI4RA-UDM/data/data-dictionary.json — pre-processed table and column metadata for building tools and documentation." />
           <LayerCard title="Relationships" color={colors.udm}
-            desc="ui-insight.github.io/AI4RA-UDM/data/relationships.json — all foreign key relationships extracted from the v2 schema, ready for ERD generation or validation." />
+            desc="ui-insight.github.io/AI4RA-UDM/data/relationships.json — all foreign key relationships extracted from the schema, ready for ERD generation or validation." />
         </div>
         <p style={{ color: '#546e7a', marginTop: '1rem', fontSize: '0.9rem' }}>
           These endpoints always reflect the latest version of the UDM. Use them to generate DDL for your database platform,

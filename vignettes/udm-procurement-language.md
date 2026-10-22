@@ -2,7 +2,7 @@
 
 **Status:** Draft. Model language for institutions to adapt. Review with procurement and counsel before use.
 
-An institution's influence over how a vendor handles its data is strongest at purchase and at renewal. These clauses ask a vendor to deliver and accept data in UDM form, and to show it with the published conformance checker (see [Conformance](udm-v2-conformance.md)). Bracketed text is for the institution to set.
+An institution's influence over how a vendor handles its data is strongest at purchase and at renewal. These clauses ask a vendor to deliver and accept data in UDM form, and to show it with the published conformance checker (see [Conformance](udm-conformance.md)). Bracketed text is for the institution to set.
 
 ## Definitions
 

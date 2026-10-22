@@ -77,7 +77,7 @@ const optionalModules = [
 
 const tiers = [
   { tier: 'Core modules', contents: 'The universal capabilities, required of every implementation: Actors, Funding Cycle, Effort, Finance, Compliance, Records (and Outputs at its release). Each is named for the sentence every institution can say: "we track the people involved," "we certify effort," "we keep the records"', meaning: 'Required. 47 canonical tables' },
-  { tier: 'Optional modules', contents: 'Capabilities only some institutions exercise, fully specified and versioned. Available (v2.3): Compliance Protocols, Animal Research, Human Subjects, Biosafety, Governance, Committee Protocol Review. Planned: IP', meaning: 'Adopted by declaration, e.g. "UDM 2.3 core + modules: compliance_protocols, human_subjects, governance." Two adopters of the same module are interoperable on it' },
+  { tier: 'Optional modules', contents: 'Capabilities only some institutions exercise, fully specified and versioned. Available: Compliance Protocols, Animal Research, Human Subjects, Biosafety, Governance, Committee Protocol Review. Planned: IP', meaning: 'Adopted by declaration, e.g. "UDM 3.0.0 core + modules: compliance_protocols, human_subjects, governance." Two adopters of the same module are interoperable on it' },
   { tier: 'Local extensions', contents: 'Institution-specific additions outside the specification', meaning: 'Not specified by UDM; the local-extensions registry documents where common cases belong' },
 ];
 
@@ -199,7 +199,7 @@ export default function OntologyTab() {
             </tbody>
           </table>
         </div>
-        <h3 style={{ color: '#2c3e50', margin: '1.5rem 0 0.75rem' }}>Optional modules (v2.3)</h3>
+        <h3 style={{ color: '#2c3e50', margin: '1.5rem 0 0.75rem' }}>Optional modules</h3>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '0.5rem' }}>
             <thead>
@@ -314,11 +314,11 @@ export default function OntologyTab() {
       </Section>
 
       <Section>
-        <SectionTitle>UDM v2 Patterns</SectionTitle>
+        <SectionTitle>UDM Patterns</SectionTitle>
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
-          v2 defines eight universal patterns; the four below do the most structural work and recur
+          The UDM defines eight universal patterns; the four below do the most structural work and recur
           across the most tables. Each one is documented in detail in the prose spec
-          (see <code>vignettes/udm-v2-system-of-record.md</code>) and in the structured constraint
+          (see <code>vignettes/udm-system-of-record.md</code>) and in the structured constraint
           catalog in <code>udm_schema.json</code>.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', marginTop: '1rem' }}>

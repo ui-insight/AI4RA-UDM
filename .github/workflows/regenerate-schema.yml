@@ -10,7 +10,7 @@ on:
       - 'scripts/check_spec_sync.py'
       - 'scripts/check_conformance.py'
       - 'schemas/**'
-      - 'vignettes/udm-v2-system-of-record.md'
+      - 'vignettes/udm-system-of-record.md'
       - 'vignettes/modules/**'
       - 'dashboard/**'
       - 'docs/**'

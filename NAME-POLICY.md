@@ -7,7 +7,7 @@ The names **AI4RA Unified Data Model** and **AI4RA UDM** are reserved by Nathan 
 A version is conforming when it is either:
 
 - a release published in this repository, or
-- an implementation or a data provider whose conformance declaration passes the published checker, `scripts/check_conformance.py`, for a published UDM version. The rules are in [Conformance](vignettes/udm-v2-conformance.md).
+- an implementation or a data provider whose conformance declaration passes the published checker, `scripts/check_conformance.py`, for a published UDM version. The rules are in [Conformance](vignettes/udm-conformance.md).
 
 Conforming versions may use the names with the claim the checker reports, for example "AI4RA UDM 2.3 core + modules: governance" or "AI4RA UDM 2.3 provider: Award, Proposal".
 

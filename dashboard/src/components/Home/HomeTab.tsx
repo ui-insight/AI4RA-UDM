@@ -257,13 +257,13 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
             <a href="data/udm_schema.json" style={{ color: '#667eea' }}>
               /data/udm_schema.json
             </a>{' '}
-            — UDM v2 schema (current): semantic conventions, cross-row constraints, derived values, example views
+            — the current schema: semantic conventions, cross-row constraints, derived values, example views
           </li>
           <li>
             <a href="data/data-dictionary.json" style={{ color: '#667eea' }}>
               /data/data-dictionary.json
             </a>{' '}
-            — table and column descriptions, synonyms, PII flags (regenerated from v2)
+            — table and column descriptions, synonyms, PII flags (regenerated from the schema)
           </li>
           <li>
             <a href="data/relationships.json" style={{ color: '#667eea' }}>
@@ -311,7 +311,7 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
             >
               Changelog
             </a>{' '}
-            — what changed in v2, and migration guidance from v1
+            — what changed in each release, with migration guidance
           </li>
           <li>
             <a

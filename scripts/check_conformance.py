@@ -2,7 +2,7 @@
 """Check a conformance declaration against udm_schema.json.
 
 A declaration describes the shape a consumer reads from an implementation
-or a data provider (see vignettes/udm-v2-conformance.md). Dependency-free.
+or a data provider (see vignettes/udm-conformance.md). Dependency-free.
 
 Two profiles:
 

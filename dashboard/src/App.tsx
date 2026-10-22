@@ -28,7 +28,7 @@ export default function App() {
 
   return (
     <>
-      <Header />
+      <Header version={dataDictionary?.version} released={dataDictionary?.released} />
       <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
       <div style={{ display: activeTab === 'home' ? 'block' : 'none' }}>
         {dataDictionary && (
