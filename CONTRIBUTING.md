@@ -8,7 +8,7 @@ The UDM improves through community input.
 
 ## Making a change
 
-A change to the standard edits `udm_schema_v2.json`. The prose spec and the module vignettes are generated from it and sync-checked in CI, so edit the JSON and regenerate rather than editing the prose by hand. Run `scripts/validate_schema.py` and `scripts/check_spec_sync.py` before opening a pull request. When `udm_schema_v2.json` changes on `main`, CI regenerates the dashboard data files served via GitHub Pages.
+A change to the standard edits `udm_schema.json`. The prose spec and the module vignettes are generated from it and sync-checked in CI, so edit the JSON and regenerate rather than editing the prose by hand. Run `scripts/validate_schema.py` and `scripts/check_spec_sync.py` before opening a pull request. When `udm_schema.json` changes on `main`, CI regenerates the dashboard data files served via GitHub Pages.
 
 A change to the standard must pass the conformance checker before a release may carry the AI4RA UDM name. See [NAME-POLICY.md](NAME-POLICY.md).
 

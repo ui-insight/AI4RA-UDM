@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Validate the structure and internal consistency of udm_schema_v2.json.
+"""Validate the structure and internal consistency of udm_schema.json.
 
 Dependency-free. Two layers of checking:
 
 1. Structural: required top-level keys, table/column entry shape.
    (The formal JSON Schema for external tooling lives at
-   schemas/udm_schema_v2.metaschema.json; this script enforces the same
+   schemas/udm_schema.metaschema.json; this script enforces the same
    rules without requiring the jsonschema package.)
 2. Referential: every foreign key targets an existing table and column,
    domain_membership and implementation_tables exactly cover the table set,
@@ -19,7 +19,7 @@ import json
 import sys
 from pathlib import Path
 
-SCHEMA_PATH = Path(__file__).resolve().parent.parent / "udm_schema_v2.json"
+SCHEMA_PATH = Path(__file__).resolve().parent.parent / "udm_schema.json"
 
 REQUIRED_TOP_LEVEL = [
     "metadata",

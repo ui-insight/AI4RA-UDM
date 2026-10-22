@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://ui-insight.github.io/AI4RA-UDM/schemas/udm_schema_v2.metaschema.json",
+  "$id": "https://ui-insight.github.io/AI4RA-UDM/schemas/udm_schema.metaschema.json",
   "title": "UDM v2 schema artifact metaschema",
-  "description": "Structural contract for udm_schema_v2.json. Referential rules (foreign keys resolve, domain membership covers the table set, primary-key naming) are enforced by scripts/validate_schema.py and cannot be expressed in JSON Schema.",
+  "description": "Structural contract for udm_schema.json. Referential rules (foreign keys resolve, domain membership covers the table set, primary-key naming) are enforced by scripts/validate_schema.py and cannot be expressed in JSON Schema.",
   "type": "object",
   "required": [
     "metadata",

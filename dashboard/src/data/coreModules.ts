@@ -1,5 +1,5 @@
 // Canonical core-module assignments for each UDM v2 table.
-// Source of truth: core_module_membership in udm_schema_v2.json.
+// Source of truth: core_module_membership in udm_schema.json.
 
 export interface CoreModuleGroup {
   name: string;

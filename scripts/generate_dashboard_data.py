@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 """
-Generate dashboard JSON files from udm_schema_v2.json.
+Generate dashboard JSON files from udm_schema.json.
 
-Reads the authoritative udm_schema_v2.json and produces the JSON files
+Reads the authoritative udm_schema.json and produces the JSON files
 that the dashboard (docs/index.html) needs:
   - docs/data/data-dictionary.json: table/column descriptions for browsing
   - docs/data/relationships.json: foreign key relationships for navigation
-  - docs/data/udm_schema_v2.json: copy of full v2 schema for API endpoint
-  - docs/data/udm_schema.json: copy of v1 schema, preserved for backwards-compat consumers
+  - docs/data/udm_schema.json: copy of full v2 schema for API endpoint
 
 Per-column synonyms in v2 live in the top-level column_synonyms.values map
 keyed by "TableName.Column_Name"; this script merges that sidecar back into
@@ -22,8 +21,7 @@ from pathlib import Path
 
 def main():
     base_dir = Path(__file__).parent.parent
-    schema_file = base_dir / 'udm_schema_v2.json'
-    v1_schema_file = base_dir / 'udm_schema.json'
+    schema_file = base_dir / 'udm_schema.json'
     output_dir = base_dir / 'docs' / 'data'
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -72,12 +70,8 @@ def main():
         json.dump(rel_output, f, indent=2)
     print(f"Generated relationships.json ({len(relationships)} relationships)")
 
-    shutil.copy2(schema_file, output_dir / 'udm_schema_v2.json')
-    print("Copied udm_schema_v2.json to docs/data/")
-
-    if v1_schema_file.exists():
-        shutil.copy2(v1_schema_file, output_dir / 'udm_schema.json')
-        print("Copied v1 udm_schema.json to docs/data/ (preserved for reference)")
+    shutil.copy2(schema_file, output_dir / 'udm_schema.json')
+    print("Copied udm_schema.json to docs/data/")
 
     print("\nDone.")
 

@@ -5,7 +5,7 @@
 **Records targets declared:** none
 **AllowedValues groups declared:** none
 
-This module is governed by the module taxonomy's two laws (capability criterion, encapsulation rule); see the Architecture section of the core specification. Canonical machine-readable definition: `optional_modules.biosafety` in `udm_schema_v2.json`. Module tables carry the universal audit columns; they are omitted below as in the core spec.
+This module is governed by the module taxonomy's two laws (capability criterion, encapsulation rule); see the Architecture section of the core specification. Canonical machine-readable definition: `optional_modules.biosafety` in `udm_schema.json`. Module tables carry the universal audit columns; they are omitted below as in the core spec.
 
 Per-regime detail for `Regime = 'Biosafety'`: biological agents with risk groups, and procedures with containment and decontamination requirements. All rows hang flat off Protocol_ID.
 

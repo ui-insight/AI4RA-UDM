@@ -108,7 +108,7 @@ function buildMedallionDiagram(): { nodes: Node[]; edges: Edge[] } {
 function buildDirectDiagram(): { nodes: Node[]; edges: Edge[] } {
   const nodes: Node[] = [
     makeNode('sources', 'Source Systems', '', 0, 0, colors.sources),
-    makeNode('schema', 'udm_schema_v2.json', 'UDM v2 Definition', 0, 80, colors.udm),
+    makeNode('schema', 'udm_schema.json', 'UDM v2 Definition', 0, 80, colors.udm),
     makeNode('db', 'Your Database', 'MySQL, PostgreSQL, etc.', 280, 40, colors.gold),
     makeNode('apps', 'Dashboards & Reports', '', 560, 40, colors.apps),
   ];
@@ -180,8 +180,8 @@ export default function InfrastructureTab() {
           <h3 style={{ color: '#2c3e50', marginBottom: '1rem', fontSize: '1.3rem' }}>Where the UDM Fits</h3>
           <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
             The UDM defines the target schema for the Silver and Gold layers. Use the <code>column_synonyms</code> sidecar in{' '}
-            <a href="https://ui-insight.github.io/AI4RA-UDM/data/udm_schema_v2.json" style={{ color: '#667eea' }}>
-              udm_schema_v2.json
+            <a href="https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json" style={{ color: '#667eea' }}>
+              udm_schema.json
             </a>{' '}
             to help map your source field names to UDM column names.
           </p>
@@ -242,7 +242,7 @@ export default function InfrastructureTab() {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
           <LayerCard title="column_synonyms sidecar" color={colors.silver}
-            desc={'Top-level map in udm_schema_v2.json keyed by TableName.Column_Name → comma-separated list of common alternative names (e.g., Personnel.Personnel_ID → "Person ID, Employee ID, Researcher ID, Faculty ID, User ID"). Matchers and LLMs use these to identify equivalent concepts without a hand-built dictionary.'} />
+            desc={'Top-level map in udm_schema.json keyed by TableName.Column_Name → comma-separated list of common alternative names (e.g., Personnel.Personnel_ID → "Person ID, Employee ID, Researcher ID, Faculty ID, User ID"). Matchers and LLMs use these to identify equivalent concepts without a hand-built dictionary.'} />
           <LayerCard title="description" color={colors.silver}
             desc="Plain-language description on every table and column. Combined with the column name, gives LLM/ML matchers enough semantic context to disambiguate near-duplicates like Sponsor vs. Submitting vs. Administering Organization." />
         </div>
@@ -377,7 +377,7 @@ export default function InfrastructureTab() {
               <VocabRow
                 term="CI/CD"
                 tags={['Software Practice']}
-                def={'Continuous Integration and Continuous Delivery (sometimes Continuous Deployment) — the practice of automating build, test, and release of software every time a change is committed. CI runs the build and test suite on each commit so regressions are caught within minutes instead of at release time; CD automates packaging and deploying those tested artifacts to the target environment, with or without a human approval gate. For the UDM specifically, the CI/CD pipeline lives in .github/workflows/: on every push to main, GitHub Actions regenerates the derived JSON endpoints (data-dictionary.json, relationships.json) from udm_schema_v2.json, rebuilds the dashboard, and publishes to GitHub Pages. This is why the site and the SSOT stay in sync without manual steps, and why a broken commit is visible quickly.'}
+                def={'Continuous Integration and Continuous Delivery (sometimes Continuous Deployment) — the practice of automating build, test, and release of software every time a change is committed. CI runs the build and test suite on each commit so regressions are caught within minutes instead of at release time; CD automates packaging and deploying those tested artifacts to the target environment, with or without a human approval gate. For the UDM specifically, the CI/CD pipeline lives in .github/workflows/: on every push to main, GitHub Actions regenerates the derived JSON endpoints (data-dictionary.json, relationships.json) from udm_schema.json, rebuilds the dashboard, and publishes to GitHub Pages. This is why the site and the SSOT stay in sync without manual steps, and why a broken commit is visible quickly.'}
               />
               <VocabRow
                 term="Metadata"
@@ -402,7 +402,7 @@ export default function InfrastructureTab() {
               <VocabRow
                 term="Schema"
                 tags={['Data Fundamentals']}
-                def={'The formal description of the structure of a database or dataset — which tables (or collections / entities) exist, what columns each one has, what data types those columns hold, what constraints apply (required, unique, value ranges), and how the tables relate to each other via foreign keys. A schema is about structure, not content; two databases can share a schema and hold completely different data. The UDM is itself a schema — the "S" is implicit in the name — published as udm_schema_v2.json so other systems can adopt it directly. In SQL, "schema" is also used in a narrower namespacing sense (e.g., lakehouse.bronze.banner, lakehouse.gold.Award); in a medallion lakehouse each layer is typically a SQL schema containing its own views. Distinct from data (the values in the tables), from the data dictionary (the descriptive metadata about the schema), and from schema mapping (the process of connecting one schema to another).'}
+                def={'The formal description of the structure of a database or dataset — which tables (or collections / entities) exist, what columns each one has, what data types those columns hold, what constraints apply (required, unique, value ranges), and how the tables relate to each other via foreign keys. A schema is about structure, not content; two databases can share a schema and hold completely different data. The UDM is itself a schema — the "S" is implicit in the name — published as udm_schema.json so other systems can adopt it directly. In SQL, "schema" is also used in a narrower namespacing sense (e.g., lakehouse.bronze.banner, lakehouse.gold.Award); in a medallion lakehouse each layer is typically a SQL schema containing its own views. Distinct from data (the values in the tables), from the data dictionary (the descriptive metadata about the schema), and from schema mapping (the process of connecting one schema to another).'}
               />
               <VocabRow
                 term="View"
@@ -417,7 +417,7 @@ export default function InfrastructureTab() {
               <VocabRow
                 term="Foreign key / parent-child relationship"
                 tags={['Data Fundamentals']}
-                def={'A foreign key is a column (or combination of columns) in one table whose value must match an existing primary-key value in another table — it is the mechanism that enforces a relationship between two tables at the database level. The parent/child terminology follows from which side of the relationship each row sits on: the table being referenced is the parent, the table carrying the foreign-key column is the child. Example in UDM v2: Budget.Proposal_ID references Proposal.Proposal_ID, so Proposal is the parent and Budget is the child — one proposal has many budget rows (Proposed-stage, then Approved-stage as the award is made), every budget row belongs to a specific Proposal or Award/Subaward, and the database will refuse to create a budget row pointing at a non-existent proposal. Foreign keys are also what make joins meaningful — without them, two tables are just side-by-side lists. The "Parents" and "Children" columns on the Data Dictionary tab are derived directly from the foreign keys declared in udm_schema_v2.json. Delete-time behavior (CASCADE, SET NULL, RESTRICT) controls what happens when a parent row is removed and is part of the relationship contract, not an afterthought.'}
+                def={'A foreign key is a column (or combination of columns) in one table whose value must match an existing primary-key value in another table — it is the mechanism that enforces a relationship between two tables at the database level. The parent/child terminology follows from which side of the relationship each row sits on: the table being referenced is the parent, the table carrying the foreign-key column is the child. Example in UDM v2: Budget.Proposal_ID references Proposal.Proposal_ID, so Proposal is the parent and Budget is the child — one proposal has many budget rows (Proposed-stage, then Approved-stage as the award is made), every budget row belongs to a specific Proposal or Award/Subaward, and the database will refuse to create a budget row pointing at a non-existent proposal. Foreign keys are also what make joins meaningful — without them, two tables are just side-by-side lists. The "Parents" and "Children" columns on the Data Dictionary tab are derived directly from the foreign keys declared in udm_schema.json. Delete-time behavior (CASCADE, SET NULL, RESTRICT) controls what happens when a parent row is removed and is part of the relationship contract, not an afterthought.'}
               />
               <VocabRow
                 term="Stored procedure"
@@ -571,7 +571,7 @@ export default function InfrastructureTab() {
         </h3>
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
           For institutions that want a simpler approach, the UDM can be implemented directly as database tables.
-          Use <code>udm_schema_v2.json</code> to generate CREATE TABLE statements for your platform
+          Use <code>udm_schema.json</code> to generate CREATE TABLE statements for your platform
           (MySQL, PostgreSQL, SQLite, SQL Server) and load data via ETL.
         </p>
         <div style={{ background: '#f8f9fa', borderRadius: 8, height: 200 }}>
@@ -633,19 +633,17 @@ export default function InfrastructureTab() {
           fontFamily: 'monospace', fontSize: '0.85rem', color: '#d4d4d4', overflowX: 'auto',
         }}>
           <div style={{ color: '#6a9955', marginBottom: '0.5rem' }}># Fetch the UDM v2 schema</div>
-          <div>curl https://ui-insight.github.io/AI4RA-UDM/data/udm_schema_v2.json</div>
+          <div>curl https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json</div>
           <div style={{ color: '#6a9955', marginTop: '1rem', marginBottom: '0.5rem' }}># Python — load as a dictionary</div>
           <div><span style={{ color: '#c586c0' }}>import</span> requests</div>
-          <div>schema = requests.get(<span style={{ color: '#ce9178' }}>"https://ui-insight.github.io/AI4RA-UDM/data/udm_schema_v2.json"</span>).json()</div>
+          <div>schema = requests.get(<span style={{ color: '#ce9178' }}>"https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json"</span>).json()</div>
           <div style={{ color: '#6a9955', marginTop: '1rem', marginBottom: '0.5rem' }}># JavaScript — fetch in browser or Node.js</div>
-          <div><span style={{ color: '#c586c0' }}>const</span> schema = <span style={{ color: '#c586c0' }}>await</span> fetch(<span style={{ color: '#ce9178' }}>"https://ui-insight.github.io/AI4RA-UDM/data/udm_schema_v2.json"</span>)</div>
+          <div><span style={{ color: '#c586c0' }}>const</span> schema = <span style={{ color: '#c586c0' }}>await</span> fetch(<span style={{ color: '#ce9178' }}>"https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json"</span>)</div>
           <div>{'  '}.then(r =&gt; r.json());</div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
           <LayerCard title="Schema Endpoint (v2)" color={colors.udm}
-            desc="ui-insight.github.io/AI4RA-UDM/data/udm_schema_v2.json — the complete v2 UDM definition: tables, columns, types, foreign keys, semantic conventions, cross-row constraints, derived values, column synonyms, and example views." />
-          <LayerCard title="Schema Endpoint (v1)" color={colors.udm}
-            desc="ui-insight.github.io/AI4RA-UDM/data/udm_schema.json — the original v1 UDM, preserved alongside v2 for institutions still in migration." />
+            desc="ui-insight.github.io/AI4RA-UDM/data/udm_schema.json — the complete v2 UDM definition: tables, columns, types, foreign keys, semantic conventions, cross-row constraints, derived values, column synonyms, and example views." />
           <LayerCard title="Data Dictionary" color={colors.udm}
             desc="ui-insight.github.io/AI4RA-UDM/data/data-dictionary.json — pre-processed v2 table and column metadata for building tools and documentation." />
           <LayerCard title="Relationships" color={colors.udm}

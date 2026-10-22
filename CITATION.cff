@@ -14,7 +14,7 @@ repository-code: https://github.com/ui-insight/AI4RA-UDM
 url: https://ui-insight.github.io/AI4RA-UDM/
 identifiers:
   - type: url
-    value: https://ui-insight.github.io/AI4RA-UDM/data/udm_schema_v2.json
+    value: https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json
     description: Canonical machine-readable schema (current version)
 abstract: >-
   A canonical schema for research administration covering pre-award

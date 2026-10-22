@@ -319,7 +319,7 @@ export default function OntologyTab() {
           v2 defines eight universal patterns; the four below do the most structural work and recur
           across the most tables. Each one is documented in detail in the prose spec
           (see <code>vignettes/udm-v2-system-of-record.md</code>) and in the structured constraint
-          catalog in <code>udm_schema_v2.json</code>.
+          catalog in <code>udm_schema.json</code>.
         </p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
           <PatternCard title="Lifecycle_Stage Discriminator">

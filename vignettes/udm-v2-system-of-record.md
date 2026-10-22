@@ -1,6 +1,6 @@
 # UDM v2 Schema Specification
 
-**Version:** 2.0.0 — Released 2026-06-11. See [CHANGELOG.md](CHANGELOG.md) for the full version history. The companion JSON serialization lives at the repository root as [udm_schema_v2.json](../udm_schema_v2.json); the v1 model is preserved as [udm_schema.json](../udm_schema.json).
+**Version:** 2.3.0. See [CHANGELOG.md](CHANGELOG.md) for the full version history. The companion JSON serialization lives at the repository root as [udm_schema.json](../udm_schema.json); its `metadata.version` is the version of record.
 
 ## Goal
 

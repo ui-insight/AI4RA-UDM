@@ -67,7 +67,7 @@ export default function ExampleViewsTab() {
           borderLeft: '4px solid #ffc107', borderRadius: 4,
         }}>
           <strong style={{ color: '#856404' }}>Source: </strong>
-          <code>udm_schema_v2.json</code>
+          <code>udm_schema.json</code>
           <p style={{ color: '#856404', marginTop: '0.5rem', fontSize: '0.9rem' }}>
             These views are defined in the v2 schema's <code>example_views</code> section and serve as
             reference query implementations that institutions can adapt for their reporting needs.

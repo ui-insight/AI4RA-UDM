@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check a conformance declaration against udm_schema_v2.json.
+"""Check a conformance declaration against udm_schema.json.
 
 A declaration describes the shape a consumer reads from an implementation
 or a data provider (see vignettes/udm-v2-conformance.md). Dependency-free.
@@ -39,7 +39,7 @@ import re
 import sys
 from pathlib import Path
 
-SCHEMA_PATH = Path(__file__).resolve().parent.parent / "udm_schema_v2.json"
+SCHEMA_PATH = Path(__file__).resolve().parent.parent / "udm_schema.json"
 
 PROFILES = ("implementation", "provider")
 DECLARED_KEYS = ("type", "required", "primary_key", "references", "allowed_values")
@@ -366,7 +366,7 @@ def report(claim):
 def main():
     parser = argparse.ArgumentParser(description="Check a UDM conformance declaration.")
     parser.add_argument("declaration", nargs="?", help="path to a conformance declaration (JSON)")
-    parser.add_argument("--schema", default=str(SCHEMA_PATH), help="path to udm_schema_v2.json")
+    parser.add_argument("--schema", default=str(SCHEMA_PATH), help="path to udm_schema.json")
     parser.add_argument("--template", action="store_true", help="print a declaration template")
     parser.add_argument("--profile", choices=PROFILES, default="implementation")
     parser.add_argument("--modules", default="", help="comma-separated optional modules")

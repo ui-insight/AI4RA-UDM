@@ -41,8 +41,7 @@ LICENSES
      and docs/ontology.html. Full text: LICENSE-APACHE-2.0.
 
   The machine-readable schema files are available under either license,
-  at your option. This covers udm_schema_v2.json, udm_schema.json,
-  schemas/, and DDL or other artifacts generated from them.
+  at your option. This covers udm_schema.json, schemas/, and DDL or other artifacts generated from them.
 
 NAMES
 

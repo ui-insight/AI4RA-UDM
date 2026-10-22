@@ -88,13 +88,13 @@ Documentation and hygiene release. No structural changes to tables, columns, or 
 
 ### Added
 - `Unfunded agreements` entry in the optional-extensions registry (MTA, DUA, NDA, teaming agreements, MOUs).
-- Validation tooling: a formal metaschema for the JSON artifact (`schemas/udm_schema_v2.metaschema.json`), a structural and referential validator (`scripts/validate_schema.py`), and a prose/JSON sync checker (`scripts/check_spec_sync.py`), all wired into CI.
+- Validation tooling: a formal metaschema for the JSON artifact (`schemas/udm_schema.metaschema.json`), a structural and referential validator (`scripts/validate_schema.py`), and a prose/JSON sync checker (`scripts/check_spec_sync.py`), all wired into CI.
 
 ## [2.0.0] — 2026-06-11
 
 UDM v2 is a major refactor of the model. It supersedes UDM v1.
 
-Both versions of the JSON serialization are kept side-by-side at the repository root: [udm_schema.json](../udm_schema.json) (v1, preserved for reference) and [udm_schema_v2.json](../udm_schema_v2.json) (v2). The canonical prose specification lives in [udm-v2-system-of-record.md](udm-v2-system-of-record.md); the architectural overview is in [ontology.md](ontology.md).
+The JSON serialization lives at the repository root as [udm_schema.json](../udm_schema.json). (The v1 file carried that name beside `udm_schema_v2.json` until 2026-10-21, when the current schema took the name; v1 is read from the v2.0.0 release.) The canonical prose specification lives in [udm-v2-system-of-record.md](udm-v2-system-of-record.md); the architectural overview is in [ontology.md](ontology.md).
 
 ### Architectural changes
 
@@ -108,7 +108,7 @@ Both versions of the JSON serialization are kept side-by-side at the repository 
 - **`SubmissionAttachment`, `SubmissionEvent`** → subsumed by `Document` polymorphic attachment + `ActivityLog`.
 - **`ApplicationSystem`, `ServiceRequest`** → removed from canonical model; documented in Optional Extensions. Service tickets recommended as `Action` rows with `Action_Type = 'Service_Request'`.
 - **`ProjectCohort`, `CohortParticipation`** → removed. Faculty-development cohorts deferred to local extensions.
-- **`InventionDisclosure`, `InventionDisclosureInventor`** → removed. Invention disclosures, patent prosecution, licensing, royalty distribution, and spinout tracking live in specialized tech transfer management systems; Bayh-Dole touchpoint via `Report.Report_Type = 'Invention_Statement'`. (These two entities existed only in v1-era prose drafts, not in the v1 `udm_schema.json`; listed here so the design decision is on record.)
+- **`InventionDisclosure`, `InventionDisclosureInventor`** → removed. Invention disclosures, patent prosecution, licensing, royalty distribution, and spinout tracking live in specialized tech transfer management systems; Bayh-Dole touchpoint via `Report.Report_Type = 'Invention_Statement'`. (These two entities existed only in v1-era prose drafts, not in the v1 schema; listed here so the design decision is on record.)
 
 #### Entities added
 - `PersonnelCredential` — sponsor-system IDs (eRA Commons, NSF FastLane) and HR-domain credentials for non-employee Personnel.
@@ -168,7 +168,7 @@ Moved to Optional Extensions:
 ### Documentation deliverables
 
 - [vignettes/udm-v2-system-of-record.md](udm-v2-system-of-record.md) — canonical prose specification.
-- [udm_schema_v2.json](../udm_schema_v2.json) — MySQL/MariaDB serialization at the repository root with structured constraints, derived values, 12 example views, ~200-entry column synonyms sidecar.
+- [udm_schema.json](../udm_schema.json) — MySQL/MariaDB serialization at the repository root with structured constraints, derived values, 12 example views, ~200-entry column synonyms sidecar.
 - [vignettes/ontology.md](ontology.md) — architectural overview describing v2.
 
 ### Migration from v1
@@ -190,4 +190,4 @@ A more detailed v1-to-v2 entity mapping is documented in [ontology.md](ontology.
 
 ## [1.0.0] — prior
 
-The pre-v2 model. See [udm_schema.json](../udm_schema.json) at the repository root and the prior [ontology.md](ontology.md) revision (git history before commit `92e21ed`).
+The pre-v2 model. Its schema file was removed from the repository on 2026-10-21 and is read from the [v2.0.0 release](https://github.com/ui-insight/AI4RA-UDM/blob/v2.0.0/udm_schema.json); the prior [ontology.md](ontology.md) revision is in git history before commit `92e21ed`.

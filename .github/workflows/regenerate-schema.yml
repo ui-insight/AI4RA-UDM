@@ -5,7 +5,6 @@ on:
     branches: [main]
     paths:
       - 'udm_schema.json'
-      - 'udm_schema_v2.json'
       - 'scripts/generate_dashboard_data.py'
       - 'scripts/validate_schema.py'
       - 'scripts/check_spec_sync.py'
@@ -54,7 +53,7 @@ jobs:
       - name: Check the specification conforms to itself
         run: python scripts/check_conformance.py --self-check
 
-      - name: Generate dashboard data files from udm_schema_v2.json
+      - name: Generate dashboard data files from udm_schema.json
         run: python scripts/generate_dashboard_data.py
 
       - name: Install dashboard dependencies

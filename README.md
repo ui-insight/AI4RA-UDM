@@ -22,7 +22,7 @@ The UDM is a **specification**, not a database. It defines what tables, columns,
 The UDM v2 is defined in two complementary artifacts:
 
 - [`vignettes/udm-v2-system-of-record.md`](vignettes/udm-v2-system-of-record.md) — the canonical prose specification: every entity, column, constraint, semantic convention, and design rationale, written database-engine agnostic.
-- [`udm_schema_v2.json`](udm_schema_v2.json) — a machine-readable MySQL/MariaDB-dialect serialization of the spec: tables, columns, types, foreign keys, allowed values, PII flags, column synonyms, cross-row constraints, derived-value rules, and example views. Use this to generate DDL, build crosswalk tooling, or feed schema context to LLMs.
+- [`udm_schema.json`](udm_schema.json) — a machine-readable MySQL/MariaDB-dialect serialization of the spec: tables, columns, types, foreign keys, allowed values, PII flags, column synonyms, cross-row constraints, derived-value rules, and example views. Use this to generate DDL, build crosswalk tooling, or feed schema context to LLMs.
 
 The two are kept in exact sync; the prose spec is authoritative on intent, the JSON on machine-consumable detail. An architectural overview lives in [`vignettes/ontology.md`](vignettes/ontology.md), and the version history in [`vignettes/CHANGELOG.md`](vignettes/CHANGELOG.md).
 
@@ -75,7 +75,7 @@ For a detailed explanation of every table, pattern, and design decision, see the
 
 ### JSON Format
 
-The `udm_schema_v2.json` structure (abbreviated):
+The `udm_schema.json` structure (abbreviated):
 
 ```json
 {
@@ -116,16 +116,15 @@ The UDM is served as static JSON via GitHub Pages. These endpoints define the **
 
 | Endpoint | Description |
 |----------|-------------|
-| [`/data/udm_schema_v2.json`](https://ui-insight.github.io/AI4RA-UDM/data/udm_schema_v2.json) | **Complete v2 schema (current)** — tables, columns, types, constraints, descriptions, synonyms, PII flags, cross-row constraints, example views |
+| [`/data/udm_schema.json`](https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json) | **Complete v2 schema (current)** — tables, columns, types, constraints, descriptions, synonyms, PII flags, cross-row constraints, example views |
 | [`/data/data-dictionary.json`](https://ui-insight.github.io/AI4RA-UDM/data/data-dictionary.json) | Human-readable descriptions, synonyms, and PII flags |
 | [`/data/relationships.json`](https://ui-insight.github.io/AI4RA-UDM/data/relationships.json) | Foreign key relationships |
-| [`/data/udm_schema.json`](https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json) | UDM v1 schema, preserved for reference |
 
-Most consumers only need the primary endpoint (`udm_schema_v2.json`) — it contains everything.
+Most consumers only need the primary endpoint (`udm_schema.json`) — it contains everything.
 
 ```javascript
 // Fetch the full UDM v2 schema
-const response = await fetch('https://ui-insight.github.io/AI4RA-UDM/data/udm_schema_v2.json');
+const response = await fetch('https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json');
 const udm = await response.json();
 
 // Browse tables
@@ -150,7 +149,7 @@ The UDM is database-agnostic. The JSON serialization uses MySQL/MariaDB types as
 
 | Technology | Notes |
 |------------|-------|
-| **MySQL / MariaDB** | Generate CREATE TABLE statements directly from `udm_schema_v2.json` |
+| **MySQL / MariaDB** | Generate CREATE TABLE statements directly from `udm_schema.json` |
 | **PostgreSQL** | Same approach; `VARCHAR` works as-is, adjust date functions |
 | **SQLite** | Good for lightweight/embedded deployments; adapt constraints to SQLite syntax |
 | **SQL Server** | Adjust type names (`VARCHAR` → `NVARCHAR`, date functions) |
@@ -188,10 +187,7 @@ An implementation or a vendor product shows that it follows the UDM with a confo
 
 ## Versions
 
-| Version | Status | Artifacts |
-|---------|--------|-----------|
-| **v2.3** | Current | [`udm_schema_v2.json`](udm_schema_v2.json), [prose spec](vignettes/udm-v2-system-of-record.md) |
-| v1.0 | Preserved for reference | [`udm_schema.json`](udm_schema.json) |
+The repository carries one version of the schema, the current one. Its version is in the `metadata` block of [`udm_schema.json`](udm_schema.json) and in the prose spec. Every release is a fixed commit published under [GitHub Releases](https://github.com/ui-insight/AI4RA-UDM/releases); an earlier version is read or cited from its release.
 
 v2 is a major refactor: 47 tables (from 40), six core modules (from ten domains), unified lifecycle modeling, Award/Subaward symmetry, and rule catalogs for cross-row constraints and semantic conventions. See the [CHANGELOG](vignettes/CHANGELOG.md) for the full delta and migration guidance from v1.
 

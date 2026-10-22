@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Verify that the prose spec and the JSON serialization agree.
 
-Compares vignettes/udm-v2-system-of-record.md against udm_schema_v2.json:
+Compares vignettes/udm-v2-system-of-record.md against udm_schema.json:
 
 1. Table sets match: every JSON table has a `#### TableName` section in the
    prose, and every prose table section names a JSON table.
@@ -20,7 +20,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SCHEMA_PATH = ROOT / "udm_schema_v2.json"
+SCHEMA_PATH = ROOT / "udm_schema.json"
 PROSE_PATH = ROOT / "vignettes" / "udm-v2-system-of-record.md"
 
 AUDIT_COLUMNS = {

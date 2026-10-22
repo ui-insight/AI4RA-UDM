@@ -254,16 +254,10 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
         </p>
         <ul style={{ paddingLeft: '1.25rem', color: '#546e7a', lineHeight: 1.8 }}>
           <li>
-            <a href="data/udm_schema_v2.json" style={{ color: '#667eea' }}>
-              /data/udm_schema_v2.json
-            </a>{' '}
-            — UDM v2 schema (current): semantic conventions, cross-row constraints, derived values, example views
-          </li>
-          <li>
             <a href="data/udm_schema.json" style={{ color: '#667eea' }}>
               /data/udm_schema.json
             </a>{' '}
-            — UDM v1 schema, preserved for reference
+            — UDM v2 schema (current): semantic conventions, cross-row constraints, derived values, example views
           </li>
           <li>
             <a href="data/data-dictionary.json" style={{ color: '#667eea' }}>

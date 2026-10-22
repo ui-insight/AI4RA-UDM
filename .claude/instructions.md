@@ -31,5 +31,5 @@
 - `udm_schema.json`: **Single Source of Truth (SSOT)** — complete schema with tables, columns, types, constraints, descriptions, synonyms, PII flags, and views
 - `scripts/generate_dashboard_data.py`: Generates dashboard data files from `udm_schema.json`
 - `docs/`: Dashboard and GitHub Pages site
-- `docs/data/`: Generated JSON files served as API endpoints
+- `docs/data/`: Generated JSON files served as API endpoints (built and deployed by the workflow, not committed)
 - `vignettes/`: Detailed documentation (ontology, AllowedValues pattern)

@@ -2,7 +2,7 @@
 
 This document describes the structure, conventions, and purpose of every entity in the AI4RA Unified Data Model, version 2. The UDM contains **47 tables** organized into **6 core modules** plus two implementation tables, along with **12 reference views**.
 
-For the canonical machine-readable specification, see [udm-v2-system-of-record.md](udm-v2-system-of-record.md) (prose) and [udm_schema_v2.json](../udm_schema_v2.json) (MySQL/MariaDB serialization at the repository root, alongside the v1 [udm_schema.json](../udm_schema.json)).
+For the canonical machine-readable specification, see [udm-v2-system-of-record.md](udm-v2-system-of-record.md) (prose) and [udm_schema.json](../udm_schema.json) (MySQL/MariaDB serialization at the repository root).
 
 ## Scope
 

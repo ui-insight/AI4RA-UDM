@@ -5,7 +5,7 @@
 **Records targets declared:** none
 **AllowedValues groups declared:** none
 
-This module is governed by the module taxonomy's two laws (capability criterion, encapsulation rule); see the Architecture section of the core specification. Canonical machine-readable definition: `optional_modules.animal_research` in `udm_schema_v2.json`. Module tables carry the universal audit columns; they are omitted below as in the core spec.
+This module is governed by the module taxonomy's two laws (capability criterion, encapsulation rule); see the Architecture section of the core specification. Canonical machine-readable definition: `optional_modules.animal_research` in `udm_schema.json`. Module tables carry the universal audit columns; they are omitted below as in the core spec.
 
 Per-regime detail for `Regime = 'Animal_Use'`: species and counts with USDA pain categories, procedures, hazards, the 3Rs alternatives search the Animal Welfare Act requires, and the closure report. All rows hang flat off Protocol_ID.
 
