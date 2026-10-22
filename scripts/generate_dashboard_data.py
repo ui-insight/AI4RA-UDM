@@ -7,6 +7,7 @@ that the dashboard (docs/index.html) needs:
   - docs/data/data-dictionary.json: table/column descriptions for browsing
   - docs/data/relationships.json: foreign key relationships for navigation
   - docs/data/udm_schema.json: copy of full v2 schema for API endpoint
+  - docs/schemas/udm_schema.metaschema.json: copy of the metaschema, so its $id URL resolves
 
 Per-column synonyms in v2 live in the top-level column_synonyms.values map
 keyed by "TableName.Column_Name"; this script merges that sidecar back into
@@ -72,6 +73,12 @@ def main():
 
     shutil.copy2(schema_file, output_dir / 'udm_schema.json')
     print("Copied udm_schema.json to docs/data/")
+
+    metaschema_file = base_dir / 'schemas' / 'udm_schema.metaschema.json'
+    metaschema_out = base_dir / 'docs' / 'schemas'
+    metaschema_out.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(metaschema_file, metaschema_out / metaschema_file.name)
+    print("Copied udm_schema.metaschema.json to docs/schemas/")
 
     print("\nDone.")
 
