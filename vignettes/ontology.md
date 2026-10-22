@@ -311,7 +311,7 @@ Specific requirements extracted from an RFA. Acts as a template; per-proposal co
 
 ### Proposal
 
-A formal request for funding submitted to a sponsor. Tracks the full lifecycle: drafting, internal routing (via ProposalApproval), submission (recorded as a Sponsor_Submission Action), and decision. Links to three distinct Organization roles: Sponsor, Submitting, Administering.
+A formal request for funding submitted to a sponsor. Tracks the full lifecycle: drafting, internal routing (via ProposalApproval), submission (recorded as SubmissionAttempt rows), and decision. Links to three distinct Organization roles: Sponsor, Submitting, Administering.
 
 Carries lineage columns: `Previous_Proposal_ID` (resubmission/renewal/continuation), `Originating_Proposal_ID` (derived chain root), `Group_ID` (user-maintained grouping).
 

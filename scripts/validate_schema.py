@@ -100,6 +100,20 @@ def check_table(label, tname, tdef, expected_pk=None):
         av = cdef.get("allowed_values")
         if av is not None and (not isinstance(av, list) or not all(isinstance(v, str) for v in av)):
             err(f"{where}: allowed_values must be a list of strings")
+        vd = cdef.get("value_definitions")
+        if av is not None and vd is None:
+            err(f"{where}: allowed_values without value_definitions")
+        if vd is not None:
+            if not isinstance(vd, dict) or set(vd) != set(av or []):
+                err(f"{where}: value_definitions keys must equal allowed_values")
+            else:
+                for v, entry in vd.items():
+                    if not isinstance(entry, dict) or not entry.get("definition"):
+                        err(f"{where}.{v}: value definition needs a 'definition'")
+                        continue
+                    for n in entry.get("next", []):
+                        if n not in av:
+                            err(f"{where}.{v}: next value '{n}' is not an allowed value")
         if "synonyms" in cdef and not isinstance(cdef["synonyms"], str):
             err(f"{where}: synonyms must be a string")
         der = cdef.get("derived")

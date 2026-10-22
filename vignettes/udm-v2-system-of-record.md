@@ -70,7 +70,7 @@ Two laws govern every module, core or optional:
 | Core module | Tables |
 |---|---|
 | **Actors** | Personnel, PersonnelCredential, Organization, OrganizationCapability, OrganizationIdentifier, OrganizationRole, ContactDetails |
-| **Funding Cycle** | RFA, RFARequirement, Proposal, ProposalApproval, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout |
+| **Funding Cycle** | RFA, RFARequirement, Proposal, SubmissionAttempt, ProposalApproval, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout |
 | **Effort** | AwardRole, Effort |
 | **Finance** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment |
 | **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure, PolicyException |
@@ -304,13 +304,12 @@ No single entity captures "the decision" abstractly; the three representations t
 
 **Action.Outcome_Description.** When an Action records a structured workflow with a substantive result (Subrecipient_Risk_Review, Modification_Approval, Cost_Transfer_Approval), the outcome lives in `Outcome_Description` plus an optional `Linked_Document_ID` for the formal report.
 
-**Sponsor submission events.** The *fact* that a proposal was submitted to a sponsor is research-administration data; the *mechanics* of how the submission tooling assembled and transmitted it are not.
+**Submission attempts.** The *fact* that a proposal went to a sponsor is research-administration data; the *mechanics* of how the submission tooling assembled and transmitted it are not.
 
-- Each submission event is one `Action` row attached to the Proposal (`Related_Entity_Type = 'Proposal'`) with `Action_Type` resolving to `Sponsor_Submission`.
-- `Completed_Date` carries the actual submission (or rejection) timestamp; `Action_Status` is `Completed` on success or `Failed`.
-- Sponsor confirmation / tracking numbers live in `Outcome_Description` as free text; a System of Insight view extracts them when an indexed lookup is needed.
-- Re-submissions add additional `Action` rows; re-submission history is the natural row sequence.
-- Package assembly artifacts, connection profiles, and retry mechanics are submission-tooling internals and live in the System of Engagement.
+- Each transmission is one `SubmissionAttempt` row. Re-submissions add attempts; the attempt history is the row sequence by `Attempt_Number`.
+- `Proposal.Submission_Status` is the newest attempt's `Attempt_Status`; `Proposal.Submission_Date` and `Submission_Version` derive from the attempts.
+- Sponsor tracking and confirmation identifiers live on the attempt, indexed, not in free text.
+- Package assembly artifacts, connection profiles, and retry mechanics are submission-tooling internals and live in the System of Engagement. The transmitted package itself is a `Document` attached to the attempt; its hash is `Package_Hash`.
 
 ---
 
@@ -365,14 +364,16 @@ Implementations enforce these abstractly-stated rules using whatever mechanisms 
 
 ## Status taxonomy reference
 
-Universal status taxonomies are listed here in one place. Each is enforced wherever the column appears. Institution-specific enums use AllowedValues and are described in their consuming table's reference.
+Universal status taxonomies are listed here in one place. The JSON artifact carries, on each column, a definition for every value and, for lifecycle values, who sets it and which values may follow. Each is enforced wherever the column appears. Institution-specific enums use AllowedValues and are described in their consuming table's reference.
 
 | Field | Allowed values |
 |---|---|
 | `Award_Status` | Pending, Active, Closing, Closed, Suspended, Terminated |
 | `Subaward_Status` | Proposed, Pending, Active, Closed, Terminated, Suspended |
-| `Proposal.Internal_Approval_Status` | Draft, In_Review, Approved, Rejected, Withdrawn |
-| `Proposal.Decision_Status` | Pending, Submitted, Under_Review, Awarded, Declined, Withdrawn |
+| `Proposal.Internal_Approval_Status` | Draft, In_Review, Returned, Approved, Rejected |
+| `Proposal.Submission_Status` | Unapproved, Unsent, Submitting, Submitted, Received, Validated, Invalid, Accepted, Failed, Withdrawn (derived) |
+| `Proposal.Decision_Status` | Unsubmitted, Pending, Intent_to_Award, Awarded, Declined |
+| `SubmissionAttempt.Attempt_Status` | Unsent, Submitting, Submitted, Received, Validated, Invalid, Accepted, Failed, Withdrawn |
 | `RFA_Status` | Active, Closed, Superseded, Cancelled |
 | `Negotiation_Status` | Pending, Active, On_Hold, Resolved, Abandoned |
 | `Modification.Approval_Status` | Pending, Approved, Rejected, Not_Required, Reversed (an approved Modification that was later withdrawn by sponsor or invalidated by institutional correction; excluded from derivations of `Award.Current_End_Date` and `Award.Current_Total_Funded`) |
@@ -439,6 +440,9 @@ Some columns are derived from other data. The model specifies the rule; the impl
 | `Award.Originating_Award_ID` | Walk the `Previous_Award_ID` chain back from this Award until reaching an Award with null `Previous_Award_ID`; that Award's `Award_ID` is the originating Award. Null when this Award is itself the root (its own `Previous_Award_ID` is null). Parallels `Proposal.Originating_Proposal_ID`. | On insert/update of Award.Previous_Award_ID |
 | `Award.Current_PI_Personnel_ID` | The `Personnel_ID` of the unique active AwardRole row on this Award where `Role_Value_ID` resolves (via Canonical_Value_Code) to `PI` and the row is active on today's date (`Start_Date <= today AND (End_Date IS NULL OR End_Date >= today)`). Null when no such row exists — either the Award is in Multi_PI mode (one or more active rows resolving to `Multi_PI`) or no PI/Multi_PI rows are active (community-partner Subaward case). The exclusivity rule on AwardRole (PI vs Multi_PI is exclusive) guarantees at most one active PI row in single-PI mode | On insert/update of any AwardRole row on this Award; on the daily rollover that may change which rows are active on today's date |
 | `Subaward.Current_PI_Personnel_ID` | Symmetric to Award.Current_PI_Personnel_ID but scoped to AwardRole rows where `Subaward_ID` equals this Subaward. | On insert/update of any AwardRole row on this Subaward; on the daily rollover |
+| `Proposal.Submission_Status` | Unapproved while `Internal_Approval_Status` is not Approved; Unsent when Approved and no SubmissionAttempt exists; otherwise the `Attempt_Status` of the SubmissionAttempt with the highest `Attempt_Number` | On insert/update of `Proposal.Internal_Approval_Status`; on insert/update of any SubmissionAttempt for the Proposal |
+| `Proposal.Submission_Version` | The count of SubmissionAttempt rows for the Proposal; 0 before the first attempt | On insert/delete of a SubmissionAttempt for the Proposal |
+| `Proposal.Submission_Date` | The date of `Submitted_At` on the newest SubmissionAttempt whose `Attempt_Status` is Submitted, Received, Validated, Invalid, or Accepted; null when no attempt has reached Submitted | On insert/update of any SubmissionAttempt for the Proposal |
 
 Common implementation choices: generated column, trigger that maintains the value, view that computes it, or application-layer compute on read. The model accepts any approach that produces the correct value at the moment a consumer reads it.
 
@@ -456,7 +460,13 @@ The following rules require enforcement beyond what a single column declaration 
 | ContactDetails | Exactly one of `Personnel_ID` or `Organization_ID` is non-null |
 | Communication | Exactly one of `External_Personnel_ID` or `External_Party_Name` is non-null. Every Communication row identifies its external party either via FK to Personnel or via free-text name |
 | ContactDetails | At most one row per (referenced entity, `Contact_Type_Value_ID`) has `Is_Primary = true` |
+| Proposal | `Decision_Status` is Unsubmitted while no SubmissionAttempt for the Proposal has `Attempt_Status` Accepted, or while the newest attempt is Withdrawn; otherwise it is Pending, Intent_to_Award, Awarded, or Declined |
 | Proposal | `Decision_Status = 'Awarded'` only when `Internal_Approval_Status = 'Approved'` |
+| SubmissionAttempt | `Attempt_Number` is unique within the Proposal and consecutive from 1 |
+| SubmissionAttempt | `Submitted_At` is required when `Attempt_Status` is Submitted, Received, Validated, Invalid, or Accepted |
+| SubmissionAttempt | At most one SubmissionAttempt per Proposal has `Attempt_Status` Unsent or Submitting: one attempt is in flight at a time |
+| SubmissionAttempt | SubmissionAttempt rows exist only for a Proposal whose `Internal_Approval_Status` is Approved |
+| PreAwardAuthorization | The Proposal referenced by `Proposal_ID` has `Decision_Status` Pending or Intent_to_Award |
 | Proposal | The `Previous_Proposal_ID` chain is acyclic: following it from any row reaches a row whose `Previous_Proposal_ID` is null |
 | Award | `FAIN` is required when the Sponsor's `Sponsor_Type = 'Federal'`; `FAIN` is unique within the institution when not null |
 | Award | Referenced `Sponsor_Organization_ID` has an OrganizationCapability with Capability resolving to `Sponsor` |
@@ -751,20 +761,39 @@ A formal request for funding submitted to a sponsor.
 | Previous_Proposal_ID | ID | optional | → Proposal. Lineage for resubmissions, renewals, continuations |
 | Originating_Proposal_ID | ID | optional | → Proposal. The root of this Proposal's `Previous_Proposal_ID` chain. Derived, stored. Null when this Proposal is itself the root (no predecessor). Auto-updates if `Previous_Proposal_ID` is ever corrected. Used for lineage queries without recursive CTE traversal |
 | Group_ID | ShortCode | optional | A user-maintained grouping label that ties related Proposals together under one longitudinal scientific or scholarly identity. Independent of the lineage chain: the institution may persist a Group across renewals or fork to a new Group while lineage continues, deliberately. Not auto-updated by lineage edits |
-| Submission_Version | Count | required | Default 1 |
+| Submission_Version | Count | derived | The number of submission attempts made for this proposal. Derived from SubmissionAttempt; 0 before the first attempt |
 | Proposed_Start_Date | Date | required | |
 | Proposed_End_Date | Date | required | |
 | Total_Proposed_Direct | Money | optional | |
 | Total_Proposed_Indirect | Money | optional | |
 | Total_Proposed_Budget | Money | optional | |
 | Submission_Deadline | Date | optional | The sponsor deadline this proposal targets |
-| Submission_Date | Date | optional | When the proposal was actually submitted |
-| Internal_Approval_Status | Status | required | See Status taxonomy |
-| Decision_Status | Status | required | See Status taxonomy |
-| Decision_Date | Date | optional | |
+| Submission_Date | Date | derived | The date the proposal last went to the sponsor: `Submitted_At` of the newest SubmissionAttempt that reached Submitted or later; null before then |
+| Internal_Approval_Status | Status | required | Where the proposal stands in the institution's internal approval chain: Draft, In_Review, Returned, Approved, Rejected. A proposal is submitted only once this is Approved |
+| Submission_Status | Status | derived | Where the proposal stands with the sponsor's submission system: Unapproved until the approval chain reaches Approved; Unsent once approved and before the first attempt; then the newest SubmissionAttempt's `Attempt_Status` |
+| Decision_Status | Status | required | The sponsor's disposition: Unsubmitted, Pending, Intent_to_Award, Awarded, Declined. Unsubmitted and Pending follow the submission stage; the rest are set from the sponsor's communication |
+| Decision_Date | Date | optional | When the sponsor's disposition was received: the Intent_to_Award, Awarded, or Declined date |
 | Risk_Level | Status | optional | See Status taxonomy |
 | Proposal_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'ProposalType'`. Recommended values: New / Resubmission / Renewal / Continuation / Revision / Task_Order |
 | Mechanism_Value_ID | ID | optional | → AllowedValues with `Value_Group = 'FundingMechanism'`. The funding mechanism / activity code the proposal targets |
+
+#### SubmissionAttempt
+
+One transmission of a proposal to a sponsor's submission system. The newest attempt's `Attempt_Status` is the proposal's `Submission_Status`. The attempt records what was sent, by whom, when, and what the sponsor's system said; package assembly, connection profiles, and retry mechanics stay in the System of Engagement.
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| SubmissionAttempt_ID | ID | required | PK |
+| Proposal_ID | ID | required | → Proposal. The proposal transmitted |
+| Attempt_Number | Count | required | 1 for the first attempt; consecutive within the Proposal |
+| Channel_Value_ID | ID | optional | → AllowedValues with `Value_Group = 'SubmissionChannel'`. Recommended values: Federal_Portal / Sponsor_Portal / Email / Paper / Other |
+| Submitted_By_Personnel_ID | ID | required | → Personnel. Who transmitted the attempt: the authorized organizational representative, or the person they released it to |
+| Submitted_At | Timestamp | conditional | When the transmission was sent. Required when `Attempt_Status` is Submitted, Received, Validated, Invalid, or Accepted |
+| Attempt_Status | Status | required | Constrained: Unsent / Submitting / Submitted / Received / Validated / Invalid / Accepted / Failed / Withdrawn. The attempt's state as the sponsor's system reports it |
+| Tracking_Identifier | ShortCode | optional | The identifier the sponsor's system assigned to this transmission |
+| Sponsor_Acknowledged_At | Timestamp | optional | When the sponsor's system acknowledged receipt |
+| Package_Hash | Hash | optional | SHA-256 of the assembled package as transmitted, so a sign-off can be matched to what went out |
+| Notes | LongText | optional | Validation messages, the reason for a withdrawal |
 
 #### ProposalApproval
 
@@ -1333,7 +1362,7 @@ Institution-specific controlled vocabularies. The `Value_Group` column names a f
 | Parent_AllowedValue_ID | ID | optional | → AllowedValues. Self-referencing. Set when the vocabulary is two-level: this row is a member of the value set that its parent row defines. CommunicationResponseValue rows carry the CommunicationResponseType row they answer as parent |
 | Canonical_Value_Code | ShortCode | optional | The canonical code (across institutions) that this local code maps to. Null when the local code has no canonical equivalent. Used by cross-institution queries to normalize values |
 
-**Canonical Value_Group names:** ContactType, OrganizationCapability, AwardRole, OrganizationRole, ProtocolRole, FundType, TransactionType, ModificationEventType, ActionType, DocumentType, FinanceCodePurpose, COIRelationshipType, CostShareCommitmentType, RestrictionType, DeadlineType, ProposalType, FundingMechanism, ComplianceReviewPathway, ComplianceClassificationLevel, CommunicationResponseType, CommunicationResponseValue.
+**Canonical Value_Group names:** ContactType, OrganizationCapability, AwardRole, OrganizationRole, ProtocolRole, FundType, TransactionType, ModificationEventType, ActionType, DocumentType, FinanceCodePurpose, COIRelationshipType, CostShareCommitmentType, RestrictionType, DeadlineType, ProposalType, FundingMechanism, ComplianceReviewPathway, ComplianceClassificationLevel, CommunicationResponseType, CommunicationResponseValue, SubmissionChannel.
 
 #### BudgetCategory
 
@@ -1366,7 +1395,7 @@ Files associated with any entity.
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | Document_ID | ID | required | PK |
-| Related_Entity_Type | Status | required | Constrained: Award / Subaward / Proposal / ProposalApproval / PreAwardAuthorization / Personnel / PersonnelCredential / ComplianceRequirement / Modification / Action / Restriction / Budget / Negotiation / Terms / Report / Closeout / Equipment |
+| Related_Entity_Type | Status | required | Constrained: Award / Subaward / Proposal / SubmissionAttempt / ProposalApproval / PreAwardAuthorization / Personnel / PersonnelCredential / ComplianceRequirement / Modification / Action / Restriction / Budget / Negotiation / Terms / Report / Closeout / Equipment |
 | Related_Entity_ID | ID | required | The PK value in the table named by Related_Entity_Type |
 | Document_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'DocumentType'`. Recommended values: NOA / Biosketch / DMP / Budget_Justification / Other_Support / Public_Access_Plan / LOI / Sponsor_Agreement / Subaward_Agreement / Modification_Notice / Approved_Items_Schedule / Closeout_Document / Compliance_Approval_Letter / Restriction_Authority_Document / Training_Certificate |
 | File_Name | MediumName | required | |
@@ -1385,7 +1414,7 @@ Inbound or outbound correspondence between the institution and an external party
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | Communication_ID | ID | required | PK |
-| Related_Entity_Type | Status | required | Constrained: Award / Subaward / Proposal / RFA / Modification / Negotiation / Terms / ComplianceRequirement / Personnel / Closeout / Report |
+| Related_Entity_Type | Status | required | Constrained: Award / Subaward / Proposal / SubmissionAttempt / RFA / Modification / Negotiation / Terms / ComplianceRequirement / Personnel / Closeout / Report |
 | Related_Entity_ID | ID | required | |
 | Communication_Type | Status | required | Constrained: Email / Phone_Call / Meeting / Letter / Portal_Message / Other |
 | Direction | Status | required | Constrained: Inbound / Outbound |
@@ -1472,7 +1501,7 @@ Work items attached to entities: deliverables, checklist items, service requests
 | Action_ID | ID | required | PK |
 | Related_Entity_Type | Status | required | Constrained: Award / Subaward / Proposal / ProposalApproval / PreAwardAuthorization / Personnel / ComplianceRequirement / Modification / Negotiation / Terms / Closeout / Report / Equipment |
 | Related_Entity_ID | ID | required | |
-| Action_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'ActionType'`. Recommended values: Deliverable / Checklist_Item / Service_Request / Modification_Approval / Compliance_Renewal / Training_Required / Training_Completion / Subrecipient_Risk_Review / Cost_Transfer_Approval / JIT_Request / Sponsor_Submission / Other |
+| Action_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'ActionType'`. Recommended values: Deliverable / Checklist_Item / Service_Request / Modification_Approval / Compliance_Renewal / Training_Required / Training_Completion / Subrecipient_Risk_Review / Cost_Transfer_Approval / JIT_Request / Other |
 | Title | MediumName | required | |
 | Description | LongText | optional | |
 | Assignee_Personnel_ID | ID | optional | → Personnel |

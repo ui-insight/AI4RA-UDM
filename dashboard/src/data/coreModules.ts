@@ -28,6 +28,7 @@ export const coreModuleGroups: CoreModuleGroup[] = [
       'RFA',
       'RFARequirement',
       'Proposal',
+      'SubmissionAttempt',
       'ProposalApproval',
       'PreAwardAuthorization',
       'Award',

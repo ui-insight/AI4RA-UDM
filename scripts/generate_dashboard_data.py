@@ -47,6 +47,8 @@ def main():
                 'description': col_def.get('description', ''),
                 'synonyms': col_def.get('synonyms'),
                 'pii': col_def.get('pii', False),
+                'allowed_values': col_def.get('allowed_values'),
+                'value_definitions': col_def.get('value_definitions'),
             })
             if 'references' in col_def:
                 relationships.append({

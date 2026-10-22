@@ -144,6 +144,18 @@
         "value_group": { "type": "string" },
         "recommended_values": { "type": "array", "items": { "type": "string" } },
         "allowed_values": { "type": "array", "items": { "type": "string" } },
+        "value_definitions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["definition"],
+            "properties": {
+              "definition": { "type": "string" },
+              "set_by": { "type": "string" },
+              "next": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
         "conditional_required": { "type": "string" },
         "references": {
           "type": "object",
