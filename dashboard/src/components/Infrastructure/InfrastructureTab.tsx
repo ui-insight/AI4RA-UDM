@@ -185,6 +185,18 @@ export default function InfrastructureTab() {
             </a>{' '}
             to help map your source field names to UDM column names.
           </p>
+          <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
+            The UDM is a normalized model, in the Inmon tradition. Normalization is what makes it modular: a module adds
+            tables that reference the core by foreign key, without changing the core tables. Star schemas are a useful next
+            step for reporting. Adopters build the ones their questions need as Platinum views or marts over Gold.{' '}
+            <a
+              href="https://github.com/ui-insight/AI4RA-UDM/blob/main/vignettes/udm-architecture.md#16-a-normalized-core-is-the-standard-star-schemas-are-the-adopters-choice"
+              style={{ color: '#667eea' }}
+            >
+              Read the full reasoning
+            </a>
+            .
+          </p>
         </div>
 
         <div style={{ marginTop: '2rem' }}>

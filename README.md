@@ -1,19 +1,16 @@
 # AI4RA Unified Data Model (UDM)
 
-A universal data model for research administration. The UDM provides a common schema that any institution can adopt to standardize how research administration data is structured, described, and shared — regardless of what systems they use internally.
+A universal data model for research administration that any institution can adopt.
 
 **Current version: v3.0.0** (released 2026-10-22). Earlier versions are fixed commits under [GitHub Releases](https://github.com/ui-insight/AI4RA-UDM/releases); see [Versions](#versions).
 
 ## Mission
 
-Research administration data is fragmented across institutions, locked in proprietary systems with inconsistent naming, structures, and definitions. The AI4RA UDM aims to:
+Research administration data is scattered across institutions and proprietary systems, and each system names and defines things its own way. When two systems disagree on what counts as an active award, someone has to work out by hand which one is right.
 
-- **Standardize** the language and structure of research administration data across institutions
-- **Be generic enough** to accommodate the diverse needs of universities, research institutes, and funding agencies
-- **Enable interoperability** between systems by providing a shared framework that institutions map their local data to
-- **Support FAIR data principles** — making research administration data Findable, Accessible, Interoperable, and Reusable
+The UDM is a shared set of definitions for this data. Once local data is mapped to the UDM, systems can exchange it and institutions can compare it. The UDM is generic enough for universities, research institutes, and funding agencies. It aims to support the FAIR data principles (Findable, Accessible, Interoperable, Reusable).
 
-The UDM is a **specification**, not a database. It defines what tables, columns, relationships, and constraints should exist. Institutions implement it in whatever database technology fits their environment and map their local data to the common model.
+The UDM is a specification. It defines the tables, columns, relationships, and constraints that should exist. Institutions implement it in whatever database technology fits their environment.
 
 ## How the UDM Is Defined
 
@@ -112,7 +109,7 @@ The `udm_schema.json` structure (abbreviated). Everything specified is a module,
 
 ## Accessing the UDM
 
-The UDM is served as static JSON via GitHub Pages. These endpoints define the **framework** — the structure and conventions of the data model. They do not contain populated data; institutions implement the model and populate it with their own data.
+The UDM is served as static JSON via GitHub Pages. These endpoints define the structure and conventions of the data model. They do not contain populated data. Institutions implement the model and populate it with their own data.
 
 | Endpoint | Description |
 |----------|-------------|

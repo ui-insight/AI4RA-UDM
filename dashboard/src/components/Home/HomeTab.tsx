@@ -28,20 +28,20 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
           AI4RA Unified Data Model
         </h2>
         <p style={{ color: '#546e7a', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '1rem' }}>
-          Every institution stores the same research administration data differently. Proposals,
-          awards, budgets, and compliance records are scattered across eRA, finance, and HR systems —
-          locked in proprietary schemas with inconsistent names, structures, and definitions. Simple
-          questions span three systems, cross-institution reporting means manual reconciliation, and
-          every institution hand-builds the same field mappings from scratch.
+          Research administration data is scattered across institutions and proprietary systems, and
+          each system names and defines things its own way. When two systems disagree on what counts
+          as an active award, someone has to work out by hand which one is right.
         </p>
         <p style={{ color: '#546e7a', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '1rem' }}>
-          The UDM is a shared answer: a common language for research administration data. It defines
-          a canonical schema — pre-award proposal preparation, sponsor submission, post-award
-          management, financial accounting, personnel effort, and compliance — that institutions map
-          their local systems onto. It is a specification, not a database: implement it in whatever
-          storage technology fits your environment. A shared language makes research administration
-          data Findable, Accessible, Interoperable, and Reusable (FAIR) — within an institution and
-          across them.
+          The UDM is a shared set of definitions for this data. Once local data is mapped to the UDM,
+          systems can exchange it and institutions can compare it. The UDM is generic enough for
+          universities, research institutes, and funding agencies. It aims to support the FAIR data
+          principles (Findable, Accessible, Interoperable, Reusable).
+        </p>
+        <p style={{ color: '#546e7a', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '1rem' }}>
+          The UDM is a specification. It defines the tables, columns, relationships, and constraints
+          that should exist. Institutions implement it in whatever database technology fits their
+          environment.
         </p>
         <p style={{ color: '#546e7a', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
           <strong>New here?</strong> Research administrators: start with the{' '}

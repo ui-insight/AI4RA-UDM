@@ -9,7 +9,10 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 
 ## [Unreleased]
 
-Nothing yet.
+### Documentation
+
+- **README and dashboard home page: description rewritten as plain prose.** Both now use the same Mission text. No change to the UDM's scope or goals.
+- **Dashboard: Infrastructure tab states the normalized position.** A short note under "Where the UDM Fits" says the UDM is normalized so it can be modular, and that adopters build star schemas over it for reporting.
 
 ## [3.0.0] - 2026-10-22
 
