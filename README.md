@@ -2,7 +2,7 @@
 
 A universal data model for research administration that any institution can adopt.
 
-**Current version: v3.0.0** (released 2026-10-22). Earlier versions are fixed commits under [GitHub Releases](https://github.com/ui-insight/AI4RA-UDM/releases); see [Versions](#versions).
+**Current version: v4.0.0** (released 2026-11-05). Earlier versions are fixed commits under [GitHub Releases](https://github.com/ui-insight/AI4RA-UDM/releases); see [Versions](#versions).
 
 ## Mission
 
@@ -78,7 +78,7 @@ The `udm_schema.json` structure (abbreviated). Everything specified is a module,
 
 ```json
 {
-  "metadata": { "name": "UDM", "version": "3.0.0", "spec_source": "vignettes/udm-system-of-record.md" },
+  "metadata": { "name": "UDM", "version": "4.0.0", "spec_source": "vignettes/udm-system-of-record.md" },
   "types": { "abstract": ["ID", "Money", "..."], "dialects": { "mysql": { "ID": "VARCHAR(50)", "Money": "DECIMAL(18,2)", "...": "..." }, "postgresql": { "...": "..." } } },
   "conventions": { "identifier": {}, "hierarchy": {}, "polymorphic_attachment": {}, "lifecycle_stage": {}, "audit_columns": {}, "constraint_vocabulary": {}, "semantic": [], "...": {} },
   "modules": {
@@ -194,7 +194,7 @@ An implementation or a vendor product shows that it follows the UDM with a confo
 
 ## Versions
 
-The repository carries one version of the schema, the current one. Its version is in the `metadata` block of [`udm_schema.json`](udm_schema.json) and in the prose spec. Every release is a fixed commit published under [GitHub Releases](https://github.com/ui-insight/AI4RA-UDM/releases); an earlier version is read or cited from its release.
+The repository carries one version of the schema, the current one. Its version is set in the [`VERSION`](VERSION) file and repeated in the `metadata` block of [`udm_schema.json`](udm_schema.json) and in the prose spec. Every release is a fixed commit published under [GitHub Releases](https://github.com/ui-insight/AI4RA-UDM/releases); an earlier version is read or cited from its release.
 
 The version follows semantic versioning: a major release may rename or remove tables and columns, a minor release only adds. See the [CHANGELOG](vignettes/CHANGELOG.md) for each release's delta and migration guidance.
 

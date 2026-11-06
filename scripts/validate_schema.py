@@ -13,8 +13,8 @@ Dependency-free. Two layers of checking:
    mapped in every dialect, and the module laws hold (a module's tables
    may reference only the core, the module itself, or a declared
    dependency; a module's Records targets are its own tables).
-3. Version: metadata.version and the README's current version match the
-   VERSION file, which is where the version is set.
+3. Version: metadata.version, the README's current version, and the prose
+   spec's version match the VERSION file, which is where the version is set.
 
 Exit status: 0 = valid, 1 = errors found. Warnings do not fail the run.
 """
@@ -27,6 +27,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SCHEMA_PATH = ROOT / "udm_schema.json"
 VERSION_PATH = ROOT / "VERSION"
 README_PATH = ROOT / "README.md"
+SPEC_PATH = ROOT / "vignettes" / "udm-system-of-record.md"
 
 REQUIRED_TOP_LEVEL = ["metadata", "types", "conventions", "modules", "implementation_tables"]
 REQUIRED_CONVENTIONS = [
@@ -175,6 +176,8 @@ def main():
             err(f"metadata.version '{meta.get('version')}' does not match VERSION '{version}'")
         if f"**Current version: v{version}**" not in README_PATH.read_text(encoding="utf-8"):
             err(f"README.md does not say 'Current version: v{version}'")
+        if f"**Version:** {version}." not in SPEC_PATH.read_text(encoding="utf-8"):
+            err(f"the prose spec does not say 'Version: {version}'")
 
     # --- Types: every abstract type is mapped in every dialect ---
     types = schema.get("types", {})
