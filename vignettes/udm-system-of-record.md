@@ -56,7 +56,7 @@ ETL or streaming pipelines carry finalized application data from the System of E
 **The module taxonomy.** Everything specified is a module: a named, fully specified, versioned slice of research administration capability. An implementation is described by what it adopts.
 
 - **Core modules** — the universal capabilities, required of every implementation. Each is named for the sentence every institution can say: Actors ("we track the people and organizations involved"), Funding Cycle ("we pursue and manage funded agreements, opportunity through closeout"), Effort ("we commit and certify effort on funded work"), Finance ("we manage the money"), Compliance ("we meet regulatory and policy obligations"), Records ("we keep the records that accumulate around the work"). Outputs ("we report what the work produced") joins the core at its release.
-- **Optional modules** — capabilities only some institutions exercise, adopted by declaration, e.g. "UDM 2.3 core + modules: compliance_protocols, human_subjects, governance." Available as of v2.3: Compliance Protocols (the spine), Animal Research, Human Subjects, Biosafety, Governance, and Committee Protocol Review; each is specified in `vignettes/modules/` and serialized under `modules.optional` in the JSON artifact. Planned: IP (requires the Outputs core module).
+- **Optional modules** — capabilities only some institutions exercise, adopted by declaration, e.g. "UDM 5.1 core + modules: compliance_protocols, human_subjects, governance." Available as of v2.3: Compliance Protocols (the spine), Animal Research, Human Subjects, Biosafety, Governance, and Committee Protocol Review; each is specified in `vignettes/modules/` and serialized under `modules.optional` in the JSON artifact. Planned: IP (requires the Outputs core module).
 - **Local extensions** — institution-specific additions outside the specification. The *Local extensions* section documents common cases and where they belong.
 
 Two laws govern every module, core or optional:
@@ -1633,7 +1633,7 @@ Convention: attachments reference other attachments by attaching to the same par
 
 ## Local extensions
 
-Areas the UDM deliberately does not model in v2. Institutions that need these capabilities add local extension tables and reference them from the canonical entities listed below. These are not gaps in the model; they are scope decisions.
+Areas the UDM deliberately does not model. Institutions that need these capabilities add local extension tables and reference them from the canonical entities listed below. These are not gaps in the model; they are scope decisions.
 
 **Detailed Export Control workflow.** ComplianceRequirement.Requirement_Type = 'Export_Control' captures the determination as a regulated approval. The model does not include dedicated entities for Technology Control Plans (the TCP document lives as a Document attachment on the ComplianceRequirement), per-shipment determinations, ECCN / commodity classification details, BIS or DDTC license records, foreign-national screening events, or visit-by-visit foreign national clearances. Institutions running active export control programs layer those records on top of ComplianceRequirement.
 
@@ -1669,7 +1669,7 @@ Institutions with substantial ticket volume that need structured analysis beyond
 
 **Human subjects participant payments.** Per-participant compensation records (anonymized participant IDs, payment dates and amounts, IRB-approved payment structures, cumulative-by-participant tax-reporting thresholds) live in study-team-managed participant payment systems. The institutional ledger sees only the bulk drawdown as a Transaction. UDM does not include a ParticipantPayment entity; institutions that centrally track participant payments add a local extension that links to Transaction and ComplianceRequirement.
 
-**Multi-currency awards and subawards.** All Money-typed columns in v2 carry a single institutional currency convention; there is no per-row currency code. Institutions with sponsor activity in non-base currencies (foreign sponsors paying in Euros, international subrecipients invoicing in local currency) add a local extension to track per-row currency, exchange rate at posting, and reporting-currency conversion. UDM does not include currency-code columns in the canonical model.
+**Multi-currency awards and subawards.** All Money-typed columns carry a single institutional currency convention; there is no per-row currency code. Institutions with sponsor activity in non-base currencies (foreign sponsors paying in Euros, international subrecipients invoicing in local currency) add a local extension to track per-row currency, exchange rate at posting, and reporting-currency conversion. UDM does not include currency-code columns in the canonical model.
 
 ---
 

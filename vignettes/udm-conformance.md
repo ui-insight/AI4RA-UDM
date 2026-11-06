@@ -8,8 +8,8 @@ Conformance is how an implementation or a product shows that it follows the UDM 
 
 | Profile | Who it is for | What it carries | Example claim |
 |---|---|---|---|
-| **Implementation** | A System of Record | Every core table, plus the tables of each declared optional module | AI4RA UDM 2.3 core + modules: governance |
-| **Provider** | A source system (eRA platform, ERP, HR system) that delivers data to a System of Record | A declared subset of tables, with provenance on every row | AI4RA UDM 2.3 provider: Award, Modification, Proposal |
+| **Implementation** | A System of Record | Every core table, plus the tables of each declared optional module | AI4RA UDM 5.1 core + modules: governance |
+| **Provider** | A source system (eRA platform, ERP, HR system) that delivers data to a System of Record | A declared subset of tables, with provenance on every row | AI4RA UDM 5.1 provider: Award, Modification, Proposal |
 
 A source system holds part of the model and is not a System of Record. The provider profile lets it deliver the part it holds in UDM form, so an institution can load it without building a crosswalk for that vendor.
 

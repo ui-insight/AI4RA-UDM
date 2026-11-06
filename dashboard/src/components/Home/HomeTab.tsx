@@ -3,7 +3,6 @@ import type { DataDictionary, Relationship, TabName } from '../../types';
 import { coreModuleGroups, getCoreModule } from '../../data/coreModules';
 import surveyQrUrl from '../../assets/udm-survey-qr.png';
 
-// Temporary survey link (original: https://bit.ly/4b2ruQ3, to be restored later)
 const SURVEY_URL = 'https://bit.ly/4b5b21q';
 const REPO_URL = 'https://github.com/ui-insight/AI4RA-UDM';
 const FORUM_JOIN_URL = 'https://groups.ai4ra.uidaho.edu/g/main/join';
