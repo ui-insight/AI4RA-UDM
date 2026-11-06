@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 955" width="1400" height="955" role="img" aria-labelledby="t d" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
 <title id="t">Proposal and award status path</title>
-<desc id="d">Four stages. Internal approval ends at Approved, which starts sponsor submission at Unsubmitted. Sponsor submission ends at Accepted, which starts sponsor decision at Pending. Sponsor decision ends at Awarded, which starts the award at In Setup. A Failed attempt is resent. An Invalid or Recalled attempt returns to Unsubmitted and is signed off again. A Withdrawn proposal ends or is revised. A recalled attempt returns to Unsubmitted and is signed off again. If the sponsor loses or rejects a proposal after accepting it, it moves from Pending back to Failed and can be resent. A sponsor can return a proposal as Not Reviewed.</desc>
+<desc id="d">Four stages. Internal approval ends at Approved, which starts sponsor submission at Unsubmitted. Sponsor submission ends at Accepted, which starts sponsor decision at Pending. Sponsor decision ends at Awarded, which starts the award at In Setup. A Failed attempt is resent. An Invalid or Recalled attempt returns to Unsubmitted and is signed off again. A Withdrawn proposal ends or is revised. A recalled attempt returns to Unsubmitted and is signed off again. A proposal sent back before consideration moves from Pending to Sent Back, then to Unsubmitted, and is signed off again. A sponsor can return a proposal as Not Reviewed.</desc>
 <defs>
 <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#334155"/></marker>
 <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#15803d"/></marker>
@@ -81,8 +81,8 @@
 <path d="M650 552L670 600" fill="none" stroke="#334155" stroke-width="1.6" marker-end="url(#a)"/>
 <path d="M842 552V670H252V728" fill="none" stroke="#15803d" stroke-width="2.4" marker-end="url(#g)"/>
 <text x="547" y="664" font-size="11.5" fill="#15803d" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="3">Awarded starts the award</text>
-<path d="M375 510V427H745V388" fill="none" stroke="#b45309" stroke-width="2.4" stroke-dasharray="5 4" marker-end="url(#m)"/>
-<text x="600" y="431" font-size="11.5" fill="#b45309" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="3">lost or rejected</text>
+<path d="M352 510V388" fill="none" stroke="#b45309" stroke-width="2.4" stroke-dasharray="5 4" marker-end="url(#m)"/>
+<path d="M352 345V313" fill="none" stroke="#b45309" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#m)"/>
 <text x="1027" y="788" font-size="11.5" fill="#b45309" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="3">post-closeout adjustment</text>
 <path d="M984 743H1070" fill="none" stroke="#b45309" stroke-width="1.6" marker-end="url(#m)"/>
 <path d="M1070 760H984" fill="none" stroke="#64748b" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#b)"/>
@@ -129,6 +129,7 @@
 <rect x="265" y="600" width="124" height="42" rx="7" fill="url(#wf)" stroke="url(#ws)" stroke-width="1.5"/><text x="327.0" y="626" font-size="13.5" font-weight="600" fill="#7c2d12" text-anchor="middle">Withdrawn</text>
 <rect x="420" y="600" width="124" height="42" rx="7" fill="#fee2e2" stroke="#991b1b" stroke-width="1.5"/><text x="482.0" y="626" font-size="13.5" font-weight="600" fill="#7f1d1d" text-anchor="middle">Not Reviewed</text>
 <rect x="610" y="600" width="124" height="42" rx="7" fill="#fee2e2" stroke="#991b1b" stroke-width="1.5"/><text x="672.0" y="626" font-size="13.5" font-weight="600" fill="#7f1d1d" text-anchor="middle">Declined</text>
+<rect x="240" y="345" width="124" height="42" rx="7" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/><text x="302.0" y="371" font-size="13.5" font-weight="600" fill="#78350f" text-anchor="middle">Sent Back</text>
 <rect x="190" y="730" width="124" height="42" rx="7" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/><text x="252.0" y="756" font-size="13.5" font-weight="600" fill="#1e3a8a" text-anchor="middle">In Setup</text>
 <rect x="390" y="730" width="124" height="42" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/><text x="452.0" y="756" font-size="13.5" font-weight="600" fill="#1e293b" text-anchor="middle">Active</text>
 <rect x="650" y="730" width="124" height="42" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/><text x="712.0" y="756" font-size="13.5" font-weight="600" fill="#1e293b" text-anchor="middle">Closing</text>

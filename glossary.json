@@ -1266,7 +1266,7 @@
     {
       "term": "Failed",
       "also": "",
-      "definition": "A submission status: the attempt did not reach the sponsor's system, or the sponsor lost it or sent it back after accepting it. The same package can be resent, and its sign-off stands. If the package changes, the status returns to Unsubmitted.",
+      "definition": "A submission status: the attempt did not reach the sponsor's system, so the same package can be resent. Its sign-off stands. If the package changes, the status returns to Unsubmitted.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Submission_Status=Failed"
@@ -1623,7 +1623,7 @@
     {
       "term": "Invalid",
       "also": "",
-      "definition": "A submission status: the sponsor's system received the attempt and rejected it on its checks. The package must be fixed and signed off again. Approval to pursue the opportunity stands. This happens before the sponsor accepts the proposal. A proposal sent back after acceptance is Failed.",
+      "definition": "A submission status: the sponsor's system received the attempt and rejected it on its checks. The package must be fixed and signed off again. Approval to pursue the opportunity stands. This happens before the sponsor accepts the proposal.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Submission_Status=Invalid"
@@ -1874,7 +1874,7 @@
     {
       "term": "Not Reviewed",
       "also": "",
-      "definition": "A decision status: the sponsor received the proposal but removed it from consideration without reviewing it. That ends the proposal. If the sponsor sends it back to be corrected and resent, the attempt is Failed.",
+      "definition": "A decision status: the sponsor received the proposal but removed it from consideration without reviewing it. That ends the proposal. A proposal that came back before it was considered, so it can be tried again, is Sent Back.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Decision_Status=Not_Reviewed"
@@ -2705,6 +2705,16 @@
       "udm": []
     },
     {
+      "term": "Sent Back",
+      "also": "",
+      "definition": "A submission status: the proposal came back before the sponsor considered it, because it was lost or rejected as incomplete. Find out why, then sign off again before resending.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Submission_Status=Sent_Back",
+        "SubmissionAttempt.Attempt_Status=Sent_Back"
+      ]
+    },
+    {
       "term": "Sign-off to submit",
       "also": "",
       "definition": "The gate that decides whether a specific package may be sent. It is tracked in sponsor submission.",
@@ -3245,7 +3255,7 @@
     {
       "term": "Unrequested",
       "also": "",
-      "definition": "A decision status: waiting on start. No sponsor outcome is recorded, and either no attempt has been accepted since the latest approval or the newest attempt was recalled or failed.",
+      "definition": "A decision status: waiting on start. No sponsor outcome is recorded, and either no attempt has been accepted since the latest approval or the newest attempt was recalled or sent back.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Decision_Status=Unrequested"

@@ -1700,7 +1700,7 @@
                 "required": false,
                 "description": "The date the proposal last went to the sponsor. Derived from SubmissionAttempt",
                 "derived": {
-                  "rule": "The date of Submitted_At on the newest SubmissionAttempt whose Attempt_Status is Submitted, Received, Validated, Invalid, Accepted, or Recalled; null when no attempt has reached Submitted.",
+                  "rule": "The date of Submitted_At on the newest SubmissionAttempt whose Attempt_Status is Submitted, Received, Validated, Invalid, Accepted, Recalled, or Sent_Back; null when no attempt has reached Submitted.",
                   "recompute_triggers": "On insert/update of any SubmissionAttempt for the Proposal."
                 }
               },
@@ -1774,7 +1774,8 @@
                   "Invalid",
                   "Accepted",
                   "Failed",
-                  "Recalled"
+                  "Recalled",
+                  "Sent_Back"
                 ],
                 "value_definitions": {
                   "Unsubmitted": {
@@ -1839,12 +1840,12 @@
                     "set_by": "Derived; the system computes it",
                     "next": [
                       "Recalled",
-                      "Failed",
+                      "Sent_Back",
                       "Unsubmitted"
                     ]
                   },
                   "Failed": {
-                    "definition": "The attempt did not reach the sponsor's system, or the sponsor lost it or sent it back after accepting it. The same package can be resent, and its sign-off stands. If the package changes, the status returns to Unsubmitted",
+                    "definition": "The attempt did not reach the sponsor's system, so the same package can be resent; its sign-off stands. If the package changes, the status returns to Unsubmitted",
                     "set_by": "Derived; the system computes it",
                     "next": [
                       "Signed_Off",
@@ -1858,11 +1859,19 @@
                     "next": [
                       "Unsubmitted"
                     ]
+                  },
+                  "Sent_Back": {
+                    "definition": "The proposal came back before the sponsor considered it, because it was lost or rejected as incomplete. Find out why, then sign off again before resending",
+                    "set_by": "Derived; the system computes it",
+                    "next": [
+                      "Unsubmitted",
+                      "Signed_Off"
+                    ]
                   }
                 },
                 "description": "Where the proposal stands with the sponsor's submission system. Unsubmitted until the current package is signed off, which requires internal approval; Signed_Off once it is ready to send; then the newest SubmissionAttempt's Attempt_Status. Derived",
                 "derived": {
-                  "rule": "Unsubmitted while Internal_Approval_Status is not Approved. When Approved: the Attempt_Status of the newest SubmissionAttempt made since the latest approval that has left Unsubmitted, if it is with the sponsor (Submitted, Received, Validated, or Accepted) or the current package matches its Package_Hash; otherwise Signed_Off when a Final_Sign_off on the current package is Approved, with any Release_to_Submit that follows it; otherwise Unsubmitted.",
+                  "rule": "Unsubmitted while Internal_Approval_Status is not Approved. When Approved: the Attempt_Status of the newest SubmissionAttempt made since the latest approval that has left Unsubmitted, if it is with the sponsor (Submitted, Received, Validated, or Accepted) or the current package matches its Package_Hash, unless it is Sent_Back and a newer Final_Sign_off is Approved; otherwise Signed_Off when a Final_Sign_off on the current package is Approved, with any Release_to_Submit that follows it; otherwise Unsubmitted.",
                   "recompute_triggers": "On insert/update of Proposal.Internal_Approval_Status; on insert/update of any SubmissionAttempt or Approval row for the Proposal; when the current package changes."
                 }
               },
@@ -1880,7 +1889,7 @@
                 ],
                 "value_definitions": {
                   "Unrequested": {
-                    "definition": "No sponsor outcome is recorded, and no attempt made since the latest approval has been accepted by the sponsor, or the newest attempt was recalled or failed",
+                    "definition": "No sponsor outcome is recorded, and no attempt made since the latest approval has been accepted by the sponsor, or the newest attempt was recalled or sent back",
                     "set_by": "Derived; the system computes it",
                     "next": [
                       "Pending",
@@ -1932,7 +1941,7 @@
                     ]
                   }
                 },
-                "description": "The outcome of the funding request. Unrequested until an attempt made since the latest approval is Accepted, and while the newest attempt is Recalled or Failed; Pending once the sponsor holds it; Intent_to_Award when the sponsor signals funding before an agreement; Awarded, Declined, Not_Reviewed, or Withdrawn as the outcome. Unrequested and Pending follow the submission stage; the rest are recorded by the institution",
+                "description": "The outcome of the funding request. Unrequested until an attempt made since the latest approval is Accepted, and while the newest attempt is Recalled or Sent_Back; Pending once the sponsor holds it; Intent_to_Award when the sponsor signals funding before an agreement; Awarded, Declined, Not_Reviewed, or Withdrawn as the outcome. Unrequested and Pending follow the submission stage; the rest are recorded by the institution",
                 "synonyms": "Outcome, Sponsor Decision, Award Decision"
               },
               "Decision_Date": {
@@ -2028,7 +2037,7 @@
             },
             "constraints": [
               {
-                "rule": "Decision_Status is Unrequested while no SubmissionAttempt made since the latest approval has Attempt_Status Accepted, or while the newest attempt is Recalled or Failed, unless a sponsor outcome or a withdrawal is recorded (Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn); otherwise it is Pending or one of those recorded values. A recorded outcome stays when the proposal is re-approved."
+                "rule": "Decision_Status is Unrequested while no SubmissionAttempt made since the latest approval has Attempt_Status Accepted, or while the newest attempt is Recalled or Sent_Back, unless a sponsor outcome or a withdrawal is recorded (Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn); otherwise it is Pending or one of those recorded values. A recorded outcome stays when the proposal is re-approved."
               },
               {
                 "rule": "Decision_Status = 'Withdrawn' only when at least one SubmissionAttempt for the Proposal was sent. When a withdrawn proposal is revised, a Returned_for_Revision Approval row returns Internal_Approval_Status to Returned and Decision_Status becomes Unrequested."
@@ -2094,7 +2103,7 @@
               "Submitted_At": {
                 "type": "Timestamp",
                 "required": false,
-                "conditional_required": "Required when Attempt_Status is Submitted, Received, Validated, Invalid, Accepted, or Recalled",
+                "conditional_required": "Required when Attempt_Status is Submitted, Received, Validated, Invalid, Accepted, Recalled, or Sent_Back",
                 "description": "When the transmission was sent. Required once Attempt_Status is Submitted or later",
                 "synonyms": "Submission Timestamp, Sent At"
               },
@@ -2109,7 +2118,8 @@
                   "Invalid",
                   "Accepted",
                   "Failed",
-                  "Recalled"
+                  "Recalled",
+                  "Sent_Back"
                 ],
                 "value_definitions": {
                   "Unsubmitted": {
@@ -2155,25 +2165,30 @@
                     "next": []
                   },
                   "Accepted": {
-                    "definition": "The sponsor took it in for consideration; terminal for this attempt unless it is recalled, or the sponsor loses it or sends it back",
+                    "definition": "The sponsor took it in for consideration; terminal for this attempt unless it is recalled or sent back",
                     "set_by": "The sponsor's system",
                     "next": [
                       "Recalled",
-                      "Failed"
+                      "Sent_Back"
                     ]
                   },
                   "Failed": {
-                    "definition": "The attempt did not reach the sponsor's system, or the sponsor lost it or sent it back after accepting it, so the same package can be resent; terminal for this attempt",
-                    "set_by": "The submission tooling, or the sponsored programs office after acceptance",
+                    "definition": "The attempt did not reach the sponsor's system, so the same package can be resent; terminal for this attempt",
+                    "set_by": "The submission tooling",
                     "next": []
                   },
                   "Recalled": {
                     "definition": "Pulled back after sending so it can be corrected and resent; terminal for this attempt",
                     "set_by": "The authorized organizational representative",
                     "next": []
+                  },
+                  "Sent_Back": {
+                    "definition": "The attempt came back before the sponsor considered it, because it was lost or rejected as incomplete; terminal for this attempt",
+                    "set_by": "Sponsored programs office",
+                    "next": []
                   }
                 },
-                "description": "The attempt's state as reported by the submission tooling or the sponsor's system. Unsubmitted while assembled but not transmitted; Submitted once sent; Received when the sponsor's system acknowledged it; Validated or Invalid on the sponsor's checks; Accepted when the sponsor took it in for consideration; Failed when it did not reach the sponsor's system; Recalled when it was pulled back to be corrected and resent",
+                "description": "The attempt's state as reported by the submission tooling or the sponsor's system. Unsubmitted while assembled but not transmitted; Submitted once sent; Received when the sponsor's system acknowledged it; Validated or Invalid on the sponsor's checks; Accepted when the sponsor took it in for consideration; Failed when it did not reach the sponsor's system; Recalled when it was pulled back to be corrected and resent; Sent_Back when it came back before the sponsor considered it",
                 "synonyms": "Grants.gov Status, Portal Status"
               },
               "Tracking_Identifier": {
@@ -2211,7 +2226,7 @@
                 }
               },
               {
-                "rule": "Submitted_At is required when Attempt_Status is Submitted, Received, Validated, Invalid, Accepted, or Recalled.",
+                "rule": "Submitted_At is required when Attempt_Status is Submitted, Received, Validated, Invalid, Accepted, Recalled, or Sent_Back.",
                 "structured": {
                   "type": "conditional_required",
                   "condition_column": "Attempt_Status",
@@ -2241,7 +2256,7 @@
                 "rule": "An attempt becomes Recalled only while the Proposal's Decision_Status is Unrequested or Pending."
               },
               {
-                "rule": "An attempt moves from Accepted to Failed only while the Proposal's Decision_Status is Pending."
+                "rule": "An attempt moves from Accepted to Sent_Back only while the Proposal's Decision_Status is Pending."
               }
             ]
           },
@@ -8594,7 +8609,7 @@
                 "rule": "Rounds: a step that is Returned_for_Revision is not reopened; the rerun steps are new rows with Approval_Round one higher. Approval_Round is consecutive from 1 within the record."
               },
               {
-                "rule": "Voiding: a Final_Sign_off row whose Signed_Package_Hash no longer equals the hash of the record's current package becomes Voided, and any Release_to_Submit row that followed it in the same round becomes Voided with it."
+                "rule": "Voiding: a Final_Sign_off row whose Signed_Package_Hash no longer equals the hash of the record's current package becomes Voided, and any Release_to_Submit row that followed it in the same round becomes Voided with it. The same happens to the latest sign-off when an attempt on that package becomes Sent_Back."
               },
               {
                 "rule": "Related_Entity_ID references an existing row in the table named by Related_Entity_Type (polymorphic attachment enforcement)."
