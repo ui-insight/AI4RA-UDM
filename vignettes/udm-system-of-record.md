@@ -1,6 +1,6 @@
 # UDM Schema Specification
 
-**Version:** 5.1.0. See [CHANGELOG.md](CHANGELOG.md) for the full version history. The companion JSON serialization lives at the repository root as [udm_schema.json](../udm_schema.json); its `metadata.version` is the version of record.
+**Version:** 5.1.1. See [CHANGELOG.md](CHANGELOG.md) for the full version history. The companion JSON serialization lives at the repository root as [udm_schema.json](../udm_schema.json); its `metadata.version` is the version of record.
 
 ## Goal
 
