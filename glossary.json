@@ -46,6 +46,17 @@
       ]
     },
     {
+      "term": "Action date",
+      "also": "",
+      "definition": "The date the sponsor signed a modification or a binding agreement was reached. On a subaward, the institution is the one signing. This follows the federal spending data standards.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Action_Date"
+      ],
+      "source": "Federal spending data standards",
+      "source_url": "https://tfx.treasury.gov/system/files/2025-04/federal-spending-transparency.pdf"
+    },
+    {
       "term": "Active (award)",
       "also": "",
       "definition": "An award status: the award is open for spending within its period of performance.",
@@ -310,13 +321,26 @@
       ]
     },
     {
+      "term": "Award date",
+      "also": "Federal award date",
+      "definition": "The date the sponsor signed the award or a binding agreement was reached. This follows the federal award date in 2 CFR 200.1. The award's start date can be different.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Award_Date"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
       "term": "Award dollars",
       "also": "Awards received, funding received",
-      "definition": "The money sponsors obligated in a period: funding on new awards plus funding added to existing awards, minus funding taken back. Planned future increments don't count until they are obligated. This follows how federal spending data counts obligations.",
+      "definition": "The money sponsors obligated in a period: funding on new awards plus funding added to existing awards, minus funding taken back. Planned future increments don't count until they are obligated. An award counts on its award date and a modification on its action date. This follows how federal spending data counts obligations.",
       "domain": "Research metrics & reporting",
       "udm": [
         "Award.Original_Total_Funded",
-        "Modification.Funding_Change_Amount"
+        "Award.Award_Date",
+        "Modification.Funding_Change_Amount",
+        "Modification.Action_Date"
       ],
       "source": "Federal spending data standard",
       "source_url": "https://fedspendingtransparency.github.io/whitepapers/amount"
@@ -1346,7 +1370,7 @@
     {
       "term": "Funding mechanism",
       "also": "Activity code, grant type",
-      "definition": "The sponsor's category of funding, such as an NIH R01 or T32. The legal kind of agreement is the instrument type.",
+      "definition": "The sponsor's category of funding, such as an NIH R01 or T32. Institutions keep the sponsor's code and map it to a shared purpose, such as a research project or training, so they can compare across sponsors. The legal kind of agreement is the instrument type.",
       "domain": "Proposal",
       "udm": [
         "Award.Mechanism_Value_ID",
@@ -1552,7 +1576,7 @@
     {
       "term": "Instrument type",
       "also": "Agreement type, award type",
-      "definition": "The legal kind of an award: a grant, cooperative agreement, contract, or other transaction. A funding mechanism such as R01 is a more detailed code within one of these.",
+      "definition": "The legal kind of an award: a grant, cooperative agreement, contract, or other transaction. The funding mechanism says what kind of funding it is, separately from this.",
       "domain": "Agreements",
       "udm": [
         "Award.Instrument_Type"

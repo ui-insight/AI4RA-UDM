@@ -30,7 +30,7 @@ The UDM controls the values of a column in one of two ways.
 | DocumentType | `Document.Document_Type_Value_ID` | `NOA`, `Biosketch`, `DMP`, `Budget_Justification`, `Other_Support`, `Public_Access_Plan`, `LOI`, `Sponsor_Agreement`, `Subaward_Agreement`, `Modification_Notice`, `Approved_Items_Schedule`, `Closeout_Document`, `Compliance_Approval_Letter`, `Restriction_Authority_Document`, `Training_Certificate` |
 | FinanceCodePurpose | `FinanceCode.Purpose_Value_ID` | `Direct_Costs`, `Cost_Share`, `Indirect_Costs`, `Subcontract` |
 | FundType | `Fund.Fund_Type_Value_ID` | `Restricted`, `Unrestricted`, `Endowment`, `Sponsored_Program` |
-| FundingMechanism | `RFA.Mechanism_Value_ID`, `Proposal.Mechanism_Value_ID`, `Award.Mechanism_Value_ID` | None. Institutions define their own |
+| FundingMechanism | `RFA.Mechanism_Value_ID`, `Proposal.Mechanism_Value_ID`, `Award.Mechanism_Value_ID` | `Research_Project`, `Center_Or_Program`, `Career_Development`, `Fellowship`, `Training`, `Small_Business`, `Equipment_Infrastructure`, `Conference`, `Planning`, `Construction`, `Other` |
 | HumanSubjectsInterventionType | `HumanSubjectsIntervention.Intervention_Type_Value_ID` | `Survey`, `Interview`, `Observation`, `Drug`, `Device`, `Behavioral`, `Surgical`, `Biospecimen`, `Other` |
 | ModificationEventType | `Modification.Event_Type_Value_ID` | `Incremental_Funding`, `No_Cost_Extension`, `Budget_Revision`, `PI_Change`, `Scope_Change`, `Carryover`, `Rebudget`, `Sponsor_Transfer`, `Supplement`, `Cost_Transfer_Authorization`, `Advance_Funding`, `Partial_Suspension`, `Partial_Termination` |
 | OrganizationCapability | `OrganizationCapability.Capability_Value_ID` | `Sponsor`, `Prime_Sponsor`, `Subrecipient`, `Vendor`, `Committee`, `Program_Office`, `Pass_Through_Entity` |

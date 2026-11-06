@@ -1,7 +1,7 @@
 {
   "metadata": {
     "name": "UDM",
-    "version": "4.1.0",
+    "version": "5.0.0",
     "released": "2026-11-06",
     "description": "Vendor-neutral research administration data model. This JSON is the machine-readable serialization of the specification in vignettes/udm-system-of-record.md: modules, tables, columns in the abstract type vocabulary, constraints, conventions, and derivation rules. It names no database engine; types.dialects maps the abstract types to native ones per engine.",
     "spec_source": "vignettes/udm-system-of-record.md",
@@ -1335,7 +1335,20 @@
                   "column": "AllowedValue_ID"
                 },
                 "value_group": "FundingMechanism",
-                "description": "The sponsor's funding mechanism for the opportunity"
+                "description": "The sponsor's funding mechanism for the opportunity",
+                "recommended_values": [
+                  "Research_Project",
+                  "Center_Or_Program",
+                  "Career_Development",
+                  "Fellowship",
+                  "Training",
+                  "Small_Business",
+                  "Equipment_Infrastructure",
+                  "Conference",
+                  "Planning",
+                  "Construction",
+                  "Other"
+                ]
               },
               "Funding_Mechanism_Description": {
                 "type": "MediumName",
@@ -1993,7 +2006,20 @@
                 },
                 "value_group": "FundingMechanism",
                 "description": "The sponsor's funding mechanism applied for",
-                "synonyms": "Funding Mechanism, Activity Code"
+                "synonyms": "Funding Mechanism, Activity Code",
+                "recommended_values": [
+                  "Research_Project",
+                  "Center_Or_Program",
+                  "Career_Development",
+                  "Fellowship",
+                  "Training",
+                  "Small_Business",
+                  "Equipment_Infrastructure",
+                  "Conference",
+                  "Planning",
+                  "Construction",
+                  "Other"
+                ]
               },
               "Activity_Type": {
                 "type": "Status",
@@ -2510,8 +2536,21 @@
                   "column": "AllowedValue_ID"
                 },
                 "value_group": "FundingMechanism",
-                "description": "The sponsor's funding mechanism for the award, for example R01, R21, P01, T32, Cooperative_Agreement, Contract_BAA",
-                "synonyms": "Funding Mechanism, Activity Code"
+                "description": "The sponsor's funding mechanism for the award, for example R01, R21, P01, T32. Set Canonical_Value_Code to a recommended value so institutions can compare across sponsors",
+                "synonyms": "Funding Mechanism, Activity Code",
+                "recommended_values": [
+                  "Research_Project",
+                  "Center_Or_Program",
+                  "Career_Development",
+                  "Fellowship",
+                  "Training",
+                  "Small_Business",
+                  "Equipment_Infrastructure",
+                  "Conference",
+                  "Planning",
+                  "Construction",
+                  "Other"
+                ]
               },
               "Instrument_Type": {
                 "type": "Status",
@@ -2540,7 +2579,7 @@
                     "definition": "Another kind of agreement"
                   }
                 },
-                "description": "The legal kind of agreement. Constrained: Grant / Cooperative_Agreement / Contract / Other_Transaction / Other. Mechanism_Value_ID holds the detailed code",
+                "description": "The legal kind of agreement. Constrained: Grant / Cooperative_Agreement / Contract / Other_Transaction / Other. Mechanism_Value_ID holds the sponsor's funding category",
                 "synonyms": "Agreement Type, Instrument, Award Type"
               },
               "Activity_Type": {
@@ -2595,6 +2634,12 @@
                 "type": "MediumName",
                 "required": false,
                 "description": "Free-text description for mechanisms not in the canonical taxonomy"
+              },
+              "Award_Date": {
+                "type": "Date",
+                "required": true,
+                "description": "The date the sponsor signed the award or a binding agreement was reached. Places the initial funding in a reporting period. Frozen.",
+                "synonyms": "Federal Award Date, Date Signed, Issue Date"
               },
               "Original_Start_Date": {
                 "type": "Date",
@@ -2927,6 +2972,13 @@
                 "description": "When the modification takes effect",
                 "synonyms": "Mod Effective Date, Change Effective Date"
               },
+              "Action_Date": {
+                "type": "Date",
+                "required": false,
+                "conditional_required": "Required when Funding_Change_Amount is not null and Approval_Status is Approved or Not_Required",
+                "description": "The date the sponsor, or the institution on a subaward, signed the modification or a binding agreement was reached. Places a funding change in a reporting period.",
+                "synonyms": "Date Signed, Issue Date"
+              },
               "Is_In_Effect": {
                 "type": "Boolean",
                 "required": false,
@@ -3151,6 +3203,9 @@
               },
               {
                 "rule": "Requires_Peer_Review is set only when Event_Type resolves to Supplement."
+              },
+              {
+                "rule": "Action_Date is required when Funding_Change_Amount is not null and Approval_Status is Approved or Not_Required."
               }
             ]
           },
