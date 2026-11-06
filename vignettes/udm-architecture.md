@@ -1,5 +1,7 @@
 # UDM Architecture
 
+**Status:** This is the design record for v2. Sections 2 to 10 show the thinking at that time and aren't updated as the model changes, so they name tables that are no longer in the model or never shipped, such as `Project`, `ActivityLog`, and `ApplicationSystem`. For the current model, use `udm_schema.json` and the [System of Record spec](udm-system-of-record.md). The principles in Section 1 still guide the model, though some of its examples name older tables.
+
 A ground-up design document for the next iteration of the Unified Data Model. Captures principles, structural decisions, and the consolidation moves that keep the schema lean while expanding what it can express.
 
 The intent: a tight, careful specification rather than a weedy garden of accumulated tables. Every entity earns its place, every relationship has a clear shape, and the patterns are few enough to be memorized.

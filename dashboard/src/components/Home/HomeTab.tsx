@@ -6,6 +6,8 @@ import surveyQrUrl from '../../assets/udm-survey-qr.png';
 // Temporary survey link (original: https://bit.ly/4b2ruQ3, to be restored later)
 const SURVEY_URL = 'https://bit.ly/4b5b21q';
 const REPO_URL = 'https://github.com/ui-insight/AI4RA-UDM';
+const FORUM_JOIN_URL = 'https://groups.ai4ra.uidaho.edu/g/main/join';
+const FORUM_UDM_URL = 'https://groups.ai4ra.uidaho.edu/g/main/search?q=%23UDM&ct=1';
 
 interface Props {
   dataDictionary: DataDictionary;
@@ -28,21 +30,23 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
         <h2 style={{ color: '#2c3e50', fontSize: '1.8rem', marginBottom: '0.5rem' }}>
           AI4RA Unified Data Model
         </h2>
+        <h3 style={{ color: '#2c3e50', fontSize: '1.3rem', marginBottom: '0.75rem' }}>
+          Start here
+        </h3>
         <p style={{ color: '#546e7a', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '1rem' }}>
-          Research administration data is scattered across institutions and proprietary systems, and
-          each system names and defines things its own way. When two systems disagree on what counts
-          as an active award, someone has to work out by hand which one is right.
+          Every research office works with the same things: sponsors, PIs, awards, budgets. Every system
+          describes them differently, so each report starts with someone reconciling them again.
         </p>
         <p style={{ color: '#546e7a', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '1rem' }}>
-          The UDM is a shared set of definitions for this data. Once local data is mapped to the UDM,
-          systems can exchange it and institutions can compare it. The UDM is generic enough for
-          universities, research institutes, and funding agencies. It aims to support the FAIR data
-          principles (Findable, Accessible, Interoperable, Reusable).
+          Because of that, reports and tools built at one institution rarely work at another.
         </p>
         <p style={{ color: '#546e7a', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '1rem' }}>
-          The UDM is a specification. It defines the tables, columns, relationships, and constraints
-          that should exist. Institutions implement it in whatever database technology fits their
-          environment.
+          The UDM is a proposed shared vocabulary for this data. It's a specification, not a database, so
+          you keep your current systems and map your data to it once.
+        </p>
+        <p style={{ color: '#546e7a', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '1rem' }}>
+          This is a draft, written by a small team at one institution. It needs readers from other
+          institutions to get it right.
         </p>
         <p style={{ color: '#546e7a', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
           <strong>New here?</strong> Research administrators: start with the{' '}
@@ -65,6 +69,96 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
           <Stat value={coreModuleCount} label="Core Modules" accent="#16a34a" />
         </div>
       </Card>
+
+      <div
+        style={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          borderRadius: 8,
+          padding: '2rem',
+          marginBottom: '1.5rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '2rem',
+          flexWrap: 'wrap',
+        }}
+      >
+        <a
+          href={SURVEY_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ flexShrink: 0, textAlign: 'center', textDecoration: 'none' }}
+        >
+          <img
+            src={surveyQrUrl}
+            alt="QR code for the UDM feedback survey. Select to open the survey."
+            style={{ width: 140, height: 140, borderRadius: 8, background: 'white', padding: 6, display: 'block' }}
+          />
+          <div style={{ color: 'white', fontWeight: 700, fontSize: '0.95rem', marginTop: '0.4rem' }}>
+            Anonymous survey
+          </div>
+        </a>
+        <div style={{ flex: 1, minWidth: 220 }}>
+          <h3 style={{ color: 'white', fontSize: '1.3rem', margin: '0 0 0.5rem' }}>
+            Help us evaluate it
+          </h3>
+          <p style={{ color: 'rgba(255,255,255,0.9)', margin: '0 0 0.5rem', lineHeight: 1.5 }}>
+            You don't have to adopt anything to help. Read it against your own work and tell us:
+          </p>
+          <ul style={{ color: 'rgba(255,255,255,0.9)', margin: '0 0 1rem', paddingLeft: '1.25rem', lineHeight: 1.5 }}>
+            <li>Does it describe an award, a sponsor, or a person the way you would?</li>
+            <li>What does your office track that isn't here?</li>
+            <li>What do you call something that it names differently?</li>
+            <li>Would you give us thirty minutes to walk through it against one of your systems?</li>
+          </ul>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
+            <a
+              href={FORUM_JOIN_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-block',
+                background: 'white',
+                color: '#4338ca',
+                fontWeight: 700,
+                padding: '0.5rem 1.25rem',
+                borderRadius: 6,
+                textDecoration: 'none',
+                fontSize: '0.95rem',
+              }}
+            >
+              Join the AI4RA forum
+            </a>
+            <span style={{ color: 'rgba(255,255,255,0.9)' }}>
+              and post under #UDM.{' '}
+              <a href={FORUM_UDM_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'white', fontWeight: 600 }}>
+                See #UDM posts
+              </a>
+              . Please share public material only.
+            </span>
+          </div>
+          <p style={{ color: 'rgba(255,255,255,0.9)', margin: 0, fontSize: '0.95rem' }}>
+            Prefer not to join?{' '}
+            <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'white', fontWeight: 600 }}>
+              Take the anonymous survey
+            </a>{' '}
+            or{' '}
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                // Assembled at click time so the address never appears in the page source
+                const user = ['nlay', 'man'].join('');
+                const host = ['uidaho', 'edu'].join('.');
+                window.location.href = `mailto:${user}@${host}?subject=${encodeURIComponent('UDM feedback')}`;
+              }}
+              style={{ color: 'white', fontWeight: 600 }}
+            >
+              email us
+            </a>
+            .
+          </p>
+        </div>
+      </div>
 
       <Card>
         <h3 style={{ color: '#2c3e50', fontSize: '1.3rem', marginBottom: '1rem' }}>
@@ -108,87 +202,6 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
         </div>
       </Card>
 
-      <div
-        style={{
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          borderRadius: 8,
-          padding: '2rem',
-          marginBottom: '1.5rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '2rem',
-          flexWrap: 'wrap',
-        }}
-      >
-        <a
-          href={SURVEY_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ flexShrink: 0, textAlign: 'center', textDecoration: 'none' }}
-        >
-          <img
-            src={surveyQrUrl}
-            alt="QR code for the UDM feedback survey. Select to open the survey."
-            style={{ width: 140, height: 140, borderRadius: 8, background: 'white', padding: 6, display: 'block' }}
-          />
-          <div style={{ color: 'white', fontWeight: 700, fontSize: '0.95rem', marginTop: '0.4rem' }}>
-            Get involved
-          </div>
-        </a>
-        <div style={{ flex: 1, minWidth: 220 }}>
-          <h3 style={{ color: 'white', fontSize: '1.3rem', margin: '0 0 0.5rem' }}>
-            Share your feedback
-          </h3>
-          <p style={{ color: 'rgba(255,255,255,0.85)', margin: '0 0 1rem', lineHeight: 1.5 }}>
-            Help shape the UDM by telling us what works, what's missing, and what your institution needs.
-            Take the anonymous survey, join the public feedback thread on GitHub (requires a free GitHub
-            account), or email us directly.
-          </p>
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <a
-              href={`${REPO_URL}/discussions/59#new_comment_field`}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'inline-block',
-                background: 'rgba(255,255,255,0.15)',
-                border: '1px solid rgba(255,255,255,0.6)',
-                color: 'white',
-                fontWeight: 700,
-                padding: '0.5rem 1.25rem',
-                borderRadius: 6,
-                textDecoration: 'none',
-                fontSize: '0.95rem',
-              }}
-            >
-              Leave feedback on GitHub
-            </a>
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                // Assembled at click time so the address never appears in the page source
-                const user = ['nlay', 'man'].join('');
-                const host = ['uidaho', 'edu'].join('.');
-                window.location.href = `mailto:${user}@${host}?subject=${encodeURIComponent('UDM feedback')}`;
-              }}
-              style={{
-                display: 'inline-block',
-                background: 'rgba(255,255,255,0.15)',
-                border: '1px solid rgba(255,255,255,0.6)',
-                color: 'white',
-                fontWeight: 700,
-                padding: '0.5rem 1.25rem',
-                borderRadius: 6,
-                textDecoration: 'none',
-                fontSize: '0.95rem',
-              }}
-            >
-              Email feedback
-            </a>
-          </div>
-        </div>
-      </div>
 
       <Card>
         <h3 style={{ color: '#2c3e50', fontSize: '1.3rem', marginBottom: '1rem' }}>

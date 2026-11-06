@@ -2,6 +2,12 @@
 
 The UDM improves through community input.
 
+## Feedback
+
+Join the [AI4RA forum](https://groups.ai4ra.uidaho.edu/g/main/join) and post questions, feedback, and proposed changes under [#UDM](https://groups.ai4ra.uidaho.edu/g/main/search?q=%23UDM&ct=1). GitHub issues and pull requests remain the route for concrete schema changes.
+
+You can also:
+
 - **Suggest changes or report issues**: open a [GitHub Issue](https://github.com/ui-insight/AI4RA-UDM/issues) describing the table, column, or convention you would like to add, change, or discuss.
 - **Join the discussion**: use [GitHub Discussions](https://github.com/ui-insight/AI4RA-UDM/discussions) for broader questions about the model's direction, new capability coverage, or adoption experiences.
 - **Take the survey**: a short [practitioner survey](https://bit.ly/4b5b21q) on what your institution needs from a shared model.

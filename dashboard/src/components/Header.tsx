@@ -6,7 +6,7 @@ export default function Header({ version, released }: { version?: string; releas
       padding: '2rem',
       boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
     }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
             <h1 style={{ fontSize: '1.8rem', fontWeight: 600, margin: 0 }}>
@@ -54,7 +54,7 @@ export default function Header({ version, released }: { version?: string; releas
             GitHub
           </a>
           <a
-            href="https://bit.ly/4b5b21q"
+            href="https://groups.ai4ra.uidaho.edu/g/main/join"
             target="_blank"
             rel="noopener noreferrer"
             style={{
