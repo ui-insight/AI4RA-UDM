@@ -81,16 +81,16 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
       >
         <div style={{ flex: 1, minWidth: 220 }}>
           <h3 style={{ color: 'white', fontSize: '1.3rem', margin: '0 0 0.5rem' }}>
-            Help us evaluate it
+            Tell us what you think
           </h3>
           <p style={{ color: 'rgba(255,255,255,0.9)', margin: '0 0 0.5rem', lineHeight: 1.5 }}>
-            You don't have to adopt anything to help. Read it against your own work and tell us:
+            We want the Unified Data Model to be useful to everyone, and we need your help! You don't have to adopt it to give us feedback. Just compare it with your own work and tell us:
           </p>
           <ul style={{ color: 'rgba(255,255,255,0.9)', margin: '0 0 1rem', paddingLeft: '1.25rem', lineHeight: 1.5 }}>
-            <li>Does it describe an award, a sponsor, or a person the way you would?</li>
-            <li>What does your office track that isn't here?</li>
+            <li>Does it describe awards, sponsors, and people the way you would?</li>
+            <li>What does your office track that's missing?</li>
             <li>What do you call something that it names differently?</li>
-            <li>Would you give us thirty minutes to walk through it against one of your systems?</li>
+            <li>Could you spare 30 minutes to walk through it against one of your systems?</li>
           </ul>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
             <a

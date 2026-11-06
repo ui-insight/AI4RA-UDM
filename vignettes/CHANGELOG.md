@@ -9,6 +9,10 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 
 While the UDM is in active development and has no production adopters, breaking changes can ship in a minor version. Each one is marked as breaking in the changelog. Major versions are reserved for stable releases.
 
+## [Unreleased]
+
+- **Dashboard: Home feedback section reworded.** "Tell us what you think" replaces "Help us evaluate it", with shorter questions.
+
 ## [5.1.1] - 2026-11-06
 
 - **All feedback goes to the AI4RA list.** The survey link, its QR code, and the email option are removed from the Home page and `CONTRIBUTING.md`.
