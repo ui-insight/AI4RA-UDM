@@ -82,7 +82,22 @@ export default function GlossaryTab() {
                       <div style={{ color: '#64748b', fontSize: '0.8rem', marginTop: 2 }}>{t.also}</div>
                     )}
                   </td>
-                  <td style={{ padding: '0.6rem 0.75rem', color: '#334155' }}>{t.definition}</td>
+                  <td style={{ padding: '0.6rem 0.75rem', color: '#334155' }}>
+                    {t.definition}
+                    {t.source && (
+                      <div style={{ color: '#64748b', fontSize: '0.8rem', marginTop: 4 }}>
+                        Source:{' '}
+                        {t.sourceUrl ? (
+                          <a href={t.sourceUrl} style={{ color: '#667eea' }}>{t.source}</a>
+                        ) : t.source}
+                      </div>
+                    )}
+                    {t.udm.length > 0 && (
+                      <div style={{ color: '#64748b', fontSize: '0.8rem', marginTop: 4 }}>
+                        In the UDM: <code>{t.udm.join(', ')}</code>
+                      </div>
+                    )}
+                  </td>
                   <td style={{ padding: '0.6rem 0.75rem', color: '#64748b', fontSize: '0.85rem' }}>{t.domain}</td>
                 </tr>
               ))}

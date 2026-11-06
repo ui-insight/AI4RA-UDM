@@ -42,7 +42,7 @@ The model's 48 tables are 46 in six core modules (the universal capabilities of 
 
 The model also includes **12 example views** (e.g., `vw_Active_Awards`, `vw_Award_Lineage`, `vw_Overdue_Reports`) as reference query implementations that institutions can adopt or adapt for dashboards and reporting. They are written against the MySQL dialect mapping; each carries a `dialect` field, and date functions need adapting for other engines.
 
-Browse the full model interactively at the [UDM Dashboard](https://ui-insight.github.io/AI4RA-UDM/). Its Infrastructure tab charts how a proposal and award move through their statuses, and how early setup, modifications, subawards, payments, deliverables, and actions move through theirs. Its Glossary tab defines the statuses in plain language.
+Browse the full model interactively at the [UDM Dashboard](https://ui-insight.github.io/AI4RA-UDM/). Its Infrastructure tab charts how a proposal and award move through their statuses, and how early setup, modifications, subawards, payments, deliverables, and actions move through theirs. Its Glossary tab defines the terms in plain language. The glossary's source is [`glossary.json`](glossary.json), and a CSV copy is served at `data/glossary.csv`.
 
 ### Naming Conventions (Ontology)
 
