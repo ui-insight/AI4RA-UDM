@@ -196,7 +196,7 @@ An implementation or a vendor product shows that it follows the UDM with a confo
 
 The repository carries one version of the schema, the current one. Its version is set in the [`VERSION`](VERSION) file and repeated in the `metadata` block of [`udm_schema.json`](udm_schema.json) and in the prose spec. Every release is a fixed commit published under [GitHub Releases](https://github.com/ui-insight/AI4RA-UDM/releases); an earlier version is read or cited from its release.
 
-The version follows semantic versioning: a major release may rename or remove tables and columns, a minor release only adds. See the [CHANGELOG](vignettes/CHANGELOG.md) for each release's delta and migration guidance.
+The version follows semantic versioning: a major release may rename or remove tables and columns, a minor release only adds. See the [CHANGELOG](vignettes/CHANGELOG.md) for each release's delta and migration guidance. While the UDM is in active development and has no production adopters, breaking changes can ship in a minor version and are marked as breaking in the changelog.
 
 ## Roadmap: Core and Optional Modules
 
