@@ -32,7 +32,7 @@ The UDM controls the values of a column in one of two ways.
 | FundType | `Fund.Fund_Type_Value_ID` | `Restricted`, `Unrestricted`, `Endowment`, `Sponsored_Program` |
 | FundingMechanism | `RFA.Mechanism_Value_ID`, `Proposal.Mechanism_Value_ID`, `Award.Mechanism_Value_ID` | None. Institutions define their own |
 | HumanSubjectsInterventionType | `HumanSubjectsIntervention.Intervention_Type_Value_ID` | `Survey`, `Interview`, `Observation`, `Drug`, `Device`, `Behavioral`, `Surgical`, `Biospecimen`, `Other` |
-| ModificationEventType | `Modification.Event_Type_Value_ID` | `Incremental_Funding`, `No_Cost_Extension`, `Budget_Revision`, `PI_Change`, `Scope_Change`, `Carryover`, `Rebudget`, `Sponsor_Transfer`, `Supplement`, `Cost_Transfer_Authorization`, `Advance_Funding` |
+| ModificationEventType | `Modification.Event_Type_Value_ID` | `Incremental_Funding`, `No_Cost_Extension`, `Budget_Revision`, `PI_Change`, `Scope_Change`, `Carryover`, `Rebudget`, `Sponsor_Transfer`, `Supplement`, `Cost_Transfer_Authorization`, `Advance_Funding`, `Partial_Suspension`, `Partial_Termination` |
 | OrganizationCapability | `OrganizationCapability.Capability_Value_ID` | `Sponsor`, `Prime_Sponsor`, `Subrecipient`, `Vendor`, `Committee`, `Program_Office`, `Pass_Through_Entity` |
 | OrganizationRole | `OrganizationRole.Role_Value_ID` | `Chair`, `Vice_Chair`, `Member`, `Ex_Officio`, `Alternate`, `Program_Officer`, `Grants_Management_Specialist`, `Contract_Officer`, `Scientific_Review_Officer`, `Authorized_Official`, `Signing_Official`, `Technical_Contact`, `Financial_Contact`, `Compliance_Contact`, `Subrecipient_PI_Contact`, `Subrecipient_Project_Lead`, `Sponsored_Programs_Administrator`, `Award_Administrator`, `Administrative_Contact` |
 | ProposalType | `Proposal.Proposal_Type_Value_ID` | `New`, `Resubmission`, `Renewal`, `Continuation`, `Revision`, `Task_Order` |
@@ -84,6 +84,7 @@ The UDM controls the values of a column in one of two ways.
 | `Award.Priority` | `Low`, `Medium`, `High`, `Critical` |
 | `Modification.Approval_Status` | `Requested`, `Approved`, `Rejected`, `Withdrawn`, `Not_Required`, `Reversed` |
 | `Modification.Priority` | `Low`, `Medium`, `High`, `Critical` |
+| `Modification.Termination_Basis` | `Noncompliance`, `Mutual_Agreement`, `Recipient_Request`, `Sponsor_Priorities`, `Prime_Terminated` |
 | `Subaward.Risk_Level` | `Low`, `Medium`, `High` |
 | `Subaward.Subaward_Status` | `Proposed`, `In_Setup`, `Active`, `Suspended`, `Closing`, `Closed`, `Adjusting`, `Terminated`, `Not_Issued` |
 | `Subaward.Termination_Basis` | `Noncompliance`, `Mutual_Agreement`, `Recipient_Request`, `Sponsor_Priorities`, `Prime_Terminated` |

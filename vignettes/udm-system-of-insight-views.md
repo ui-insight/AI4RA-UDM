@@ -558,6 +558,21 @@ WHERE r.Report_Type IN ('Final_Progress', 'Final_Financial', 'Invention_Statemen
   AND d.Is_Active = true;
 ```
 
+To find active awards with part of the work stopped, read their modifications, because `Award_Status` stays `Active`:
+
+```sql
+CREATE VIEW v_partial_actions AS
+SELECT a.Award_ID, a.Award_Number, COALESCE(av.Canonical_Value_Code, av.Value_Code) AS Event_Type,
+       m.Effective_Date, m.Termination_Basis, m.Funding_Change_Amount, m.Description
+FROM Modification m
+JOIN Award a ON a.Award_ID = m.Award_ID
+JOIN AllowedValues av ON av.AllowedValue_ID = m.Event_Type_Value_ID
+WHERE COALESCE(av.Canonical_Value_Code, av.Value_Code) IN ('Partial_Suspension', 'Partial_Termination')
+  AND m.Approval_Status IN ('Approved', 'Not_Required')
+  AND a.Award_Status = 'Active'
+  AND m.Is_Active = true;
+```
+
 For the HERD survey's figures, including `R&D expenditures` and `Source of funds`, see [herd-report.md](herd-report.md).
 
 ---

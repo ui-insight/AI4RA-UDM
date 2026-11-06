@@ -309,7 +309,7 @@ No single entity captures "the decision" abstractly; the three representations t
 **Submission attempts.** The *fact* that a proposal went to a sponsor is research-administration data; the *mechanics* of how the submission tooling assembled and transmitted it are not.
 
 - Each transmission is one `SubmissionAttempt` row. Re-submissions add attempts; the attempt history is the row sequence by `Attempt_Number`.
-- `Proposal.Submission_Status` is the newest attempt's `Attempt_Status` once an attempt has left Unsubmitted, as long as it is in transmission or with the sponsor or the current package still matches it; before that it is Unapproved, Unsubmitted, or Signed_Off. `Proposal.Submission_Date` and `Submission_Version` derive from the attempts.
+- `Proposal.Submission_Status` is the `Attempt_Status` of the newest attempt that has left Unsubmitted, as long as it is in transmission or with the sponsor or the current package still matches it; before that it is Unapproved, Unsubmitted, or Signed_Off. `Proposal.Submission_Date` and `Submission_Version` derive from the attempts.
 - Sponsor tracking and confirmation identifiers live on the attempt, indexed, not in free text.
 - Package assembly artifacts, connection profiles, and retry mechanics are submission-tooling internals and live in the System of Action. The transmitted package itself is a `Document` attached to the attempt; its hash is `Package_Hash`.
 
@@ -441,8 +441,8 @@ Some columns are derived from other data. The model specifies the rule; the impl
 | `Award.Originating_Award_ID` | Walk the `Previous_Award_ID` chain back from this Award until reaching an Award with null `Previous_Award_ID`; that Award's `Award_ID` is the originating Award. Null when this Award is itself the root (its own `Previous_Award_ID` is null). Parallels `Proposal.Originating_Proposal_ID`. | On insert/update of Award.Previous_Award_ID |
 | `Award.Current_PI_Personnel_ID` | The `Personnel_ID` of the unique active TeamRole row on this Award where `Role_Value_ID` resolves (via Canonical_Value_Code) to `PI` and the row is active on today's date (`Start_Date <= today AND (End_Date IS NULL OR End_Date >= today)`). Null when no such row exists — either the Award is in Multi_PI mode (one or more active rows resolving to `Multi_PI`) or no PI/Multi_PI rows are active (community-partner Subaward case). The exclusivity rule on TeamRole (PI vs Multi_PI is exclusive) guarantees at most one active PI row in single-PI mode | On insert/update of any TeamRole row on this Award; on the daily rollover that may change which rows are active on today's date |
 | `Subaward.Current_PI_Personnel_ID` | Symmetric to Award.Current_PI_Personnel_ID but scoped to TeamRole rows where `Subaward_ID` equals this Subaward. | On insert/update of any TeamRole row on this Subaward; on the daily rollover |
-| `Proposal.Submission_Status` | Unapproved while `Internal_Approval_Status` is not Approved. When Approved: the `Attempt_Status` of the newest SubmissionAttempt made since the latest approval, if it has left Unsubmitted and either the attempt is in transmission or with the sponsor (Submitting, Submitted, Received, Validated, or Accepted) or the current package matches its `Package_Hash`; otherwise Signed_Off when a Final_Sign_off on the current package is Approved, with any Release_to_Submit that follows it; otherwise Unsubmitted | On insert/update of `Proposal.Internal_Approval_Status`; on insert/update of any SubmissionAttempt or Approval row for the Proposal; when the current package changes |
-| `Proposal.Submission_Version` | The count of SubmissionAttempt rows for the Proposal; 0 before the first attempt | On insert/delete of a SubmissionAttempt for the Proposal |
+| `Proposal.Submission_Status` | Unapproved while `Internal_Approval_Status` is not Approved. When Approved: the `Attempt_Status` of the newest SubmissionAttempt made since the latest approval that has left Unsubmitted, if it is in transmission or with the sponsor (Submitting, Submitted, Received, Validated, or Accepted) or the current package matches its `Package_Hash`; otherwise Signed_Off when a Final_Sign_off on the current package is Approved, with any Release_to_Submit that follows it; otherwise Unsubmitted | On insert/update of `Proposal.Internal_Approval_Status`; on insert/update of any SubmissionAttempt or Approval row for the Proposal; when the current package changes |
+| `Proposal.Submission_Version` | The count of SubmissionAttempt rows for the Proposal whose `Attempt_Status` has left Unsubmitted; 0 before the first attempt is sent | On insert/update of a SubmissionAttempt for the Proposal |
 | `Proposal.Submission_Date` | The date of `Submitted_At` on the newest SubmissionAttempt whose `Attempt_Status` is Submitted, Received, Validated, Invalid, Accepted, or Recalled; null when no attempt has reached Submitted | On insert/update of any SubmissionAttempt for the Proposal |
 | `Proposal.Internal_Approval_Status` | Draft when no Approval row exists for the Proposal; otherwise, over the rows of the highest `Approval_Round`: Rejected if any row is Rejected; Returned if any is Returned_for_Revision; Approved if every row other than Final_Sign_off and Release_to_Submit is Approved or Bypassed; In_Review otherwise | On insert/update of any Approval row on the Proposal |
 
@@ -468,7 +468,7 @@ The following rules require enforcement beyond what a single column declaration 
 | SubmissionAttempt | `Attempt_Number` is unique within the Proposal and consecutive from 1 |
 | SubmissionAttempt | `Submitted_At` is required when `Attempt_Status` is Submitted, Received, Validated, Invalid, Accepted, or Recalled |
 | SubmissionAttempt | `Package_Hash` is required when `Attempt_Status` is any value other than Unsubmitted |
-| SubmissionAttempt | At most one SubmissionAttempt per Proposal has `Attempt_Status` Unsubmitted or Submitting: one attempt is in flight at a time |
+| SubmissionAttempt | At most one SubmissionAttempt per Proposal has `Attempt_Status` Submitting: one attempt is in transit at a time. An attempt assembled and never sent stays at Unsubmitted as history, and the newest attempt is current |
 | SubmissionAttempt | A SubmissionAttempt is created only while the Proposal's `Internal_Approval_Status` is Approved and, when its chain has a Final_Sign_off, the current package is signed off. Earlier attempts stay as history if the proposal later leaves Approved |
 | SubmissionAttempt | An attempt becomes Recalled only while the Proposal's `Decision_Status` is Unrequested or Pending |
 | PreAwardAuthorization | `Authorization_Date` and `Authorizing_Personnel_ID` are required when `Authorization_Status` is Approved, Converted_To_Award, or Expired_Unused, and kept if an approved authorization is later Revoked |
@@ -493,6 +493,7 @@ The following rules require enforcement beyond what a single column declaration 
 | Subaward | A Subaward at Adjusting returns to the `Subaward_Status` it came from, Closed or Terminated |
 | Modification | `Prior_Approval_Granted_Date` is required when `Requires_Prior_Approval = true` and `Approval_Status = 'Approved'` |
 | Modification | `Carryover_Amount` is required when the Event_Type value resolves to a carryover event |
+| Modification | `Termination_Basis` is required when Event_Type resolves to Partial_Termination, and null otherwise |
 | Modification | `Funding_Change_Amount` is required for Incremental_Funding and Supplement, and for a Budget_Revision that changes the total; null is permitted for non-financial event types (No_Cost_Extension, PI_Change, Scope_Change), Rebudget, and a Budget_Revision that does not change the total. When the modification does not change funding, the value is null (not zero) |
 | Modification | Exactly one of `Award_ID` or `Subaward_ID` is non-null |
 | Modification | `Modification_Number` is unique within the parent agreement (Award or Subaward) |
@@ -584,6 +585,7 @@ Applications often track more statuses than the UDM, because many of them are qu
 
 | What the application tracks | UDM representation |
 |---|---|
+| Proposal dropped before it was sent | A `Rejected` `Approval` row from the PI or the office, in a new `Approval_Round` if the proposal was already approved, with the reason in `Notes`. `Internal_Approval_Status` becomes `Rejected` |
 | Any setup step before the award is open for spending | `Award_Status = In_Setup` |
 | Award open for spending | `Award_Status = Active` |
 | Modification or no-cost extension in progress | `Award_Status = Active` plus a `Modification` with `Approval_Status = Requested` |
@@ -591,6 +593,7 @@ Applications often track more statuses than the UDM, because many of them are qu
 | Advance funding | A `Modification` with event type `Advance_Funding` |
 | Negotiation in progress | The current `Award_Status` (`In_Setup` or `Active`) plus an open `Negotiation` row |
 | Suspended | `Award_Status = Suspended` |
+| Part of an award suspended or terminated | `Award_Status` stays `Active`, plus a `Modification` with event type `Partial_Suspension` or `Partial_Termination`. `Description` says which part, a cut in funding goes in `Funding_Change_Amount` as a negative number, and a lifted suspension or overturned termination moves to `Reversed` |
 | Closeout in process | `Award_Status = Closing`; `Closeout.Final_Invoice_Status` records the final invoice |
 | Termination in process | `Award_Status = Terminating` |
 | Closed or terminated | `Award_Status = Closed` or `Terminated` |
@@ -811,7 +814,7 @@ A formal request for funding submitted to a sponsor.
 | Previous_Proposal_ID | ID | optional | → Proposal. Lineage for resubmissions, renewals, continuations |
 | Originating_Proposal_ID | ID | optional | → Proposal. The root of this Proposal's `Previous_Proposal_ID` chain. Derived, stored. Null when this Proposal is itself the root (no predecessor). Auto-updates if `Previous_Proposal_ID` is ever corrected. Used for lineage queries without recursive CTE traversal |
 | Group_ID | ShortCode | optional | A user-maintained grouping label that ties related Proposals together under one longitudinal scientific or scholarly identity. Independent of the lineage chain: the institution may persist a Group across renewals or fork to a new Group while lineage continues, deliberately. Not auto-updated by lineage edits |
-| Submission_Version | Count | derived | The number of submission attempts made for this proposal. Derived from SubmissionAttempt; 0 before the first attempt |
+| Submission_Version | Count | derived | The number of times this proposal has been sent. Attempts never sent do not count. Derived from SubmissionAttempt; 0 before the first attempt is sent |
 | Proposed_Start_Date | Date | required | |
 | Proposed_End_Date | Date | required | |
 | Total_Proposed_Direct | Money | optional | |
@@ -830,7 +833,7 @@ A formal request for funding submitted to a sponsor.
 
 #### SubmissionAttempt
 
-One transmission of a proposal to a sponsor's submission system. `Proposal.Submission_Status` shows the newest attempt's `Attempt_Status` once it has left Unsubmitted, as long as it is in transmission or with the sponsor or the current package still matches it. The attempt records what was sent, by whom, when, and what the sponsor's system said; package assembly, connection profiles, and retry mechanics stay in the System of Action.
+One transmission of a proposal to a sponsor's submission system. `Proposal.Submission_Status` shows the `Attempt_Status` of the newest attempt that has left Unsubmitted, as long as it is in transmission or with the sponsor or the current package still matches it. The attempt records what was sent, by whom, when, and what the sponsor's system said; package assembly, connection profiles, and retry mechanics stay in the System of Action.
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
@@ -916,7 +919,7 @@ A change to an Award or Subaward after initial funding. Modification is XOR-atta
 | Modification_Number | ShortCode | required | Unique within the parent agreement |
 | Effective_Date | Date | required | When the modification takes effect |
 | Is_In_Effect | Boolean | derived | True when `Approval_Status` is Approved or Not_Required and `Effective_Date` has arrived. The award's current totals and dates do not use it |
-| Event_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'ModificationEventType'`. Recommended values: Incremental_Funding / No_Cost_Extension / Budget_Revision / PI_Change / Scope_Change / Carryover / Rebudget / Sponsor_Transfer / Supplement / Cost_Transfer_Authorization / Advance_Funding |
+| Event_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'ModificationEventType'`. Recommended values: Incremental_Funding / No_Cost_Extension / Budget_Revision / PI_Change / Scope_Change / Carryover / Rebudget / Sponsor_Transfer / Supplement / Cost_Transfer_Authorization / Advance_Funding / Partial_Suspension / Partial_Termination |
 | Approval_Status | Status | required | Requested, Approved, Rejected, Withdrawn, Not_Required, Reversed. Withdrawn before a decision; Reversed after approval or after being recorded as Not_Required, and excluded from the derived award totals and dates |
 | Priority | Status | required | Constrained: Low / Medium / High / Critical. Processing priority the office assigned, Medium unless set; Critical is a rush |
 | Requires_Prior_Approval | Boolean | required | |
@@ -926,6 +929,7 @@ A change to an Award or Subaward after initial funding. Modification is XOR-atta
 | Carryover_Amount | Money | conditional | Required when the Event_Type resolves to Carryover |
 | Pre_Award_Costs_Amount | Money | optional | Costs incurred before the award's start date that this modification covers; at the institution's risk until the award is made |
 | Description | LongText | optional | Free-text description of the change |
+| Termination_Basis | Status | conditional | Why part of the agreement was terminated: Noncompliance / Mutual_Agreement / Recipient_Request / Sponsor_Priorities / Prime_Terminated. Required when Event_Type resolves to Partial_Termination; null otherwise |
 
 #### Subaward
 

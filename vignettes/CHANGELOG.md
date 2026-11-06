@@ -13,6 +13,9 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 
 - **`Closeout.Final_Report_Status` is removed.** Final reports are `Deliverable` rows with their own status, and an award can owe several. `v_final_reports` in the sample views shows how to read them.
 - **`Closeout_Status`: `Pending_Sponsor_Final_Audit` becomes `Awaiting_Sponsor`.** Most closeouts wait on the sponsor accepting final reports, with no audit involved.
+- **Unsent attempts stay as history.** An attempt assembled and never sent no longer blocks a new one. Only one attempt can be `Submitting` at a time, `Submission_Version` counts only attempts that were sent, and `Submission_Status` reads the newest attempt that was sent.
+- **A proposal dropped before it's sent is `Rejected`.** The PI or the office records a `Rejected` approval row, and `Internal_Approval_Status` can now reach `Rejected` from `Draft`, `Returned`, and `Approved`.
+- **Partial suspensions and terminations are modifications.** `ModificationEventType` gains `Partial_Suspension` and `Partial_Termination`, and `Modification` gains `Termination_Basis`. The award stays `Active`.
 - **`Requirement_Status` gains `Closed` and `Withdrawn`.** `Closed` is the normal ending when the work finishes. `Withdrawn` comes from `Submitted` or `In_Review`, and a new attempt is a new row.
 
 ### Documentation, dashboard, and CI

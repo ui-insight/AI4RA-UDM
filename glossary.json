@@ -234,7 +234,7 @@
     {
       "term": "Attempt",
       "also": "",
-      "definition": "One transmission of a package to a sponsor. A proposal can have several attempts, and earlier attempts stay as history.",
+      "definition": "One transmission of a package to a sponsor. A proposal can have several attempts, and earlier attempts stay as history. A package assembled but never sent stays as an unsent attempt, and the newest attempt is current.",
       "domain": "Proposal",
       "udm": [
         "SubmissionAttempt"
@@ -1957,6 +1957,29 @@
       ]
     },
     {
+      "term": "Partial suspension",
+      "also": "Partial stop-work order",
+      "definition": "A sponsor or institution pauses part of an award while the rest continues. The award stays Active, and lifting the suspension reverses the modification.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Event_Type_Value_ID=Partial_Suspension"
+      ],
+      "source": "2 CFR 200.339",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.339"
+    },
+    {
+      "term": "Partial termination",
+      "also": "",
+      "definition": "Part of an award ends early while the rest continues. The award stays Active, and the notice states the reason, the effective date, and the portion ended.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Event_Type_Value_ID=Partial_Termination",
+        "Modification.Termination_Basis"
+      ],
+      "source": "2 CFR 200.340",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.340"
+    },
+    {
       "term": "Pass-through",
       "also": "",
       "definition": "R&D funds an institution sends to a subrecipient to carry out part of the work. Payments to contractors or vendors for goods and services do not count.",
@@ -2399,7 +2422,7 @@
     {
       "term": "Rejected (internal approval)",
       "also": "",
-      "definition": "An internal approval status: an approval step refused the proposal, and it goes no further.",
+      "definition": "An internal approval status: the proposal was refused inside the institution, by an approval step or by the PI deciding not to submit, and it goes no further.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Internal_Approval_Status=Rejected"
