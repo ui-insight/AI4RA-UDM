@@ -7,6 +7,7 @@ import TablesTab from './components/Tables/TablesTab';
 import ERDTab from './components/ERD/ERDTab';
 import ExampleViewsTab from './components/ExampleViews/ExampleViewsTab';
 import OntologyTab from './components/Ontology/OntologyTab';
+import Footer from './components/Footer';
 import GlossaryTab from './components/Glossary/GlossaryTab';
 import StatusesTab from './components/Statuses/StatusesTab';
 import InfrastructureTab from './components/Infrastructure/InfrastructureTab';
@@ -15,7 +16,7 @@ import type { TabName } from './types';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabName>('home');
-  const { dataDictionary, relationships, reverseRelationships, loading, error } = useSchemaData();
+  const { dataDictionary, relationships, reverseRelationships, loading, error, exampleViews } = useSchemaData();
 
   if (error) {
     return (
@@ -63,7 +64,7 @@ export default function App() {
         />
       )}
       <div style={{ display: activeTab === 'views' ? 'block' : 'none' }}>
-        <ExampleViewsTab />
+        <ExampleViewsTab views={exampleViews} />
       </div>
       <div style={{ display: activeTab === 'ontology' ? 'block' : 'none' }}>
         <OntologyTab />
@@ -77,6 +78,7 @@ export default function App() {
       {activeTab === 'infrastructure' && (
         <InfrastructureTab />
       )}
+      <Footer />
     </>
   );
 }

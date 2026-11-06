@@ -6,6 +6,8 @@ on:
     paths:
       - 'udm_schema.json'
       - 'glossary.json'
+      - 'VERSION'
+      - 'README.md'
       - 'scripts/generate_dashboard_data.py'
       - 'scripts/generate_glossary.py'
       - 'scripts/check_glossary.py'

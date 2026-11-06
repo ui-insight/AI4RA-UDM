@@ -14,6 +14,8 @@ The glossary's source is `glossary.json`. Edit it, run `scripts/generate_glossar
 
 A change to the standard must pass the conformance checker before a release may carry the AI4RA UDM name. See [NAME-POLICY.md](NAME-POLICY.md).
 
+The version is set in the `VERSION` file. When it changes, update `metadata.version` in `udm_schema.json` and the current version line in `README.md` to match. `scripts/validate_schema.py` fails if they differ.
+
 ## License
 
 By submitting a contribution you agree that it is licensed under the same terms as the part of the repository it changes, as set out in [NOTICE](NOTICE):

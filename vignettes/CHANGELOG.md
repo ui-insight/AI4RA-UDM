@@ -62,7 +62,10 @@ Migrate by column, not by a find-and-replace on a word, because some words chang
 ### Documentation
 
 - **Architecture: System of Action added as a fourth layer.** Workflow logic, submission tooling, job runs, and notifications move there from the System of Engagement. The layers now run Record, Engagement, Insight, Action, and the spec states that the System of Insight reads only from the System of Record. No UDM tables change.
+- **Dashboard: Example Views is generated from the schema.** It shows every view's purpose and SQL. It replaces hand-written sample data, which included four views that weren't in the schema.
 - **Dashboard: corrected tab content.** Ontology & Design, Infrastructure, and Home had wrong counts, examples naming columns and tables that don't exist, and a claim of more DDL dialects than the generator supports.
+- **`VERSION` file.** The version is set in `VERSION` at the repository root. `scripts/validate_schema.py` fails if `metadata.version` or the README's current version differs.
+- **Dashboard: footer on every tab.** It states the author, AI4RA, the licenses, and the NSF award.
 - **Dashboard: tabs reordered.** Glossary now follows Home, and a new Statuses tab holds the status charts.
 - **Glossary.** The Glossary tab has 330 plain-language terms, searchable and filterable by domain. `glossary.json` is the single source, and `scripts/generate_glossary.py` builds the tab's data and a CSV copy. Terms link to the tables, columns, and values they describe, and `scripts/check_glossary.py` checks those links in CI. Facts from federal and sponsor rules cite their sources. The Infrastructure tab's Integration Glossary is merged into it. Metric terms state what is counted and name the published method they follow, including the NSF HERD survey, NIH and NSF rates, and the federal financial report. Similar counts have separate names.
 - **README and dashboard home page: description rewritten as plain prose.** Both now use the same Mission text. No change to the UDM's scope or goals.

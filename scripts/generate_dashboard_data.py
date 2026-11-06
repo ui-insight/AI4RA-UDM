@@ -6,6 +6,7 @@ Reads the authoritative udm_schema.json and produces the JSON files
 that the dashboard (docs/index.html) needs:
   - docs/data/data-dictionary.json: table/column descriptions for browsing
   - docs/data/relationships.json: foreign key relationships for navigation
+  - docs/data/example-views.json: the core modules' example views
   - docs/data/udm_schema.json: copy of full schema for API endpoint
   - docs/schemas/udm_schema.metaschema.json: copy of the metaschema, so its $id URL resolves
 
@@ -70,6 +71,21 @@ def main():
     with open(output_dir / 'data-dictionary.json', 'w') as f:
         json.dump(dd_output, f, indent=2)
     print(f"Generated data-dictionary.json ({len(dd_tables)} tables)")
+
+    views = [
+        {
+            'name': view['name'],
+            'purpose': view.get('purpose', ''),
+            'module': module['name'],
+            'dialect': view.get('dialect', ''),
+            'sql': view['sql'],
+        }
+        for module in schema['modules']['core'].values()
+        for view in module.get('example_views', [])
+    ]
+    with open(output_dir / 'example-views.json', 'w') as f:
+        json.dump({'views': views, 'view_count': len(views)}, f, indent=2)
+    print(f"Generated example-views.json ({len(views)} views)")
 
     rel_output = {'relationships': relationships, 'relationship_count': len(relationships)}
     with open(output_dir / 'relationships.json', 'w') as f:

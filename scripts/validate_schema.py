@@ -13,6 +13,8 @@ Dependency-free. Two layers of checking:
    mapped in every dialect, and the module laws hold (a module's tables
    may reference only the core, the module itself, or a declared
    dependency; a module's Records targets are its own tables).
+3. Version: metadata.version and the README's current version match the
+   VERSION file, which is where the version is set.
 
 Exit status: 0 = valid, 1 = errors found. Warnings do not fail the run.
 """
@@ -21,7 +23,10 @@ import json
 import sys
 from pathlib import Path
 
-SCHEMA_PATH = Path(__file__).resolve().parent.parent / "udm_schema.json"
+ROOT = Path(__file__).resolve().parent.parent
+SCHEMA_PATH = ROOT / "udm_schema.json"
+VERSION_PATH = ROOT / "VERSION"
+README_PATH = ROOT / "README.md"
 
 REQUIRED_TOP_LEVEL = ["metadata", "types", "conventions", "modules", "implementation_tables"]
 REQUIRED_CONVENTIONS = [
@@ -160,6 +165,16 @@ def main():
     for key in ("name", "version", "released"):
         if key not in meta:
             err(f"metadata missing required key: {key}")
+
+    # --- Version: the VERSION file is the source; these copies must match it ---
+    version = VERSION_PATH.read_text(encoding="utf-8").strip() if VERSION_PATH.exists() else None
+    if version is None:
+        err("VERSION file is missing")
+    else:
+        if meta.get("version") != version:
+            err(f"metadata.version '{meta.get('version')}' does not match VERSION '{version}'")
+        if f"**Current version: v{version}**" not in README_PATH.read_text(encoding="utf-8"):
+            err(f"README.md does not say 'Current version: v{version}'")
 
     # --- Types: every abstract type is mapped in every dialect ---
     types = schema.get("types", {})

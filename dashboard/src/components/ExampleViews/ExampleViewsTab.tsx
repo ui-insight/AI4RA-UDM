@@ -1,6 +1,10 @@
-import { exampleViews } from '../../data/exampleViews';
+import type { ExampleView } from '../../types';
+import { coreModuleGroups } from '../../data/coreModules';
 
-export default function ExampleViewsTab() {
+const colorFor = (module: string) =>
+  coreModuleGroups.find(group => group.name === module)?.color ?? '#667eea';
+
+export default function ExampleViewsTab({ views }: { views: ExampleView[] }) {
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2rem' }}>
       <div style={{
@@ -8,75 +12,38 @@ export default function ExampleViewsTab() {
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)', marginBottom: '2rem',
       }}>
         <h2 style={{ color: '#2c3e50', marginBottom: '1rem', fontSize: '1.8rem' }}>
-          Useful Database Views
+          Example Views
         </h2>
         <p style={{ color: '#546e7a', marginBottom: '2rem' }}>
-          The UDM includes pre-built SQL views that combine data from multiple tables for common reporting needs.
-          These views simplify complex queries and provide ready-to-use data for dashboards and reports.
-          To produce the NSF HERD survey, see the{' '}
+          The UDM includes SQL views that combine data from several tables for common reporting needs.
+          They are reference queries, written for MySQL, that institutions can adapt. This page is
+          generated from <code>udm_schema.json</code>. To produce the NSF HERD survey, see the{' '}
           <a href="https://github.com/ui-insight/AI4RA-UDM/blob/main/vignettes/herd-report.md" style={{ color: '#667eea' }}>
             HERD report guide
           </a>.
         </p>
 
-        {exampleViews.map(view => (
+        {views.map(view => (
           <div key={view.name} style={{
             background: '#f8f9fa', padding: '1.5rem', borderRadius: 6,
-            borderLeft: `4px solid ${view.color}`, marginBottom: '1.5rem',
+            borderLeft: `4px solid ${colorFor(view.module)}`, marginBottom: '1.5rem',
           }}>
-            <h3 style={{ color: '#2c3e50', marginBottom: '0.5rem', fontSize: '1.2rem' }}>{view.name}</h3>
-            <p style={{ color: '#546e7a', fontSize: '0.95rem', marginBottom: '1rem' }}>{view.description}</p>
-            <div style={{ background: 'white', padding: '1rem', borderRadius: 4, overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
-                <thead>
-                  <tr style={{ background: '#f8f9fa', borderBottom: '2px solid #e9ecef' }}>
-                    {view.columns.map(col => (
-                      <th key={col.header} style={{
-                        padding: '0.5rem', textAlign: (col.align || 'left') as 'left' | 'right' | 'center',
-                        fontWeight: 600, color: '#495057',
-                      }}>
-                        {col.header}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {view.rows.map((row, ri) => (
-                    <tr key={ri} style={{ borderBottom: ri < view.rows.length - 1 ? '1px solid #e9ecef' : 'none' }}>
-                      {row.map((cell, ci) => {
-                        const val = typeof cell === 'string' ? { value: cell } : cell;
-                        return (
-                          <td key={ci} style={{
-                            padding: '0.5rem',
-                            textAlign: (view.columns[ci]?.align || 'left') as 'left' | 'right' | 'center',
-                            color: val.color || '#2c3e50',
-                            fontWeight: val.fontWeight as 'normal' | 'bold' | '600' | undefined,
-                            fontFamily: val.mono ? "'Monaco', 'Courier New', monospace" : undefined,
-                            fontSize: val.fontSize,
-                          }}>
-                            {val.value}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '1rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
+              <h3 style={{ color: '#2c3e50', fontSize: '1.2rem', margin: 0 }}>{view.name}</h3>
+              <span style={{ color: '#64748b', fontSize: '0.85rem' }}>{view.module}</span>
             </div>
+            <p style={{ color: '#546e7a', fontSize: '0.95rem', marginBottom: '0.75rem' }}>{view.purpose}</p>
+            <details>
+              <summary style={{ color: '#667eea', cursor: 'pointer', fontSize: '0.9rem' }}>Show SQL</summary>
+              <pre style={{
+                background: '#1e1e1e', color: '#d4d4d4', padding: '1rem', borderRadius: 6,
+                overflowX: 'auto', fontSize: '0.82rem', marginTop: '0.75rem',
+              }}>
+                <code style={{ background: 'transparent', color: 'inherit', padding: 0 }}>{view.sql}</code>
+              </pre>
+            </details>
           </div>
         ))}
-
-        <div style={{
-          marginTop: '2rem', padding: '1rem', background: '#fff3cd',
-          borderLeft: '4px solid #ffc107', borderRadius: 4,
-        }}>
-          <strong style={{ color: '#856404' }}>Source: </strong>
-          <code>udm_schema.json</code>
-          <p style={{ color: '#856404', marginTop: '0.5rem', fontSize: '0.9rem' }}>
-            These views are defined on each core module in <code>udm_schema.json</code> and serve as
-            reference query implementations that institutions can adapt for their reporting needs.
-          </p>
-        </div>
       </div>
     </div>
   );

@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
-import type { DataDictionary, Relationship } from '../types';
+import type { DataDictionary, ExampleView, Relationship } from '../types';
 
 const BASE = import.meta.env.BASE_URL;
 
 export function useSchemaData() {
   const [dataDictionary, setDataDictionary] = useState<DataDictionary | null>(null);
   const [relationships, setRelationships] = useState<Relationship[]>([]);
+  const [exampleViews, setExampleViews] = useState<ExampleView[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -13,10 +14,12 @@ export function useSchemaData() {
     Promise.all([
       fetch(`${BASE}data/data-dictionary.json`).then(r => r.json()),
       fetch(`${BASE}data/relationships.json`).then(r => r.json()),
+      fetch(`${BASE}data/example-views.json`).then(r => r.json()),
     ])
-      .then(([dd, rel]) => {
+      .then(([dd, rel, ev]) => {
         setDataDictionary(dd);
         setRelationships(rel.relationships);
+        setExampleViews(ev.views);
         setLoading(false);
       })
       .catch(err => {
@@ -41,5 +44,5 @@ export function useSchemaData() {
     return map;
   }, [relationships]);
 
-  return { dataDictionary, relationships, reverseRelationships, loading, error };
+  return { dataDictionary, relationships, exampleViews, reverseRelationships, loading, error };
 }

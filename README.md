@@ -118,6 +118,7 @@ The UDM is served as static JSON via GitHub Pages. These endpoints define the st
 | [`/data/udm_schema.json`](https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json) | **Complete schema (current)** — tables, columns, types, constraints, descriptions, synonyms, PII flags, cross-row constraints, example views |
 | [`/data/data-dictionary.json`](https://ui-insight.github.io/AI4RA-UDM/data/data-dictionary.json) | Human-readable descriptions, synonyms, and PII flags |
 | [`/data/relationships.json`](https://ui-insight.github.io/AI4RA-UDM/data/relationships.json) | Foreign key relationships |
+| [`/data/example-views.json`](https://ui-insight.github.io/AI4RA-UDM/data/example-views.json) | Example views, with each view's purpose and SQL |
 
 Most consumers only need the primary endpoint (`udm_schema.json`) — it contains everything.
 

@@ -239,7 +239,7 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
           />
           <NavCard
             title="Example Views"
-            desc="Reference SQL views for common analytics: active awards, expiring deliverables, budget comparisons."
+            desc="Reference SQL views for common reporting: active awards, overdue deliverables, and HERD survey spending."
             onClick={() => onNavigate('views')}
           />
           <NavCard
@@ -280,6 +280,12 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
               /data/relationships.json
             </a>:{' '}
             Foreign-key relationships ready for ERD or validation tooling
+          </li>
+          <li>
+            <a href="data/example-views.json" style={{ color: '#667eea' }}>
+              /data/example-views.json
+            </a>:{' '}
+            Example views, with each view's purpose and SQL
           </li>
         </ul>
       </Card>
