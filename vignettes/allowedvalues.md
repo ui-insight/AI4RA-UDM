@@ -69,11 +69,11 @@ The UDM controls the values of a column in one of two ways.
 | `RFA.RFA_Status` | `Active`, `Closed`, `Superseded`, `Cancelled` |
 | `RFARequirement.Requirement_Category` | `Eligibility`, `Budget`, `Format`, `Compliance`, `Reporting`, `Personnel`, `Document`, `Review_Criterion`, `Submission`, `Deadline`, `Special_Condition`, `PAPPG_Deviation`, `Other` |
 | `Proposal.Internal_Approval_Status` | `Draft`, `In_Review`, `Returned`, `Approved`, `Rejected` |
-| `Proposal.Submission_Status` | `Unapproved`, `Unsubmitted`, `Signed_Off`, `Submitting`, `Submitted`, `Received`, `Validated`, `Invalid`, `Accepted`, `Failed`, `Recalled` |
+| `Proposal.Submission_Status` | `Unsubmitted`, `Signed_Off`, `Submitted`, `Received`, `Validated`, `Invalid`, `Accepted`, `Failed`, `Recalled`, `Sent_Back` |
 | `Proposal.Decision_Status` | `Unrequested`, `Pending`, `Intent_to_Award`, `Awarded`, `Declined`, `Not_Reviewed`, `Withdrawn` |
 | `Proposal.Risk_Level` | `Low`, `Medium`, `High` |
 | `Proposal.Activity_Type` | `Organized_Research`, `Instruction`, `Other_Sponsored_Activity` |
-| `SubmissionAttempt.Attempt_Status` | `Unsubmitted`, `Submitting`, `Submitted`, `Received`, `Validated`, `Invalid`, `Accepted`, `Failed`, `Recalled` |
+| `SubmissionAttempt.Attempt_Status` | `Unsubmitted`, `Submitted`, `Received`, `Validated`, `Invalid`, `Accepted`, `Failed`, `Recalled`, `Sent_Back` |
 | `PreAwardAuthorization.Authorization_Status` | `Requested`, `Approved`, `Revoked`, `Converted_To_Award`, `Expired_Unused` |
 | `Award.Instrument_Type` | `Grant`, `Cooperative_Agreement`, `Contract`, `Other_Transaction`, `Other` |
 | `Award.Activity_Type` | `Organized_Research`, `Instruction`, `Other_Sponsored_Activity` |

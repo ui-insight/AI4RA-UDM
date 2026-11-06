@@ -7,8 +7,17 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 - **MINOR** when entities or columns are added in a backward-compatible way
 - **PATCH** for documentation, convention clarifications, or fixes to non-load-bearing rules
 
-## [Unreleased]
+While the UDM is in active development and has no production adopters, breaking changes can ship in a minor version. Each one is marked as breaking in the changelog. Major versions are reserved for stable releases.
 
+## [5.1.0] - 2026-11-06
+
+- **Versioning.** While the UDM is in active development, breaking changes can ship in a minor version and are marked as breaking here.
+- **`Submission_Status` drops `Unapproved` (breaking).** `Internal_Approval_Status` already holds that fact, so a proposal that isn't approved is `Unsubmitted`. No attempt can be created until the proposal is approved.
+- **`Submitting` is removed from `Submission_Status` and `Attempt_Status` (breaking).** A transmission takes moments and is the sending application's concern, so the UDM records the result, `Submitted` or `Failed`. The glossary keeps the term, and the chart shows it as an arrow label.
+- **`Approved` means approval to pursue the opportunity.** `Signed_Off` means everything is in order to submit. A changed package voids only the sign-off, and returning to `Returned` means the institution reopened consideration of the opportunity.
+- **`Sent_Back` is new on `Submission_Status` and `Attempt_Status`.** A proposal can come back before the sponsor considers it, because it was lost or rejected as incomplete. It moves from `Pending` to `Sent_Back`, the sign-off is voided, and the decision returns to `Unrequested`. `Failed` still means the attempt never reached the sponsor's system, and its sign-off stands.
+- **`Intent_to_Award` can return to `Pending`.** A sponsor can walk the signal back without deciding, and `Decision_Date` is cleared.
+- **Dashboard: proposal and award chart.** It removes `Unapproved` and the note under `Recalled`, and adds `Sent Back`.
 - **Glossary sources.** `Award rate` and `Effective F&A rate` replace dead links, and `Award rate` now states only what NIH publishes. `Key personnel` credits NSF for its wording, `Export control` cites the regulation, and `Research Performance Progress Report` says agencies may use the format, not that they must.
 - **Dashboard: landing page for research administrators.** Home opens with a short "Start here" section. "Help us evaluate it" replaces "Share your feedback", points to the AI4RA forum and `#UDM`, and moves above Core Modules. The GitHub button is gone, the survey and email remain, and the header's Give Feedback button goes to the forum. The tab bar and header no longer widen the page on a phone.
 - **README and CONTRIBUTING: Feedback section.** Both point to the AI4RA forum and `#UDM`.

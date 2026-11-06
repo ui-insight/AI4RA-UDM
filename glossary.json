@@ -227,7 +227,7 @@
     {
       "term": "Approved (internal approval)",
       "also": "",
-      "definition": "An internal approval status: every approval step on the material has approved. Sign-off to submit is separate.",
+      "definition": "An internal approval status: the institution approved pursuing this opportunity. It doesn't mean the package is ready to send, which is what Signed Off means.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Internal_Approval_Status=Approved"
@@ -1587,7 +1587,7 @@
     {
       "term": "Intent to Award",
       "also": "",
-      "definition": "A decision status: the sponsor has signaled funding, but no agreement exists yet.",
+      "definition": "A decision status: the sponsor has signaled funding, but no agreement exists yet. The sponsor can walk the signal back, which returns the decision to Pending.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Decision_Status=Intent_to_Award"
@@ -1596,7 +1596,7 @@
     {
       "term": "Internal approval",
       "also": "Routing, internal routing, internal review",
-      "definition": "The approvals of a proposal's material inside the institution. Sign-off to submit is a separate gate.",
+      "definition": "The institution's decision to pursue an opportunity. Sign-off to submit is a separate gate, and the people involved in each can differ. Who holds each role varies by institution.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Internal_Approval_Status"
@@ -1623,7 +1623,7 @@
     {
       "term": "Invalid",
       "also": "",
-      "definition": "A submission status: the sponsor's system received the attempt and rejected it on its checks. The package must be fixed and signed off again. Material approval stands.",
+      "definition": "A submission status: the sponsor's system received the attempt and rejected it on its checks. The package must be fixed and signed off again. Approval to pursue the opportunity stands. This happens before the sponsor accepts the proposal.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Submission_Status=Invalid"
@@ -1874,7 +1874,7 @@
     {
       "term": "Not Reviewed",
       "also": "",
-      "definition": "A decision status: the sponsor received the proposal but removed it from consideration without reviewing it.",
+      "definition": "A decision status: the sponsor received the proposal but removed it from consideration without reviewing it. That ends the proposal. A proposal that came back before it was considered, so it can be tried again, is Sent Back.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Decision_Status=Not_Reviewed"
@@ -2012,7 +2012,7 @@
     {
       "term": "Package",
       "also": "",
-      "definition": "The set of files and forms assembled to send to the sponsor. If the package changes, its sign-off no longer applies. Changes do not affect an attempt in transmission or with the sponsor; sending them takes a recall, a new sign-off, and a new attempt.",
+      "definition": "The set of files and forms assembled to send to the sponsor. If the package changes, its sign-off no longer applies. Changes do not affect an attempt already sent; sending them takes a recall, a new sign-off, and a new attempt.",
       "domain": "Proposal",
       "udm": [
         "SubmissionAttempt.Package_Hash"
@@ -2605,7 +2605,7 @@
     {
       "term": "Returned",
       "also": "",
-      "definition": "An internal approval status: the proposal was sent back for changes and must be routed again. An approval step can return it, approved material can change, or a withdrawn proposal can be revised.",
+      "definition": "An internal approval status: the proposal was sent back and must be routed again. An approval step can return it, the institution can reopen consideration of the opportunity, or a withdrawn proposal can be revised. A changed package alone voids only the sign-off.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Internal_Approval_Status=Returned"
@@ -2705,6 +2705,16 @@
       "udm": []
     },
     {
+      "term": "Sent Back",
+      "also": "",
+      "definition": "A submission status: the proposal came back before the sponsor considered it, because it was lost or rejected as incomplete. Find out why, then sign off again before resending.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Submission_Status=Sent_Back",
+        "SubmissionAttempt.Attempt_Status=Sent_Back"
+      ]
+    },
+    {
       "term": "Sign-off to submit",
       "also": "",
       "definition": "The gate that decides whether a specific package may be sent. It is tracked in sponsor submission.",
@@ -2717,7 +2727,7 @@
     {
       "term": "Signed Off",
       "also": "",
-      "definition": "A submission status: the authorized organizational representative signed off on the current package, with any release to submit. It is ready to send.",
+      "definition": "A submission status: everything is in order to submit. The authorized organizational representative signed off on the current package, with any release to submit.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Submission_Status=Signed_Off"
@@ -2940,11 +2950,9 @@
     {
       "term": "Submitting",
       "also": "",
-      "definition": "A submission status: the attempt is being sent.",
+      "definition": "The process of sending a package to the sponsor's system. It takes moments, so the UDM records the result, Submitted or Failed, and not this step.",
       "domain": "Proposal",
-      "udm": [
-        "Proposal.Submission_Status=Submitting"
-      ]
+      "udm": []
     },
     {
       "term": "Submitting organization",
@@ -3196,15 +3204,6 @@
       "source_url": "https://www.hhs.gov/ohrp/regulations-and-policy/guidance/reviewing-unanticipated-problems/index.html"
     },
     {
-      "term": "Unapproved",
-      "also": "",
-      "definition": "A submission status: waiting on start. The material is not approved, so nothing can be sent.",
-      "domain": "Proposal",
-      "udm": [
-        "Proposal.Submission_Status=Unapproved"
-      ]
-    },
-    {
       "term": "Unified Data Model",
       "also": "UDM, AI4RA UDM",
       "definition": "A common, institution-neutral description of research administration data, so universities and vendors describe the same things the same way.",
@@ -3256,7 +3255,7 @@
     {
       "term": "Unrequested",
       "also": "",
-      "definition": "A decision status: waiting on start. No sponsor outcome is recorded, and either no attempt has been accepted since the latest approval or the newest attempt was recalled.",
+      "definition": "A decision status: waiting on start. No sponsor outcome is recorded, and either no attempt has been accepted since the latest approval or the newest attempt was recalled or sent back.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Decision_Status=Unrequested"
@@ -3275,7 +3274,7 @@
     {
       "term": "Unsubmitted",
       "also": "",
-      "definition": "A submission status: the material is approved, and the current package has not been signed off or sent.",
+      "definition": "A submission status: the current package has not been signed off or sent. Nothing can be sent until the proposal is approved and signed off.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Submission_Status=Unsubmitted"
@@ -3312,7 +3311,6 @@
       "definition": "A status that holds a place until the earlier stage is finished.",
       "domain": "Proposal",
       "udm": [
-        "Proposal.Submission_Status=Unapproved",
         "Proposal.Decision_Status=Unrequested"
       ]
     },
