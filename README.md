@@ -42,7 +42,7 @@ The model's 48 tables are 46 in six core modules (the universal capabilities of 
 
 The model also includes **12 example views** (e.g., `vw_Active_Awards`, `vw_Award_Lineage`, `vw_Overdue_Reports`) as reference query implementations that institutions can adopt or adapt for dashboards and reporting. They are written against the MySQL dialect mapping; each carries a `dialect` field, and date functions need adapting for other engines.
 
-Browse the full model interactively at the [UDM Dashboard](https://ui-insight.github.io/AI4RA-UDM/).
+Browse the full model interactively at the [UDM Dashboard](https://ui-insight.github.io/AI4RA-UDM/). Its Infrastructure tab charts how a proposal and award move through their statuses, and how early setup, modifications, subawards, payments, deliverables, and actions move through theirs. Its Glossary tab defines the statuses in plain language.
 
 ### Naming Conventions (Ontology)
 
@@ -91,7 +91,7 @@ The `udm_schema.json` structure (abbreviated). Everything specified is a module,
             "columns": {
               "Award_ID": { "type": "ID", "primary_key": true, "required": true, "description": "PK" },
               "Sponsor_Organization_ID": { "type": "ID", "references": { "table": "Organization", "column": "Organization_ID" }, "description": "..." },
-              "Award_Status": { "type": "Status", "allowed_values": ["Pending", "Active", "Suspended", "Closing", "Closed", "Terminating", "Terminated"], "synonyms": "Grant Status, Status", "description": "..." },
+              "Award_Status": { "type": "Status", "allowed_values": ["In_Setup", "Active", "Suspended", "Closing", "Closed", "Adjusting", "Terminating", "Terminated"], "synonyms": "Grant Status, Status", "description": "..." },
               "Current_End_Date": { "type": "DATE", "derived": { "rule": "...", "recompute_triggers": "..." }, "description": "..." }
             },
             "constraints": [ { "rule": "...", "structured": { "type": "referenced_status_is", "...": "..." } } ]

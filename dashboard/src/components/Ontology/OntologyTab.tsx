@@ -330,7 +330,7 @@ export default function OntologyTab() {
             <p style={{ color: '#546e7a', fontSize: '0.9rem' }}>
               <strong>Used by:</strong> Budget (Proposed/Approved/Current/Actual),
               Effort (Proposed/Approved/Charged/Certified), CostShare (Proposed/Committed/Met/Waived),
-              Payment (Scheduled/Invoiced/Received/Reconciled).
+              Payment (Scheduled/Invoiced/Paid/Reconciled).
             </p>
           </PatternCard>
           <PatternCard title="Two-FK XOR Attachment">

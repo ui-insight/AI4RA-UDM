@@ -101,8 +101,8 @@ The following tables use CHECK constraints for standardized enumerations:
 - Rationale: Universal project lifecycle states
 
 ### Proposal
-- **Internal_Approval_Status**: `'Draft','In Review','Approved','Rejected','Withdrawn'`
-- **Decision_Status**: `'Pending','Submitted','Under Review','Awarded','Declined','Withdrawn'`
+- **Internal_Approval_Status**: `'Draft','In_Review','Returned','Approved','Rejected'`
+- **Decision_Status**: `'Unrequested','Pending','Intent_to_Award','Awarded','Declined','Not_Reviewed','Withdrawn'`
 - Rationale: Standard proposal workflow states
 
 ### ProposalBudget
@@ -110,7 +110,7 @@ The following tables use CHECK constraints for standardized enumerations:
 - Rationale: Federal indirect cost rate bases
 
 ### Award
-- **Award_Status**: `'Pending','Active','Closed','Suspended','Terminated'`
+- **Award_Status**: `'In_Setup','Active','Suspended','Closing','Closed','Adjusting','Terminating','Terminated'`
 - Rationale: Standard award lifecycle states
 
 ### Modification
@@ -131,7 +131,7 @@ The following tables use CHECK constraints for standardized enumerations:
 - Rationale: Federal indirect cost rate bases
 
 ### Subaward
-- **Subaward_Status**: `'Pending','Active','Closed','Terminated','Suspended'`
+- **Subaward_Status**: `'Proposed','In_Setup','Active','Suspended','Closing','Closed','Adjusting','Terminated'`
 - **Risk_Level**: `'Low','Medium','High'`
 - Rationale: Standard subaward lifecycle and risk classifications
 

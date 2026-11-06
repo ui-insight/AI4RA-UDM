@@ -131,7 +131,7 @@ Action
 ├── Assignee_Personnel_ID
 ├── Requestor_Personnel_ID
 ├── Due_Date
-├── Action_Status          (Open / In_Progress / Blocked / Completed / Cancelled)
+├── Action_Status          (Open / In_Progress / Blocked / Completed / Cancelled / Unsuccessful)
 ├── Priority               (CHECK)
 ├── Completed_Date
 ├── Origin                 (Sponsor_Required / Internal / System_Generated / Manual)
@@ -277,7 +277,8 @@ Committed-vs-actual queries become single-table aggregations. Other Support / Cu
 ```
 Payment
 ├── Payment_ID
-├── Lifecycle_Stage       (Scheduled / Invoiced / Received / Reconciled)
+├── Lifecycle_Stage       (Scheduled / Invoiced / Paid / Reconciled)
+├── Payment_Direction     (Incoming / Outgoing)
 ├── Previous_Payment_ID     (revisions chain; later stages chain back to earlier ones)
 ├── Award_ID
 ├── Budget_ID             (optional period reference after Budget collapse)
@@ -285,7 +286,7 @@ Payment
 ├── Invoice_Number        (sponsor-side identifier; populated when Lifecycle_Stage='Invoiced')
 ├── Submission_Date
 ├── Actual_Date / Actual_Amount
-├── Payment_Status        (CHECK list)
+├── Payment_Status        (Clear / Disputed / Cancelled)
 ```
 
 ### 4.13 CostShare family collapse

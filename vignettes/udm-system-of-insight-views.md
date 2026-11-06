@@ -39,7 +39,7 @@ JOIN Award a ON a.Award_ID = ar.Award_ID
 JOIN Organization org ON org.Organization_ID = a.Sponsor_Organization_ID
 JOIN AllowedValues av ON av.AllowedValue_ID = ar.Role_Value_ID
 WHERE av.Value_Code IN ('Primary_Investigator', 'Contact_PI', 'Multi_PI')
-  AND a.Award_Status NOT IN ('Closed', 'Terminated')
+  AND a.Award_Status NOT IN ('Closed', 'Adjusting', 'Terminated')
   AND (ar.End_Date IS NULL OR ar.End_Date > CURRENT_DATE);
 ```
 
@@ -74,7 +74,7 @@ SELECT
   MAX(CASE WHEN ac.Requirement_Type = 'IBC' THEN 'Covered' ELSE 'Missing' END) AS IBC_Status
 FROM Award a
 LEFT JOIN active_coverage ac ON ac.Award_ID = a.Award_ID
-WHERE a.Award_Status NOT IN ('Closed', 'Terminated')
+WHERE a.Award_Status NOT IN ('Closed', 'Adjusting', 'Terminated')
 GROUP BY a.Award_ID, a.Award_Title;
 ```
 
@@ -356,7 +356,8 @@ FROM Proposal p
 JOIN RFARequirement r ON r.RFA_ID = p.RFA_ID
 LEFT JOIN proposal_docs pd ON pd.Proposal_ID = p.Proposal_ID AND pd.Document_Type_Code = r.Requirement_Code
 LEFT JOIN proposal_compliance pc ON pc.Proposal_ID = p.Proposal_ID
-WHERE p.Internal_Approval_Status NOT IN ('Withdrawn', 'Rejected')
+WHERE p.Internal_Approval_Status <> 'Rejected'
+  AND p.Decision_Status <> 'Withdrawn'
 ORDER BY p.Proposal_ID, r.Sort_Order;
 ```
 

@@ -176,7 +176,7 @@ Four tables carry a `Lifecycle_Stage` column that distinguishes records of the s
 | Budget | Proposed → Approved → Current → Actual |
 | Effort | Proposed → Approved → Charged → Certified |
 | CostShare | Proposed → Committed → Met → Waived |
-| Payment | Scheduled → Invoiced → Received → Reconciled |
+| Payment | Scheduled → Invoiced → Paid → Reconciled |
 
 Later-stage rows store a `Previous_*_ID` pointing at the earlier-stage row they descend from. Stages may be skipped; when a stage is skipped, the later row points at the nearest existing earlier row.
 
@@ -406,7 +406,7 @@ Individual financial entries charged to an Award or Subaward (XOR). Carries `Cos
 
 ### Payment
 
-Payment records spanning Scheduled / Invoiced / Received / Reconciled stages (Lifecycle_Stage discriminator). The v1 `Invoice` entity is now `Payment` at `Lifecycle_Stage = 'Invoiced'`.
+Payment records spanning Scheduled / Invoiced / Paid / Reconciled stages (Lifecycle_Stage discriminator). The v1 `Invoice` entity is now `Payment` at `Lifecycle_Stage = 'Invoiced'`.
 
 ### CostShare
 

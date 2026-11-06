@@ -9,9 +9,39 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 
 ## [Unreleased]
 
+### Statuses (breaking)
+
+Migrate by column, not by a find-and-replace on a word, because some words change column or meaning in this release.
+
+**Proposal**
+
+- **Approval of the material and sign-off to submit are separate gates.** `Internal_Approval_Status` no longer counts `Final_Sign_off` or `Release_to_Submit`, and `Submission_Status` gains `Signed_Off`. A voided sign-off returns the submission stage to `Unsubmitted` and leaves internal approval at `Approved`. `Approved` can move to `Returned`.
+- **`Submission_Status` and `Attempt_Status`: `Unsent` becomes `Unsubmitted`.** `Decision_Status`: `Unsubmitted` becomes `Unrequested`. Update `Decision_Status` first.
+- **`Submission_Status` and `Attempt_Status`: `Withdrawn` becomes `Recalled`.** It means one attempt was pulled back to be corrected and resent, and it requires `Decision_Status` to be `Unrequested` or `Pending`. Migration: decide for each `Withdrawn` attempt whether the proposal was being resent (the attempt becomes `Recalled`) or pulled for good (also set `Decision_Status` to `Withdrawn`).
+- **`Decision_Status` gains `Withdrawn` and `Not_Reviewed`, and now means the outcome of the funding request.** `Not_Reviewed` means the sponsor removed the proposal from consideration without reviewing it. The institution either stops at `Withdrawn` or revises the proposal, which returns internal approval to `Returned` and the decision to `Unrequested`. `Intent_to_Award` no longer returns to `Unrequested`.
+- **`Accepted` and `Failed` are redefined.** `Accepted` means the sponsor took the proposal in for consideration. `Failed` means the attempt did not reach the sponsor's system, and the same package can be resent. An `Invalid` or `Recalled` attempt returns to `Unsubmitted`.
+- **New attempt moves.** `Submitted` and `Received` can go directly to `Accepted`, for channels that report nothing in between, and `Validated` can go to `Invalid`.
+
+**Award and subaward**
+
+- **`Award_Status`: `Pending` becomes `In_Setup`.** `Subaward_Status`: `Pending` becomes `In_Setup`.
+- **Both gain `Adjusting`.** A closed or terminated agreement can take a late correction, such as an audit finding or a late charge, without opening for spending, and then returns to the status it came from. Views that exclude closed awards now exclude this status too.
+- **Reopening and reinstatement.** A `Closed` award or subaward reopens to `Active`, not `Closing`. `Terminated` can be reinstated to `Active`, and an award at `Terminating` can return to `Active`.
+- **`Termination_Basis` is new on `Award` and `Subaward`.** Values are `Noncompliance`, `Mutual_Agreement`, `Recipient_Request`, and `Sponsor_Priorities`, which covers executive orders; `Subaward` adds `Prime_Terminated`. `Terminating` no longer requires a received notice.
+
+**Other records**
+
+- **`PreAwardAuthorization.Authorization_Status` and `Modification.Approval_Status`: `Pending` becomes `Requested`.** `Modification` can no longer move from `Requested` to `Reversed`, its `Approved` definition now says it counts from approval, and the new derived `Is_In_Effect` says whether it is in effect today.
+- **`Report_Status`: `Pending` becomes `Not_Started`, and `Accepted` becomes `Fulfilled`.** `vw_Overdue_Reports` is updated. The `Acceptance_Date` column keeps its name.
+- **`Payment`.** `Lifecycle_Stage`: `Received` becomes `Paid`, and `Scheduled` can go directly to `Paid`. `Payment_Status` is now `Clear`, `Disputed`, or `Cancelled`; migrate `Open`, `Submitted`, and `Paid` to `Clear`, with the stage recording progress. `Payment_Direction` (`Incoming` or `Outgoing`) is new and required; a refund is an `Outgoing` payment on an award or an `Incoming` payment on a subaward. Vendor and other ordinary expenses remain `Transaction` rows.
+- **`Action_Status`: `Failed` becomes `Unsuccessful`, and `Cancelled` is redefined.** `ActionType` gains `Monitoring_Exception`.
+- **Application status mapping in the spec.** A new section under Implementation guidance says how an application's more detailed statuses map to the UDM.
+
 ### Documentation
 
+- **Dashboard: Glossary tab.** 262 plain-language research administration terms with synonyms and definitions, searchable and filterable across 12 domain areas (Systems & identifiers, Federal identifiers & rules, People & organizations, Proposal, Agreements, Award & lifecycle, Subawards, Budget & costing, Effort, Compliance & research security, Records & workflow, Research metrics & reporting). Includes the three meanings of "project" (research program, award, ERP cost object) and the System of Record, Insight, and Engagement layers.
 - **README and dashboard home page: description rewritten as plain prose.** Both now use the same Mission text. No change to the UDM's scope or goals.
+- **Dashboard: Infrastructure tab shows status paths.** One flow chart covers the proposal and award, including where each stage hands off to the next. A second covers early setup, modifications, subawards, payments, deliverables, and actions.
 - **Dashboard: Infrastructure tab states the normalized position.** A short note under "Where the UDM Fits" says the UDM is normalized so it can be modular, and that adopters build star schemas over it for reporting.
 
 ## [3.0.0] - 2026-10-22
