@@ -58,62 +58,49 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
         </div>
       </Card>
 
-      <div
-        style={{
-          background: 'linear-gradient(135deg, #4338ca 0%, #5b21b6 100%)',
-          borderRadius: 8,
-          padding: '2rem',
-          marginBottom: '1.5rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '2rem',
-          flexWrap: 'wrap',
-        }}
-      >
-        <div style={{ flex: 1, minWidth: 220 }}>
-          <h3 style={{ color: 'white', fontSize: '1.3rem', margin: '0 0 0.5rem' }}>
-            Tell us what you think!
-          </h3>
-          <p style={{ color: 'white', margin: '0 0 0.5rem', lineHeight: 1.5 }}>
-            We want the Unified Data Model to be useful to everyone, and we need your help! You don't have to adopt it to give us feedback. Just compare it with your own work and tell us:
-          </p>
-          <ul style={{ color: 'white', margin: '0 0 1rem', paddingLeft: '1.25rem', lineHeight: 1.5 }}>
-            <li>Does it describe awards, sponsors, and people the way you would?</li>
-            <li>What does your office track that's missing?</li>
-            <li>What do you call something that it names differently?</li>
-            <li>Could you spare 30 minutes to walk through it against one of your systems?</li>
-          </ul>
-          <p style={{ color: 'white', margin: '0 0 1rem', lineHeight: 1.5 }}>
-            We particularly need your input on the Glossary and Data Dictionary tabs.
-          </p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <a
-              href={FORUM_JOIN_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'inline-block',
-                background: 'white',
-                color: '#4338ca',
-                fontWeight: 700,
-                padding: '0.5rem 1.25rem',
-                borderRadius: 6,
-                textDecoration: 'none',
-                fontSize: '0.95rem',
-              }}
-            >
-              Join the AI4RA list
+      <Card>
+        <h3 style={{ color: '#2c3e50', fontSize: '1.3rem', margin: '0 0 0.5rem' }}>
+          Tell us what you think!
+        </h3>
+        <p style={{ color: '#546e7a', margin: '0 0 0.5rem', lineHeight: 1.5 }}>
+          We want the Unified Data Model to be useful to everyone, and we need your help! You don't have to adopt it to give us feedback. Just compare it with your own work and tell us:
+        </p>
+        <ul style={{ color: '#546e7a', margin: '0 0 1rem', paddingLeft: '1.25rem', lineHeight: 1.5 }}>
+          <li>Does it describe awards, sponsors, and people the way you would?</li>
+          <li>What does your office track that's missing?</li>
+          <li>What do you call something that it names differently?</li>
+          <li>Could you spare 30 minutes to walk through it against one of your systems?</li>
+        </ul>
+        <p style={{ color: '#546e7a', margin: '0 0 1rem', lineHeight: 1.5 }}>
+          We particularly need your input on the Glossary and Data Dictionary tabs.
+        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <a
+            href={FORUM_JOIN_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-block',
+              background: '#4338ca',
+              color: 'white',
+              fontWeight: 700,
+              padding: '0.5rem 1.25rem',
+              borderRadius: 6,
+              textDecoration: 'none',
+              fontSize: '0.95rem',
+            }}
+          >
+            Join the AI4RA list
+          </a>
+          <span style={{ color: '#546e7a' }}>
+            and post using the #UDM hashtag.{' '}
+            <a href={FORUM_UDM_URL} target="_blank" rel="noopener noreferrer" style={{ color: '#4338ca', fontWeight: 600 }}>
+              See #UDM posts
             </a>
-            <span style={{ color: 'white' }}>
-              and post using the #UDM hashtag.{' '}
-              <a href={FORUM_UDM_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'white', fontWeight: 600 }}>
-                See #UDM posts
-              </a>
-              . Please share public material only.
-            </span>
-          </div>
+            . Please share public material only.
+          </span>
         </div>
-      </div>
+      </Card>
 
       <Card>
         <h3 style={{ color: '#2c3e50', fontSize: '1.3rem', marginBottom: '1rem' }}>
