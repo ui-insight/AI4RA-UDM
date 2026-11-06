@@ -24,33 +24,24 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
   return (
     <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2rem' }}>
       <Card>
-        <h2 style={{ color: '#2c3e50', fontSize: '1.8rem', marginBottom: '0.5rem' }}>
+        <h2 style={{ color: '#2c3e50', fontSize: '1.8rem', marginBottom: '0.75rem' }}>
           AI4RA Unified Data Model
         </h2>
-        <h3 style={{ color: '#2c3e50', fontSize: '1.3rem', marginBottom: '0.75rem' }}>
-          Start here
-        </h3>
         <p style={{ color: '#546e7a', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '1rem' }}>
-          Every research office works with the same things: sponsors, PIs, awards, budgets. Every system
-          describes them differently, so each report starts with someone reconciling them again.
-        </p>
-        <p style={{ color: '#546e7a', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '1rem' }}>
-          Because of that, reports and tools built at one institution rarely work at another.
+          Every research office works with sponsors, PIs, awards, and budgets, but every system describes
+          them differently. Each report starts with someone reconciling the data, and reports and tools
+          built at one institution rarely work at another.
         </p>
         <p style={{ color: '#546e7a', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '1rem' }}>
           The UDM is a proposed shared vocabulary for this data. It's a specification, not a database, so
-          you keep your current systems and map your data to it once.
-        </p>
-        <p style={{ color: '#546e7a', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: '1rem' }}>
-          This is a draft, written by a small team at one institution. It needs readers from other
-          institutions to get it right.
+          you keep your current systems and map your data to it once. This draft comes from a small team
+          at one institution, and it needs readers from other institutions to get it right.
         </p>
         <p style={{ color: '#546e7a', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
-          <strong>New here?</strong> Research administrators: start with the{' '}
-          <NavLink onClick={() => onNavigate('glossary')}>Glossary</NavLink> for what terms mean and{' '}
-          <NavLink onClick={() => onNavigate('statuses')}>Statuses</NavLink> for how records move. Data engineers and IT: start with{' '}
-          <NavLink onClick={() => onNavigate('infrastructure')}>Infrastructure</NavLink> for how the
-          UDM fits your stack, then grab the JSON endpoints below.
+          <strong>New here?</strong> Research administrators can start with the{' '}
+          <NavLink onClick={() => onNavigate('glossary')}>Glossary</NavLink> and{' '}
+          <NavLink onClick={() => onNavigate('statuses')}>Statuses</NavLink>. Data engineers and IT can start with{' '}
+          <NavLink onClick={() => onNavigate('infrastructure')}>Infrastructure</NavLink>.
         </p>
 
         <div

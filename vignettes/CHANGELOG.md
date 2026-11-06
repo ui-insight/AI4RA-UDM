@@ -13,6 +13,7 @@ While the UDM is in active development and has no production adopters, breaking 
 
 - **Dashboard: Home feedback section reworded.** "Tell us what you think!" replaces "Help us evaluate it", with shorter questions.
 - **Dashboard: "Where to start" card removed from Home.** The tabs already show where everything is.
+- **Dashboard: shorter Home intro.** The text is condensed and the "Start here" heading is gone.
 
 ## [5.1.1] - 2026-11-06
 
