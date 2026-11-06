@@ -1,26 +1,49 @@
 # Contributing
 
-The UDM improves through community input.
+The UDM is a draft, and it needs people who work in research administration to get it right. You don't need a GitHub account or a technical background to take part.
 
-## Feedback
+## Talk about the design
 
-Join the [AI4RA forum](https://groups.ai4ra.uidaho.edu/g/main/join) and post questions, feedback, and proposed changes under [#UDM](https://groups.ai4ra.uidaho.edu/g/main/search?q=%23UDM&ct=1). GitHub issues and pull requests remain the route for concrete schema changes.
+[Join the AI4RA list](https://groups.ai4ra.uidaho.edu/g/main/join), which is also linked from the [AI4RA website](https://ai4ra.uidaho.edu/), and post using the [#UDM](https://groups.ai4ra.uidaho.edu/g/main/search?q=%23UDM&ct=1) hashtag. This is the place for questions, feedback, and ideas about the model, such as:
 
-You can also:
+- Does it describe an award, a sponsor, or a person the way you would?
+- What does your office track that isn't here?
+- What do you call something that it names differently?
+- Does a glossary definition match how your office uses the term?
 
-- **Suggest changes or report issues**: open a [GitHub Issue](https://github.com/ui-insight/AI4RA-UDM/issues) describing the table, column, or convention you would like to add, change, or discuss.
-- **Join the discussion**: use [GitHub Discussions](https://github.com/ui-insight/AI4RA-UDM/discussions) for broader questions about the model's direction, new capability coverage, or adoption experiences.
-- **Take the survey**: a short [practitioner survey](https://bit.ly/4b5b21q) on what your institution needs from a shared model.
+Design conversations happen on the list so everyone can join them, with or without GitHub. Please share public material only.
 
-## Making a change
+Prefer not to join? Take the short [practitioner survey](https://bit.ly/4b5b21q).
 
-A change to the standard edits `udm_schema.json`. The prose spec and the module vignettes are generated from it and sync-checked in CI, so edit the JSON and regenerate rather than editing the prose by hand. Run `scripts/validate_schema.py` and `scripts/check_spec_sync.py` before opening a pull request. When `udm_schema.json` changes on `main`, CI regenerates the dashboard data files served via GitHub Pages.
+## Report a problem or bug
 
-The glossary's source is `glossary.json`. Edit it, run `scripts/generate_glossary.py`, and run `scripts/check_glossary.py`, which confirms that each term's references exist in the schema and that every lifecycle status has a term. A schema change that renames a status fails this check until the glossary is updated. Definitions say what a thing is, without amounts, dates, or other details that change; point to the governing source for those. Cite a published source for any fact taken from a federal or sponsor rule.
+Raise problems and bugs as a [GitHub Issue](https://github.com/ui-insight/AI4RA-UDM/issues), such as a broken link, a failing check, or a mismatch between the schema and the docs. If you don't use GitHub, post them on the list.
+
+## Make a change
+
+A change to the standard has three parts, and they have to agree:
+
+- **Schema:** `udm_schema.json` is the machine-readable definition.
+- **Spec:** `vignettes/udm-system-of-record.md` and the docs in `vignettes/modules/` are written by hand. Update them along with the schema.
+- **Status charts:** if a status or path changes, update the SVG charts in `dashboard/src/assets/`.
+
+The glossary's source is `glossary.json`, and it's the reference for what terms mean. Edit it, then run `scripts/generate_glossary.py`. Definitions say what a thing is, without amounts, dates, or other details that change; point to the governing source for those. Add a source only when its text supports the definition.
+
+Run these before opening a pull request:
+
+| Check | What it confirms |
+|---|---|
+| `python scripts/validate_schema.py` | The schema is valid and the version matches everywhere |
+| `python scripts/check_spec_sync.py` | The spec lists the same tables and columns as the schema |
+| `python scripts/check_conformance.py --self-check` | The conformance checker still works |
+| `python scripts/check_glossary.py` | Glossary references exist, and every lifecycle status and chart box has a term |
+| `python scripts/generate_allowed_values_doc.py --check` | `vignettes/allowedvalues.md` is current. Run it without `--check` to regenerate it |
+
+CI runs these on pull requests. When a change reaches `main`, CI rebuilds and publishes the dashboard and its data files.
 
 A change to the standard must pass the conformance checker before a release may carry the AI4RA UDM name. See [NAME-POLICY.md](NAME-POLICY.md).
 
-The version is set in the `VERSION` file. To change it, edit `VERSION`, then run `python scripts/bump_version.py`. It updates the schema metadata, the README, the prose spec, and the conformance example, and moves the changelog's Unreleased entries under the new version. Add `--released YYYY-MM-DD` for a date other than today. `scripts/validate_schema.py` fails if these differ from `VERSION`.
+Log changes under `## [Unreleased]` in `vignettes/CHANGELOG.md`, and mark breaking changes. To set a version, edit `VERSION`, then run `python scripts/bump_version.py`. It updates the schema metadata, the README, the prose spec, and the conformance example, and moves the Unreleased entries under the new version. Add `--released YYYY-MM-DD` for a date other than today.
 
 ## License
 
