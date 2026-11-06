@@ -1,6 +1,6 @@
 # UDM Schema Specification
 
-**Version:** 4.1.0. See [CHANGELOG.md](CHANGELOG.md) for the full version history. The companion JSON serialization lives at the repository root as [udm_schema.json](../udm_schema.json); its `metadata.version` is the version of record.
+**Version:** 5.0.0. See [CHANGELOG.md](CHANGELOG.md) for the full version history. The companion JSON serialization lives at the repository root as [udm_schema.json](../udm_schema.json); its `metadata.version` is the version of record.
 
 ## Goal
 
@@ -492,6 +492,7 @@ The following rules require enforcement beyond what a single column declaration 
 | Subaward | `Termination_Basis` is required when `Subaward_Status` is Terminated, and null otherwise |
 | Subaward | A Subaward at Adjusting returns to the `Subaward_Status` it came from, Closed or Terminated |
 | Modification | `Prior_Approval_Granted_Date` is required when `Requires_Prior_Approval = true` and `Approval_Status = 'Approved'` |
+| Modification | `Action_Date` is required when `Funding_Change_Amount` is not null and `Approval_Status` is Approved or Not_Required |
 | Modification | `Carryover_Amount` is required when the Event_Type value resolves to a carryover event |
 | Modification | `Termination_Basis` is required when Event_Type resolves to Partial_Termination, and null otherwise |
 | Modification | `Requires_Peer_Review` is set only when Event_Type resolves to Supplement |
@@ -602,7 +603,7 @@ Applications often track more statuses than the UDM, because many of them are qu
 | Waiting on an internal unit or the sponsor | Open `CommunicationResponse` rows with `Response_Status = Pending`, which say why and on whom |
 | Rush processing | `Priority = Critical` on the `Award` or `Modification` |
 | Early setup | A `PreAwardAuthorization` row, which carries the ceiling, authorizer, window, and status |
-| Subaward invoice | `Payment` with `Payment_Direction = Outgoing`. `Lifecycle_Stage`: received, under review, or approved is `Invoiced`; paid is `Paid`. `Payment_Status`: rejected is `Disputed`; otherwise `Clear` |
+| Subaward invoice | `Payment` with `Payment_Direction = Outgoing`. `Lifecycle_Stage`: received, under review, or approved is `Invoiced`; paid is `Paid`; matched to the ledger is `Reconciled`. `Payment_Status`: rejected is `Disputed`, or `Cancelled` once no payment will occur; otherwise `Clear` |
 | Deliverable | `Deliverable.Deliverable_Status`: not started is `Not_Started`, in progress is `Drafted`, then `Submitted`, `Fulfilled`, or `Waived` |
 | Monitoring exception | `Action` with `Action_Type = Monitoring_Exception`. `Action_Status`: `Open`, `In_Progress`, resolved is `Completed`, dismissed is `Cancelled` |
 
@@ -888,12 +889,13 @@ A funded grant, contract, or cooperative agreement. The central post-award entit
 | RFA_ID | ID | optional | → RFA |
 | FAIN | ShortCode | conditional | Federal Award Identification Number. Required when the Sponsor has Sponsor_Type = 'Federal' and `Instrument_Type` is Grant or Cooperative_Agreement; other instruments do not need one. Unique within the institution when not null |
 | Assistance_Listing_Number | ShortCode | optional | Federal program identifier (formerly CFDA) |
-| Mechanism_Value_ID | ID | optional | → AllowedValues with `Value_Group = 'FundingMechanism'`. The funding mechanism / activity code (R01, R21, R03, P01, P30, U54, K01, K23, K99, T32, F31, F32, Cooperative_Agreement, Contract_BAA, Contract_RFP, OT_Other_Transaction, etc.). A major analytics dimension; institutions populate with their sponsor-recognized mechanism taxonomy |
-| Instrument_Type | Status | required | The legal kind of agreement. Constrained: Grant / Cooperative_Agreement / Contract / Other_Transaction / Other. `Mechanism_Value_ID` holds the detailed code |
+| Mechanism_Value_ID | ID | optional | → AllowedValues with `Value_Group = 'FundingMechanism'`. The sponsor's funding mechanism, for example R01, R21, P01, T32. A major analytics dimension. Institutions keep the sponsor's code as `Value_Code` and set `Canonical_Value_Code` to a recommended value: `Research_Project`, `Center_Or_Program`, `Career_Development`, `Fellowship`, `Training`, `Small_Business`, `Equipment_Infrastructure`, `Conference`, `Planning`, `Construction`, `Other`. These categories are grouped from NIH's and NSF's funding categories; no government-wide list exists |
+| Instrument_Type | Status | required | The legal kind of agreement. Constrained: Grant / Cooperative_Agreement / Contract / Other_Transaction / Other. `Mechanism_Value_ID` holds the sponsor's funding category |
 | Activity_Type | Status | required | What kind of work this funds, using the major functions in 2 CFR 200 Appendix III. Constrained: Organized_Research / Instruction / Other_Sponsored_Activity. Organized_Research is what the HERD survey counts as sponsored research |
 | Research_Character | Status | optional | The kind of research, as the HERD survey defines it. Applies only when `Activity_Type` = Organized_Research. Constrained when present: Basic_Research / Applied_Research / Experimental_Development |
 | Is_Clinical_Trial | Boolean | optional | Whether the award funds a Phase I, II, or III clinical trial with human patients. Phase IV post-market studies do not count |
 | Funding_Mechanism_Description | MediumName | optional | Free-text description for mechanisms not in the canonical taxonomy |
+| Award_Date | Date | required | The date the sponsor signed the award or a binding agreement was reached, following the federal award date in 2 CFR 200.1. Places the initial funding in a reporting period. Frozen |
 | Original_Start_Date | Date | required | Start of the originally authorized Period of Performance at award execution. Frozen; not adjusted by Modifications |
 | Original_End_Date | Date | required | End of the originally authorized Period of Performance at award execution. Frozen; not adjusted by Modifications. To query the live end date after extensions, use `Current_End_Date` |
 | Current_End_Date | Date | derived | Current end after Modifications. Derivation rule documented in *Derived values* |
@@ -919,6 +921,7 @@ A change to an Award or Subaward after initial funding. Modification is XOR-atta
 | Subaward_ID | ID | optional | → Subaward. Exactly one of `Award_ID` or `Subaward_ID` is non-null |
 | Modification_Number | ShortCode | required | Unique within the parent agreement |
 | Effective_Date | Date | required | When the modification takes effect |
+| Action_Date | Date | conditional | The date the sponsor, or the institution on a subaward, signed the modification or a binding agreement was reached, following the federal spending data standards. Places a funding change in a reporting period. Required when `Funding_Change_Amount` is not null and `Approval_Status` is Approved or Not_Required |
 | Is_In_Effect | Boolean | derived | True when `Approval_Status` is Approved or Not_Required and `Effective_Date` has arrived. The award's current totals and dates do not use it |
 | Event_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'ModificationEventType'`. Recommended values: Incremental_Funding / No_Cost_Extension / Budget_Revision / PI_Change / Scope_Change / Carryover / Rebudget / Sponsor_Transfer / Supplement / Cost_Transfer_Authorization / Advance_Funding / Partial_Suspension / Partial_Termination |
 | Approval_Status | Status | required | Requested, Approved, Rejected, Withdrawn, Not_Required, Reversed. Withdrawn before a decision; Reversed after approval or after being recorded as Not_Required, and excluded from the derived award totals and dates |

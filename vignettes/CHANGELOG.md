@@ -7,6 +7,15 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 - **MINOR** when entities or columns are added in a backward-compatible way
 - **PATCH** for documentation, convention clarifications, or fixes to non-load-bearing rules
 
+## [5.0.0] - 2026-11-06
+
+- **`Award.Award_Date` is new and required (breaking).** It's the date the sponsor signed the award or a binding agreement was reached. Every existing award needs one.
+- **`Modification.Action_Date` is new.** It holds the same date for a modification, and is required once an approved modification changes the funding.
+- **`v_award_funding_events` uses the new dates.** Award dollars no longer depend on start dates and effective dates, which could put money in the wrong fiscal year.
+- **`FundingMechanism` has recommended values.** They are grouped by purpose from NIH's and NSF's funding categories. Institutions keep the sponsor's code, such as R01, and map it with `Canonical_Value_Code`. `Cooperative_Agreement` and `Contract_BAA` are no longer examples of a mechanism, since `Instrument_Type` holds the legal kind of agreement.
+- **Subaward invoice mapping.** Adds `Reconciled` for an invoice matched to the ledger, and `Cancelled` for a rejected invoice that won't be paid.
+- **Glossary.** Adds `Award date` and `Action date`, and updates `Award dollars`, `Funding mechanism`, and `Instrument type`.
+
 ## [4.1.0] - 2026-11-06
 
 - **`Modification.Requires_Peer_Review` is new and optional.** It separates NIH's administrative supplements from competitive revisions on a `Supplement` event, and stays empty where a sponsor doesn't distinguish them.

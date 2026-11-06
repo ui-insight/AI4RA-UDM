@@ -471,11 +471,11 @@ Over the same proposals, the funding and award rate queries differ only in the t
 
 ```sql
 CREATE VIEW v_award_funding_events AS
-SELECT a.Award_ID, a.Original_Start_Date AS Funding_Date, a.Original_Total_Funded AS Amount, 'Initial' AS Event
+SELECT a.Award_ID, a.Award_Date AS Funding_Date, a.Original_Total_Funded AS Amount, 'Initial' AS Event
 FROM Award a
 WHERE a.Is_Active = true
 UNION ALL
-SELECT m.Award_ID, m.Effective_Date, m.Funding_Change_Amount, 'Modification'
+SELECT m.Award_ID, m.Action_Date, m.Funding_Change_Amount, 'Modification'
 FROM Modification m
 WHERE m.Award_ID IS NOT NULL
   AND m.Funding_Change_Amount IS NOT NULL
@@ -491,7 +491,7 @@ WHERE COALESCE(av.Canonical_Value_Code, av.Value_Code) IN ('New', 'Renewal')
 GROUP BY COALESCE(av.Canonical_Value_Code, av.Value_Code);
 ```
 
-The UDM has no obligation date on `Award`, so this uses `Original_Start_Date` for the initial funding, and it can differ from the date the money was obligated. It also has no column saying an award was competed, so `Competitive award` is new awards plus renewals with any uncompeted ones removed by hand.
+The UDM has no column saying an award was competed, so `Competitive award` is new awards plus renewals with any uncompeted ones removed by hand.
 
 ---
 
