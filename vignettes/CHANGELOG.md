@@ -14,6 +14,7 @@ While the UDM is in active development and has no production adopters, breaking 
 - **Dashboard: Home feedback section reworded.** "Tell us what you think!" replaces "Help us evaluate it", with shorter questions.
 - **Dashboard: "Where to start" card removed from Home.** The tabs already show where everything is.
 - **Dashboard: shorter Home intro.** The text is condensed and the "Start here" heading is gone.
+- **Dashboard: Home feedback section is easier to read.** It has a darker background and solid white text, and asks for input on the Glossary and Data Dictionary tabs.
 
 ## [5.1.1] - 2026-11-06
 
