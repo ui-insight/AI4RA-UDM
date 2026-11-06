@@ -7,9 +7,70 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 - **MINOR** when entities or columns are added in a backward-compatible way
 - **PATCH** for documentation, convention clarifications, or fixes to non-load-bearing rules
 
-## [Unreleased]
+## [4.0.0] - 2026-11-05
 
-Nothing yet.
+### Statuses (breaking)
+
+Migrate by column, not by a find-and-replace on a word, because some words change column or meaning in this release.
+
+**Proposal**
+
+- **Approval of the material and sign-off to submit are separate gates.** `Internal_Approval_Status` no longer counts `Final_Sign_off` or `Release_to_Submit`, and `Submission_Status` gains `Signed_Off`. A voided sign-off returns the submission stage to `Unsubmitted` and leaves internal approval at `Approved`. `Approved` can move to `Returned`.
+- **`Submission_Status` and `Attempt_Status`: `Unsent` becomes `Unsubmitted`.** `Decision_Status`: `Unsubmitted` becomes `Unrequested`. Update `Decision_Status` first.
+- **`Submission_Status` and `Attempt_Status`: `Withdrawn` becomes `Recalled`.** It means one attempt was pulled back to be corrected and resent, and it requires `Decision_Status` to be `Unrequested` or `Pending`. Migration: decide for each `Withdrawn` attempt whether the proposal was being resent (the attempt becomes `Recalled`) or pulled for good (also set `Decision_Status` to `Withdrawn`).
+- **`Decision_Status` gains `Withdrawn` and `Not_Reviewed`, and now means the outcome of the funding request.** `Not_Reviewed` means the sponsor removed the proposal from consideration without reviewing it. The institution either stops at `Withdrawn` or revises the proposal, which returns internal approval to `Returned` and the decision to `Unrequested`. `Intent_to_Award` no longer returns to `Unrequested`.
+- **`Accepted` and `Failed` are redefined.** `Accepted` means the sponsor took the proposal in for consideration. `Failed` means the attempt did not reach the sponsor's system, and the same package can be resent. An `Invalid` or `Recalled` attempt returns to `Unsubmitted`.
+- **A recorded sponsor outcome stays.** Re-approving material no longer returns `Intent_to_Award`, `Awarded`, `Declined`, or `Not_Reviewed` to `Unrequested`.
+- **Package changes after sending.** While an attempt is in transmission or with the sponsor, changes on the institution's side leave `Submission_Status` alone. After `Failed`, `Invalid`, or `Recalled`, a changed package returns it to `Unsubmitted`, so `Failed` gains that move. `Package_Hash` is required once an attempt leaves `Unsubmitted`.
+- **New attempt moves.** `Submitted` and `Received` can go directly to `Accepted`, for channels that report nothing in between, and `Validated` can go to `Invalid`.
+
+**Award and subaward**
+
+- **`Award_Status`: `Pending` becomes `In_Setup`.** `Subaward_Status`: `Pending` becomes `In_Setup`.
+- **`Subaward_Status` gains `Not_Issued`.** A subaward planned or being set up whose agreement is never issued ends here, replacing `Terminated` as the exit from `Proposed` and `In_Setup`. It has no `Termination_Basis`, needs no `Prime_Award_ID`, and doesn't block its award from closing.
+- **`Not_Required` modifications now count.** `Award.Current_End_Date`, `Award.Current_Total_Funded`, and `Subaward.Current_End_Date` count `Approved` and `Not_Required` modifications, so a change needing no approval moves the award's dates and totals. `Reversed` can undo either.
+- **Early setup can convert.** The limit to `Pending` or `Intent_to_Award` now applies only while an authorization is `Requested` or `Approved`. `Converted_To_Award` requires `Awarded`.
+- **Early setup requests no longer need an authorizer.** `Authorization_Date` and `Authorizing_Personnel_ID` are required once a request is approved.
+- **`Award.Instrument_Type` is new and required**, with `Grant`, `Cooperative_Agreement`, `Contract`, `Other_Transaction`, and `Other`. `Mechanism_Value_ID` still holds the detailed code.
+- **`FAIN` applies to grants and cooperative agreements**, using `Instrument_Type`. Federal contracts no longer need one.
+- **Returning to `Active`.** People, compliance coverage, and subawards ended by closure or termination don't come back automatically. The institution sets them up again.
+- **Rebudgets have their own budget rule.** A `Rebudget` has no `Funding_Change_Amount`, so total funding doesn't change, and it creates new Current budget rows for the categories it moves money between, netting to zero.
+- **`Budget_Revision` is a catch-all.** It covers a budget change with no more specific value, and `Funding_Change_Amount` is required only when the total changes.
+- **Closeout statuses match.** `Final_Report_Status` becomes `Not_Started`, `Submitted`, `Fulfilled`, and `Final_Invoice_Status` uses `Not_Started` and also fits subaward invoices. Records retention now typically starts when the final financial report is submitted, per 2 CFR 200.334.
+- **`Modification.Continuation_Type` is removed.** A competing renewal is a new `Proposal` of type `Renewal`, a non-competing year is a `Modification` with event type `Incremental_Funding` (with a `Continuation` proposal if one is filed), and a supplement is a `Modification` with event type `Supplement`.
+- **`Report` splits into `Deliverable` and `Report`.** `Deliverable` is new and holds anything owed to the sponsor, with `Deliverable_Type` (`Report`, `Work_Product`, `Other`), `Description`, `Deliverable_Status` (formerly `Report_Status`), due date, and submission and acceptance fields. `Report` becomes its child, holding `Report_Type` and the reporting period, and other kinds can have child tables later. `Related_Entity_Type` values, the xor attachment, and `vw_Overdue_Reports` (now `vw_Overdue_Deliverables`) move to `Deliverable`, and `Action_Type` loses `Deliverable`.
+- **`Modification.Carryforward_Amount` is removed.** `Carryover_Amount` is the only home for carried-over money.
+- **`Protocol` links to its core approval.** The optional module's `Protocol` gains a required `ComplianceRequirement_ID`, and the `ComplianceRequirement` is authoritative for the approval number and dates.
+- **`Income_Treatment` gains `Cost_Sharing`**, the third use of program income under 2 CFR 200.307.
+- **`PolicyException.Personnel_ID` is optional.** An exception can belong to a proposal, award, or subaward without naming a person, and each must name at least one of the four.
+- **`TeamRole` loses the `Key_Personnel` role value.** `Is_Key_Personnel` is the only record of the designation.
+- **`Activity_Type` is new and required on `Award` and `Proposal`**, with `Organized_Research`, `Instruction`, and `Other_Sponsored_Activity` from 2 CFR 200 Appendix III. It separates what the HERD survey counts as research.
+- **`Award.Research_Character` is new and optional**, with the HERD survey's `Basic_Research`, `Applied_Research`, and `Experimental_Development`.
+- **HERD reporting.** `vignettes/herd-report.md` shows where each HERD survey answer comes from, with new example views `vw_HERD_Expenditures` and `vw_HERD_Expenditures_By_Field`. `Sponsor_Type` now says only what kind of organization this is: `Foundation` becomes `Nonprofit`, `Higher_Ed_PassThrough` becomes `Higher_Ed`, `Foreign` becomes `Foreign_Government`, `Other` is new, and it is also required for subrecipients. New columns: `Organization.Is_Foreign`, `Organization.Is_Medical_School`, `Award.Is_Clinical_Trial`, `BudgetCategory.HERD_Cost_Type`, and `Classification.Allocation_Percent`. `Classification.Scheme` gains `HERD_Field`.
+- **Both gain `Adjusting`.** A closed or terminated agreement can take a late correction, such as an audit finding or a late charge, without opening for spending, and then returns to the status it came from. Views that exclude closed awards now exclude this status too.
+- **Reopening and reinstatement.** A `Closed` award or subaward reopens to `Active`, not `Closing`. `Terminated` can be reinstated to `Active`, and an award at `Terminating` can return to `Active`.
+- **`Termination_Basis` is new on `Award` and `Subaward`.** Values are `Noncompliance`, `Mutual_Agreement`, `Recipient_Request`, and `Sponsor_Priorities`, which covers executive orders; `Subaward` adds `Prime_Terminated`. `Terminating` no longer requires a received notice.
+
+**Other records**
+
+- **`PreAwardAuthorization.Authorization_Status` and `Modification.Approval_Status`: `Pending` becomes `Requested`.** `Modification` can no longer move from `Requested` to `Reversed`, its `Approved` definition now says it counts from approval, and the new derived `Is_In_Effect` says whether it is in effect today.
+- **`Report_Status`: `Pending` becomes `Not_Started`, and `Accepted` becomes `Fulfilled`.** `vw_Overdue_Reports` is updated. The `Acceptance_Date` column keeps its name.
+- **`Payment`.** `Lifecycle_Stage`: `Received` becomes `Paid`, and `Scheduled` can go directly to `Paid`. `Payment_Status` is now `Clear`, `Disputed`, or `Cancelled`; migrate `Open`, `Submitted`, and `Paid` to `Clear`, with the stage recording progress. `Payment_Direction` (`Incoming` or `Outgoing`) is new and required; a refund is an `Outgoing` payment on an award or an `Incoming` payment on a subaward. Vendor and other ordinary expenses remain `Transaction` rows.
+- **`Action_Status`: `Failed` becomes `Unsuccessful`, and `Cancelled` is redefined.** `ActionType` gains `Monitoring_Exception`.
+- **Application status mapping in the spec.** A new section under Implementation guidance says how an application's more detailed statuses map to the UDM.
+
+### Documentation
+
+- **Architecture: System of Action added as a fourth layer.** Workflow logic, submission tooling, job runs, and notifications move there from the System of Engagement. The layers now run Record, Engagement, Insight, Action, and the spec states that the System of Insight reads only from the System of Record. No UDM tables change.
+- **Dashboard: Example Views is generated from the schema.** It shows every view's purpose and SQL. It replaces hand-written sample data, which included four views that weren't in the schema.
+- **Dashboard: corrected tab content.** Ontology & Design, Infrastructure, and Home had wrong counts, examples naming columns and tables that don't exist, and a claim of more DDL dialects than the generator supports.
+- **`VERSION` file.** The version is set in `VERSION` at the repository root, and `scripts/bump_version.py` copies it to the files that repeat it. `scripts/validate_schema.py` fails if `metadata.version`, the README's current version, or the prose spec's version differs.
+- **Dashboard: footer on every tab.** It states the author, AI4RA, the licenses, and the NSF award.
+- **Dashboard: tabs reordered.** Glossary now follows Home, and a new Statuses tab holds the status charts.
+- **Glossary.** The Glossary tab has 330 plain-language terms, searchable and filterable by domain. `glossary.json` is the single source, and `scripts/generate_glossary.py` builds the tab's data and a CSV copy. Terms link to the tables, columns, and values they describe, and `scripts/check_glossary.py` checks those links in CI. Facts from federal and sponsor rules cite their sources. The Infrastructure tab's Integration Glossary is merged into it. Metric terms state what is counted and name the published method they follow, including the NSF HERD survey, NIH and NSF rates, and the federal financial report. Similar counts have separate names.
+- **README and dashboard home page: description rewritten as plain prose.** Both now use the same Mission text. No change to the UDM's scope or goals.
+- **Dashboard: Statuses tab shows status paths.** One flow chart covers the proposal and award, including where each stage hands off to the next. A second covers early setup, modifications, subawards, payments, deliverables, and actions.
+- **Dashboard: Infrastructure tab states the normalized position.** A short note under "Where the UDM Fits" says the UDM is normalized so it can be modular, and that adopters build star schemas over it for reporting.
 
 ## [3.0.0] - 2026-10-22
 

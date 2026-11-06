@@ -19,6 +19,14 @@ export interface DataDictionary {
   table_count: number;
 }
 
+export interface ExampleView {
+  name: string;
+  purpose: string;
+  module: string;
+  dialect: string;
+  sql: string;
+}
+
 export interface Relationship {
   from_table: string;
   from_column: string;
@@ -40,4 +48,6 @@ export type TabName =
   | 'erd'
   | 'views'
   | 'ontology'
+  | 'glossary'
+  | 'statuses'
   | 'infrastructure';

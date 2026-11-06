@@ -36,11 +36,16 @@ const suffixes = [
   { suffix: '_Name', purpose: 'Human-readable name or title', example: 'Organization_Name, First_Name' },
   { suffix: '_Description', purpose: 'Longer text description', example: 'Value_Description, Outcome_Description' },
   { suffix: '_Date', purpose: 'Date or datetime value', example: 'Start_Date, Due_Date' },
-  { suffix: '_Type', purpose: 'Classification or category', example: 'Report_Type; institution-specific types use *_Type_Value_ID → AllowedValues' },
+  { suffix: '_Type', purpose: 'Classification or category', example: 'Report_Type, Instrument_Type (fixed lists)' },
+  { suffix: '_Value_ID', purpose: 'Reference to an institution-extensible list in AllowedValues', example: 'Transaction_Type_Value_ID, Role_Value_ID' },
   { suffix: '_Status', purpose: 'Current state or status', example: 'Award_Status, Deadline_Status' },
   { suffix: '_Amount', purpose: 'Monetary value', example: 'Transaction_Amount, Funding_Ceiling_Amount' },
   { suffix: '_Percent', purpose: 'Percentage value', example: 'Effort_Percent, Rate_Percent' },
   { suffix: '_Number', purpose: 'Sequential or reference number', example: 'Award_Number, Modification_Number' },
+  { suffix: '_At', purpose: 'Exact date and time', example: 'Submitted_At, Responded_At' },
+  { suffix: '_Count', purpose: 'A number of things', example: 'Module_Count, Animal_Count' },
+  { suffix: '_Hash', purpose: 'Fingerprint of a file or package', example: 'Package_Hash, Signed_Package_Hash' },
+  { suffix: 'Is_ (prefix)', purpose: 'True or false', example: 'Is_Flow_Through, Is_Key_Personnel' },
 ];
 
 const th: React.CSSProperties = {
@@ -54,16 +59,17 @@ const td: React.CSSProperties = {
 
 const layers = [
   { n: '1', name: 'System of Record', holds: 'UDM source-of-truth research administration data', profile: 'Versioned OLAP storage with transaction metadata capture', examples: 'Apache Iceberg + Nessie, Dolt, PostgreSQL temporal tables' },
-  { n: '2', name: 'System of Insight', holds: 'Derived data: review findings, dashboards, reports, computed aggregates', profile: "View / projection layer inside the System of Record's query engine", examples: 'Trino views, materialized views' },
-  { n: '3', name: 'System of Engagement', holds: 'Non-UDM application infrastructure: authentication, session state, submission tooling, in-flight drafts, observability', profile: 'OLTP, transactional, user-facing', examples: 'PostgreSQL or equivalent' },
+  { n: '2', name: 'System of Engagement', holds: 'Non-UDM application infrastructure: authentication, session state, in-flight drafts, observability', profile: 'OLTP, transactional, user-facing', examples: 'PostgreSQL or equivalent' },
+  { n: '3', name: 'System of Insight', holds: 'Derived data: review findings, dashboards, reports, computed aggregates', profile: "View / projection layer inside the System of Record's query engine", examples: 'Trino views, materialized views' },
+  { n: '4', name: 'System of Action', holds: 'Automated work and its run state: workflow runs, scheduled jobs, submission tooling, notifications, automated agents', profile: 'Event-driven or scheduled, with run logs and human approval where needed', examples: 'Workflow engines, job schedulers, integration tools, AI agents' },
 ];
 
 const logicKinds = [
-  { kind: 'Invariants (validation)', examples: 'Two-FK exclusive-or, lifecycle chain rules, conditional-required columns', home: 'System of Record enforcement; mechanism (constraint, trigger, scheduled check) is the institution’s choice', spec: '71 typed cross-row constraints, machine-readable' },
+  { kind: 'Invariants (validation)', examples: 'Two-FK exclusive-or, lifecycle chain rules, conditional-required columns', home: 'System of Record enforcement; mechanism (constraint, trigger, scheduled check) is the institution’s choice', spec: 'Cross-row constraints, many of them typed and machine-readable' },
   { kind: 'Derivation', examples: 'Award.Current_End_Date, Current_Total_Funded, lineage roots', home: 'Write-path recompute against the System of Record', spec: 'Derived-value rules with documented recompute triggers' },
-  { kind: 'Business / analytical', examples: 'Active awards, overdue reports, requirement satisfaction, review findings', home: 'System of Insight views over UDM data', spec: '12 example views as reference implementations; finding and checklist shapes documented as patterns' },
-  { kind: 'Workflow / process', examples: 'Approval gating, reviewer auto-assignment, escalation', home: 'System of Engagement application code, reading Insight views', spec: 'Deliberately unspecified; the spec documents the data the workflow reads, never the workflow itself' },
-  { kind: 'Usage conventions', examples: 'Modification vs new Award, role-bearer changes, submission events', home: 'Consumers and integrators', spec: '20 semantic conventions' },
+  { kind: 'Business / analytical', examples: 'Active awards, overdue deliverables, requirement satisfaction, review findings', home: 'System of Insight views over UDM data', spec: 'Example views as reference implementations; finding and checklist shapes documented as patterns' },
+  { kind: 'Workflow / process', examples: 'Approval gating, reviewer auto-assignment, escalation', home: 'System of Action, reading Insight views', spec: 'Deliberately unspecified; the spec documents the data the workflow reads, never the workflow itself' },
+  { kind: 'Usage conventions', examples: 'Modification vs new Award, role-bearer changes, submission events', home: 'Consumers and integrators', spec: 'Semantic conventions' },
 ];
 
 const optionalModules = [
@@ -76,8 +82,8 @@ const optionalModules = [
 ];
 
 const tiers = [
-  { tier: 'Core modules', contents: 'The universal capabilities, required of every implementation: Actors, Funding Cycle, Effort, Finance, Compliance, Records (and Outputs at its release). Each is named for the sentence every institution can say: "we track the people involved," "we certify effort," "we keep the records"', meaning: 'Required. 47 canonical tables' },
-  { tier: 'Optional modules', contents: 'Capabilities only some institutions exercise, fully specified and versioned. Available: Compliance Protocols, Animal Research, Human Subjects, Biosafety, Governance, Committee Protocol Review. Planned: IP', meaning: 'Adopted by declaration, e.g. "UDM 3.0.0 core + modules: compliance_protocols, human_subjects, governance." Two adopters of the same module are interoperable on it' },
+  { tier: 'Core modules', contents: 'The universal capabilities, required of every implementation: Actors, Funding Cycle, Effort, Finance, Compliance, Records (and Outputs at its release). Each is named for the sentence every institution can say: "we track the people involved," "we certify effort," "we keep the records"', meaning: 'Required' },
+  { tier: 'Optional modules', contents: 'Capabilities only some institutions exercise, fully specified and versioned. Available: Compliance Protocols, Animal Research, Human Subjects, Biosafety, Governance, Committee Protocol Review. Planned: IP', meaning: 'Adopted by declaration, e.g. "UDM core + modules: compliance_protocols, human_subjects, governance." Two adopters of the same module are interoperable on it' },
   { tier: 'Local extensions', contents: 'Institution-specific additions outside the specification', meaning: 'Not specified by UDM; the local-extensions registry documents where common cases belong' },
 ];
 
@@ -95,8 +101,8 @@ export default function OntologyTab() {
           <strong>The UDM is the data model of the System of Record.</strong> Data belongs in the UDM
           only if it is source-of-truth research administration data that cannot be regenerated from
           other UDM data plus engine logic. Derived data lives in the System of Insight; application
-          infrastructure lives in the System of Engagement; row history lives in the storage layer's
-          versioned history.
+          infrastructure lives in the System of Engagement; automation run state lives in the System
+          of Action; row history lives in the storage layer's versioned history.
         </p>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '1.5rem' }}>
@@ -119,7 +125,7 @@ export default function OntologyTab() {
         </div>
         <h3 style={{ color: '#2c3e50', marginBottom: '0.75rem' }}>Data needs by layer</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
-          <PatternCard title="System of Record — the durable facts">
+          <PatternCard title="System of Record: the durable facts">
             <p style={{ color: '#546e7a', fontSize: '0.88rem', margin: 0 }}>
               Who (personnel, organizations, roles), the funding lifecycle (opportunity through
               proposal, award, and closeout), money (budgets, transactions, rates, cost share),
@@ -130,22 +136,29 @@ export default function OntologyTab() {
               never drafts.
             </p>
           </PatternCard>
-          <PatternCard title="System of Insight — the derived answers">
+          <PatternCard title="System of Engagement: where people work">
             <p style={{ color: '#546e7a', fontSize: '0.88rem', margin: 0 }}>
-              Everything re-computable from the Record: active-award rosters, overdue reports,
+              Operational and transactional state behind the tools people use: in-progress proposal
+              drafts, user sessions and authentication, application telemetry. This data needs OLTP speed and mutability, and most of it is ephemeral.
+              When work finalizes (a proposal is submitted, an award is set up), the resulting
+              facts flow into the System of Record by ETL or streaming; the scaffolding stays behind.
+            </p>
+          </PatternCard>
+          <PatternCard title="System of Insight: the derived answers">
+            <p style={{ color: '#546e7a', fontSize: '0.88rem', margin: 0 }}>
+              Everything re-computable from the Record: active-award rosters, overdue deliverables,
               requirement satisfaction, review findings, effort certification status, and metrics
-              like success rate or income by sponsor type. This data needs read access to the
-              Record and nothing else. It stores no source-of-truth of its own, so views can be
+              like success rate or income by sponsor type. It reads only from the Record, by design. It stores no source-of-truth of its own, so views can be
               rebuilt, corrected, or redesigned at any time without a data migration.
             </p>
           </PatternCard>
-          <PatternCard title="System of Engagement — the work in flight">
+          <PatternCard title="System of Action: software working on people's behalf">
             <p style={{ color: '#546e7a', fontSize: '0.88rem', margin: 0 }}>
-              Operational and transactional state: in-progress proposal drafts, user sessions and
-              authentication, submission tooling artifacts, notification queues, application
-              telemetry. This data needs OLTP speed and mutability, and most of it is ephemeral.
-              When work finalizes (a proposal is submitted, an award is set up), the resulting
-              facts flow into the System of Record by ETL or streaming; the scaffolding stays behind.
+              Automated work and its run state: workflow runs, scheduled jobs, submission tooling,
+              notifications, and automated agents. It reads the Record and Insight to decide what to
+              do, works within limits people set, and keeps a record of what it did. Results that are
+              research administration facts, such as a submission attempt, go back into the Record;
+              the run state stays here.
             </p>
           </PatternCard>
         </div>
@@ -264,7 +277,7 @@ export default function OntologyTab() {
         <ul style={{ listStyle: 'none', padding: 0 }}>
           <ConventionItem><strong>Pattern:</strong> <code>ReferencedTableName_ID</code></ConventionItem>
           <ConventionItem>Examples: <code>Organization_ID</code>, <code>Sponsor_Organization_ID</code>, <code>Award_ID</code></ConventionItem>
-          <li style={{ padding: '0.75rem 0' }}>Descriptive prefix when multiple FKs reference the same table (e.g., <code>Sponsor_Organization_ID</code>, <code>Lead_Organization_ID</code>)</li>
+          <li style={{ padding: '0.75rem 0' }}>Descriptive prefix when multiple FKs reference the same table (e.g., <code>Sponsor_Organization_ID</code>, <code>Administering_Organization_ID</code>)</li>
         </ul>
       </Section>
 
@@ -296,7 +309,7 @@ export default function OntologyTab() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
           <PatternCard title="AllowedValues Table">
             <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Extensible controlled vocabulary for enumerations that may change or vary by institution.</p>
-            <p style={{ color: '#546e7a', fontSize: '0.9rem' }}><strong>Pattern:</strong> <code>TableName_Type_Value_ID</code></p>
+            <p style={{ color: '#546e7a', fontSize: '0.9rem' }}><strong>Pattern:</strong> columns ending in <code>_Value_ID</code></p>
           </PatternCard>
           <PatternCard title="Self-Referential Foreign Keys">
             <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Tables that reference themselves to represent hierarchies.</p>
@@ -307,8 +320,8 @@ export default function OntologyTab() {
             <p style={{ color: '#546e7a', fontSize: '0.9rem' }}><strong>Example:</strong> <code>ComplianceCoverage</code> (links ComplianceRequirement to Award/Subaward)</p>
           </PatternCard>
           <PatternCard title="Status vs Type">
-            <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}><strong>Status:</strong> Current state (often changes) - fixed vocabulary, enforced with a CHECK constraint or ENUM</p>
-            <p style={{ color: '#546e7a', fontSize: '0.9rem' }}><strong>Type:</strong> Category/classification (institution-specific) - use AllowedValues</p>
+            <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}><strong>Status:</strong> Current state, which often changes. A fixed list, enforced with a CHECK constraint or ENUM</p>
+            <p style={{ color: '#546e7a', fontSize: '0.9rem' }}><strong>Type:</strong> A category, which rarely changes. Ending in <code>_Type</code> means a fixed list. Ending in <code>_Value_ID</code> means the list is in AllowedValues, and institutions can add to it</p>
           </PatternCard>
         </div>
       </Section>
@@ -316,8 +329,7 @@ export default function OntologyTab() {
       <Section>
         <SectionTitle>UDM Patterns</SectionTitle>
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
-          The UDM defines eight universal patterns; the four below do the most structural work and recur
-          across the most tables. Each one is documented in detail in the prose spec
+          The four patterns below do the most structural work and recur across the most tables. Each one is documented in detail in the prose spec
           (see <code>vignettes/udm-system-of-record.md</code>) and in the structured constraint
           catalog in <code>udm_schema.json</code>.
         </p>
@@ -330,17 +342,18 @@ export default function OntologyTab() {
             <p style={{ color: '#546e7a', fontSize: '0.9rem' }}>
               <strong>Used by:</strong> Budget (Proposed/Approved/Current/Actual),
               Effort (Proposed/Approved/Charged/Certified), CostShare (Proposed/Committed/Met/Waived),
-              Payment (Scheduled/Invoiced/Received/Reconciled).
+              Payment (Scheduled/Invoiced/Paid/Reconciled).
             </p>
           </PatternCard>
           <PatternCard title="Two-FK XOR Attachment">
             <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
               Satellite tables attach to either Award or Subaward via two nullable FK columns; exactly
               one is populated per row. On Budget and CostShare the exclusive-or applies only at
-              post-award Lifecycle_Stages (both FKs are null at Proposed).
+              post-award Lifecycle_Stages (both FKs are null at Proposed). On TeamRole both are null
+              while the row is at the proposal stage.
             </p>
             <p style={{ color: '#546e7a', fontSize: '0.9rem' }}>
-              <strong>Used by:</strong> Payment, Modification, Transaction, Equipment, Report,
+              <strong>Used by:</strong> Payment, Modification, Transaction, Equipment, Deliverable,
               Closeout, Terms, TeamRole, ComplianceCoverage, and (stage-conditionally) Budget and
               CostShare. ContactDetails and Negotiation use the same mechanics with different parents.
             </p>
@@ -351,7 +364,7 @@ export default function OntologyTab() {
               Type-stable references; soft deletes preserve attachments.
             </p>
             <p style={{ color: '#546e7a', fontSize: '0.9rem' }}>
-              <strong>Used by:</strong> Document, Communication, Restriction, Deadline, Classification, Action, ActivityLog.
+              <strong>Used by:</strong> Document, Communication, Restriction, Deadline, Classification, Action, Approval.
             </p>
           </PatternCard>
           <PatternCard title="Derived Columns">

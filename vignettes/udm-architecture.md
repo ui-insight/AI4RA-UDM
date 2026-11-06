@@ -131,7 +131,7 @@ Action
 ├── Assignee_Personnel_ID
 ├── Requestor_Personnel_ID
 ├── Due_Date
-├── Action_Status          (Open / In_Progress / Blocked / Completed / Cancelled)
+├── Action_Status          (Open / In_Progress / Blocked / Completed / Cancelled / Unsuccessful)
 ├── Priority               (CHECK)
 ├── Completed_Date
 ├── Origin                 (Sponsor_Required / Internal / System_Generated / Manual)
@@ -277,7 +277,8 @@ Committed-vs-actual queries become single-table aggregations. Other Support / Cu
 ```
 Payment
 ├── Payment_ID
-├── Lifecycle_Stage       (Scheduled / Invoiced / Received / Reconciled)
+├── Lifecycle_Stage       (Scheduled / Invoiced / Paid / Reconciled)
+├── Payment_Direction     (Incoming / Outgoing)
 ├── Previous_Payment_ID     (revisions chain; later stages chain back to earlier ones)
 ├── Award_ID
 ├── Budget_ID             (optional period reference after Budget collapse)
@@ -285,7 +286,7 @@ Payment
 ├── Invoice_Number        (sponsor-side identifier; populated when Lifecycle_Stage='Invoiced')
 ├── Submission_Date
 ├── Actual_Date / Actual_Amount
-├── Payment_Status        (CHECK list)
+├── Payment_Status        (Clear / Disputed / Cancelled)
 ```
 
 ### 4.13 CostShare family collapse
@@ -364,12 +365,10 @@ Schema improvements that don't require structural moves.
 
 | Field | Purpose |
 |---|---|
-| `Modification.Continuation_Type` | Competing / Non-Competing / Supplement / Other |
 | `Modification.Carryover_Amount` | Unspent funds moved between periods |
-| `Modification.Carryforward_Amount` | Synonym/companion of Carryover depending on accounting policy |
 | `Modification.Requires_Prior_Approval` | Flag triggering sponsor approval workflow |
 | `Modification.Prior_Approval_Granted_Date` | Closure date for approval |
-| `Modification.Pre_Award_Costs_Amount` | At-risk spending captured at the modification level |
+| `Modification.Pre_Award_Costs_Amount` | Costs incurred before the award's start date that this modification covers; at the institution's risk until the award is made |
 
 **Event_Type AllowedValues expansion:**
 - `Incremental_Funding`, `No_Cost_Extension`, `Budget_Revision`, `PI_Change`, `Scope_Change`, `Carryover`, `Rebudget` (existing-style values)
@@ -380,7 +379,7 @@ Schema improvements that don't require structural moves.
 
 | Field | Purpose |
 |---|---|
-| `Organization.Sponsor_Type` | Federal / State / Foundation / Industry / etc. (CHECK) |
+| `Organization.Sponsor_Type` | Federal / State / Nonprofit / Industry / etc. (CHECK) |
 
 ### 6.5 Personnel & Effort additions
 
@@ -433,7 +432,7 @@ A separate FundingSource table is not necessary; these fields cover the common c
 
 | Field | Purpose |
 |---|---|
-| `Transaction.Income_Treatment` | CHECK: `Offset` / `Additive`. Required when `Transaction_Type` is project income; describes whether the income reduces sponsor amount or adds to project value. |
+| `Transaction.Income_Treatment` | CHECK: `Offset` / `Additive` / `Cost_Sharing`. Required when `Transaction_Type` is project income; describes whether the income reduces sponsor amount, adds to project value, or counts toward cost share. |
 
 **Transaction_Type AllowedValues expansion:** `Project_Income`, `Cost_Transfer_In`, `Cost_Transfer_Out` (added to the existing CHECK / AllowedValues list).
 

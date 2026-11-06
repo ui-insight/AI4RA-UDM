@@ -5,7 +5,12 @@ on:
     branches: [main]
     paths:
       - 'udm_schema.json'
+      - 'glossary.json'
+      - 'VERSION'
+      - 'README.md'
       - 'scripts/generate_dashboard_data.py'
+      - 'scripts/generate_glossary.py'
+      - 'scripts/check_glossary.py'
       - 'scripts/validate_schema.py'
       - 'scripts/check_spec_sync.py'
       - 'scripts/check_conformance.py'
@@ -53,8 +58,14 @@ jobs:
       - name: Check the specification conforms to itself
         run: python scripts/check_conformance.py --self-check
 
+      - name: Check the glossary against the schema
+        run: python scripts/check_glossary.py
+
       - name: Generate dashboard data files from udm_schema.json
         run: python scripts/generate_dashboard_data.py
+
+      - name: Generate the glossary outputs
+        run: python scripts/generate_glossary.py
 
       - name: Generate DDL and seed rows for every mapped dialect
         run: |

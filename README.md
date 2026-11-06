@@ -1,19 +1,16 @@
 # AI4RA Unified Data Model (UDM)
 
-A universal data model for research administration. The UDM provides a common schema that any institution can adopt to standardize how research administration data is structured, described, and shared — regardless of what systems they use internally.
+A universal data model for research administration that any institution can adopt.
 
-**Current version: v3.0.0** (released 2026-10-22). Earlier versions are fixed commits under [GitHub Releases](https://github.com/ui-insight/AI4RA-UDM/releases); see [Versions](#versions).
+**Current version: v4.0.0** (released 2026-11-05). Earlier versions are fixed commits under [GitHub Releases](https://github.com/ui-insight/AI4RA-UDM/releases); see [Versions](#versions).
 
 ## Mission
 
-Research administration data is fragmented across institutions, locked in proprietary systems with inconsistent naming, structures, and definitions. The AI4RA UDM aims to:
+Research administration data is scattered across institutions and proprietary systems, and each system names and defines things its own way. When two systems disagree on what counts as an active award, someone has to work out by hand which one is right.
 
-- **Standardize** the language and structure of research administration data across institutions
-- **Be generic enough** to accommodate the diverse needs of universities, research institutes, and funding agencies
-- **Enable interoperability** between systems by providing a shared framework that institutions map their local data to
-- **Support FAIR data principles** — making research administration data Findable, Accessible, Interoperable, and Reusable
+The UDM is a shared set of definitions for this data. Once local data is mapped to the UDM, systems can exchange it and institutions can compare it. The UDM is generic enough for universities, research institutes, and funding agencies. It aims to support the FAIR data principles (Findable, Accessible, Interoperable, Reusable).
 
-The UDM is a **specification**, not a database. It defines what tables, columns, relationships, and constraints should exist. Institutions implement it in whatever database technology fits their environment and map their local data to the common model.
+The UDM is a specification. It defines the tables, columns, relationships, and constraints that should exist. Institutions implement it in whatever database technology fits their environment.
 
 ## How the UDM Is Defined
 
@@ -26,6 +23,8 @@ The UDM is defined in two complementary artifacts:
 
 The two are kept in exact sync; the prose spec is authoritative on intent, the JSON on machine-consumable detail. An architectural overview lives in [`vignettes/ontology.md`](vignettes/ontology.md), and the version history in [`vignettes/CHANGELOG.md`](vignettes/CHANGELOG.md).
 
+To produce the NSF HERD survey from UDM data, see [`vignettes/herd-report.md`](vignettes/herd-report.md), which goes question by question.
+
 The UDM is a normalized model, in the Inmon tradition: the standard defines the integrated System of Record, and star schemas are derived from it by each adopter as views ([why](vignettes/udm-architecture.md#16-a-normalized-core-is-the-standard-star-schemas-are-the-adopters-choice)). Modules extend the standard and are conformance-checked; marts are deployment specific and are not part of it.
 
 ### Core Modules
@@ -35,7 +34,7 @@ The model's 48 tables are 46 in six core modules (the universal capabilities of 
 | Core module | Tables | Purpose |
 |--------|--------|---------|
 | **Actors** | Personnel, PersonnelCredential, Organization, OrganizationCapability, OrganizationIdentifier, OrganizationRole, ContactDetails | People, organizations, their roles, credentials, and contact information |
-| **Funding Cycle** | RFA, RFARequirement, Proposal, SubmissionAttempt, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout | The full lifecycle from funding opportunity through proposal, award, and closeout |
+| **Funding Cycle** | RFA, RFARequirement, Proposal, SubmissionAttempt, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Deliverable, Report, Closeout | The full lifecycle from funding opportunity through proposal, award, and closeout |
 | **Effort** | TeamRole, Effort | Who is on a proposal or award, and effort certification |
 | **Finance** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment | Budgets, accounting, transactions, rates, and capital assets |
 | **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure, PolicyException | IRB/IACUC protocols, COI, other support, policy exceptions, and regulatory tracking |
@@ -43,9 +42,9 @@ The model's 48 tables are 46 in six core modules (the universal capabilities of 
 
 **Implementation tables** (not a core module): `AllowedValues` (institution-specific controlled vocabularies with cross-institution canonical codes) and `BudgetCategory` (shared budget category reference). Core modules are research-administration capabilities; these two tables support the model's mechanics.
 
-The model also includes **12 example views** (e.g., `vw_Active_Awards`, `vw_Award_Lineage`, `vw_Overdue_Reports`) as reference query implementations that institutions can adopt or adapt for dashboards and reporting. They are written against the MySQL dialect mapping; each carries a `dialect` field, and date functions need adapting for other engines.
+The model also includes **14 example views** (e.g., `vw_Active_Awards`, `vw_Award_Lineage`, `vw_Overdue_Deliverables`) as reference query implementations that institutions can adopt or adapt for dashboards and reporting. They are written against the MySQL dialect mapping; each carries a `dialect` field, and date functions need adapting for other engines.
 
-Browse the full model interactively at the [UDM Dashboard](https://ui-insight.github.io/AI4RA-UDM/).
+Browse the full model interactively at the [UDM Dashboard](https://ui-insight.github.io/AI4RA-UDM/). Its Statuses tab charts how a proposal and award move through their statuses, and how early setup, modifications, subawards, payments, deliverables, and actions move through theirs. Its Glossary tab defines the terms in plain language. The glossary's source is [`glossary.json`](glossary.json), and a CSV copy is served at `data/glossary.csv`.
 
 ### Naming Conventions (Ontology)
 
@@ -65,7 +64,7 @@ For full ontology documentation, see [`vignettes/ontology.md`](vignettes/ontolog
 The UDM rests on a small set of universal patterns applied consistently across the model:
 
 - **Lifecycle_Stage discriminator** — one table carries a record through its whole life (Budget: Proposed → Approved → Current → Actual; likewise Effort, CostShare, Payment), with revisions chained through `Previous_*_ID`.
-- **Two-FK exclusive-or attachment** — satellite tables (Modification, Report, Transaction, Terms, Closeout, and others) attach to either an Award or a Subaward via two nullable FKs, keeping inbound and outbound funding symmetric.
+- **Two-FK exclusive-or attachment:** satellite tables (Modification, Deliverable, Transaction, Terms, Closeout, and others) attach to either an Award or a Subaward via two nullable FKs, keeping inbound and outbound funding symmetric.
 - **Polymorphic attachment** — six Records tables reference any permitted entity via `Related_Entity_Type` + `Related_Entity_ID`, with documented minimum-conformance enforcement behavior.
 - **Flexible vs. fixed enumerations** — institution-specific vocabularies live in the `AllowedValues` table (with `Canonical_Value_Code` for cross-institution normalization); universal standards use CHECK constraints. See [allowedvalues.md](vignettes/allowedvalues.md).
 - **Derived columns with recompute triggers** — convenience columns like `Award.Current_End_Date` are documented as derived, with the rules to recompute them.
@@ -79,7 +78,7 @@ The `udm_schema.json` structure (abbreviated). Everything specified is a module,
 
 ```json
 {
-  "metadata": { "name": "UDM", "version": "3.0.0", "spec_source": "vignettes/udm-system-of-record.md" },
+  "metadata": { "name": "UDM", "version": "4.0.0", "spec_source": "vignettes/udm-system-of-record.md" },
   "types": { "abstract": ["ID", "Money", "..."], "dialects": { "mysql": { "ID": "VARCHAR(50)", "Money": "DECIMAL(18,2)", "...": "..." }, "postgresql": { "...": "..." } } },
   "conventions": { "identifier": {}, "hierarchy": {}, "polymorphic_attachment": {}, "lifecycle_stage": {}, "audit_columns": {}, "constraint_vocabulary": {}, "semantic": [], "...": {} },
   "modules": {
@@ -94,7 +93,7 @@ The `udm_schema.json` structure (abbreviated). Everything specified is a module,
             "columns": {
               "Award_ID": { "type": "ID", "primary_key": true, "required": true, "description": "PK" },
               "Sponsor_Organization_ID": { "type": "ID", "references": { "table": "Organization", "column": "Organization_ID" }, "description": "..." },
-              "Award_Status": { "type": "Status", "allowed_values": ["Pending", "Active", "Suspended", "Closing", "Closed", "Terminating", "Terminated"], "synonyms": "Grant Status, Status", "description": "..." },
+              "Award_Status": { "type": "Status", "allowed_values": ["In_Setup", "Active", "Suspended", "Closing", "Closed", "Adjusting", "Terminating", "Terminated"], "synonyms": "Grant Status, Status", "description": "..." },
               "Current_End_Date": { "type": "DATE", "derived": { "rule": "...", "recompute_triggers": "..." }, "description": "..." }
             },
             "constraints": [ { "rule": "...", "structured": { "type": "referenced_status_is", "...": "..." } } ]
@@ -112,13 +111,14 @@ The `udm_schema.json` structure (abbreviated). Everything specified is a module,
 
 ## Accessing the UDM
 
-The UDM is served as static JSON via GitHub Pages. These endpoints define the **framework** — the structure and conventions of the data model. They do not contain populated data; institutions implement the model and populate it with their own data.
+The UDM is served as static JSON via GitHub Pages. These endpoints define the structure and conventions of the data model. They do not contain populated data. Institutions implement the model and populate it with their own data.
 
 | Endpoint | Description |
 |----------|-------------|
 | [`/data/udm_schema.json`](https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json) | **Complete schema (current)** — tables, columns, types, constraints, descriptions, synonyms, PII flags, cross-row constraints, example views |
 | [`/data/data-dictionary.json`](https://ui-insight.github.io/AI4RA-UDM/data/data-dictionary.json) | Human-readable descriptions, synonyms, and PII flags |
 | [`/data/relationships.json`](https://ui-insight.github.io/AI4RA-UDM/data/relationships.json) | Foreign key relationships |
+| [`/data/example-views.json`](https://ui-insight.github.io/AI4RA-UDM/data/example-views.json) | Example views, with each view's purpose and SQL |
 
 Most consumers only need the primary endpoint (`udm_schema.json`) — it contains everything.
 
@@ -194,7 +194,7 @@ An implementation or a vendor product shows that it follows the UDM with a confo
 
 ## Versions
 
-The repository carries one version of the schema, the current one. Its version is in the `metadata` block of [`udm_schema.json`](udm_schema.json) and in the prose spec. Every release is a fixed commit published under [GitHub Releases](https://github.com/ui-insight/AI4RA-UDM/releases); an earlier version is read or cited from its release.
+The repository carries one version of the schema, the current one. Its version is set in the [`VERSION`](VERSION) file and repeated in the `metadata` block of [`udm_schema.json`](udm_schema.json) and in the prose spec. Every release is a fixed commit published under [GitHub Releases](https://github.com/ui-insight/AI4RA-UDM/releases); an earlier version is read or cited from its release.
 
 The version follows semantic versioning: a major release may rename or remove tables and columns, a minor release only adds. See the [CHANGELOG](vignettes/CHANGELOG.md) for each release's delta and migration guidance.
 
@@ -368,10 +368,11 @@ graph TD
     RFA-->Organization
     RFARequirement-->RFA
     RateAgreement-->Organization
-    Report-->Award
-    Report-->Document
-    Report-->Personnel
-    Report-->Subaward
+    Deliverable-->Award
+    Deliverable-->Document
+    Deliverable-->Personnel
+    Deliverable-->Subaward
+    Report-->Deliverable
     Restriction-->AllowedValues
     Restriction-->Personnel
     Subaward-->Award

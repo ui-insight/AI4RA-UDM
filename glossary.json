@@ -1,0 +1,3212 @@
+{
+  "description": "The AI4RA UDM glossary. Edit this file, then run scripts/generate_glossary.py. Each term may list udm references (Table, Table.Column, or Table.Column=Value), which scripts/check_glossary.py validates against udm_schema.json, and a source for facts taken from a published rule.",
+  "domains": [
+    "Systems & identifiers",
+    "Federal identifiers & rules",
+    "People & organizations",
+    "Proposal",
+    "Agreements",
+    "Award & lifecycle",
+    "Subawards",
+    "Budget & costing",
+    "Effort",
+    "Compliance & research security",
+    "Records & workflow",
+    "Research metrics & reporting",
+    "Data & integration"
+  ],
+  "terms": [
+    {
+      "term": "Accepted",
+      "also": "",
+      "definition": "A submission status: the sponsor took the proposal in for consideration. This doesn't promise a review or an award, and the sponsor can still return it. This starts the sponsor decision stage.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Submission_Status=Accepted"
+      ]
+    },
+    {
+      "term": "Accounting string",
+      "also": "Finance code",
+      "definition": "The full set of codes (fund, organization, account, program, or equivalent) that tells the accounting system where a charge goes.",
+      "domain": "Budget & costing",
+      "udm": [
+        "FinanceCode"
+      ]
+    },
+    {
+      "term": "Accounts receivable aging",
+      "also": "AR aging",
+      "definition": "How long invoices sent to sponsors have gone unpaid, counted from the date each was sent.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Payment.Submission_Date",
+        "Payment.Payment_Direction=Incoming",
+        "Payment.Lifecycle_Stage=Invoiced"
+      ]
+    },
+    {
+      "term": "Active (award)",
+      "also": "",
+      "definition": "An award status: the award is open for spending within its period of performance.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Award_Status=Active"
+      ]
+    },
+    {
+      "term": "Active (subaward)",
+      "also": "",
+      "definition": "A subaward status: the agreement is executed and open for the subrecipient's work.",
+      "domain": "Subawards",
+      "udm": [
+        "Subaward.Subaward_Status=Active"
+      ]
+    },
+    {
+      "term": "Active awards",
+      "also": "Active portfolio",
+      "definition": "Awards currently open for work and spending.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Award_Status=Active"
+      ]
+    },
+    {
+      "term": "Activity type",
+      "also": "Sponsored activity type",
+      "definition": "What kind of work an award or proposal funds: organized research, instruction, or another sponsored activity.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Activity_Type",
+        "Proposal.Activity_Type"
+      ],
+      "source": "2 CFR 200 Appendix III",
+      "source_url": "https://www.ecfr.gov/current/title-2/part-200/appendix-Appendix%20III%20to%20Part%20200"
+    },
+    {
+      "term": "Adjusting (award)",
+      "also": "",
+      "definition": "An award status: the award has ended and a late correction is under way, such as an audit finding or a late charge. It is not open for spending. It returns to the status it came from.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Award_Status=Adjusting"
+      ]
+    },
+    {
+      "term": "Adjusting (subaward)",
+      "also": "",
+      "definition": "A subaward status: the subaward has ended and a late correction is under way. It is not open for work or spending. It returns to the status it came from.",
+      "domain": "Subawards",
+      "udm": [
+        "Subaward.Subaward_Status=Adjusting"
+      ]
+    },
+    {
+      "term": "Administering organization",
+      "also": "Responsible unit, lead unit",
+      "definition": "The unit that manages the finances of a proposal, award, or subaward.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Administering_Organization_ID",
+        "Award.Administering_Organization_ID",
+        "Subaward.Administering_Organization_ID"
+      ]
+    },
+    {
+      "term": "Advance funding",
+      "also": "",
+      "definition": "The institution's approval to spend on an existing award ahead of a sponsor amendment. The institution carries the risk until the amendment arrives.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Event_Type_Value_ID=Advance_Funding"
+      ]
+    },
+    {
+      "term": "Advance payment",
+      "also": "",
+      "definition": "The sponsor pays before the costs are incurred. This is a way of being paid, not an approval to spend.",
+      "domain": "Agreements",
+      "udm": [
+        "Terms.Payment_Method=Advance"
+      ],
+      "source": "2 CFR 200.305",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.305"
+    },
+    {
+      "term": "Adverse event",
+      "also": "",
+      "definition": "A harmful or unexpected event on an approved protocol.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ProtocolAdverseEvent"
+      ],
+      "source": "HHS OHRP",
+      "source_url": "https://www.hhs.gov/ohrp/regulations-and-policy/guidance/reviewing-unanticipated-problems/index.html"
+    },
+    {
+      "term": "Allowed values",
+      "also": "Controlled vocabulary, code list, picklist, lookup values",
+      "definition": "The agreed list of codes that can be used for a field, such as the list of proposal types.",
+      "domain": "Systems & identifiers",
+      "udm": [
+        "AllowedValues"
+      ]
+    },
+    {
+      "term": "Anticipated amount",
+      "also": "Total anticipated funding, total award value",
+      "definition": "The total an award is expected to receive over its whole life if every planned increment is funded.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Total_Anticipated_Funding",
+        "Subaward.Total_Anticipated_Amount"
+      ]
+    },
+    {
+      "term": "Applied research",
+      "also": "",
+      "definition": "Original investigation done to gain new knowledge, directed mainly toward a specific, practical aim or objective.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Research_Character=Applied_Research"
+      ],
+      "source": "NSF HERD questionnaire",
+      "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
+    },
+    {
+      "term": "Approval of the material",
+      "also": "",
+      "definition": "The gate that decides whether the content of the proposal is approved. It is tracked in internal approval.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Internal_Approval_Status"
+      ]
+    },
+    {
+      "term": "Approval step",
+      "also": "Sign-off, routing step",
+      "definition": "One decision in an approval chain: who was asked to decide what, and what they decided.",
+      "domain": "Proposal",
+      "udm": [
+        "Approval"
+      ]
+    },
+    {
+      "term": "Approved (early setup)",
+      "also": "",
+      "definition": "An early setup status: at-risk spending is authorized up to the maximum amount within the effective window.",
+      "domain": "Proposal",
+      "udm": [
+        "PreAwardAuthorization.Authorization_Status=Approved"
+      ]
+    },
+    {
+      "term": "Approved (internal approval)",
+      "also": "",
+      "definition": "An internal approval status: every approval step on the material has approved. Sign-off to submit is separate.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Internal_Approval_Status=Approved"
+      ]
+    },
+    {
+      "term": "Approved (modification)",
+      "also": "",
+      "definition": "A modification status: the sponsor or institution approved the modification. It counts in the award's current totals and dates from approval, and Effective_Date records when the change takes effect.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Approval_Status=Approved"
+      ]
+    },
+    {
+      "term": "Assistance Listing Number",
+      "also": "ALN, CFDA number",
+      "definition": "The number that identifies a federal funding program.",
+      "domain": "Federal identifiers & rules",
+      "udm": [
+        "RFA.Assistance_Listing_Number",
+        "Award.Assistance_Listing_Number"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
+      "term": "Attempt",
+      "also": "",
+      "definition": "One transmission of a package to a sponsor. A proposal can have several attempts, and earlier attempts stay as history.",
+      "domain": "Proposal",
+      "udm": [
+        "SubmissionAttempt"
+      ]
+    },
+    {
+      "term": "Authorized Organizational Representative",
+      "also": "AOR, authorized official, signing official",
+      "definition": "The person who can legally commit the institution to a proposal or agreement.",
+      "domain": "People & organizations",
+      "udm": [
+        "PersonnelCredential.Credential_Type=Authorized_Organizational_Representative",
+        "OrganizationRole.Role_Value_ID=Authorized_Official",
+        "OrganizationRole.Role_Value_ID=Signing_Official",
+        "Approval.Approval_Role=Authorized_Organizational_Representative"
+      ],
+      "source": "NIH Grants Policy Statement 2.1.2",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_2/2.1.2_recipient_staff.htm"
+    },
+    {
+      "term": "Available balance",
+      "also": "Remaining balance, free balance",
+      "definition": "The money still free to commit on an award: its funding minus money spent and money set aside for future expenses. It is the institution's counterpart to the unobligated balance. See Spending for what counts as money spent.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Current_Total_Funded",
+        "Transaction.Transaction_Amount",
+        "Transaction.Transaction_Type_Value_ID=Encumbrance"
+      ],
+      "source": "UTRGV Project Burn Rate",
+      "source_url": "https://www.utrgv.edu/research/departments/research-analytics/reports-and-dashboards/project-burn-rate/index.htm"
+    },
+    {
+      "term": "Average monthly burn rate",
+      "also": "Spending rate, run rate",
+      "definition": "The money spent on an award divided by the months passed in its period. See Spending for what counts as money spent.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Transaction.Transaction_Amount",
+        "Award.Original_Start_Date"
+      ],
+      "source": "CASRAI dictionary",
+      "source_url": "https://www.casrai.org/dictionary/term/burn-rate-grant"
+    },
+    {
+      "term": "Award",
+      "also": "Grant, contract, project, sponsored project",
+      "definition": "Funding the institution has received for a project.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award"
+      ]
+    },
+    {
+      "term": "Award dollars",
+      "also": "Awards received, funding received",
+      "definition": "The money sponsors obligated in a period: funding on new awards plus funding added to existing awards, minus funding taken back. Planned future increments don't count until they are obligated. This follows how federal spending data counts obligations.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Original_Total_Funded",
+        "Modification.Funding_Change_Amount"
+      ],
+      "source": "Federal spending data standard",
+      "source_url": "https://fedspendingtransparency.github.io/whitepapers/amount"
+    },
+    {
+      "term": "Award number",
+      "also": "Sponsor award number, grant number",
+      "definition": "The number the sponsor assigns to an award.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Award_Number"
+      ]
+    },
+    {
+      "term": "Award rate",
+      "also": "",
+      "definition": "The share of applications that are funded, following NIH's method, with each resubmission counted separately. It is usually lower than the success rate because the bottom number is larger.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Proposal.Decision_Status=Awarded",
+        "Proposal.Decision_Status=Declined"
+      ],
+      "source": "NIH success rates",
+      "source_url": "https://edgeforscholars.vumc.org/?p=21258"
+    },
+    {
+      "term": "Award status",
+      "also": "",
+      "definition": "Where an award stands: in setup, active, suspended, closing, closed, adjusting, terminating, or terminated.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Award_Status"
+      ]
+    },
+    {
+      "term": "Awarded",
+      "also": "",
+      "definition": "A decision status: the sponsor funded the proposal, and an Award record exists.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Decision_Status=Awarded"
+      ]
+    },
+    {
+      "term": "Awarded amount",
+      "also": "Award amount, obligated amount, funded amount",
+      "definition": "The money the sponsor has actually committed to an award so far.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Current_Total_Funded"
+      ],
+      "source": "2 CFR 200.211",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.211"
+    },
+    {
+      "term": "Basic research",
+      "also": "",
+      "definition": "Experimental or theoretical work done mainly to gain new knowledge of the foundations of phenomena and observable facts, with no particular application or use in view.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Research_Character=Basic_Research"
+      ],
+      "source": "NSF HERD questionnaire",
+      "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
+    },
+    {
+      "term": "Biosketch",
+      "also": "Biographical sketch",
+      "definition": "A structured summary of a researcher's education, positions, and contributions, required in many federal proposals.",
+      "domain": "Proposal",
+      "udm": [
+        "Document.Document_Type_Value_ID=Biosketch"
+      ]
+    },
+    {
+      "term": "Blocked",
+      "also": "",
+      "definition": "An action status: the task is waiting on something outside the assignee's control.",
+      "domain": "Records & workflow",
+      "udm": [
+        "Action.Action_Status=Blocked"
+      ]
+    },
+    {
+      "term": "Broad Agency Announcement",
+      "also": "BAA",
+      "definition": "A general announcement, common with defense agencies, inviting proposals in broad research areas, often leading to contracts.",
+      "domain": "Proposal",
+      "udm": [
+        "RFA"
+      ],
+      "source": "FAR part 35",
+      "source_url": "https://www.acquisition.gov/far/part-35"
+    },
+    {
+      "term": "Budget",
+      "also": "Budget line, line item",
+      "definition": "The planned and actual money for a proposal, award, or subaward, by line item and period.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Budget"
+      ]
+    },
+    {
+      "term": "Budget category",
+      "also": "Cost category, object class",
+      "definition": "A heading in a budget, such as salaries, fringe, equipment, travel, participant support, or other direct costs.",
+      "domain": "Budget & costing",
+      "udm": [
+        "BudgetCategory"
+      ]
+    },
+    {
+      "term": "Budget period",
+      "also": "Funding period, budget year",
+      "definition": "A slice of the period of performance for which money is budgeted and released.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Budget.Period_Start_Date"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
+      "term": "Budget revision",
+      "also": "",
+      "definition": "Any change to an award's approved budget. A rebudget is one kind.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Event_Type_Value_ID=Budget_Revision"
+      ],
+      "source": "2 CFR 200.308",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.308"
+    },
+    {
+      "term": "Burn rate",
+      "also": "",
+      "definition": "The share of an award's budget that has been spent, divided by the share of its period that has passed. Above 1, or 100%, means spending is ahead of time. Sponsors don't define a standard formula, so this follows common sponsored programs usage. Spending counts as on the federal financial report, without open purchase orders or cost share. See Spending for what counts as money spent.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Transaction.Transaction_Amount",
+        "Award.Current_Total_Funded",
+        "Award.Original_Start_Date",
+        "Award.Current_End_Date"
+      ],
+      "source": "University of Illinois glossary",
+      "source_url": "https://sponsoredprograms.illinois.edu/glossary/burn-rate"
+    },
+    {
+      "term": "Business definition",
+      "also": "",
+      "definition": "A plain-language explanation of what a data element means, in the terms people who use it would use.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "CAGE code",
+      "also": "Commercial and Government Entity code",
+      "definition": "An ID used for organizations doing business with the U.S. government, especially defense.",
+      "domain": "Federal identifiers & rules",
+      "udm": [
+        "OrganizationIdentifier"
+      ],
+      "source": "Defense Logistics Agency",
+      "source_url": "https://www.dla.mil/Working-With-DLA/Applications/Details/Article/2920893/cage-code-commercial-and-government-entity-code/"
+    },
+    {
+      "term": "Cancelled (action)",
+      "also": "",
+      "definition": "An action status: the task was stopped before it finished and won't be completed.",
+      "domain": "Records & workflow",
+      "udm": [
+        "Action.Action_Status=Cancelled"
+      ]
+    },
+    {
+      "term": "Cancelled (payment)",
+      "also": "",
+      "definition": "A payment status: no payment will occur.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Payment.Payment_Status=Cancelled"
+      ]
+    },
+    {
+      "term": "Capitalized equipment",
+      "also": "",
+      "definition": "Payments for movable equipment above the institution's capitalization threshold, including delivery and setup, as the HERD survey counts them. Check the institution's capitalization policy for its threshold.",
+      "domain": "Budget & costing",
+      "udm": [
+        "BudgetCategory.HERD_Cost_Type=Capitalized_Equipment",
+        "Equipment"
+      ],
+      "source": "NSF HERD questionnaire",
+      "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
+    },
+    {
+      "term": "Carryover",
+      "also": "Carry forward",
+      "definition": "Moving unspent money from one budget period into the next. No new money comes from the sponsor.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Carryover_Amount"
+      ],
+      "source": "2 CFR 200.308",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.308"
+    },
+    {
+      "term": "CI/CD",
+      "also": "Continuous integration, continuous delivery",
+      "definition": "Automating the build, test, and release of software each time a change is committed.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Classification",
+      "also": "Research area, subject tag, keyword, science code",
+      "definition": "A subject or research-area tag on a proposal, award, subaward, or compliance requirement.",
+      "domain": "Records & workflow",
+      "udm": [
+        "Classification"
+      ]
+    },
+    {
+      "term": "Clear",
+      "also": "",
+      "definition": "A payment status: nothing is wrong with the payment.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Payment.Payment_Status=Clear"
+      ]
+    },
+    {
+      "term": "Clinical trial",
+      "also": "",
+      "definition": "A research study of the effects of drugs, vaccines, devices, tests, or other therapies on patients. For the HERD survey, it means Phase I, II, or III trials with human patients.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Is_Clinical_Trial"
+      ],
+      "source": "NSF HERD questionnaire",
+      "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
+    },
+    {
+      "term": "Closed (award)",
+      "also": "",
+      "definition": "An award status: closeout is complete.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Award_Status=Closed"
+      ]
+    },
+    {
+      "term": "Closed (subaward)",
+      "also": "",
+      "definition": "A subaward status: closeout is complete.",
+      "domain": "Subawards",
+      "udm": [
+        "Subaward.Subaward_Status=Closed"
+      ]
+    },
+    {
+      "term": "Closeout",
+      "also": "Award closeout",
+      "definition": "The process of formally ending an award or subaward.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Closeout"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
+      "term": "Closing (award)",
+      "also": "",
+      "definition": "An award status: the period of performance has ended, and closeout is under way.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Award_Status=Closing"
+      ]
+    },
+    {
+      "term": "Closing (subaward)",
+      "also": "",
+      "definition": "A subaward status: the period of performance has ended, and closeout is under way, including the final invoice.",
+      "domain": "Subawards",
+      "udm": [
+        "Subaward.Subaward_Status=Closing"
+      ]
+    },
+    {
+      "term": "CMMC",
+      "also": "Cybersecurity Maturity Model Certification",
+      "definition": "The Defense Department's cybersecurity assessment program, required for some defense contracts and subcontracts. Check the Defense Department for current levels and requirements.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "Restriction.Restriction_Type_Value_ID=CMMC_Level_1",
+        "Restriction.Restriction_Type_Value_ID=CMMC_Level_2",
+        "Restriction.Restriction_Type_Value_ID=CMMC_Level_3"
+      ],
+      "source": "32 CFR 170.3",
+      "source_url": "https://www.ecfr.gov/current/title-32/section-170.3"
+    },
+    {
+      "term": "Co-investigator",
+      "also": "Co-I",
+      "definition": "A senior researcher who contributes substantially to a project but does not lead it.",
+      "domain": "People & organizations",
+      "udm": [
+        "TeamRole.Role_Value_ID=Co_I"
+      ]
+    },
+    {
+      "term": "Co-principal investigator",
+      "also": "Co-PI",
+      "definition": "A person who shares leadership of a project with the PI.",
+      "domain": "People & organizations",
+      "udm": [
+        "TeamRole.Role_Value_ID=Co_PI"
+      ]
+    },
+    {
+      "term": "Cognizant agency",
+      "also": "Cognizant agency for indirect costs",
+      "definition": "The federal agency that reviews and negotiates an institution's indirect cost rates on behalf of federal agencies. The agency overseeing its audits may be a different one.",
+      "domain": "Budget & costing",
+      "udm": [
+        "RateAgreement.Cognizant_Agency_Organization_ID"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
+      "term": "Committed burn rate",
+      "also": "",
+      "definition": "The same comparison as burn rate, with money set aside for future expenses counted along with money spent. See Spending for what counts as money spent.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Transaction.Transaction_Amount",
+        "Award.Current_Total_Funded",
+        "Award.Original_Start_Date",
+        "Award.Current_End_Date",
+        "Transaction.Transaction_Type_Value_ID=Encumbrance"
+      ],
+      "source": "UTRGV Project Burn Rate",
+      "source_url": "https://www.utrgv.edu/research/departments/research-analytics/reports-and-dashboards/project-burn-rate/index.htm"
+    },
+    {
+      "term": "Committed effort",
+      "also": "Commitment, FTE percent",
+      "definition": "The share of time promised to a project in the proposal or award.",
+      "domain": "Effort",
+      "udm": [
+        "TeamRole.FTE_Percent"
+      ]
+    },
+    {
+      "term": "Committee",
+      "also": "Board, panel",
+      "definition": "A body that meets and decides, such as an IRB, IACUC, IBC, conflict-of-interest committee, research security board, or internal funding panel.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "Committee"
+      ]
+    },
+    {
+      "term": "Communication",
+      "also": "Correspondence",
+      "definition": "A message between the institution and an outside party.",
+      "domain": "Records & workflow",
+      "udm": [
+        "Communication"
+      ]
+    },
+    {
+      "term": "Competitive award",
+      "also": "",
+      "definition": "An award won through competition, whether a new award or a renewal. New awards and renewals are counted separately, and this is the two added together where both were competed.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Proposal_ID"
+      ]
+    },
+    {
+      "term": "Completed",
+      "also": "",
+      "definition": "An action status: the task achieved its outcome.",
+      "domain": "Records & workflow",
+      "udm": [
+        "Action.Action_Status=Completed"
+      ]
+    },
+    {
+      "term": "Compliance requirement",
+      "also": "Compliance approval, regulatory approval",
+      "definition": "A regulatory approval a project needs, such as IRB, IACUC, IBC, conflict of interest, radiation safety, or export control.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ComplianceRequirement"
+      ]
+    },
+    {
+      "term": "Conflict of interest",
+      "also": "COI",
+      "definition": "An outside relationship (financial, consulting, employment, equity, royalty, board) that could affect a person's research. People disclose these relationships, and the institution reviews whether each one is a conflict.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ConflictOfInterest"
+      ],
+      "source": "42 CFR 50.603",
+      "source_url": "https://www.ecfr.gov/current/title-42/section-50.603"
+    },
+    {
+      "term": "Contact PI",
+      "also": "",
+      "definition": "On a multiple-PI award, the one PI the sponsor treats as its main contact.",
+      "domain": "People & organizations",
+      "udm": [
+        "TeamRole.Is_Contact_PI"
+      ],
+      "source": "NIH Grants Policy Statement 2.1.2",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_2/2.1.2_recipient_staff.htm"
+    },
+    {
+      "term": "Continuation",
+      "also": "Non-competing continuation",
+      "definition": "Funding for a later period of an existing award without a new competition.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Proposal.Proposal_Type_Value_ID=Continuation",
+        "Modification.Event_Type_Value_ID=Incremental_Funding"
+      ]
+    },
+    {
+      "term": "Continuing review",
+      "also": "Annual review, protocol renewal",
+      "definition": "A periodic re-review of an approved protocol. Whether and how often it is needed depends on the governing rule.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ProtocolContinuingReview",
+        "ComplianceRequirement"
+      ],
+      "source": "45 CFR 46.109",
+      "source_url": "https://www.ecfr.gov/current/title-45/section-46.109"
+    },
+    {
+      "term": "Contract",
+      "also": "",
+      "definition": "A legally binding agreement in which the sponsor buys specific work or deliverables, usually with stricter terms.",
+      "domain": "Agreements",
+      "udm": [
+        "Award.Instrument_Type=Contract",
+        "Award.Mechanism_Value_ID"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
+      "term": "Contracting officer",
+      "also": "CO, contract officer",
+      "definition": "The sponsor official with legal authority to sign and change a contract.",
+      "domain": "People & organizations",
+      "udm": [
+        "OrganizationRole.Role_Value_ID=Contract_Officer"
+      ],
+      "source": "FAR 2.101",
+      "source_url": "https://www.acquisition.gov/far/2.101"
+    },
+    {
+      "term": "Controlled Unclassified Information",
+      "also": "CUI",
+      "definition": "Government information that is not classified but must be protected.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "Restriction.Restriction_Type_Value_ID=CUI"
+      ],
+      "source": "32 CFR 2002.4",
+      "source_url": "https://www.ecfr.gov/current/title-32/section-2002.4"
+    },
+    {
+      "term": "Converted to Award",
+      "also": "",
+      "definition": "An early setup status: the award arrived, and the at-risk spending folds into the executed funding.",
+      "domain": "Proposal",
+      "udm": [
+        "PreAwardAuthorization.Authorization_Status=Converted_To_Award"
+      ]
+    },
+    {
+      "term": "Cooperative agreement",
+      "also": "",
+      "definition": "Funding in which the sponsor is substantially involved in doing the work alongside the institution.",
+      "domain": "Agreements",
+      "udm": [
+        "Award.Instrument_Type=Cooperative_Agreement",
+        "Award.Mechanism_Value_ID"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
+      "term": "Cost share",
+      "also": "Cost sharing, matching or match (required cost share)",
+      "definition": "The part of project costs paid by the institution or a third party rather than the sponsor.",
+      "domain": "Budget & costing",
+      "udm": [
+        "CostShare"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
+      "term": "Cost transfer",
+      "also": "Expense transfer, retroactive transfer",
+      "definition": "Moving a charge from one award or account to another after it was first posted.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Transaction.Transaction_Type_Value_ID=Cost_Transfer_In",
+        "Transaction.Transaction_Type_Value_ID=Cost_Transfer_Out",
+        "Modification.Event_Type_Value_ID=Cost_Transfer_Authorization"
+      ]
+    },
+    {
+      "term": "Credential",
+      "also": "Person credential",
+      "definition": "A fact about a person the institution needs on file: citizenship or visa status, sponsor-system login, completed training, clearance, background check, or a standing authority. For employees, HR facts such as citizenship stay in the HR system.",
+      "domain": "People & organizations",
+      "udm": [
+        "PersonnelCredential"
+      ]
+    },
+    {
+      "term": "Crosswalk",
+      "also": "",
+      "definition": "A field-by-field mapping from a source system to the UDM, including value translations and notes on any changes. In a medallion lakehouse, it lives in the Silver layer.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Data catalog",
+      "also": "Catalog",
+      "definition": "An inventory of an organization's data assets: what exists, where it lives, who owns it, how it is refreshed, and who may use it.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Data custodian",
+      "also": "",
+      "definition": "The role responsible for operating a dataset: storage, backups, access, security, and availability. Custodians carry out what the owner decides.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Data dictionary",
+      "also": "",
+      "definition": "A description of the data in a system: what each field means, why it exists, its type, its constraints, and how it connects to other data.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Data freshness",
+      "also": "As-of date, refresh date",
+      "definition": "How recent the data on a report is.",
+      "domain": "Research metrics & reporting",
+      "udm": []
+    },
+    {
+      "term": "Data governance",
+      "also": "",
+      "definition": "The policies, standards, and procedures that keep an organization's data accurate, secure, and available, including who owns it and how decisions about it are made.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Data lake",
+      "also": "",
+      "definition": "A large storage area that holds raw data from many systems in its original form, to be organized later.",
+      "domain": "Systems & identifiers",
+      "udm": []
+    },
+    {
+      "term": "Data lakehouse",
+      "also": "Lakehouse, medallion architecture",
+      "definition": "A combination of a data lake and a data warehouse: raw data is kept cheaply, then refined in stages into reliable tables.",
+      "domain": "Systems & identifiers",
+      "udm": []
+    },
+    {
+      "term": "Data lineage",
+      "also": "Provenance",
+      "definition": "Where a number on a report came from and how it was calculated.",
+      "domain": "Research metrics & reporting",
+      "udm": []
+    },
+    {
+      "term": "Data management plan",
+      "also": "DMP, data management and sharing plan, DMSP",
+      "definition": "A proposal document describing what data a project will produce, and how it will be stored, protected, and shared.",
+      "domain": "Proposal",
+      "udm": [
+        "Document.Document_Type_Value_ID=DMP"
+      ]
+    },
+    {
+      "term": "Data model",
+      "also": "",
+      "definition": "A shared description of what information an organization keeps: the things it tracks, the details recorded about each, and how they connect.",
+      "domain": "Systems & identifiers",
+      "udm": []
+    },
+    {
+      "term": "Data owner",
+      "also": "",
+      "definition": "The person, role, or team accountable for a dataset: who fixes problems, answers questions about its meaning, and approves changes.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Data silo",
+      "also": "",
+      "definition": "A dataset isolated in one system, team, or department, so that it is hard to query from anywhere else.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Data type",
+      "also": "",
+      "definition": "The kind of value a column holds, such as text, number, date, or true/false. It limits what can be stored and what can be done with it.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Data warehouse",
+      "also": "EDW, enterprise data warehouse",
+      "definition": "A central database built for reporting, pulling cleaned data together from many systems.",
+      "domain": "Systems & identifiers",
+      "udm": []
+    },
+    {
+      "term": "Deadline",
+      "also": "",
+      "definition": "A one-off future obligation attached to a record, for a date with no home of its own. Due dates that belong to a report, action, or funding announcement stay on those records.",
+      "domain": "Records & workflow",
+      "udm": [
+        "Deadline"
+      ]
+    },
+    {
+      "term": "Decision status",
+      "also": "Funding decision, proposal outcome",
+      "definition": "The outcome of the funding request: unrequested, pending, intent to award, awarded, declined, not reviewed, or withdrawn.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Decision_Status"
+      ]
+    },
+    {
+      "term": "Declined",
+      "also": "",
+      "definition": "A decision status: the sponsor reviewed the proposal and did not fund it.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Decision_Status=Declined"
+      ]
+    },
+    {
+      "term": "Deficit",
+      "also": "Overdraft, overrun, overspent",
+      "definition": "Money spent on an award beyond its funding, so its unspent balance is below zero. See Spending for what counts as money spent.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Current_Total_Funded",
+        "Transaction.Transaction_Amount"
+      ]
+    },
+    {
+      "term": "Deliverable",
+      "also": "Sponsor deliverable",
+      "definition": "Something owed to the sponsor under an award: a report, or a work product such as a prototype, dataset, software, or samples.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Deliverable",
+        "Deliverable.Deliverable_Type"
+      ]
+    },
+    {
+      "term": "Derived value",
+      "also": "Calculated field, computed value",
+      "definition": "A value worked out from other records rather than typed in, such as an award's current end date.",
+      "domain": "Systems & identifiers",
+      "udm": []
+    },
+    {
+      "term": "Direct costs",
+      "also": "DC",
+      "definition": "Costs that can be tied to a specific project, such as salaries, supplies, and travel.",
+      "domain": "Budget & costing",
+      "udm": [
+        "BudgetCategory.Is_Direct_Cost"
+      ],
+      "source": "2 CFR 200.413",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.413"
+    },
+    {
+      "term": "Disputed",
+      "also": "",
+      "definition": "A payment status: the payer or payee contests the payment.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Payment.Payment_Status=Disputed"
+      ]
+    },
+    {
+      "term": "Document",
+      "also": "File, attachment",
+      "definition": "A file attached to any record, kept with its versions.",
+      "domain": "Records & workflow",
+      "udm": [
+        "Document"
+      ]
+    },
+    {
+      "term": "Draft",
+      "also": "",
+      "definition": "An internal approval status: the proposal is being prepared and has not been routed for approval.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Internal_Approval_Status=Draft"
+      ]
+    },
+    {
+      "term": "Drafted",
+      "also": "",
+      "definition": "A deliverable status: the project team is preparing it.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Deliverable.Deliverable_Status=Drafted"
+      ]
+    },
+    {
+      "term": "DUNS number",
+      "also": "D-U-N-S",
+      "definition": "The older Dun and Bradstreet organization number once used for federal awards.",
+      "domain": "Federal identifiers & rules",
+      "udm": [
+        "OrganizationIdentifier"
+      ],
+      "source": "GSA",
+      "source_url": "https://www.gsa.gov/about-gsa/newsroom/news-releases/gsa-systems-switch-to-unique-entity-id-sam-on-april-4-2022-03162022"
+    },
+    {
+      "term": "Effective F&A rate",
+      "also": "Realized rate",
+      "definition": "Recovered indirect costs as a percentage of direct costs. It is usually well below the negotiated rate because some costs carry no indirect costs and some sponsors pay less than that rate. Sponsors don't define a standard formula, so this follows common university usage.",
+      "domain": "Research metrics & reporting",
+      "udm": [],
+      "source": "UC Davis Indirect Cost Overview",
+      "source_url": "https://ucaft.org/sites/default/files/main/Indirect%20Cost%20Overview-UCD.pdf"
+    },
+    {
+      "term": "Effort",
+      "also": "Time and effort, level of effort",
+      "definition": "The portion of a person's work time spent on a project, expressed as a percentage or in person-months.",
+      "domain": "Effort",
+      "udm": [
+        "Effort"
+      ]
+    },
+    {
+      "term": "Effort certification",
+      "also": "Effort reporting, time and effort certification",
+      "definition": "A person's after-the-fact confirmation that the effort charged to their projects reasonably reflects the work done.",
+      "domain": "Effort",
+      "udm": [
+        "Effort.Certification_Date"
+      ],
+      "source": "2 CFR 200.430",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.430"
+    },
+    {
+      "term": "Employer Identification Number",
+      "also": "EIN, federal tax ID",
+      "definition": "An organization's federal tax ID number.",
+      "domain": "Federal identifiers & rules",
+      "udm": [
+        "OrganizationIdentifier"
+      ],
+      "source": "IRS",
+      "source_url": "https://www.irs.gov/tin/taxpayer-identification-numbers-tin"
+    },
+    {
+      "term": "Encumbrance",
+      "also": "Open PO",
+      "definition": "In institutional accounting, money set aside for a future expense, such as an open purchase order or future salary.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Transaction.Transaction_Type_Value_ID=Encumbrance"
+      ]
+    },
+    {
+      "term": "Equipment",
+      "also": "Capital equipment",
+      "definition": "A major item bought for a project that meets a cost and useful-life threshold. Check 2 CFR 200.1 and the institution's capitalization policy for current thresholds.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Equipment"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
+      "term": "Equipment disposition",
+      "also": "",
+      "definition": "Deciding what happens to equipment at the end of an award.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Closeout.Equipment_Disposition_Status"
+      ]
+    },
+    {
+      "term": "eRA Commons",
+      "also": "",
+      "definition": "NIH's online system where applicants, recipients, and federal staff handle grant administration.",
+      "domain": "Federal identifiers & rules",
+      "udm": [
+        "PersonnelCredential.Credential_Type=eRA_Commons_ID"
+      ],
+      "source": "NIH Grants Policy Statement 2.2",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_2/2.2_era_commons.htm"
+    },
+    {
+      "term": "eRA system",
+      "also": "Electronic research administration system, grants management system, ERA",
+      "definition": "Software for managing research funding: proposals, routing and approvals, awards, and often compliance.",
+      "domain": "Systems & identifiers",
+      "udm": []
+    },
+    {
+      "term": "ETL",
+      "also": "Extract, transform, load; ETL code",
+      "definition": "Pipeline code that extracts data from a source, transforms it according to the crosswalk, and loads it into the target.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Experimental development",
+      "also": "",
+      "definition": "Systematic work, drawing on research and practical experience and producing additional knowledge, directed at producing new products or processes or improving existing ones.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Research_Character=Experimental_Development"
+      ],
+      "source": "NSF HERD questionnaire",
+      "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
+    },
+    {
+      "term": "Expired Unused",
+      "also": "",
+      "definition": "An early setup status: the window closed without an award and without conversion.",
+      "domain": "Proposal",
+      "udm": [
+        "PreAwardAuthorization.Authorization_Status=Expired_Unused"
+      ]
+    },
+    {
+      "term": "Export control",
+      "also": "",
+      "definition": "Federal rules on sharing certain technology, items, and information with foreign persons or countries.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ComplianceRequirement.Requirement_Type=Export_Control"
+      ],
+      "source": "BIS deemed exports",
+      "source_url": "https://www.bis.gov/learn-support/deemed-exports"
+    },
+    {
+      "term": "Externally funded R&D expenditures",
+      "also": "",
+      "definition": "R&D expenditures from every source except institutional funds, as the HERD survey counts them.",
+      "domain": "Research metrics & reporting",
+      "udm": [],
+      "source": "NSF HERD questionnaire",
+      "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
+    },
+    {
+      "term": "F&A rate",
+      "also": "Indirect cost rate, overhead rate",
+      "definition": "The percentage applied to a cost base to calculate indirect costs.",
+      "domain": "Budget & costing",
+      "udm": [
+        "IndirectRate"
+      ],
+      "source": "2 CFR 200.414",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.414"
+    },
+    {
+      "term": "Failed",
+      "also": "",
+      "definition": "A submission status: the attempt did not reach the sponsor's system, so the same package can be resent. Its sign-off stands. If the package changes, the status returns to Unsubmitted.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Submission_Status=Failed"
+      ]
+    },
+    {
+      "term": "Federal Award Identification Number",
+      "also": "FAIN",
+      "definition": "The unique number a federal agency gives a financial assistance award.",
+      "domain": "Federal identifiers & rules",
+      "udm": [
+        "Award.FAIN"
+      ],
+      "source": "2 CFR 200.211",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.211"
+    },
+    {
+      "term": "Federal Financial Report",
+      "also": "FFR, SF-425",
+      "definition": "The standard federal form reporting how award money was spent.",
+      "domain": "Federal identifiers & rules",
+      "udm": [
+        "Report.Report_Type=FFR_SF425"
+      ],
+      "source": "Grants.gov",
+      "source_url": "https://grants.gov/learn-grants/grant-reporting"
+    },
+    {
+      "term": "Federal funding rules apply",
+      "also": "Federally funded, federal flow-through",
+      "definition": "Whether federal rules govern an award, either because the sponsor is federal or because federal money reaches it through another organization.",
+      "domain": "Federal identifiers & rules",
+      "udm": [
+        "Award.Subject_To_Federal_Funding"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
+      "term": "Field of R&D",
+      "also": "",
+      "definition": "The research discipline that R&D spending is reported under, from the HERD survey's list of fields. A project spanning several fields is prorated where possible.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Classification.Scheme=HERD_Field",
+        "Classification.Allocation_Percent"
+      ],
+      "source": "NSF HERD questionnaire",
+      "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
+    },
+    {
+      "term": "Financial system",
+      "also": "ERP, general ledger, accounting system, ERP system",
+      "definition": "The institution's accounting software, where money is officially recorded: budgets, charges, payments, and account codes.",
+      "domain": "Systems & identifiers",
+      "udm": []
+    },
+    {
+      "term": "Fiscal year",
+      "also": "FY",
+      "definition": "The institution's yearly accounting period.",
+      "domain": "Research metrics & reporting",
+      "udm": []
+    },
+    {
+      "term": "Foreign key",
+      "also": "Parent-child relationship",
+      "definition": "A column whose value must match a primary key in another table. The referenced table is the parent, and the table holding the column is the child.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Fringe benefits",
+      "also": "Fringe, employee benefits",
+      "definition": "The cost of employee benefits charged along with salaries, usually as a percentage rate.",
+      "domain": "Budget & costing",
+      "udm": [
+        "IndirectRate.Rate_Type=Fringe_Benefits"
+      ]
+    },
+    {
+      "term": "Fulfilled",
+      "also": "",
+      "definition": "A deliverable status: the sponsor reviewed and approved the deliverable, and the obligation is met.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Deliverable.Deliverable_Status=Fulfilled"
+      ]
+    },
+    {
+      "term": "Fund",
+      "also": "Fund code",
+      "definition": "A code in the accounting system that tracks a pool of money.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Fund"
+      ]
+    },
+    {
+      "term": "Funding mechanism",
+      "also": "Activity code, award type, grant type",
+      "definition": "The kind of funding vehicle, such as a research grant, training grant, cooperative agreement, or contract.",
+      "domain": "Proposal",
+      "udm": [
+        "Award.Mechanism_Value_ID",
+        "Proposal.Mechanism_Value_ID",
+        "RFA.Mechanism_Value_ID"
+      ]
+    },
+    {
+      "term": "Funding opportunity",
+      "also": "RFA, FOA, NOFO, solicitation, program announcement",
+      "definition": "A sponsor's announcement inviting proposals, with its rules, deadlines, and funding limits.",
+      "domain": "Proposal",
+      "udm": [
+        "RFA"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
+      "term": "Funding rate",
+      "also": "",
+      "definition": "The share of new, competitively reviewed proposals with a final decision that were awarded, counting awards and declines, following NSF's method. NSF sometimes calls this a success rate, but it is not NIH's success rate.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Proposal.Decision_Status=Awarded",
+        "Proposal.Decision_Status=Declined"
+      ],
+      "source": "NSF funding rates",
+      "source_url": "https://www.nsf.gov/mps/funding-rates"
+    },
+    {
+      "term": "Glossary",
+      "also": "",
+      "definition": "A list of terms and what they mean. A data dictionary applies those terms to a specific dataset, and a catalog indexes all the datasets.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Grant",
+      "also": "",
+      "definition": "Money given to carry out a project, with the sponsor having limited involvement in the work.",
+      "domain": "Agreements",
+      "udm": [
+        "Award.Instrument_Type=Grant",
+        "Award.Mechanism_Value_ID"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
+      "term": "Grants management specialist",
+      "also": "GMS",
+      "definition": "The sponsor's contact for the business and financial side of an award.",
+      "domain": "People & organizations",
+      "udm": [
+        "OrganizationRole.Role_Value_ID=Grants_Management_Specialist"
+      ],
+      "source": "NIH Grants Policy Statement",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/nihgps_2021.pdf"
+    },
+    {
+      "term": "Grants.gov",
+      "also": "",
+      "definition": "The federal website for finding and applying to federal grant opportunities.",
+      "domain": "Federal identifiers & rules",
+      "udm": [],
+      "source": "Grants.gov",
+      "source_url": "https://grants.gov/learn-grants/grant-making-agencies/"
+    },
+    {
+      "term": "HERD survey",
+      "also": "Higher Education Research and Development Survey",
+      "definition": "The NSF survey of university research spending. See the HERD report guide in the repository for how each answer comes from UDM data.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Activity_Type"
+      ],
+      "source": "NSF NCSES",
+      "source_url": "https://ncses.nsf.gov/pubs/nsf26305"
+    },
+    {
+      "term": "HR system",
+      "also": "HRIS, human resources information system",
+      "definition": "The institution's personnel system, which holds appointments, salaries, and employee records.",
+      "domain": "Systems & identifiers",
+      "udm": []
+    },
+    {
+      "term": "IACUC",
+      "also": "Institutional Animal Care and Use Committee",
+      "definition": "The committee that reviews and approves research involving vertebrate animals.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "Committee.Committee_Type=IACUC",
+        "ComplianceRequirement.Requirement_Type=IACUC"
+      ],
+      "source": "9 CFR 2.31",
+      "source_url": "https://www.ecfr.gov/current/title-9/section-2.31"
+    },
+    {
+      "term": "IBC",
+      "also": "Institutional Biosafety Committee",
+      "definition": "The committee that reviews research with recombinant or synthetic nucleic acid molecules, and often other biological hazards under institutional policy.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "Committee.Committee_Type=IBC",
+        "ComplianceRequirement.Requirement_Type=IBC"
+      ],
+      "source": "NIH Grants Policy Statement 4.1.27",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_4/4.1.27_research_involving_recombinant_or_synthetic_nucleic_acid_molecules__including_human_gene_transfer_research_.htm"
+    },
+    {
+      "term": "In effect",
+      "also": "",
+      "definition": "A modification that is Approved or Not_Required and whose Effective_Date has arrived. Is_In_Effect records this. An award's current totals and dates count these modifications once approved or recorded, even before their effective date.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Is_In_Effect"
+      ]
+    },
+    {
+      "term": "In Progress",
+      "also": "",
+      "definition": "An action status: the task is being worked on.",
+      "domain": "Records & workflow",
+      "udm": [
+        "Action.Action_Status=In_Progress"
+      ]
+    },
+    {
+      "term": "In Review",
+      "also": "",
+      "definition": "An internal approval status: the proposal has been routed, and one or more approval steps are open.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Internal_Approval_Status=In_Review"
+      ]
+    },
+    {
+      "term": "In Setup (award)",
+      "also": "",
+      "definition": "An award status: the award has been received and is in setup, and it is not yet open for spending. Review, negotiation, and account setup can all happen here.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Award_Status=In_Setup"
+      ]
+    },
+    {
+      "term": "In Setup (subaward)",
+      "also": "",
+      "definition": "A subaward status: the prime award exists, and the subaward agreement is being issued.",
+      "domain": "Subawards",
+      "udm": [
+        "Subaward.Subaward_Status=In_Setup"
+      ]
+    },
+    {
+      "term": "In-kind contribution",
+      "also": "In-kind cost share",
+      "definition": "Goods, services, or donated time contributed instead of cash.",
+      "domain": "Budget & costing",
+      "udm": [
+        "CostShare.Commitment_Type_Value_ID=In_Kind"
+      ],
+      "source": "2 CFR 200.306",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.306"
+    },
+    {
+      "term": "Incremental funding",
+      "also": "Increment, funding action",
+      "definition": "An additional installment of money added to an existing award. The installment was already planned, and the work doesn't change.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Event_Type_Value_ID=Incremental_Funding"
+      ]
+    },
+    {
+      "term": "Indirect costs",
+      "also": "F&A, facilities and administrative costs, overhead, IDC",
+      "definition": "Shared institutional costs that support research but cannot be tied to one project, such as buildings, utilities, libraries, and administration.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Proposal.Total_Proposed_Indirect",
+        "BudgetCategory.Is_Direct_Cost"
+      ],
+      "source": "2 CFR 200.414",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.414"
+    },
+    {
+      "term": "Institutional funds",
+      "also": "",
+      "definition": "R&D money from the institution itself, as the HERD survey counts it: institutionally financed research, committed cost sharing, and unrecovered indirect costs. Research administration and support, such as the sponsored programs office, is not institutionally financed research.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Organization.Sponsor_Type=Internal",
+        "CostShare"
+      ],
+      "source": "NSF HERD questionnaire",
+      "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
+    },
+    {
+      "term": "Instrument type",
+      "also": "Agreement type",
+      "definition": "The legal kind of an award: a grant, cooperative agreement, contract, or other transaction. A funding mechanism such as R01 is a more detailed code within one of these.",
+      "domain": "Agreements",
+      "udm": [
+        "Award.Instrument_Type"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
+      "term": "Intent to Award",
+      "also": "",
+      "definition": "A decision status: the sponsor has signaled funding, but no agreement exists yet.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Decision_Status=Intent_to_Award"
+      ]
+    },
+    {
+      "term": "Internal approval",
+      "also": "Routing, internal routing, internal review",
+      "definition": "The approvals of a proposal's material inside the institution. Sign-off to submit is a separate gate.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Internal_Approval_Status"
+      ]
+    },
+    {
+      "term": "Internal award number",
+      "also": "Project number, ERP project ID",
+      "definition": "The institution's own ID for an award in its financial or research systems.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Internal_Award_Number"
+      ]
+    },
+    {
+      "term": "Internal PI",
+      "also": "PI of record",
+      "definition": "The person the institution holds accountable as principal investigator, under its own PI eligibility policy. The UDM records the sponsor-facing PI in TeamRole. A difference from the internal PI isn't modeled; record an approved exception in PolicyException.",
+      "domain": "People & organizations",
+      "udm": [
+        "PolicyException"
+      ]
+    },
+    {
+      "term": "Invalid",
+      "also": "",
+      "definition": "A submission status: the sponsor's system received the attempt and rejected it on its checks. The package must be fixed and signed off again. Material approval stands.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Submission_Status=Invalid"
+      ]
+    },
+    {
+      "term": "Invention statement",
+      "also": "Final invention statement",
+      "definition": "A report to the sponsor listing inventions made under the award, or stating there were none.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Report.Report_Type=Invention_Statement"
+      ]
+    },
+    {
+      "term": "Investigator credit",
+      "also": "Credit split, credit allocation, research credit",
+      "definition": "How credit for an award is divided among investigators and their units.",
+      "domain": "Effort",
+      "udm": [
+        "TeamRole.Credit_Percent"
+      ]
+    },
+    {
+      "term": "Invoice",
+      "also": "Bill, draw request",
+      "definition": "A request for payment sent to a sponsor, or received from a subrecipient.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Payment.Invoice_Number"
+      ]
+    },
+    {
+      "term": "Invoiced",
+      "also": "",
+      "definition": "A payment stage: the payment has been billed, and it carries an invoice number.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Payment.Lifecycle_Stage=Invoiced"
+      ]
+    },
+    {
+      "term": "IRB",
+      "also": "Institutional Review Board",
+      "definition": "The committee that reviews and approves research involving human participants.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "Committee.Committee_Type=IRB",
+        "ComplianceRequirement.Requirement_Type=IRB"
+      ],
+      "source": "45 CFR 46.109",
+      "source_url": "https://www.ecfr.gov/current/title-45/section-46.109"
+    },
+    {
+      "term": "Just-in-time",
+      "also": "JIT",
+      "definition": "Information a sponsor (especially NIH) asks for after review, while an application is under consideration, such as other support, compliance approvals, and training. A request does not mean an award will follow.",
+      "domain": "Proposal",
+      "udm": [
+        "Action.Action_Type_Value_ID=JIT_Request"
+      ],
+      "source": "NIH Grants Policy Statement 2.5.1",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_2/2.5.1_just-in-time_procedures.htm"
+    },
+    {
+      "term": "Key personnel",
+      "also": "Senior/key personnel",
+      "definition": "People the sponsor considers essential to the project, often named in the award. Changing them may need sponsor approval.",
+      "domain": "People & organizations",
+      "udm": [
+        "TeamRole.Is_Key_Personnel"
+      ],
+      "source": "2 CFR 200.308",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.308"
+    },
+    {
+      "term": "Late",
+      "also": "",
+      "definition": "A deliverable status: it is past its due date and has not been submitted.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Deliverable.Deliverable_Status=Late"
+      ]
+    },
+    {
+      "term": "Letter of credit",
+      "also": "LOC",
+      "definition": "A federal arrangement that lets an institution draw funds as it needs them. Check the sponsor for its current payment system.",
+      "domain": "Agreements",
+      "udm": [
+        "Terms.Payment_Method=Letter_of_Credit"
+      ],
+      "source": "Treasury payment mechanisms",
+      "source_url": "https://tfx.treasury.gov/payment-mechanisms"
+    },
+    {
+      "term": "Lifecycle stage",
+      "also": "",
+      "definition": "One of the steps a record moves through, such as a budget going from proposed to approved to current to actual. Each step is kept so earlier stages remain as history.",
+      "domain": "Systems & identifiers",
+      "udm": [
+        "Budget.Lifecycle_Stage",
+        "Effort.Lifecycle_Stage",
+        "CostShare.Lifecycle_Stage",
+        "Payment.Lifecycle_Stage"
+      ]
+    },
+    {
+      "term": "Lookup table",
+      "also": "",
+      "definition": "Reference data that translates codes to labels within one system, such as state code to state name. A crosswalk instead bridges two different systems.",
+      "domain": "Data & integration",
+      "udm": [
+        "AllowedValues"
+      ]
+    },
+    {
+      "term": "Materialized view",
+      "also": "",
+      "definition": "A view whose results are stored. It is faster to query than a plain view, but it must be refreshed to stay current.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Metadata",
+      "also": "",
+      "definition": "Data about data, such as its type, source, owner, freshness, and meaning.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Modification",
+      "also": "Amendment, mod",
+      "definition": "A change to an award or subaward after it was first funded.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification"
+      ]
+    },
+    {
+      "term": "Modified total direct costs",
+      "also": "MTDC",
+      "definition": "The cost base most federal indirect rates apply to: direct costs minus certain excluded items. Check 2 CFR 200.1 for the current exclusions.",
+      "domain": "Budget & costing",
+      "udm": [
+        "IndirectRate.Base_Type=MTDC"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
+      "term": "Modular budget",
+      "also": "",
+      "definition": "A budget requested in fixed blocks without detailed line items. Check the sponsor's guidance for current block sizes and limits.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Budget.Module_Count"
+      ],
+      "source": "NIH budget guidance",
+      "source_url": "https://grants.nih.gov/grants-process/write-application/advice-on-application-sections/develop-your-budget"
+    },
+    {
+      "term": "Module",
+      "also": "UDM module",
+      "definition": "A section of the UDM that covers one recognizable kind of work the institution does, such as \"we have an IRB.\"",
+      "domain": "Systems & identifiers",
+      "udm": []
+    },
+    {
+      "term": "Monitoring exception",
+      "also": "",
+      "definition": "A problem found while monitoring an award, such as a high burn rate. It is recorded as an Action with the Monitoring_Exception type. A late report does not create one automatically. Late is the report's own status, and an exception is a problem someone chose to log.",
+      "domain": "Records & workflow",
+      "udm": [
+        "Action.Action_Type_Value_ID=Monitoring_Exception"
+      ]
+    },
+    {
+      "term": "Multiple PI",
+      "also": "MPI, multi-PI",
+      "definition": "An arrangement in which two or more PIs share authority and responsibility for leading a project, under a written leadership plan, common at NIH.",
+      "domain": "People & organizations",
+      "udm": [
+        "TeamRole.Role_Value_ID=Multi_PI"
+      ],
+      "source": "NIH Grants Policy Statement 2.1.2",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_2/2.1.2_recipient_staff.htm"
+    },
+    {
+      "term": "Negotiation",
+      "also": "Contract negotiation, agreement negotiation",
+      "definition": "The back-and-forth with a sponsor or subrecipient over agreement terms before they are accepted.",
+      "domain": "Agreements",
+      "udm": [
+        "Negotiation"
+      ]
+    },
+    {
+      "term": "New award",
+      "also": "",
+      "definition": "An award for a project funded for the first time. Renewals and funding added to an existing award do not count.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Proposal_ID",
+        "Proposal.Proposal_Type_Value_ID=New"
+      ]
+    },
+    {
+      "term": "No-cost extension",
+      "also": "NCE",
+      "definition": "Extending an award's end date without adding money.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Event_Type_Value_ID=No_Cost_Extension"
+      ],
+      "source": "2 CFR 200.308",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.308"
+    },
+    {
+      "term": "Not Issued",
+      "also": "",
+      "definition": "A subaward status: the subaward was planned or being set up, but the agreement was never issued. This is where a planned subaward ends if its proposal is not funded.",
+      "domain": "Subawards",
+      "udm": [
+        "Subaward.Subaward_Status=Not_Issued"
+      ]
+    },
+    {
+      "term": "Not Required",
+      "also": "",
+      "definition": "A modification status: no approval was needed. It counts in the award's current totals and dates once recorded.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Approval_Status=Not_Required"
+      ]
+    },
+    {
+      "term": "Not Reviewed",
+      "also": "",
+      "definition": "A decision status: the sponsor received the proposal but removed it from consideration without reviewing it.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Decision_Status=Not_Reviewed"
+      ]
+    },
+    {
+      "term": "Not Started",
+      "also": "",
+      "definition": "A deliverable status: the deliverable is due and work has not started.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Deliverable.Deliverable_Status=Not_Started"
+      ]
+    },
+    {
+      "term": "Notice of Award",
+      "also": "NOA, award letter, notice of grant award",
+      "definition": "The sponsor's official document announcing an award and its terms.",
+      "domain": "Agreements",
+      "udm": [
+        "Document.Document_Type_Value_ID=NOA"
+      ]
+    },
+    {
+      "term": "NSF PAPPG",
+      "also": "Proposal and Award Policies and Procedures Guide",
+      "definition": "NSF's rulebook for proposals and awards.",
+      "domain": "Federal identifiers & rules",
+      "udm": [],
+      "source": "NSF PAPPG",
+      "source_url": "https://www.nsf.gov/policies/pappg/24-1"
+    },
+    {
+      "term": "Open",
+      "also": "",
+      "definition": "An action status: the task has been created and not started.",
+      "domain": "Records & workflow",
+      "udm": [
+        "Action.Action_Status=Open"
+      ]
+    },
+    {
+      "term": "Opportunity requirement",
+      "also": "Solicitation requirement, compliance checklist item",
+      "definition": "One rule pulled out of a funding opportunity, such as page limits, eligibility, required documents, or review criteria.",
+      "domain": "Proposal",
+      "udm": [
+        "RFARequirement"
+      ]
+    },
+    {
+      "term": "ORCID",
+      "also": "ORCID iD",
+      "definition": "A free, permanent ID number for an individual researcher that follows them across institutions.",
+      "domain": "Systems & identifiers",
+      "udm": [
+        "Personnel.ORCID"
+      ],
+      "source": "ORCID",
+      "source_url": "https://info.orcid.org/what-is-orcid/"
+    },
+    {
+      "term": "Organization",
+      "also": "Entity, unit",
+      "definition": "Any group that takes part in research funding: sponsors, the institution's own departments and colleges, subrecipients, vendors, and committees.",
+      "domain": "People & organizations",
+      "udm": [
+        "Organization"
+      ]
+    },
+    {
+      "term": "Organization capability",
+      "also": "Organization function",
+      "definition": "A role an organization plays, such as sponsor, subrecipient, or vendor. One organization can play several.",
+      "domain": "People & organizations",
+      "udm": [
+        "OrganizationCapability"
+      ]
+    },
+    {
+      "term": "Organization identifier",
+      "also": "",
+      "definition": "An outside ID number an organization carries, such as its UEI or tax ID.",
+      "domain": "Systems & identifiers",
+      "udm": [
+        "OrganizationIdentifier"
+      ]
+    },
+    {
+      "term": "Organized research",
+      "also": "",
+      "definition": "Research and development that is separately budgeted and accounted for, including research training. On an award, it is what the HERD survey counts as sponsored research.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Activity_Type=Organized_Research",
+        "Proposal.Activity_Type=Organized_Research"
+      ],
+      "source": "2 CFR 200 Appendix III",
+      "source_url": "https://www.ecfr.gov/current/title-2/part-200/appendix-Appendix%20III%20to%20Part%20200"
+    },
+    {
+      "term": "Other sponsored activity",
+      "also": "",
+      "definition": "Externally funded work other than instruction and research, such as health service or community service projects.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Activity_Type=Other_Sponsored_Activity",
+        "Proposal.Activity_Type=Other_Sponsored_Activity"
+      ],
+      "source": "2 CFR 200 Appendix III",
+      "source_url": "https://www.ecfr.gov/current/title-2/part-200/appendix-Appendix%20III%20to%20Part%20200"
+    },
+    {
+      "term": "Other support",
+      "also": "Current and pending support",
+      "definition": "All current and pending resources that support a person's research, wherever based and whether or not they have monetary value, which sponsors require disclosed.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "OtherSupport"
+      ],
+      "source": "NIH disclosure requirements",
+      "source_url": "https://grants.nih.gov/policy-and-compliance/policy-topics/foreign-interference/requirements-for-disclosure"
+    },
+    {
+      "term": "Overdue report",
+      "also": "Delinquent report",
+      "definition": "A required report not submitted by its due date.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Deliverable.Deliverable_Status=Late"
+      ]
+    },
+    {
+      "term": "Package",
+      "also": "",
+      "definition": "The set of files and forms assembled to send to the sponsor. If the package changes, its sign-off no longer applies. Changes do not affect an attempt in transmission or with the sponsor; sending them takes a recall, a new sign-off, and a new attempt.",
+      "domain": "Proposal",
+      "udm": [
+        "SubmissionAttempt.Package_Hash"
+      ]
+    },
+    {
+      "term": "Paid",
+      "also": "",
+      "definition": "A payment stage: the money has moved between the parties. An unplanned refund can start here.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Payment.Lifecycle_Stage=Paid"
+      ]
+    },
+    {
+      "term": "Pass-through",
+      "also": "",
+      "definition": "R&D funds an institution sends to a subrecipient to carry out part of the work. Payments to contractors or vendors for goods and services do not count.",
+      "domain": "Budget & costing",
+      "udm": [
+        "BudgetCategory.HERD_Cost_Type=Pass_Through",
+        "Subaward"
+      ],
+      "source": "NSF HERD questionnaire",
+      "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
+    },
+    {
+      "term": "Pass-through entity",
+      "also": "PTE",
+      "definition": "An organization that holds an award or subaward and issues a subaward to another organization to carry out part of the program. Buying goods or services from a vendor does not make it one.",
+      "domain": "Subawards",
+      "udm": [
+        "OrganizationCapability.Capability_Value_ID=Pass_Through_Entity",
+        "Award.Sponsor_Organization_ID",
+        "Award.Is_Flow_Through"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
+      "term": "Payment",
+      "also": "Sponsor payment, receivable, cash receipt",
+      "definition": "Money moving between the parties to an award or subaward, as the agreement's payment terms provide. This covers sponsor payments to the institution, institution payments to a subrecipient, and refunds. Ordinary expenses on the award, such as vendors, consultants, and salaries, are Transaction rows.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Payment"
+      ],
+      "source": "2 CFR 200.305",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.305"
+    },
+    {
+      "term": "Payment direction",
+      "also": "",
+      "definition": "Whether the money is Incoming to the institution or Outgoing from it. Every payment row states this.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Payment.Payment_Direction"
+      ]
+    },
+    {
+      "term": "Payment method",
+      "also": "",
+      "definition": "How the sponsor pays: reimbursement after costs are incurred, advance payment, cost reimbursement contract, fixed price, letter of credit draws, or payment on request.",
+      "domain": "Agreements",
+      "udm": [
+        "Terms.Payment_Method"
+      ]
+    },
+    {
+      "term": "Pending",
+      "also": "",
+      "definition": "A decision status: the sponsor has the proposal and has not decided. It does not imply an award.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Decision_Status=Pending"
+      ]
+    },
+    {
+      "term": "Period of performance",
+      "also": "Project period, award period",
+      "definition": "The dates during which work may be done and costs may be charged.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Original_Start_Date"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
+      "term": "Person",
+      "also": "Personnel, individual",
+      "definition": "Anyone involved in research administration: faculty, staff, students, postdocs, residents, fellows, outside collaborators, and contacts at sponsors or subrecipients.",
+      "domain": "People & organizations",
+      "udm": [
+        "Personnel"
+      ]
+    },
+    {
+      "term": "Person-months",
+      "also": "Calendar months, PM",
+      "definition": "Effort expressed in months: the effort percentage times the months in the appointment.",
+      "domain": "Effort",
+      "udm": [
+        "Effort.Person_Months"
+      ]
+    },
+    {
+      "term": "PI eligibility",
+      "also": "",
+      "definition": "The institutional policy on who may serve as principal investigator. Sponsors have their own expectations, so this can differ from whom a sponsor would accept.",
+      "domain": "People & organizations",
+      "udm": [
+        "PolicyException.Policy_Rule_Code"
+      ]
+    },
+    {
+      "term": "Pipeline",
+      "also": "Pending proposals, proposal pipeline",
+      "definition": "Proposals sent to a sponsor and still awaiting a final decision, as a forecast of future funding.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Proposal.Submission_Status=Submitted",
+        "Proposal.Submission_Status=Received",
+        "Proposal.Submission_Status=Validated",
+        "Proposal.Decision_Status=Pending",
+        "Proposal.Decision_Status=Intent_to_Award"
+      ]
+    },
+    {
+      "term": "Playbook",
+      "also": "",
+      "definition": "A documented, repeatable procedure for a recurring task, with its tools, steps, responsible roles, and acceptance criteria. Onboarding a new source system to the UDM is one example.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Policy exception",
+      "also": "Policy waiver, PI exception",
+      "definition": "An exception the institution grants to a rule, such as letting someone serve as PI who would not normally qualify, or waiving cost share or indirect costs.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "PolicyException",
+        "CostShare.Lifecycle_Stage=Waived"
+      ]
+    },
+    {
+      "term": "Post-closeout adjustment",
+      "also": "",
+      "definition": "A correction made to an award or subaward after it has closed, such as an audit finding or a late charge.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Award_Status=Adjusting",
+        "Subaward.Subaward_Status=Adjusting"
+      ],
+      "source": "2 CFR 200.345",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.345"
+    },
+    {
+      "term": "Post-termination adjustment",
+      "also": "",
+      "definition": "A correction made to an award or subaward after it has been terminated, such as an audit finding or a late charge.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Award_Status=Adjusting",
+        "Subaward.Subaward_Status=Adjusting"
+      ],
+      "source": "2 CFR 200.340",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.340"
+    },
+    {
+      "term": "Pre-award authorization",
+      "also": "At-risk account, early setup",
+      "definition": "The institution's permission to start spending before an award is official.",
+      "domain": "Proposal",
+      "udm": [
+        "PreAwardAuthorization"
+      ],
+      "source": "2 CFR 200.308",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.308"
+    },
+    {
+      "term": "Pre-award costs",
+      "also": "Pre-award spending",
+      "definition": "Costs incurred before an award's start date, in anticipation of the award and needed to do the work on time. They are at the institution's own risk until the award is made, and the sponsor's rules decide whether the award can cover them. The institution's permission to incur them is a pre-award authorization.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Modification.Pre_Award_Costs_Amount"
+      ],
+      "source": "2 CFR 200.458",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.458"
+    },
+    {
+      "term": "Prime award",
+      "also": "",
+      "definition": "The award a subaward's money comes from.",
+      "domain": "Subawards",
+      "udm": [
+        "Subaward.Prime_Award_ID"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
+      "term": "Prime sponsor",
+      "also": "Original sponsor, ultimate funder",
+      "definition": "The original source of the money when funding passes through another organization first.",
+      "domain": "People & organizations",
+      "udm": [
+        "Award.Prime_Sponsor_Organization_ID"
+      ]
+    },
+    {
+      "term": "Principal investigator",
+      "also": "PI, project director, PD/PI",
+      "definition": "The person who leads the project and is responsible for its science and administration.",
+      "domain": "People & organizations",
+      "udm": [
+        "TeamRole.Role_Value_ID=PI"
+      ]
+    },
+    {
+      "term": "Prior approval",
+      "also": "Sponsor prior approval",
+      "definition": "Written permission the sponsor must give before certain changes, such as moving money, extending dates, or changing the PI.",
+      "domain": "Agreements",
+      "udm": [
+        "Modification.Requires_Prior_Approval"
+      ],
+      "source": "2 CFR 200.308",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.308"
+    },
+    {
+      "term": "Priority",
+      "also": "Rush",
+      "definition": "How urgently an office should handle an item: low, medium, high, or critical.",
+      "domain": "Records & workflow",
+      "udm": [
+        "Award.Priority",
+        "Modification.Priority",
+        "Action.Priority"
+      ]
+    },
+    {
+      "term": "Program income",
+      "also": "Project income",
+      "definition": "Money a project earns during the award, such as fees or sales. Depending on the award terms, it reduces the award total (deduction), adds to project funds (addition), or counts toward cost share.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Transaction.Transaction_Type_Value_ID=Project_Income",
+        "Transaction.Income_Treatment"
+      ],
+      "source": "2 CFR 200.307",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.307"
+    },
+    {
+      "term": "Program officer",
+      "also": "PO, program manager, program director",
+      "definition": "The sponsor's contact for the science and goals of a program or award.",
+      "domain": "People & organizations",
+      "udm": [
+        "OrganizationRole.Role_Value_ID=Program_Officer"
+      ],
+      "source": "NIH Grants Policy Statement",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/nihgps_2021.pdf"
+    },
+    {
+      "term": "Project",
+      "also": "Sponsored project, grant, award, project ID, longitudinal project",
+      "definition": "A word with at least three different meanings in research administration, so always ask which one is meant: (1) a long-running research effort that may span many proposals and awards, (2) a single funded award, or (3) an accounting object in the financial system that collects costs.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Proposal.Group_ID",
+        "Award.Group_ID"
+      ]
+    },
+    {
+      "term": "Proposal",
+      "also": "Application, submission",
+      "definition": "A formal request for funding sent to a sponsor.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal"
+      ]
+    },
+    {
+      "term": "Proposal dollars",
+      "also": "Proposed dollars, requested dollars",
+      "definition": "The total value requested by proposals sent to sponsors in a period. Repeated attempts at the same proposal count once.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Proposal.Total_Proposed_Budget",
+        "Proposal.Submission_Date"
+      ]
+    },
+    {
+      "term": "Proposal lineage",
+      "also": "Proposal chain, project history",
+      "definition": "The thread linking a proposal to the earlier proposals and later awards it is part of, so a long-running project can be followed over years.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Previous_Proposal_ID",
+        "Proposal.Originating_Proposal_ID",
+        "Award.Proposal_ID"
+      ]
+    },
+    {
+      "term": "Proposal type",
+      "also": "Application type",
+      "definition": "How a proposal relates to earlier ones: new, resubmission, renewal, continuation, revision (supplement request), or task order.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Proposal_Type_Value_ID"
+      ]
+    },
+    {
+      "term": "Proposal volume",
+      "also": "Proposals submitted",
+      "definition": "The number of proposals sent to sponsors in a period. Repeated attempts at the same proposal count once.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Proposal.Submission_Date",
+        "SubmissionAttempt.Submitted_At"
+      ]
+    },
+    {
+      "term": "Proposed",
+      "also": "",
+      "definition": "A subaward status: the subaward is planned in the proposal, and no prime award exists yet.",
+      "domain": "Subawards",
+      "udm": [
+        "Subaward.Subaward_Status=Proposed"
+      ]
+    },
+    {
+      "term": "Protocol",
+      "also": "IRB protocol, IACUC protocol, IBC registration, study",
+      "definition": "The standing approved plan for a line of research reviewed by a committee.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "Protocol",
+        "ComplianceRequirement"
+      ]
+    },
+    {
+      "term": "Protocol deviation",
+      "also": "Deviation, noncompliance",
+      "definition": "A departure from what the approved protocol says to do. Major deviations affect safety or data and need committee review.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ProtocolDeviation"
+      ]
+    },
+    {
+      "term": "R&D expenditures",
+      "also": "Research expenditures, research spend",
+      "definition": "Spending on research and development that is separately accounted for in the institution's current operating funds, as the HERD survey counts it. It includes sponsored research, institutionally funded research, committed cost sharing, recovered and unrecovered indirect costs, equipment bought from R&D accounts, and funds passed through to subrecipients. It leaves out public service, non-research training grants, and capital projects. Check the current questionnaire for the full rules.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Activity_Type=Organized_Research"
+      ],
+      "source": "NSF HERD questionnaire",
+      "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
+    },
+    {
+      "term": "Rate agreement",
+      "also": "NICRA, negotiated indirect cost rate agreement",
+      "definition": "The agreement between the institution and the federal government that sets its indirect cost (and often fringe) rates.",
+      "domain": "Budget & costing",
+      "udm": [
+        "RateAgreement"
+      ],
+      "source": "2 CFR 200.414",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.414"
+    },
+    {
+      "term": "Rebudget",
+      "also": "Budget transfer",
+      "definition": "A budget revision that moves money between categories without changing the total funding.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Event_Type_Value_ID=Rebudget"
+      ],
+      "source": "2 CFR 200.308",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.308"
+    },
+    {
+      "term": "Recalled",
+      "also": "",
+      "definition": "A submission status: the attempt was pulled back to be corrected and resent. The institution still wants the sponsor to consider the proposal. The package must be fixed and signed off again, and the decision returns to Unrequested.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Submission_Status=Recalled"
+      ]
+    },
+    {
+      "term": "Received",
+      "also": "",
+      "definition": "A submission status: the sponsor's system acknowledged the attempt.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Submission_Status=Received"
+      ]
+    },
+    {
+      "term": "Reconciled",
+      "also": "",
+      "definition": "A payment stage: the payment has been matched to the ledger.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Payment.Lifecycle_Stage=Reconciled"
+      ]
+    },
+    {
+      "term": "Record retention period",
+      "also": "Records retention",
+      "definition": "How many years records must be kept after an award ends.",
+      "domain": "Agreements",
+      "udm": [
+        "Terms.Record_Retention_Years"
+      ],
+      "source": "2 CFR 200.334",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.334"
+    },
+    {
+      "term": "Recovered indirect costs",
+      "also": "F&A recovery, indirect cost recovery, overhead recovery",
+      "definition": "Indirect costs reimbursed by external sponsors.",
+      "domain": "Budget & costing",
+      "udm": [
+        "BudgetCategory.HERD_Cost_Type=Indirect",
+        "BudgetCategory.Is_Direct_Cost"
+      ],
+      "source": "NSF HERD questionnaire",
+      "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
+    },
+    {
+      "term": "Refund",
+      "also": "",
+      "definition": "Money moving backward. An Outgoing payment on an award is a refund to the sponsor. An Incoming payment on a subaward is a refund from the subrecipient.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Payment.Payment_Direction"
+      ]
+    },
+    {
+      "term": "Reinstated",
+      "also": "",
+      "definition": "A termination is called off or overturned, and the award or subaward returns to Active. People, compliance coverage, and subawards ended earlier do not come back automatically; the institution sets them up again.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Award_Status=Active",
+        "Subaward.Subaward_Status=Active"
+      ]
+    },
+    {
+      "term": "Rejected (internal approval)",
+      "also": "",
+      "definition": "An internal approval status: an approval step refused the proposal, and it goes no further.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Internal_Approval_Status=Rejected"
+      ]
+    },
+    {
+      "term": "Rejected (modification)",
+      "also": "",
+      "definition": "A modification status: the sponsor refused the modification, or the institution did where the sponsor's approval isn't needed.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Approval_Status=Rejected"
+      ]
+    },
+    {
+      "term": "Renewal",
+      "also": "Competing renewal, competing continuation",
+      "definition": "An award that gives an existing project a further period of funding won through a new competition. A continuation, by contrast, involves no new competition.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Proposal.Proposal_Type_Value_ID=Renewal"
+      ]
+    },
+    {
+      "term": "Reopened",
+      "also": "",
+      "definition": "An award or subaward that has started or finished closing returns to Active and can spend again. People, compliance coverage, and subawards ended earlier do not come back automatically; the institution sets them up again.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Award_Status=Active",
+        "Subaward.Subaward_Status=Active"
+      ]
+    },
+    {
+      "term": "Requested (early setup)",
+      "also": "",
+      "definition": "An early setup status: at-risk spending has been requested and is not yet authorized.",
+      "domain": "Proposal",
+      "udm": [
+        "PreAwardAuthorization.Authorization_Status=Requested"
+      ]
+    },
+    {
+      "term": "Requested (modification)",
+      "also": "",
+      "definition": "A modification status: the modification has been requested and is waiting on approval by the sponsor, or by the institution where the sponsor's approval isn't needed.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Approval_Status=Requested"
+      ]
+    },
+    {
+      "term": "Research Performance Progress Report",
+      "also": "RPPR",
+      "definition": "The standard federal format for interim and final progress reports on research grants and cooperative agreements.",
+      "domain": "Federal identifiers & rules",
+      "udm": [
+        "Report.Report_Type=RPPR"
+      ],
+      "source": "NSF RPPR",
+      "source_url": "https://www.nsf.gov/policies/research-performance-progress-reports"
+    },
+    {
+      "term": "Research security",
+      "also": "NSPM-33 (the policy behind it)",
+      "definition": "Protecting research from misappropriation that harms national or economic security, from related research integrity violations, and from foreign government interference.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "Committee.Committee_Type=Research_Security"
+      ],
+      "source": "NSPM-33 Implementation Guidance",
+      "source_url": "https://bidenwhitehouse.archives.gov/wp-content/uploads/2022/01/010422-NSPM-33-Implementation-Guidance.pdf"
+    },
+    {
+      "term": "Responsible conduct of research",
+      "also": "RCR",
+      "definition": "Required training in research ethics, covering topics such as authorship, data management, and misconduct.",
+      "domain": "Compliance & research security",
+      "udm": []
+    },
+    {
+      "term": "Restriction",
+      "also": "",
+      "definition": "An operating limit on a proposal, award, subaward, person, or piece of equipment.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "Restriction"
+      ]
+    },
+    {
+      "term": "Resubmission",
+      "also": "A1 (NIH), resubmitted application",
+      "definition": "A revised version of a proposal that was previously not funded.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Proposal_Type_Value_ID=Resubmission"
+      ],
+      "source": "NIH Grants Policy Statement 2.3.4",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_2/2.3.4_types_of_applications.htm"
+    },
+    {
+      "term": "Returned",
+      "also": "",
+      "definition": "An internal approval status: the proposal was sent back for changes and must be routed again. An approval step can return it, approved material can change, or a withdrawn proposal can be revised.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Internal_Approval_Status=Returned"
+      ]
+    },
+    {
+      "term": "Returned for Revision",
+      "also": "",
+      "definition": "A deliverable status: the sponsor sent it back for changes.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Deliverable.Deliverable_Status=Returned_for_Revision"
+      ]
+    },
+    {
+      "term": "Reversed",
+      "also": "",
+      "definition": "A modification status: an Approved or Not_Required modification was later withdrawn by the sponsor or invalidated by correction. It no longer counts in the award's totals and dates, and its budget rows are unwound.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Approval_Status=Reversed"
+      ]
+    },
+    {
+      "term": "Review pathway",
+      "also": "Review type, review level",
+      "definition": "The kind of review an approval gets, such as exempt, expedited, or full board for human research.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ComplianceRequirement.Review_Pathway_Value_ID"
+      ]
+    },
+    {
+      "term": "Revoked",
+      "also": "",
+      "definition": "An early setup status: the request or authorization was withdrawn before conversion or expiry.",
+      "domain": "Proposal",
+      "udm": [
+        "PreAwardAuthorization.Authorization_Status=Revoked"
+      ]
+    },
+    {
+      "term": "Risk level",
+      "also": "Risk rating, risk tier",
+      "definition": "A low, medium, or high rating that sets how closely something is reviewed and monitored.",
+      "domain": "People & organizations",
+      "udm": [
+        "Award.Risk_Level",
+        "Proposal.Risk_Level",
+        "Subaward.Risk_Level",
+        "OrganizationCapability.Risk_Level"
+      ]
+    },
+    {
+      "term": "Salary cap",
+      "also": "NIH salary cap, over-cap salary",
+      "definition": "A sponsor limit on the salary rate that can be charged; the part above the cap must be paid from other money.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Effort.Over_Cap_Amount"
+      ],
+      "source": "NIH NOT-OD-26-034",
+      "source_url": "https://grants.nih.gov/grants/guide/notice-files/NOT-OD-26-034.html"
+    },
+    {
+      "term": "SAM.gov",
+      "also": "System for Award Management",
+      "definition": "The federal website where organizations register to receive federal money and where UEIs are issued.",
+      "domain": "Federal identifiers & rules",
+      "udm": [],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
+      "term": "Scheduled",
+      "also": "",
+      "definition": "A payment stage: the payment is expected under the payment terms, and nothing has been billed yet.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Payment.Lifecycle_Stage=Scheduled"
+      ]
+    },
+    {
+      "term": "Schema",
+      "also": "",
+      "definition": "The formal structure of a dataset: its tables, columns, data types, constraints, and relationships. It describes structure, not the values stored.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Schema mapping",
+      "also": "",
+      "definition": "The process of deciding how one schema corresponds to another. Crosswalks record the decisions.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Sign-off to submit",
+      "also": "",
+      "definition": "The gate that decides whether a specific package may be sent. It is tracked in sponsor submission.",
+      "domain": "Proposal",
+      "udm": [
+        "Approval.Step_Type_Value_ID=Final_Sign_off",
+        "Proposal.Submission_Status=Signed_Off"
+      ]
+    },
+    {
+      "term": "Signed Off",
+      "also": "",
+      "definition": "A submission status: the authorized organizational representative signed off on the current package, with any release to submit. It is ready to send.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Submission_Status=Signed_Off"
+      ]
+    },
+    {
+      "term": "Single Audit",
+      "also": "Uniform Guidance audit",
+      "definition": "A yearly organization-wide audit of federal award spending, required of non-federal organizations above a spending threshold. Check 2 CFR 200.501 for the current threshold and who is covered.",
+      "domain": "Federal identifiers & rules",
+      "udm": [],
+      "source": "2 CFR 200.501",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.501"
+    },
+    {
+      "term": "Software as a Service",
+      "also": "SaaS, cloud software, hosted software",
+      "definition": "Software you use over the internet and pay for by subscription, rather than installing and running it yourself.",
+      "domain": "Systems & identifiers",
+      "udm": []
+    },
+    {
+      "term": "Source of funds",
+      "also": "",
+      "definition": "Where R&D money originally came from, in the HERD survey's categories: U.S. federal government, state and local government, business, nonprofit organizations, institutional funds, and all other sources. Federal money passed through another institution counts as federal.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Organization.Sponsor_Type",
+        "Organization.Is_Foreign",
+        "Award.Prime_Sponsor_Organization_ID"
+      ],
+      "source": "NSF HERD questionnaire",
+      "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
+    },
+    {
+      "term": "Special conditions",
+      "also": "Special terms, award-specific conditions",
+      "definition": "Conditions that apply to one award beyond the standard terms.",
+      "domain": "Agreements",
+      "udm": [
+        "Terms.Special_Conditions"
+      ]
+    },
+    {
+      "term": "Spending",
+      "also": "Expenditures, money spent",
+      "definition": "Spending means expenses, plus or minus any corrections to them such as cost transfers, adjustments, and reversals.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Transaction.Transaction_Type_Value_ID=Expense",
+        "Transaction.Transaction_Type_Value_ID=Cost_Transfer_In",
+        "Transaction.Transaction_Type_Value_ID=Cost_Transfer_Out",
+        "Transaction.Transaction_Type_Value_ID=Adjustment",
+        "Transaction.Transaction_Type_Value_ID=Reversal"
+      ]
+    },
+    {
+      "term": "Sponsor",
+      "also": "Funder, funding agency, sponsoring agency",
+      "definition": "The organization that pays for the work.",
+      "domain": "People & organizations",
+      "udm": [
+        "Award.Sponsor_Organization_ID"
+      ]
+    },
+    {
+      "term": "Sponsor expenditures",
+      "also": "Extramural expenditures",
+      "definition": "Money spent from externally sponsored awards, including research and non-research awards, with direct costs and the indirect costs charged to them. Open purchase orders and the institution's cost share do not count, matching how expenditures are reported to sponsors. See Spending for what counts as money spent.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Transaction.Transaction_Amount",
+        "Transaction.Award_ID"
+      ],
+      "source": "SF-425 guidance",
+      "source_url": "https://www.era.nih.gov/files/FFR-Summary-of-Instructions-Guidance-Final-Version.pdf"
+    },
+    {
+      "term": "Sponsor PI",
+      "also": "",
+      "definition": "The person the sponsor recognizes as principal investigator on an award, under the sponsor's rules. This is often the same person as the internal PI, but not always.",
+      "domain": "People & organizations",
+      "udm": [
+        "TeamRole.Role_Value_ID=PI"
+      ]
+    },
+    {
+      "term": "Sponsor report",
+      "also": "Required report",
+      "definition": "A deliverable that is a report owed to the sponsor, such as a progress, financial, final, invention, data-sharing, or equipment report.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Report"
+      ]
+    },
+    {
+      "term": "Sponsored instruction",
+      "also": "Sponsored training",
+      "definition": "Teaching or training set up by a grant, contract, or cooperative agreement, other than research training.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Activity_Type=Instruction",
+        "Proposal.Activity_Type=Instruction"
+      ],
+      "source": "2 CFR 200 Appendix III",
+      "source_url": "https://www.ecfr.gov/current/title-2/part-200/appendix-Appendix%20III%20to%20Part%20200"
+    },
+    {
+      "term": "Sponsored programs office",
+      "also": "OSP, SPA, Office of Sponsored Projects, Sponsored Programs Administration",
+      "definition": "The institutional unit that handles the lifecycle of sponsored projects, from proposal review through closeout.",
+      "domain": "People & organizations",
+      "udm": [
+        "OrganizationRole.Role_Value_ID=Sponsored_Programs_Administrator",
+        "Approval.Approval_Role=OSP_Pre_Award"
+      ]
+    },
+    {
+      "term": "Staff assignment",
+      "also": "Grant administrator, award administrator, assigned specialist",
+      "definition": "Which person in the research office is responsible for a given proposal, award, or subaward.",
+      "domain": "People & organizations",
+      "udm": [
+        "OrganizationRole"
+      ]
+    },
+    {
+      "term": "Stage",
+      "also": "",
+      "definition": "One part of the path with its own set of statuses. Internal approval, sponsor submission, and sponsor decision are on the Proposal record. Award is on the Award record.",
+      "domain": "Systems & identifiers",
+      "udm": [
+        "Proposal.Internal_Approval_Status",
+        "Proposal.Submission_Status",
+        "Proposal.Decision_Status",
+        "Award.Award_Status"
+      ]
+    },
+    {
+      "term": "Standing authority",
+      "also": "Delegation of authority, signature authority",
+      "definition": "What a person is registered or certified to do, independent of any specific proposal or award.",
+      "domain": "People & organizations",
+      "udm": [
+        "PersonnelCredential"
+      ]
+    },
+    {
+      "term": "Stored procedure",
+      "also": "",
+      "definition": "A named block of SQL kept in the database and run on request. It can perform several steps in sequence, and its syntax is specific to the database product.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Subaward",
+      "also": "Subagreement, outgoing subaward, subcontract (when it carries out part of the award)",
+      "definition": "An agreement in which the institution passes part of its award's work and money to another organization.",
+      "domain": "Subawards",
+      "udm": [
+        "Subaward"
+      ],
+      "source": "2 CFR 200.331",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.331"
+    },
+    {
+      "term": "Subaward invoice",
+      "also": "Sub invoice",
+      "definition": "A bill from a subrecipient for work done under a subaward.",
+      "domain": "Subawards",
+      "udm": [
+        "Payment.Subaward_ID"
+      ]
+    },
+    {
+      "term": "Submission attempt",
+      "also": "Transmission",
+      "definition": "One send of a proposal to a sponsor's system.",
+      "domain": "Proposal",
+      "udm": [
+        "SubmissionAttempt"
+      ]
+    },
+    {
+      "term": "Submission status",
+      "also": "",
+      "definition": "Where a proposal stands in submission: unapproved, unsubmitted, signed off, submitting, submitted, received, validated, invalid, accepted, failed, or recalled.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Submission_Status"
+      ]
+    },
+    {
+      "term": "Submitted (deliverable)",
+      "also": "",
+      "definition": "A deliverable status: it was sent to the sponsor.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Deliverable.Deliverable_Status=Submitted"
+      ]
+    },
+    {
+      "term": "Submitted (submission)",
+      "also": "",
+      "definition": "A submission status: the attempt was sent.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Submission_Status=Submitted"
+      ]
+    },
+    {
+      "term": "Submitting",
+      "also": "",
+      "definition": "A submission status: the attempt is being sent.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Submission_Status=Submitting"
+      ]
+    },
+    {
+      "term": "Submitting organization",
+      "also": "",
+      "definition": "The unit that prepares and submits the proposal.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Submitting_Organization_ID"
+      ]
+    },
+    {
+      "term": "Subrecipient",
+      "also": "Subawardee, sub",
+      "definition": "The organization that receives a subaward and carries out part of the work.",
+      "domain": "Subawards",
+      "udm": [
+        "Subaward.Subrecipient_Organization_ID"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
+      "term": "Subrecipient monitoring",
+      "also": "",
+      "definition": "Ongoing oversight of a subrecipient's work, spending, and compliance.",
+      "domain": "Subawards",
+      "udm": [
+        "Subaward.Monitoring_Frequency_Months"
+      ]
+    },
+    {
+      "term": "Subrecipient risk review",
+      "also": "Risk assessment",
+      "definition": "An assessment of a subrecipient's risk before issuing or continuing a subaward.",
+      "domain": "Subawards",
+      "udm": [
+        "Action.Action_Type_Value_ID=Subrecipient_Risk_Review"
+      ]
+    },
+    {
+      "term": "Success rate",
+      "also": "Hit rate, funding rate, win rate",
+      "definition": "The share of reviewed applications that are funded, following NIH's method. An application and its resubmissions in the same fiscal year count once. Applications withdrawn or not reviewed are left out.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Proposal.Decision_Status=Awarded",
+        "Proposal.Decision_Status=Declined",
+        "Proposal.Previous_Proposal_ID"
+      ],
+      "source": "NIH Success Rate Definition",
+      "source_url": "https://report.nih.gov/sites/report/files/docs/NIH_Success_Rate_Definition.pdf"
+    },
+    {
+      "term": "Supplement",
+      "also": "Administrative supplement, supplemental funding",
+      "definition": "Extra money added to an existing award for added or expanded work. Unlike incremental funding, it wasn't part of the planned total.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Event_Type_Value_ID=Supplement"
+      ]
+    },
+    {
+      "term": "Suspended (award)",
+      "also": "",
+      "definition": "An award status: spending was stopped by the sponsor or the institution, and it may resume.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Award_Status=Suspended"
+      ]
+    },
+    {
+      "term": "Suspended (subaward)",
+      "also": "",
+      "definition": "A subaward status: work was stopped by the institution or the sponsor, and it may resume.",
+      "domain": "Subawards",
+      "udm": [
+        "Subaward.Subaward_Status=Suspended"
+      ]
+    },
+    {
+      "term": "System of Action",
+      "also": "",
+      "definition": "Where software carries out work on people's behalf, such as workflows, scheduled jobs, and automated agents, within limits people set and with a record of what it did. This is different from an Action in the UDM, which is a logged work item.",
+      "domain": "Systems & identifiers",
+      "udm": [],
+      "source": "Forrester, Insight Was Never The Point: Arise, Systems Of Action",
+      "source_url": "https://www.forrester.com/blogs/insight-was-never-the-point-arise-systems-of-action/"
+    },
+    {
+      "term": "System of Engagement",
+      "also": "SoE, operational system, front-end application",
+      "definition": "Where people do the work: the tools they use to view data, collaborate, and complete tasks, along with what those tools need to run.",
+      "domain": "Systems & identifiers",
+      "udm": []
+    },
+    {
+      "term": "System of Insight",
+      "also": "SoI, analytics layer, reporting layer, BI",
+      "definition": "Where data is analyzed to show what it means, such as reports and dashboards. In the UDM's architecture, it reads only from the System of Record, so it can be rebuilt at any time.",
+      "domain": "Systems & identifiers",
+      "udm": []
+    },
+    {
+      "term": "System of Record",
+      "also": "SoR, source of truth, authoritative system",
+      "definition": "Where the official version of the data is stored. When two reports disagree, the System of Record wins.",
+      "domain": "Systems & identifiers",
+      "udm": []
+    },
+    {
+      "term": "Team role",
+      "also": "Project role, project team member",
+      "definition": "A person's role on a proposal and, once funded, on the award, with effort, dates, and credit share.",
+      "domain": "Effort",
+      "udm": [
+        "TeamRole"
+      ]
+    },
+    {
+      "term": "Technology control plan",
+      "also": "TCP",
+      "definition": "A plan controlling who can access export-controlled items or information on a project.",
+      "domain": "Compliance & research security",
+      "udm": []
+    },
+    {
+      "term": "Terminated (award)",
+      "also": "",
+      "definition": "An award status: the award ended before its period of performance finished, and termination processing is complete.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Award_Status=Terminated"
+      ]
+    },
+    {
+      "term": "Terminated (subaward)",
+      "also": "",
+      "definition": "A subaward status: the subaward ended before its period of performance finished.",
+      "domain": "Subawards",
+      "udm": [
+        "Subaward.Subaward_Status=Terminated"
+      ]
+    },
+    {
+      "term": "Terminating",
+      "also": "",
+      "definition": "An award status: the award is being ended early, and termination is being processed. The sponsor, the institution, or both may have started it. Spending stops.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Award_Status=Terminating"
+      ]
+    },
+    {
+      "term": "Termination",
+      "also": "Early termination",
+      "definition": "Ending an award before its scheduled end date, by the sponsor or the institution.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Award_Status=Terminating",
+        "Award.Termination_Basis",
+        "Subaward.Subaward_Status=Terminated",
+        "Subaward.Termination_Basis"
+      ],
+      "source": "2 CFR 200.340",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.340"
+    },
+    {
+      "term": "Termination basis",
+      "also": "",
+      "definition": "Why an award or subaward was terminated: Noncompliance, Mutual_Agreement, Recipient_Request, Sponsor_Priorities, or, for a subaward, Prime_Terminated. Executive orders use Sponsor_Priorities. The value is cleared on reinstatement.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Termination_Basis",
+        "Subaward.Termination_Basis"
+      ]
+    },
+    {
+      "term": "Terms and conditions",
+      "also": "T&Cs, award terms",
+      "definition": "The rules of a funded agreement: payment, reporting, special conditions, property, publication, closeout, and records retention.",
+      "domain": "Agreements",
+      "udm": [
+        "Terms"
+      ]
+    },
+    {
+      "term": "Title vesting",
+      "also": "Equipment ownership, title",
+      "definition": "Who owns a piece of equipment: the institution, the sponsor, the vendor, shared, or not yet decided.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Equipment.Title_Vesting"
+      ]
+    },
+    {
+      "term": "Total costs",
+      "also": "TC",
+      "definition": "Direct costs plus indirect costs.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Proposal.Total_Proposed_Budget"
+      ]
+    },
+    {
+      "term": "Traceability",
+      "also": "",
+      "definition": "Being able to follow a value, decision, or artifact back to its origin and forward to what depends on it. Data lineage is the form this takes for data.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Transaction",
+      "also": "Charge, expense, ledger entry, journal line",
+      "definition": "A single entry posted to an award or subaward.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Transaction"
+      ]
+    },
+    {
+      "term": "Turnaround time",
+      "also": "Cycle time, processing time",
+      "definition": "How long a step takes, in calendar days from when it started to when it finished, such as routing a proposal, setting up an award, or executing a subaward. Calendar days match how federal rules state their time limits.",
+      "domain": "Research metrics & reporting",
+      "udm": [],
+      "source": "2 CFR 200.308",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.308"
+    },
+    {
+      "term": "Unapproved",
+      "also": "",
+      "definition": "A submission status: waiting on start. The material is not approved, so nothing can be sent.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Submission_Status=Unapproved"
+      ]
+    },
+    {
+      "term": "Unified Data Model",
+      "also": "UDM, AI4RA UDM",
+      "definition": "A common, institution-neutral description of research administration data, so universities and vendors describe the same things the same way.",
+      "domain": "Systems & identifiers",
+      "udm": []
+    },
+    {
+      "term": "Uniform Guidance",
+      "also": "2 CFR 200, OMB Uniform Guidance",
+      "definition": "The main federal rulebook for managing grants and cooperative agreements: allowable costs, indirect costs, subrecipient monitoring, closeout, and audits.",
+      "domain": "Federal identifiers & rules",
+      "udm": [],
+      "source": "2 CFR 200",
+      "source_url": "https://www.ecfr.gov/current/title-2/part-200"
+    },
+    {
+      "term": "Unique Entity Identifier",
+      "also": "UEI, SAM UEI",
+      "definition": "The ID SAM.gov assigns to organizations, used to identify those receiving federal awards and subawards.",
+      "domain": "Federal identifiers & rules",
+      "udm": [
+        "OrganizationIdentifier"
+      ],
+      "source": "2 CFR 200.211",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.211"
+    },
+    {
+      "term": "Unobligated balance",
+      "also": "",
+      "definition": "The federal funds on an award not yet spent or obligated, as reported on the federal financial report.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Current_Total_Funded",
+        "Transaction.Transaction_Amount",
+        "Transaction.Transaction_Type_Value_ID=Encumbrance"
+      ],
+      "source": "SF-425 instructions (NHPRC)",
+      "source_url": "https://www.archives.gov/nhprc/administer/financialreporting.html"
+    },
+    {
+      "term": "Unrecovered indirect costs",
+      "also": "",
+      "definition": "The indirect costs sponsors did not reimburse on externally funded R&D: the negotiated rate times its base, minus what was recovered. Amounts above what the negotiated rate would give do not count.",
+      "domain": "Budget & costing",
+      "udm": [],
+      "source": "NSF HERD questionnaire",
+      "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
+    },
+    {
+      "term": "Unrequested",
+      "also": "",
+      "definition": "A decision status: waiting on start. No sponsor outcome is recorded, and either no attempt has been accepted since the latest approval or the newest attempt was recalled.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Decision_Status=Unrequested"
+      ]
+    },
+    {
+      "term": "Unspent balance",
+      "also": "",
+      "definition": "An award's funding minus money spent. Money set aside for future expenses still counts as unspent. See Spending for what counts as money spent.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Current_Total_Funded",
+        "Transaction.Transaction_Amount"
+      ]
+    },
+    {
+      "term": "Unsubmitted",
+      "also": "",
+      "definition": "A submission status: the material is approved, and the current package has not been signed off or sent.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Submission_Status=Unsubmitted"
+      ]
+    },
+    {
+      "term": "Unsuccessful",
+      "also": "",
+      "definition": "An action status: the task was attempted and did not achieve its outcome.",
+      "domain": "Records & workflow",
+      "udm": [
+        "Action.Action_Status=Unsuccessful"
+      ]
+    },
+    {
+      "term": "Validated",
+      "also": "",
+      "definition": "A submission status: the attempt passed the sponsor's system checks.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Submission_Status=Validated"
+      ]
+    },
+    {
+      "term": "View",
+      "also": "",
+      "definition": "A saved query that behaves like a table. It stores no data of its own, and it returns current results each time it runs.",
+      "domain": "Data & integration",
+      "udm": []
+    },
+    {
+      "term": "Waiting on start",
+      "also": "",
+      "definition": "A status that holds a place until the earlier stage is finished.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Submission_Status=Unapproved",
+        "Proposal.Decision_Status=Unrequested"
+      ]
+    },
+    {
+      "term": "Waived",
+      "also": "",
+      "definition": "A deliverable status: the sponsor no longer requires it.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Deliverable.Deliverable_Status=Waived"
+      ]
+    },
+    {
+      "term": "Withdrawn (modification)",
+      "also": "",
+      "definition": "A modification status: the request was withdrawn before a decision.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Approval_Status=Withdrawn"
+      ]
+    },
+    {
+      "term": "Withdrawn (sponsor decision)",
+      "also": "",
+      "definition": "A decision status: a submitted proposal was pulled from the sponsor's consideration, and no decision is requested any longer. The institution then chooses one of two outcomes: stop here, and Withdrawn is the final status, or revise and try again, and internal approval returns to Returned and the decision to Unrequested.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Decision_Status=Withdrawn"
+      ]
+    },
+    {
+      "term": "Work item",
+      "also": "Action, task, to-do",
+      "definition": "A task attached to a record. It tells you what needs doing and who is doing it.",
+      "domain": "Records & workflow",
+      "udm": [
+        "Action"
+      ]
+    },
+    {
+      "term": "Work product",
+      "also": "",
+      "definition": "A deliverable that isn't a report, such as a prototype, dataset, software, or samples.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Deliverable.Deliverable_Type=Work_Product"
+      ]
+    }
+  ]
+}

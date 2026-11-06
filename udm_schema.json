@@ -1,8 +1,8 @@
 {
   "metadata": {
     "name": "UDM",
-    "version": "3.0.0",
-    "released": "2026-10-22",
+    "version": "4.0.0",
+    "released": "2026-11-05",
     "description": "Vendor-neutral research administration data model. This JSON is the machine-readable serialization of the specification in vignettes/udm-system-of-record.md: modules, tables, columns in the abstract type vocabulary, constraints, conventions, and derivation rules. It names no database engine; types.dialects maps the abstract types to native ones per engine.",
     "spec_source": "vignettes/udm-system-of-record.md",
     "changelog": "vignettes/CHANGELOG.md",
@@ -163,7 +163,7 @@
         "Payment": [
           "Scheduled",
           "Invoiced",
-          "Received",
+          "Paid",
           "Reconciled"
         ]
       },
@@ -240,7 +240,7 @@
           ]
         },
         {
-          "table": "Report",
+          "table": "Deliverable",
           "fks": [
             "Award_ID",
             "Subaward_ID"
@@ -395,15 +395,19 @@
         },
         {
           "when": "Award_Status becomes Closed",
-          "then": "Every Subaward whose Prime_Award_ID is the Award is already Closed or Terminated. The prime closes last; this is a constraint on Award."
+          "then": "Every Subaward whose Prime_Award_ID is the Award is already Closed, Terminated, or Not_Issued. The prime closes last; this is a constraint on Award."
         },
         {
           "when": "Award_Status becomes Terminated",
           "then": "Every Subaward whose Prime_Award_ID is the Award and whose Subaward_Status is Active or Suspended becomes Terminated on the same date."
         },
         {
+          "when": "Award_Status or Subaward_Status returns to Active from Closed or Terminated",
+          "then": "Nothing ended by the closure comes back automatically. The institution creates new TeamRole and ComplianceCoverage rows as needed, so the earlier rows stay as history, and reinstates or leaves terminated each Subaward that ended with the Award."
+        },
+        {
           "when": "Award_Status or Subaward_Status becomes Closed or Terminated",
-          "then": "Actions, Deadlines, and Reports attached to the agreement are unchanged. They complete, are met, waived, or cancelled on their own terms; final reports and closeout work are due after the status change."
+          "then": "Actions, Deadlines, and Deliverables attached to the agreement are unchanged. They complete, are met, waived, or cancelled on their own terms; final reports and closeout work are due after the status change."
         }
       ],
       "default": "A child not named here is unchanged by its parent's status change."
@@ -413,14 +417,14 @@
         "name": "Lifecycle_Stage vs *_Status",
         "criterion": "Whether the row's shape changes between states.",
         "lifecycle_stage_use": "Used when different stages require different columns to be populated (Budget at Modular vs Approved-with-period, Effort at Charged adds Charged_Amount, Effort at Certified adds Statement/Signature, Payment at Invoiced adds Invoice_Number). The Previous_*_ID chain plus chain immutability is justified by the row's shape changing as the stage advances.",
-        "bare_status_use": "Used when the row carries the same columns at every state (Award_Status, Subaward_Status, Requirement_Status, Report_Status, Modification.Approval_Status). No chain immutability is required because corrections at a status point don't conflict with later rows of different shape."
+        "bare_status_use": "Used when the row carries the same columns at every state (Award_Status, Subaward_Status, Requirement_Status, Deliverable_Status, Modification.Approval_Status). No chain immutability is required because corrections at a status point don't conflict with later rows of different shape."
       },
       {
         "name": "TeamRole vs OrganizationRole vs ProtocolRole",
         "description": "Three parallel person-in-role tables, each answering a different question.",
         "tables": {
           "TeamRole": "Who is on the team performing this Award (PI, Co_I, Coordinator, etc., with effort and credit allocation).",
-          "OrganizationRole": "Who holds a role at this Organization (committee member, program officer at the sponsor, Authorized Official at the subrecipient, financial contact at the vendor, institutional Sponsored Programs liaison). Optionally scoped to an Award, Subaward, or RFA.",
+          "OrganizationRole": "Who holds a role at this Organization (committee member, program officer at the sponsor, Authorized Official at the subrecipient, financial contact at the vendor, institutional Sponsored Programs liaison). Optionally scoped to a Proposal, Award, Subaward, or RFA.",
           "ProtocolRole": "Who is on the team for this compliance protocol (Primary_Investigator, Co_Investigator, study coordinator, lab manager, TCP-cleared personnel)."
         },
         "cross_table_examples": [
@@ -811,12 +815,13 @@
                   "Federal",
                   "State",
                   "Local",
-                  "Foundation",
+                  "Nonprofit",
                   "Industry",
-                  "Higher_Ed_PassThrough",
-                  "Foreign",
+                  "Higher_Ed",
+                  "Foreign_Government",
                   "Tribal",
-                  "Internal"
+                  "Internal",
+                  "Other"
                 ],
                 "value_definitions": {
                   "Federal": {
@@ -828,33 +833,46 @@
                   "Local": {
                     "definition": "County, city, or other local government"
                   },
-                  "Foundation": {
-                    "definition": "Private foundation or nonprofit"
+                  "Nonprofit": {
+                    "definition": "Foundation or other nonprofit organization, other than a college or university"
                   },
                   "Industry": {
-                    "definition": "Commercial company"
+                    "definition": "For-profit company"
                   },
-                  "Higher_Ed_PassThrough": {
-                    "definition": "Another university passing through prime funding"
+                  "Higher_Ed": {
+                    "definition": "College or university"
                   },
-                  "Foreign": {
-                    "definition": "Non-United States government or entity"
+                  "Foreign_Government": {
+                    "definition": "Government outside the United States"
                   },
                   "Tribal": {
                     "definition": "Tribal government"
                   },
                   "Internal": {
                     "definition": "The institution funding itself"
+                  },
+                  "Other": {
+                    "definition": "Another kind of organization, such as an international organization"
                   }
                 },
-                "conditional_required": "Required when the Organization has an OrganizationCapability row with Capability = 'Sponsor'",
-                "description": "Constrained when present: Federal / State / Local / Foundation / Industry / Higher_Ed_PassThrough / Foreign / Tribal / Internal. Required when the Organization has an OrganizationCapability row with Capability = 'Sponsor'",
+                "conditional_required": "Required when the Organization has an OrganizationCapability row with Capability = 'Sponsor' or 'Subrecipient'",
+                "description": "Constrained when present: Federal / State / Local / Nonprofit / Industry / Higher_Ed / Foreign_Government / Tribal / Internal / Other. It says what kind of organization this is. How money reached the institution is on the Award (Is_Flow_Through). Required when the Organization has an OrganizationCapability row with Capability = 'Sponsor' or 'Subrecipient'",
                 "synonyms": "Funder Type, Funding Source Type, Sponsor Category"
+              },
+              "Is_Foreign": {
+                "type": "Boolean",
+                "required": false,
+                "description": "Whether the organization is outside the United States and its territories. Foreign_Government organizations are always foreign"
+              },
+              "Is_Medical_School": {
+                "type": "Boolean",
+                "required": false,
+                "description": "Whether this unit is the institution's medical school or part of it. Set on the school and on each unit within it"
               }
             },
             "constraints": [
               {
-                "rule": "Sponsor_Type is required when the Organization has an OrganizationCapability row with Capability_Value resolving to Sponsor."
+                "rule": "Sponsor_Type is required when the Organization has an OrganizationCapability row with Capability_Value resolving to Sponsor or Subrecipient."
               }
             ]
           },
@@ -1589,7 +1607,7 @@
                   "column": "Organization_ID"
                 },
                 "description": "The unit managing finances",
-                "synonyms": "Admin Unit, OSP, Sponsored Programs"
+                "synonyms": "Admin Unit, Managing Unit"
               },
               "Previous_Proposal_ID": {
                 "type": "ID",
@@ -1669,7 +1687,7 @@
                 "required": false,
                 "description": "The date the proposal last went to the sponsor. Derived from SubmissionAttempt",
                 "derived": {
-                  "rule": "The date of Submitted_At on the newest SubmissionAttempt whose Attempt_Status is Submitted, Received, Validated, Invalid, or Accepted; null when no attempt has reached Submitted.",
+                  "rule": "The date of Submitted_At on the newest SubmissionAttempt whose Attempt_Status is Submitted, Received, Validated, Invalid, Accepted, or Recalled; null when no attempt has reached Submitted.",
                   "recompute_triggers": "On insert/update of any SubmissionAttempt for the Proposal."
                 }
               },
@@ -1701,17 +1719,18 @@
                     ]
                   },
                   "Returned": {
-                    "definition": "An approval step sent it back for revision; it must be rerouted",
+                    "definition": "An approval step sent it back for revision, approved material changed, or a withdrawn proposal is being revised; it must be rerouted",
                     "set_by": "Derived from the Approval rows of the current round",
                     "next": [
                       "In_Review"
                     ]
                   },
                   "Approved": {
-                    "definition": "Every approval step has approved; the proposal may be submitted",
+                    "definition": "Every approval step on the material has approved; the package can be signed off and submitted",
                     "set_by": "Derived from the Approval rows of the current round",
                     "next": [
-                      "In_Review"
+                      "In_Review",
+                      "Returned"
                     ]
                   },
                   "Rejected": {
@@ -1720,10 +1739,10 @@
                     "next": []
                   }
                 },
-                "description": "Where the proposal stands in the institution's internal approval chain. Draft until routed; In_Review while steps are pending; Returned when a step sent it back for revision; Approved once every step has approved; Rejected when a step refused it. A proposal is submitted only once this is Approved",
+                "description": "Where the proposal's material stands in the institution's internal approval chain. Draft until routed; In_Review while steps are pending; Returned when a step sent it back for revision, approved material changed, or a withdrawn proposal is being revised; Approved once every step except Final_Sign_off and Release_to_Submit has approved; Rejected when a step refused it. Sign-off to submit is a separate gate, tracked in Submission_Status",
                 "synonyms": "Internal Routing Status, OSP Approval",
                 "derived": {
-                  "rule": "Draft when no Approval row exists for the Proposal; otherwise, over the rows of the highest Approval_Round: Rejected if any row is Rejected; Returned if any row is Returned_for_Revision; Approved if every row is Approved or Bypassed; In_Review otherwise.",
+                  "rule": "Draft when no Approval row exists for the Proposal; otherwise, over the rows of the highest Approval_Round: Rejected if any row is Rejected; Returned if any row is Returned_for_Revision; Approved if every row other than Final_Sign_off and Release_to_Submit is Approved or Bypassed; In_Review otherwise.",
                   "recompute_triggers": "On insert/update of any Approval row whose Related_Entity_Type is Proposal and Related_Entity_ID is the Proposal."
                 }
               },
@@ -1732,7 +1751,8 @@
                 "required": true,
                 "allowed_values": [
                   "Unapproved",
-                  "Unsent",
+                  "Unsubmitted",
+                  "Signed_Off",
                   "Submitting",
                   "Submitted",
                   "Received",
@@ -1740,21 +1760,32 @@
                   "Invalid",
                   "Accepted",
                   "Failed",
-                  "Withdrawn"
+                  "Recalled"
                 ],
                 "value_definitions": {
                   "Unapproved": {
                     "definition": "The internal approval chain has not reached Approved, so nothing can be sent",
                     "set_by": "Derived; the system computes it",
                     "next": [
-                      "Unsent"
+                      "Unsubmitted"
                     ]
                   },
-                  "Unsent": {
-                    "definition": "Approved internally; no transmission attempted yet",
+                  "Unsubmitted": {
+                    "definition": "Approved internally; the current package has not been signed off or sent",
                     "set_by": "Derived; the system computes it",
                     "next": [
-                      "Submitting"
+                      "Signed_Off",
+                      "Submitting",
+                      "Unapproved"
+                    ]
+                  },
+                  "Signed_Off": {
+                    "definition": "The authorized organizational representative signed off on the current package, with any release to submit; it is ready to send",
+                    "set_by": "Derived; the system computes it",
+                    "next": [
+                      "Submitting",
+                      "Unsubmitted",
+                      "Unapproved"
                     ]
                   },
                   "Submitting": {
@@ -1770,8 +1801,10 @@
                     "set_by": "Derived; the system computes it",
                     "next": [
                       "Received",
+                      "Accepted",
                       "Failed",
-                      "Withdrawn"
+                      "Recalled",
+                      "Unapproved"
                     ]
                   },
                   "Received": {
@@ -1779,8 +1812,10 @@
                     "set_by": "Derived; the system computes it",
                     "next": [
                       "Validated",
+                      "Accepted",
                       "Invalid",
-                      "Withdrawn"
+                      "Recalled",
+                      "Unapproved"
                     ]
                   },
                   "Validated": {
@@ -1788,60 +1823,71 @@
                     "set_by": "Derived; the system computes it",
                     "next": [
                       "Accepted",
-                      "Withdrawn"
+                      "Invalid",
+                      "Recalled",
+                      "Unapproved"
                     ]
                   },
                   "Invalid": {
-                    "definition": "The sponsor's system rejected the newest attempt on its checks; a new attempt is needed",
+                    "definition": "The sponsor's system rejected the newest attempt on its checks; the package must be fixed and signed off again",
                     "set_by": "Derived; the system computes it",
                     "next": [
-                      "Submitting"
+                      "Unsubmitted",
+                      "Unapproved"
                     ]
                   },
                   "Accepted": {
-                    "definition": "The sponsor took the newest attempt for review; the decision stage begins",
+                    "definition": "The sponsor took the proposal in for consideration. This doesn't promise a review or an award, and the sponsor can still return it. This starts the sponsor decision stage",
                     "set_by": "Derived; the system computes it",
                     "next": [
-                      "Withdrawn"
+                      "Recalled",
+                      "Unapproved"
                     ]
                   },
                   "Failed": {
-                    "definition": "The newest attempt did not complete transmission; a new attempt is needed",
+                    "definition": "The attempt did not reach the sponsor's system, so the same package can be resent; its sign-off stands. If the package changes, the status returns to Unsubmitted",
                     "set_by": "Derived; the system computes it",
                     "next": [
-                      "Submitting"
+                      "Signed_Off",
+                      "Submitting",
+                      "Unsubmitted",
+                      "Unapproved"
                     ]
                   },
-                  "Withdrawn": {
-                    "definition": "The institution pulled the newest attempt back; the decision stage returns to Unsubmitted",
+                  "Recalled": {
+                    "definition": "The newest attempt was pulled back to be corrected and resent; the package must be fixed and signed off again, and the decision returns to Unrequested",
                     "set_by": "Derived; the system computes it",
                     "next": [
-                      "Submitting"
+                      "Unsubmitted",
+                      "Unapproved"
                     ]
                   }
                 },
-                "description": "Where the proposal stands with the sponsor's submission system. Unapproved until the internal approval chain reaches Approved; Unsent once approved and before the first attempt; then the newest SubmissionAttempt's Attempt_Status. Derived",
+                "description": "Where the proposal stands with the sponsor's submission system. Unapproved until the internal approval chain reaches Approved; Unsubmitted once approved and before the current package is signed off; Signed_Off once it is ready to send; then the newest SubmissionAttempt's Attempt_Status. Derived",
                 "derived": {
-                  "rule": "Unapproved while Internal_Approval_Status is not Approved; Unsent when Approved and no SubmissionAttempt exists; otherwise the Attempt_Status of the SubmissionAttempt with the highest Attempt_Number.",
-                  "recompute_triggers": "On insert/update of Proposal.Internal_Approval_Status; on insert/update of any SubmissionAttempt for the Proposal."
+                  "rule": "Unapproved while Internal_Approval_Status is not Approved. When Approved: the Attempt_Status of the newest SubmissionAttempt made since the latest approval, if it has left Unsubmitted and either the attempt is in transmission or with the sponsor (Submitting, Submitted, Received, Validated, or Accepted) or the current package matches its Package_Hash; otherwise Signed_Off when a Final_Sign_off on the current package is Approved, with any Release_to_Submit that follows it; otherwise Unsubmitted.",
+                  "recompute_triggers": "On insert/update of Proposal.Internal_Approval_Status; on insert/update of any SubmissionAttempt or Approval row for the Proposal; when the current package changes."
                 }
               },
               "Decision_Status": {
                 "type": "Status",
                 "required": true,
                 "allowed_values": [
-                  "Unsubmitted",
+                  "Unrequested",
                   "Pending",
                   "Intent_to_Award",
                   "Awarded",
-                  "Declined"
+                  "Declined",
+                  "Not_Reviewed",
+                  "Withdrawn"
                 ],
                 "value_definitions": {
-                  "Unsubmitted": {
-                    "definition": "No attempt has been accepted by the sponsor, or the newest attempt was withdrawn",
+                  "Unrequested": {
+                    "definition": "No sponsor outcome is recorded, and no attempt made since the latest approval has been accepted by the sponsor, or the newest attempt was recalled",
                     "set_by": "Derived; the system computes it",
                     "next": [
-                      "Pending"
+                      "Pending",
+                      "Withdrawn"
                     ]
                   },
                   "Pending": {
@@ -1851,7 +1897,9 @@
                       "Intent_to_Award",
                       "Awarded",
                       "Declined",
-                      "Unsubmitted"
+                      "Not_Reviewed",
+                      "Withdrawn",
+                      "Unrequested"
                     ]
                   },
                   "Intent_to_Award": {
@@ -1859,7 +1907,8 @@
                     "set_by": "Recorded from the sponsor's communication",
                     "next": [
                       "Awarded",
-                      "Declined"
+                      "Declined",
+                      "Withdrawn"
                     ]
                   },
                   "Awarded": {
@@ -1868,18 +1917,30 @@
                     "next": []
                   },
                   "Declined": {
-                    "definition": "The sponsor did not fund it",
+                    "definition": "The sponsor reviewed the proposal and did not fund it",
                     "set_by": "Recorded from the sponsor's communication",
                     "next": []
+                  },
+                  "Not_Reviewed": {
+                    "definition": "The sponsor received the proposal but removed it from consideration without reviewing it",
+                    "set_by": "Recorded from the sponsor's communication",
+                    "next": []
+                  },
+                  "Withdrawn": {
+                    "definition": "A submitted proposal was pulled from the sponsor's consideration, and no decision is requested any longer. The institution then chooses one of two outcomes: stop here, and Withdrawn is the final status, or revise and try again, and internal approval returns to Returned and the decision to Unrequested",
+                    "set_by": "Sponsored programs office",
+                    "next": [
+                      "Unrequested"
+                    ]
                   }
                 },
-                "description": "The sponsor's disposition of the proposal. Unsubmitted until an attempt is Accepted (and while the newest attempt is Withdrawn); Pending once the sponsor holds it; Intent_to_Award when the sponsor signals funding before an agreement; Awarded or Declined on the decision. Unsubmitted and Pending follow the submission stage; the rest are set from the sponsor's communication",
+                "description": "The outcome of the funding request. Unrequested until an attempt made since the latest approval is Accepted, and while the newest attempt is Recalled; Pending once the sponsor holds it; Intent_to_Award when the sponsor signals funding before an agreement; Awarded, Declined, Not_Reviewed, or Withdrawn as the outcome. Unrequested and Pending follow the submission stage; the rest are recorded by the institution",
                 "synonyms": "Outcome, Sponsor Decision, Award Decision"
               },
               "Decision_Date": {
                 "type": "Date",
                 "required": false,
-                "description": "When the sponsor's disposition was received: the Intent_to_Award, Awarded, or Declined date"
+                "description": "When the proposal's outcome was recorded: the Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn date"
               },
               "Risk_Level": {
                 "type": "Status",
@@ -1930,11 +1991,36 @@
                 "value_group": "FundingMechanism",
                 "description": "The sponsor's funding mechanism applied for",
                 "synonyms": "Funding Mechanism, Activity Code, Award Type"
+              },
+              "Activity_Type": {
+                "type": "Status",
+                "required": true,
+                "allowed_values": [
+                  "Organized_Research",
+                  "Instruction",
+                  "Other_Sponsored_Activity"
+                ],
+                "value_definitions": {
+                  "Organized_Research": {
+                    "definition": "Research and development that is separately budgeted and accounted for, including research training"
+                  },
+                  "Instruction": {
+                    "definition": "Sponsored teaching and training, other than research training"
+                  },
+                  "Other_Sponsored_Activity": {
+                    "definition": "Externally funded work other than instruction and research, such as health service or community service projects"
+                  }
+                },
+                "description": "What kind of work this funds, using the major functions in 2 CFR 200 Appendix III. Constrained: Organized_Research / Instruction / Other_Sponsored_Activity. Organized_Research is what the HERD survey counts as sponsored research",
+                "synonyms": "Sponsored Activity Type, Type of Activity"
               }
             },
             "constraints": [
               {
-                "rule": "Decision_Status is Unsubmitted while no SubmissionAttempt for the Proposal has Attempt_Status Accepted, or while the newest attempt is Withdrawn; otherwise it is Pending, Intent_to_Award, Awarded, or Declined."
+                "rule": "Decision_Status is Unrequested while no SubmissionAttempt made since the latest approval has Attempt_Status Accepted, or while the newest attempt is Recalled, unless a sponsor outcome or a withdrawal is recorded (Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn); otherwise it is Pending or one of those recorded values. A recorded outcome stays when material is re-approved."
+              },
+              {
+                "rule": "Decision_Status = 'Withdrawn' only when at least one SubmissionAttempt for the Proposal was sent. When a withdrawn proposal is revised, a Returned_for_Revision Approval row returns Internal_Approval_Status to Returned and Decision_Status becomes Unrequested."
               },
               {
                 "rule": "Decision_Status = 'Awarded' only when Internal_Approval_Status = 'Approved'."
@@ -1945,7 +2031,7 @@
             ]
           },
           "SubmissionAttempt": {
-            "description": "One transmission of a proposal to a sponsor's submission system. The newest attempt's Attempt_Status is the proposal's Submission_Status. The attempt records what was sent, by whom, when, and what the sponsor's system said; package assembly, connection profiles, and retry mechanics stay in the System of Engagement.",
+            "description": "One transmission of a proposal to a sponsor's submission system. Proposal.Submission_Status follows the newest attempt's Attempt_Status under its derived rule. The attempt records what was sent, by whom, when, and what the sponsor's system said; package assembly, connection profiles, and retry mechanics stay in the System of Action.",
             "columns": {
               "SubmissionAttempt_ID": {
                 "type": "ID",
@@ -1997,7 +2083,7 @@
               "Submitted_At": {
                 "type": "Timestamp",
                 "required": false,
-                "conditional_required": "Required when Attempt_Status is Submitted, Received, Validated, Invalid, or Accepted",
+                "conditional_required": "Required when Attempt_Status is Submitted, Received, Validated, Invalid, Accepted, or Recalled",
                 "description": "When the transmission was sent. Required once Attempt_Status is Submitted or later",
                 "synonyms": "Submission Timestamp, Sent At"
               },
@@ -2005,7 +2091,7 @@
                 "type": "Status",
                 "required": true,
                 "allowed_values": [
-                  "Unsent",
+                  "Unsubmitted",
                   "Submitting",
                   "Submitted",
                   "Received",
@@ -2013,15 +2099,14 @@
                   "Invalid",
                   "Accepted",
                   "Failed",
-                  "Withdrawn"
+                  "Recalled"
                 ],
                 "value_definitions": {
-                  "Unsent": {
+                  "Unsubmitted": {
                     "definition": "Assembled but not transmitted",
                     "set_by": "The submitter",
                     "next": [
-                      "Submitting",
-                      "Withdrawn"
+                      "Submitting"
                     ]
                   },
                   "Submitting": {
@@ -2037,8 +2122,9 @@
                     "set_by": "The submission tooling",
                     "next": [
                       "Received",
+                      "Accepted",
                       "Failed",
-                      "Withdrawn"
+                      "Recalled"
                     ]
                   },
                   "Received": {
@@ -2046,8 +2132,9 @@
                     "set_by": "The sponsor's system",
                     "next": [
                       "Validated",
+                      "Accepted",
                       "Invalid",
-                      "Withdrawn"
+                      "Recalled"
                     ]
                   },
                   "Validated": {
@@ -2055,7 +2142,8 @@
                     "set_by": "The sponsor's system",
                     "next": [
                       "Accepted",
-                      "Withdrawn"
+                      "Invalid",
+                      "Recalled"
                     ]
                   },
                   "Invalid": {
@@ -2064,25 +2152,25 @@
                     "next": []
                   },
                   "Accepted": {
-                    "definition": "The sponsor took it for review; terminal for this attempt",
+                    "definition": "The sponsor took it in for consideration; terminal for this attempt except for a recall",
                     "set_by": "The sponsor's system",
                     "next": [
-                      "Withdrawn"
+                      "Recalled"
                     ]
                   },
                   "Failed": {
-                    "definition": "Transmission did not complete; terminal for this attempt",
+                    "definition": "The attempt did not reach the sponsor's system, so the same package can be resent; terminal for this attempt",
                     "set_by": "The submission tooling",
                     "next": []
                   },
-                  "Withdrawn": {
-                    "definition": "The institution pulled it back; terminal for this attempt",
+                  "Recalled": {
+                    "definition": "Pulled back after sending so it can be corrected and resent; terminal for this attempt",
                     "set_by": "The authorized organizational representative",
                     "next": []
                   }
                 },
-                "description": "The attempt's state as the sponsor's system reports it. Unsent while assembled but not transmitted; Submitting during transmission; Submitted once sent; Received when the sponsor's system acknowledged it; Validated or Invalid on the sponsor's checks; Accepted when the sponsor took it for review; Failed when transmission did not complete; Withdrawn when the institution pulled it back",
-                "synonyms": "Submission Status, Grants.gov Status, Portal Status"
+                "description": "The attempt's state as reported by the submission tooling or the sponsor's system. Unsubmitted while assembled but not transmitted; Submitting during transmission; Submitted once sent; Received when the sponsor's system acknowledged it; Validated or Invalid on the sponsor's checks; Accepted when the sponsor took it in for consideration; Failed when it did not reach the sponsor's system; Recalled when it was pulled back to be corrected and resent",
+                "synonyms": "Grants.gov Status, Portal Status"
               },
               "Tracking_Identifier": {
                 "type": "ShortCode",
@@ -2098,12 +2186,13 @@
               "Package_Hash": {
                 "type": "Hash",
                 "required": false,
+                "conditional_required": "Required when Attempt_Status is any value other than Unsubmitted",
                 "description": "SHA-256 of the assembled package as transmitted, so a sign-off can be matched to what went out"
               },
               "Notes": {
                 "type": "LongText",
                 "required": false,
-                "description": "Free text: validation messages, the reason for a withdrawal"
+                "description": "Free text: validation messages, the reason for a recall"
               }
             },
             "constraints": [
@@ -2118,7 +2207,7 @@
                 }
               },
               {
-                "rule": "Submitted_At is required when Attempt_Status is Submitted, Received, Validated, Invalid, or Accepted.",
+                "rule": "Submitted_At is required when Attempt_Status is Submitted, Received, Validated, Invalid, Accepted, or Recalled.",
                 "structured": {
                   "type": "conditional_required",
                   "condition_column": "Attempt_Status",
@@ -2127,7 +2216,8 @@
                     "Received",
                     "Validated",
                     "Invalid",
-                    "Accepted"
+                    "Accepted",
+                    "Recalled"
                   ],
                   "required_columns": [
                     "Submitted_At"
@@ -2135,23 +2225,23 @@
                 }
               },
               {
-                "rule": "At most one SubmissionAttempt per Proposal has Attempt_Status Unsent or Submitting: one attempt is in flight at a time.",
+                "rule": "Package_Hash is required when Attempt_Status is any value other than Unsubmitted."
+              },
+              {
+                "rule": "At most one SubmissionAttempt per Proposal has Attempt_Status Unsubmitted or Submitting: one attempt is in flight at a time.",
                 "structured": {
                   "type": "unique_scope",
                   "columns": [
                     "Proposal_ID"
                   ],
-                  "condition": "Attempt_Status IN ('Unsent', 'Submitting')"
+                  "condition": "Attempt_Status IN ('Unsubmitted', 'Submitting')"
                 }
               },
               {
-                "rule": "SubmissionAttempt rows exist only for a Proposal whose Internal_Approval_Status is Approved.",
-                "structured": {
-                  "type": "referenced_status_is",
-                  "column": "Proposal_ID",
-                  "target_status_column": "Proposal.Internal_Approval_Status",
-                  "value": "Approved"
-                }
+                "rule": "A SubmissionAttempt is created only while the Proposal's Internal_Approval_Status is Approved and, when its chain has a Final_Sign_off, the current package is signed off. Earlier attempts stay as history if the proposal later leaves Approved."
+              },
+              {
+                "rule": "An attempt becomes Recalled only while the Proposal's Decision_Status is Unrequested or Pending."
               }
             ]
           },
@@ -2181,7 +2271,8 @@
               },
               "Authorization_Date": {
                 "type": "Date",
-                "required": true,
+                "required": false,
+                "conditional_required": "Required when Authorization_Status is Approved, Converted_To_Award, or Expired_Unused; kept if an approved authorization is later Revoked",
                 "description": "When the at-risk spending was authorized"
               },
               "Effective_Start_Date": {
@@ -2196,7 +2287,8 @@
               },
               "Authorizing_Personnel_ID": {
                 "type": "ID",
-                "required": true,
+                "required": false,
+                "conditional_required": "Required when Authorization_Status is Approved, Converted_To_Award, or Expired_Unused; kept if an approved authorization is later Revoked",
                 "references": {
                   "table": "Personnel",
                   "column": "Personnel_ID"
@@ -2208,15 +2300,15 @@
                 "type": "Status",
                 "required": true,
                 "allowed_values": [
-                  "Pending",
+                  "Requested",
                   "Approved",
                   "Revoked",
                   "Converted_To_Award",
                   "Expired_Unused"
                 ],
                 "value_definitions": {
-                  "Pending": {
-                    "definition": "Requested; not yet authorized",
+                  "Requested": {
+                    "definition": "Requested; not yet authorized, so no authorizer or date is recorded",
                     "set_by": "The proposal team or department",
                     "next": [
                       "Approved",
@@ -2248,7 +2340,7 @@
                     "next": []
                   }
                 },
-                "description": "Constrained: Pending / Approved / Revoked / Converted_To_Award / Expired_Unused"
+                "description": "Constrained: Requested / Approved / Revoked / Converted_To_Award / Expired_Unused"
               },
               "Converted_To_Award_ID": {
                 "type": "ID",
@@ -2268,16 +2360,13 @@
             },
             "constraints": [
               {
-                "rule": "The Proposal referenced by Proposal_ID has Decision_Status Pending or Intent_to_Award.",
-                "structured": {
-                  "type": "referenced_status_is",
-                  "column": "Proposal_ID",
-                  "target_status_column": "Proposal.Decision_Status",
-                  "value": [
-                    "Pending",
-                    "Intent_to_Award"
-                  ]
-                }
+                "rule": "Authorization_Date and Authorizing_Personnel_ID are required when Authorization_Status is Approved, Converted_To_Award, or Expired_Unused, and kept if an approved authorization is later Revoked."
+              },
+              {
+                "rule": "While Authorization_Status is Requested or Approved, the Proposal referenced by Proposal_ID has Decision_Status Pending or Intent_to_Award."
+              },
+              {
+                "rule": "When Authorization_Status is Converted_To_Award, the Proposal referenced by Proposal_ID has Decision_Status Awarded."
               }
             ]
           },
@@ -2332,7 +2421,7 @@
                   "column": "Organization_ID"
                 },
                 "description": "Referenced Organization has Capability = 'Sponsor'",
-                "synonyms": "Funder, Funding Agency, Direct Sponsor"
+                "synonyms": "Funder, Funding Agency, Direct Sponsor, Pass-Through Sponsor"
               },
               "Prime_Sponsor_Organization_ID": {
                 "type": "ID",
@@ -2342,7 +2431,7 @@
                   "column": "Organization_ID"
                 },
                 "description": "Original funder for pass-through awards",
-                "synonyms": "Pass-Through Sponsor, Original Funder, Ultimate Funder, Prime"
+                "synonyms": "Original Funder, Ultimate Funder, Prime"
               },
               "Administering_Organization_ID": {
                 "type": "ID",
@@ -2352,7 +2441,7 @@
                   "column": "Organization_ID"
                 },
                 "description": "Institutional unit managing finances",
-                "synonyms": "Admin Unit, OSP, Sponsored Programs Office"
+                "synonyms": "Admin Unit, Managing Unit"
               },
               "Parent_Award_ID": {
                 "type": "ID",
@@ -2400,7 +2489,7 @@
               "FAIN": {
                 "type": "ShortCode",
                 "required": false,
-                "conditional_required": "Required when Sponsor.Sponsor_Type = 'Federal'. Unique within the institution when not null.",
+                "conditional_required": "Required when Sponsor.Sponsor_Type = 'Federal' and Instrument_Type is Grant or Cooperative_Agreement; other instruments do not need one. Unique within the institution when not null.",
                 "description": "Federal Award Identification Number",
                 "synonyms": "Federal Award ID, Federal Identifier, USA Spending ID"
               },
@@ -2420,6 +2509,84 @@
                 "value_group": "FundingMechanism",
                 "description": "The sponsor's funding mechanism for the award, for example R01, R21, P01, T32, Cooperative_Agreement, Contract_BAA",
                 "synonyms": "Funding Mechanism, Activity Code, Award Type"
+              },
+              "Instrument_Type": {
+                "type": "Status",
+                "required": true,
+                "allowed_values": [
+                  "Grant",
+                  "Cooperative_Agreement",
+                  "Contract",
+                  "Other_Transaction",
+                  "Other"
+                ],
+                "value_definitions": {
+                  "Grant": {
+                    "definition": "Funding to carry out a project, with limited sponsor involvement in the work"
+                  },
+                  "Cooperative_Agreement": {
+                    "definition": "Funding with substantial sponsor involvement in the work"
+                  },
+                  "Contract": {
+                    "definition": "A binding agreement in which the sponsor buys specific work or deliverables"
+                  },
+                  "Other_Transaction": {
+                    "definition": "A federal other transaction agreement, neither a grant, cooperative agreement, nor procurement contract"
+                  },
+                  "Other": {
+                    "definition": "Another kind of agreement"
+                  }
+                },
+                "description": "The legal kind of agreement. Constrained: Grant / Cooperative_Agreement / Contract / Other_Transaction / Other. Mechanism_Value_ID holds the detailed code",
+                "synonyms": "Agreement Type, Instrument"
+              },
+              "Activity_Type": {
+                "type": "Status",
+                "required": true,
+                "allowed_values": [
+                  "Organized_Research",
+                  "Instruction",
+                  "Other_Sponsored_Activity"
+                ],
+                "value_definitions": {
+                  "Organized_Research": {
+                    "definition": "Research and development that is separately budgeted and accounted for, including research training"
+                  },
+                  "Instruction": {
+                    "definition": "Sponsored teaching and training, other than research training"
+                  },
+                  "Other_Sponsored_Activity": {
+                    "definition": "Externally funded work other than instruction and research, such as health service or community service projects"
+                  }
+                },
+                "description": "What kind of work this funds, using the major functions in 2 CFR 200 Appendix III. Constrained: Organized_Research / Instruction / Other_Sponsored_Activity. Organized_Research is what the HERD survey counts as sponsored research",
+                "synonyms": "Sponsored Activity Type, Type of Activity"
+              },
+              "Research_Character": {
+                "type": "Status",
+                "required": false,
+                "allowed_values": [
+                  "Basic_Research",
+                  "Applied_Research",
+                  "Experimental_Development"
+                ],
+                "value_definitions": {
+                  "Basic_Research": {
+                    "definition": "Work done mainly to gain new knowledge of underlying foundations, with no particular application in view"
+                  },
+                  "Applied_Research": {
+                    "definition": "Original investigation directed mainly toward a specific, practical aim"
+                  },
+                  "Experimental_Development": {
+                    "definition": "Systematic work directed at producing new products or processes or improving existing ones"
+                  }
+                },
+                "description": "The kind of research, as the HERD survey defines it. Applies only when Activity_Type = Organized_Research. Constrained when present: Basic_Research / Applied_Research / Experimental_Development"
+              },
+              "Is_Clinical_Trial": {
+                "type": "Boolean",
+                "required": false,
+                "description": "Whether the award funds a Phase I, II, or III clinical trial with human patients. Phase IV post-market studies do not count"
               },
               "Funding_Mechanism_Description": {
                 "type": "MediumName",
@@ -2444,7 +2611,7 @@
                 "description": "Current end after Modifications. Derived from Modifications.",
                 "synonyms": "POP End, Live End Date, Current Award End",
                 "derived": {
-                  "rule": "The Award's Original_End_Date adjusted by the latest approved Modification that changes the end date. Computed as: among Modifications where Award_ID = the Award, Approval_Status = 'Approved', Is_Active = true, and New_End_Date is non-null, take the one with the latest Effective_Date, breaking ties by the highest Modification_Number, and use its New_End_Date. If no such Modification exists, use the Award's Original_End_Date.",
+                  "rule": "The Award's Original_End_Date adjusted by the latest Approved or Not_Required Modification that changes the end date. Computed as: among Modifications where Award_ID = the Award, Approval_Status is Approved or Not_Required, Is_Active = true, and New_End_Date is non-null, take the one with the latest Effective_Date, breaking ties by the highest Modification_Number, and use its New_End_Date. If no such Modification exists, use the Award's Original_End_Date.",
                   "recompute_triggers": "On insert/update of any Modification on the Award, including a change to its Is_Active; on insert/update of Award."
                 }
               },
@@ -2457,10 +2624,10 @@
               "Current_Total_Funded": {
                 "type": "Money",
                 "required": false,
-                "description": "Originally funded amount plus sum of approved funding-changing Modifications.",
+                "description": "Originally funded amount plus the sum of Approved or Not_Required funding-changing Modifications.",
                 "synonyms": "Current Award Amount, Live Funding, Cumulative Funded",
                 "derived": {
-                  "rule": "The Award's Original_Total_Funded plus the sum of Funding_Change_Amount across Modifications where Award_ID = the Award, Approval_Status = 'Approved', and Is_Active = true. Modifications with null Funding_Change_Amount (non-financial event types) contribute 0.",
+                  "rule": "The Award's Original_Total_Funded plus the sum of Funding_Change_Amount across Modifications where Award_ID = the Award, Approval_Status is Approved or Not_Required, and Is_Active = true. Modifications with null Funding_Change_Amount (non-financial event types) contribute 0.",
                   "recompute_triggers": "On insert/update of any Modification on the Award, including a change to its Is_Active; on insert/update of Award."
                 }
               },
@@ -2487,16 +2654,17 @@
                 "type": "Status",
                 "required": true,
                 "allowed_values": [
-                  "Pending",
+                  "In_Setup",
                   "Active",
                   "Suspended",
                   "Closing",
                   "Closed",
+                  "Adjusting",
                   "Terminating",
                   "Terminated"
                 ],
                 "value_definitions": {
-                  "Pending": {
+                  "In_Setup": {
                     "definition": "Received and in setup; not yet open for spending",
                     "set_by": "Sponsored programs office",
                     "next": [
@@ -2534,23 +2702,62 @@
                     "definition": "Closeout complete; the account is inactivated",
                     "set_by": "Sponsored programs office",
                     "next": [
-                      "Closing"
+                      "Active",
+                      "Adjusting"
+                    ]
+                  },
+                  "Adjusting": {
+                    "definition": "The award has ended and a late correction is under way, such as an audit finding or a late charge; not open for spending. It returns to the status it came from",
+                    "set_by": "Sponsored programs office",
+                    "next": [
+                      "Closed",
+                      "Terminated"
                     ]
                   },
                   "Terminating": {
-                    "definition": "A termination notice has been received and is being processed; spending stops, closeout of the terminated scope begins",
+                    "definition": "The award is being ended early, and termination is being processed. The sponsor, the institution, or both may have started it; spending stops",
                     "set_by": "Sponsored programs office",
                     "next": [
-                      "Terminated"
+                      "Terminated",
+                      "Active"
                     ]
                   },
                   "Terminated": {
                     "definition": "Ended before its period of performance; termination processing complete",
                     "set_by": "Sponsored programs office",
-                    "next": []
+                    "next": [
+                      "Active",
+                      "Adjusting"
+                    ]
                   }
                 },
-                "description": "The award's lifecycle state. Pending until setup completes; Closing once closeout has begun; Suspended and Terminating for sponsor or institutional stop actions, Terminated once the termination is processed. Authoritative for the award's state; Is_Active only hides rows"
+                "description": "The award's lifecycle state. In_Setup until setup completes; Closing once closeout has begun; Suspended and Terminating for sponsor or institutional stop actions, Terminated once the termination is processed. Authoritative for the award's state; Is_Active only hides rows. Adjusting is a late correction after Closed or Terminated; the award can be reopened or reinstated to Active"
+              },
+              "Termination_Basis": {
+                "type": "Status",
+                "required": false,
+                "conditional_required": "Required when the status is Terminating or Terminated; cleared on reinstatement",
+                "allowed_values": [
+                  "Noncompliance",
+                  "Mutual_Agreement",
+                  "Recipient_Request",
+                  "Sponsor_Priorities"
+                ],
+                "value_definitions": {
+                  "Noncompliance": {
+                    "definition": "Ended because a party failed to comply with the terms of the agreement"
+                  },
+                  "Mutual_Agreement": {
+                    "definition": "Ended by agreement of both parties"
+                  },
+                  "Recipient_Request": {
+                    "definition": "Ended at the recipient's request"
+                  },
+                  "Sponsor_Priorities": {
+                    "definition": "Ended because the agreement no longer serves the sponsor's program goals or priorities, including under an executive order"
+                  }
+                },
+                "description": "Why the agreement was terminated. Required when the status is Terminating or Terminated; cleared on reinstatement, with earlier values kept by versioned storage"
               },
               "Risk_Level": {
                 "type": "Status",
@@ -2619,11 +2826,11 @@
             },
             "constraints": [
               {
-                "rule": "FAIN is required when the Sponsor's Sponsor_Type = 'Federal'; FAIN is unique within the institution when not null.",
+                "rule": "FAIN is required when the Sponsor's Sponsor_Type = 'Federal' and Instrument_Type is Grant or Cooperative_Agreement; other instruments do not need one. FAIN is unique within the institution when not null.",
                 "structured": {
                   "type": "conditional_required",
                   "column": "FAIN",
-                  "when": "Sponsor.Sponsor_Type = 'Federal'"
+                  "when": "Sponsor.Sponsor_Type = 'Federal' and Instrument_Type in (Grant, Cooperative_Agreement)"
                 }
               },
               {
@@ -2658,7 +2865,16 @@
                 "rule": "The Previous_Award_ID chain is acyclic: following it from any row reaches a row whose Previous_Award_ID is null."
               },
               {
-                "rule": "Award_Status is Closed only when every Subaward whose Prime_Award_ID is the Award has Subaward_Status Closed or Terminated."
+                "rule": "Award_Status is Closed only when every Subaward whose Prime_Award_ID is the Award has Subaward_Status Closed, Terminated, or Not_Issued."
+              },
+              {
+                "rule": "An Award at Adjusting returns to the Award_Status it came from, Closed or Terminated."
+              },
+              {
+                "rule": "Termination_Basis is required when Award_Status is Terminating or Terminated, and null otherwise."
+              },
+              {
+                "rule": "Research_Character is null unless Activity_Type = 'Organized_Research'."
               }
             ]
           },
@@ -2708,6 +2924,15 @@
                 "description": "When the modification takes effect",
                 "synonyms": "Mod Effective Date, Change Effective Date"
               },
+              "Is_In_Effect": {
+                "type": "Boolean",
+                "required": false,
+                "derived": {
+                  "rule": "True when Approval_Status is Approved or Not_Required and Effective_Date has arrived; false otherwise.",
+                  "recompute_triggers": "On insert/update of the Modification; date-driven when Effective_Date arrives."
+                },
+                "description": "Whether the modification is in effect today. Derived from Approval_Status and Effective_Date and kept as a column so that every consumer shares one meaning of in effect and can filter on it. The award's current totals and dates do not use it; they count every Approved or Not_Required modification once it is recorded"
+              },
               "Event_Type_Value_ID": {
                 "type": "ID",
                 "required": true,
@@ -2729,39 +2954,14 @@
                   "Cost_Transfer_Authorization",
                   "Advance_Funding"
                 ],
-                "description": "What kind of change the modification makes. Advance_Funding records the institution's approval of spending ahead of a sponsor amendment; a prior-approval request is a Modification in Pending, not a kind of modification",
+                "description": "What kind of change the modification makes. Advance_Funding records the institution's approval of spending ahead of a sponsor amendment; a prior-approval request is a Modification in Requested, not a kind of modification",
                 "synonyms": "Modification Type, Amendment Type, Change Type"
-              },
-              "Continuation_Type": {
-                "type": "Status",
-                "required": false,
-                "allowed_values": [
-                  "Competing",
-                  "Non_Competing",
-                  "Supplement",
-                  "Other"
-                ],
-                "value_definitions": {
-                  "Competing": {
-                    "definition": "A competing continuation; a new competition"
-                  },
-                  "Non_Competing": {
-                    "definition": "A non-competing continuation; the next budget period"
-                  },
-                  "Supplement": {
-                    "definition": "A supplement to the current period"
-                  },
-                  "Other": {
-                    "definition": "Another kind of continuation"
-                  }
-                },
-                "description": "Constrained when present: Competing / Non_Competing / Supplement / Other"
               },
               "Approval_Status": {
                 "type": "Status",
                 "required": true,
                 "allowed_values": [
-                  "Pending",
+                  "Requested",
                   "Approved",
                   "Rejected",
                   "Withdrawn",
@@ -2769,26 +2969,25 @@
                   "Reversed"
                 ],
                 "value_definitions": {
-                  "Pending": {
+                  "Requested": {
                     "definition": "Requested; awaiting the sponsor's approval, or the institution's where no sponsor approval is needed",
                     "set_by": "Sponsored programs office",
                     "next": [
                       "Approved",
                       "Rejected",
                       "Withdrawn",
-                      "Not_Required",
-                      "Reversed"
+                      "Not_Required"
                     ]
                   },
                   "Approved": {
-                    "definition": "In effect; counted by the derived award totals and dates",
+                    "definition": "The sponsor or institution approved the modification. It counts in the award's current totals and dates from approval, and Effective_Date records when the change takes effect",
                     "set_by": "Recorded from the sponsor's communication",
                     "next": [
                       "Reversed"
                     ]
                   },
                   "Rejected": {
-                    "definition": "Refused by the sponsor",
+                    "definition": "Refused by the sponsor, or by the institution where the sponsor's approval isn't needed",
                     "set_by": "Recorded from the sponsor's communication",
                     "next": []
                   },
@@ -2798,19 +2997,19 @@
                     "next": []
                   },
                   "Not_Required": {
-                    "definition": "Recorded for the record; no approval was needed",
+                    "definition": "No approval was needed. It counts in the award's current totals and dates once recorded, and Effective_Date records when the change takes effect",
                     "set_by": "Sponsored programs office",
                     "next": [
                       "Reversed"
                     ]
                   },
                   "Reversed": {
-                    "definition": "An approved modification later withdrawn by the sponsor or invalidated by correction; excluded from the derivations and its budget rows unwound",
+                    "definition": "An Approved or Not_Required modification later withdrawn by the sponsor or invalidated by correction; excluded from the derivations and its budget rows unwound",
                     "set_by": "Sponsored programs office",
                     "next": []
                   }
                 },
-                "description": "The decision on the modification. Withdrawn before a decision; Reversed after approval, by the sponsor or by correction, and excluded from the derivations of Award.Current_End_Date and Award.Current_Total_Funded",
+                "description": "The decision on the modification. Withdrawn before a decision; Reversed after approval or after being recorded as Not_Required, by the sponsor or by correction, and excluded from the derivations of Award.Current_End_Date and Award.Current_Total_Funded",
                 "synonyms": "Mod Status, Sponsor Approval"
               },
               "Priority": {
@@ -2854,7 +3053,7 @@
               "Funding_Change_Amount": {
                 "type": "Money",
                 "required": false,
-                "conditional_required": "Required for funding-changing event types (Incremental_Funding, Budget_Revision, Supplement); null for non-financial event types. Sign: positive for adds, negative for reductions.",
+                "conditional_required": "Required for Incremental_Funding and Supplement, and for a Budget_Revision that changes the total; null for non-financial event types, Rebudget, and a Budget_Revision that does not change the total. Sign: positive for adds, negative for reductions.",
                 "description": "Positive for adds, negative for reductions. Required for funding-changing event types; null for non-financial event types",
                 "synonyms": "Supplement, Reduction, Net Change"
               },
@@ -2870,17 +3069,12 @@
                 "required": false,
                 "conditional_required": "Required when the Event_Type resolves to Carryover",
                 "description": "Required when the Event_Type resolves to Carryover",
-                "synonyms": "Carry-Forward, Unobligated Balance"
-              },
-              "Carryforward_Amount": {
-                "type": "Money",
-                "required": false,
-                "description": "Companion of Carryover depending on accounting policy"
+                "synonyms": "Carry-Forward"
               },
               "Pre_Award_Costs_Amount": {
                 "type": "Money",
                 "required": false,
-                "description": "At-risk spending captured at the modification level",
+                "description": "Costs incurred before the award's start date that this modification covers; at the institution's risk until the award is made",
                 "synonyms": "Pre-Award Spending, At-Risk Amount"
               },
               "Description": {
@@ -2897,7 +3091,7 @@
                 "rule": "Carryover_Amount is required when the Event_Type value resolves to a carryover event."
               },
               {
-                "rule": "Funding_Change_Amount is required for funding-changing event types; null is permitted for non-financial event types. When the modification does not change funding, the value is null (not zero)."
+                "rule": "Funding_Change_Amount is required for Incremental_Funding and Supplement, and for a Budget_Revision that changes the total; null is permitted for non-financial event types, Rebudget, and a Budget_Revision that does not change the total. When the modification does not change funding, the value is null (not zero)."
               },
               {
                 "rule": "Exactly one of Award_ID or Subaward_ID is non-null.",
@@ -2931,8 +3125,8 @@
                   "table": "Proposal",
                   "column": "Proposal_ID"
                 },
-                "conditional_required": "Required when Subaward_Status = 'Proposed'. Persists after the transition to Pending/Active.",
-                "description": "The proposal that planned this subaward. Required when Subaward_Status = 'Proposed'. Persists after the transition to Pending/Active so the originating-proposal link is preserved across the subaward lifecycle"
+                "conditional_required": "Required when Subaward_Status = 'Proposed'. Persists after the transition to In_Setup/Active.",
+                "description": "The proposal that planned this subaward. Required when Subaward_Status = 'Proposed'. Persists after the transition to In_Setup/Active so the originating-proposal link is preserved across the subaward lifecycle"
               },
               "Prime_Award_ID": {
                 "type": "ID",
@@ -2941,8 +3135,8 @@
                   "table": "Award",
                   "column": "Award_ID"
                 },
-                "conditional_required": "Required when Subaward_Status is any value other than 'Proposed'. Null while Subaward_Status = 'Proposed'.",
-                "description": "References Award (the parent inbound award). Required when Subaward_Status is any value other than 'Proposed', that is, once the prime award has been received. Null while Subaward_Status = 'Proposed'",
+                "conditional_required": "Required when Subaward_Status is any value other than 'Proposed' or 'Not_Issued'. Null while Subaward_Status = 'Proposed'; a Not_Issued subaward keeps whatever it had.",
+                "description": "References Award (the parent inbound award). Required when Subaward_Status is any value other than 'Proposed' or 'Not_Issued', that is, once the prime award has been received. Null while Subaward_Status = 'Proposed'; a Not_Issued subaward keeps whatever it had",
                 "synonyms": "Parent Award, Primary Award, Prime"
               },
               "Parent_Subaward_ID": {
@@ -3061,28 +3255,30 @@
                 "required": true,
                 "allowed_values": [
                   "Proposed",
-                  "Pending",
+                  "In_Setup",
                   "Active",
                   "Suspended",
                   "Closing",
                   "Closed",
-                  "Terminated"
+                  "Adjusting",
+                  "Terminated",
+                  "Not_Issued"
                 ],
                 "value_definitions": {
                   "Proposed": {
                     "definition": "Planned in the proposal; no prime award yet",
                     "set_by": "The proposal team",
                     "next": [
-                      "Pending",
-                      "Terminated"
+                      "In_Setup",
+                      "Not_Issued"
                     ]
                   },
-                  "Pending": {
+                  "In_Setup": {
                     "definition": "The prime award exists; the subaward agreement is being issued",
                     "set_by": "Sponsored programs office",
                     "next": [
                       "Active",
-                      "Terminated"
+                      "Not_Issued"
                     ]
                   },
                   "Active": {
@@ -3114,16 +3310,65 @@
                   "Closed": {
                     "definition": "Closeout complete",
                     "set_by": "Sponsored programs office",
-                    "next": []
+                    "next": [
+                      "Active",
+                      "Adjusting"
+                    ]
+                  },
+                  "Adjusting": {
+                    "definition": "The subaward has ended and a late correction is under way; not open for work or spending. It returns to the status it came from",
+                    "set_by": "Sponsored programs office",
+                    "next": [
+                      "Closed",
+                      "Terminated"
+                    ]
                   },
                   "Terminated": {
                     "definition": "Ended before its period of performance",
                     "set_by": "Sponsored programs office",
+                    "next": [
+                      "Active",
+                      "Adjusting"
+                    ]
+                  },
+                  "Not_Issued": {
+                    "definition": "Planned or being set up, but the agreement was never issued",
+                    "set_by": "Sponsored programs office",
                     "next": []
                   }
                 },
-                "description": "The subaward's lifecycle state. Proposed while planned in the proposal; Pending once the prime award exists and the agreement is being issued; Closing once closeout has begun",
+                "description": "The subaward's lifecycle state. Proposed while planned in the proposal; In_Setup once the prime award exists and the agreement is being issued; Closing once closeout has begun. Not_Issued means the agreement was never issued, from Proposed or In_Setup. Adjusting is a late correction after Closed or Terminated; the subaward can be reopened or reinstated to Active",
                 "synonyms": "Sub Status, Subcontract State"
+              },
+              "Termination_Basis": {
+                "type": "Status",
+                "required": false,
+                "conditional_required": "Required when the status is Terminated; cleared on reinstatement",
+                "allowed_values": [
+                  "Noncompliance",
+                  "Mutual_Agreement",
+                  "Recipient_Request",
+                  "Sponsor_Priorities",
+                  "Prime_Terminated"
+                ],
+                "value_definitions": {
+                  "Noncompliance": {
+                    "definition": "Ended because a party failed to comply with the terms of the agreement"
+                  },
+                  "Mutual_Agreement": {
+                    "definition": "Ended by agreement of both parties"
+                  },
+                  "Recipient_Request": {
+                    "definition": "Ended at the recipient's request"
+                  },
+                  "Sponsor_Priorities": {
+                    "definition": "Ended because the agreement no longer serves the sponsor's program goals or priorities, including under an executive order"
+                  },
+                  "Prime_Terminated": {
+                    "definition": "Ended because the prime award was terminated"
+                  }
+                },
+                "description": "Why the agreement was terminated. Required when the status is Terminated; cleared on reinstatement, with earlier values kept by versioned storage"
               },
               "Monitoring_Frequency_Months": {
                 "type": "Count",
@@ -3142,7 +3387,13 @@
                 }
               },
               {
-                "rule": "Proposal_ID required when Subaward_Status = 'Proposed'; Prime_Award_ID required when Subaward_Status is any value other than 'Proposed'. Both columns may be non-null at the same time after transition."
+                "rule": "Proposal_ID required when Subaward_Status = 'Proposed'; Prime_Award_ID required when Subaward_Status is any value other than 'Proposed' or 'Not_Issued'. Both columns may be non-null at the same time after transition."
+              },
+              {
+                "rule": "Termination_Basis is required when Subaward_Status is Terminated, and null otherwise."
+              },
+              {
+                "rule": "A Subaward at Adjusting returns to the Subaward_Status it came from, Closed or Terminated."
               }
             ]
           },
@@ -3352,7 +3603,7 @@
                     "definition": "A fixed-price agreement"
                   },
                   "Letter_of_Credit": {
-                    "definition": "Draws against a federal letter of credit"
+                    "definition": "Draws through a federal payment system, historically a letter of credit"
                   },
                   "Payment_Request": {
                     "definition": "Payment on request by schedule or milestone"
@@ -3440,10 +3691,10 @@
               }
             ]
           },
-          "Report": {
-            "description": "A scheduled or ad hoc deliverable to the sponsor: progress report, RPPR, FFR, final report, invention statement, data-sharing plan update.",
+          "Deliverable": {
+            "description": "Something owed to the sponsor under an award: a report, or a work product such as a prototype, dataset, software, or samples. Tracks what is due and where it stands. Kinds with their own details have child tables, such as Report.",
             "columns": {
-              "Report_ID": {
+              "Deliverable_ID": {
                 "type": "ID",
                 "primary_key": true,
                 "required": true,
@@ -3473,6 +3724,177 @@
                 ],
                 "description": "Exactly one of Award_ID or Subaward_ID is non-null"
               },
+              "Deliverable_Type": {
+                "type": "Status",
+                "required": true,
+                "allowed_values": [
+                  "Report",
+                  "Work_Product",
+                  "Other"
+                ],
+                "value_definitions": {
+                  "Report": {
+                    "definition": "A report to the sponsor; it has a Report row"
+                  },
+                  "Work_Product": {
+                    "definition": "A work product such as a prototype, dataset, software, or samples"
+                  },
+                  "Other": {
+                    "definition": "Another kind of deliverable"
+                  }
+                },
+                "description": "Constrained: Report / Work_Product / Other",
+                "synonyms": "Deliverable Category"
+              },
+              "Description": {
+                "type": "LongText",
+                "required": true,
+                "description": "What is owed to the sponsor"
+              },
+              "Due_Date": {
+                "type": "Date",
+                "required": true,
+                "description": "When the deliverable is due to the sponsor",
+                "synonyms": "Submission Deadline, Report Deadline"
+              },
+              "Submitted_Date": {
+                "type": "Date",
+                "required": false,
+                "conditional_required": "Required when Deliverable_Status is 'Submitted', 'Fulfilled', or 'Returned_for_Revision'",
+                "description": "Required when Deliverable_Status is 'Submitted', 'Fulfilled', or 'Returned_for_Revision': the deliverable has reached the sponsor",
+                "synonyms": "Submission Date"
+              },
+              "Submitted_By_Personnel_ID": {
+                "type": "ID",
+                "required": false,
+                "references": {
+                  "table": "Personnel",
+                  "column": "Personnel_ID"
+                },
+                "conditional_required": "Required when Deliverable_Status is 'Submitted', 'Fulfilled', or 'Returned_for_Revision'",
+                "description": "Required when Deliverable_Status is 'Submitted', 'Fulfilled', or 'Returned_for_Revision': the deliverable has reached the sponsor"
+              },
+              "Sponsor_Confirmation_Number": {
+                "type": "ShortName",
+                "required": false,
+                "description": "Sponsor-issued upon receipt",
+                "synonyms": "Confirmation Receipt, Submission Confirmation"
+              },
+              "Deliverable_Status": {
+                "type": "Status",
+                "required": true,
+                "allowed_values": [
+                  "Not_Started",
+                  "Drafted",
+                  "Submitted",
+                  "Fulfilled",
+                  "Returned_for_Revision",
+                  "Late",
+                  "Waived"
+                ],
+                "value_definitions": {
+                  "Not_Started": {
+                    "definition": "Due and not started",
+                    "set_by": "Scheduled from the award terms",
+                    "next": [
+                      "Drafted",
+                      "Late",
+                      "Waived"
+                    ]
+                  },
+                  "Drafted": {
+                    "definition": "In preparation by the project team",
+                    "set_by": "The project team",
+                    "next": [
+                      "Submitted",
+                      "Late",
+                      "Waived"
+                    ]
+                  },
+                  "Submitted": {
+                    "definition": "Sent to the sponsor",
+                    "set_by": "The submitter",
+                    "next": [
+                      "Fulfilled",
+                      "Returned_for_Revision"
+                    ]
+                  },
+                  "Fulfilled": {
+                    "definition": "The sponsor reviewed and approved the deliverable, and the obligation is met",
+                    "set_by": "Recorded from the sponsor's communication",
+                    "next": []
+                  },
+                  "Returned_for_Revision": {
+                    "definition": "The sponsor sent it back for changes",
+                    "set_by": "Recorded from the sponsor's communication",
+                    "next": [
+                      "Drafted",
+                      "Submitted"
+                    ]
+                  },
+                  "Late": {
+                    "definition": "Past its due date and not submitted",
+                    "set_by": "Date-driven when Due_Date passes",
+                    "next": [
+                      "Drafted",
+                      "Submitted",
+                      "Waived"
+                    ]
+                  },
+                  "Waived": {
+                    "definition": "The sponsor no longer requires it",
+                    "set_by": "Recorded from the sponsor's communication",
+                    "next": []
+                  }
+                },
+                "description": "Constrained: Not_Started / Drafted / Submitted / Fulfilled / Returned_for_Revision / Late / Waived"
+              },
+              "Acceptance_Date": {
+                "type": "Date",
+                "required": false,
+                "conditional_required": "Required when Deliverable_Status = 'Fulfilled'",
+                "description": "Required when Deliverable_Status = 'Fulfilled'"
+              },
+              "Linked_Document_ID": {
+                "type": "ID",
+                "required": false,
+                "references": {
+                  "table": "Document",
+                  "column": "Document_ID"
+                },
+                "description": "The deliverable's file or transmittal, when there is one"
+              }
+            },
+            "constraints": [
+              {
+                "rule": "Exactly one of Award_ID or Subaward_ID is non-null."
+              },
+              {
+                "rule": "Submitted_Date and Submitted_By_Personnel_ID are required when Deliverable_Status in {Submitted, Fulfilled, Returned_for_Revision}; Acceptance_Date is required when Deliverable_Status = 'Fulfilled'."
+              },
+              {
+                "rule": "Every Deliverable with Deliverable_Type = 'Report' has one Report row."
+              }
+            ]
+          },
+          "Report": {
+            "description": "The report details of a Deliverable: which kind of report it is and the period it covers. Progress report, RPPR, federal financial report, final report, invention statement, or data-sharing report. Status and due date are on the Deliverable.",
+            "columns": {
+              "Report_ID": {
+                "type": "ID",
+                "primary_key": true,
+                "required": true,
+                "description": "PK"
+              },
+              "Deliverable_ID": {
+                "type": "ID",
+                "required": true,
+                "references": {
+                  "table": "Deliverable",
+                  "column": "Deliverable_ID"
+                },
+                "description": "The Deliverable this report details"
+              },
               "Report_Type": {
                 "type": "Status",
                 "required": true,
@@ -3494,7 +3916,7 @@
                     "definition": "A periodic technical progress report"
                   },
                   "RPPR": {
-                    "definition": "NIH Research Performance Progress Report"
+                    "definition": "Research Performance Progress Report, the standard federal format"
                   },
                   "Financial": {
                     "definition": "A periodic financial report"
@@ -3525,7 +3947,7 @@
                   }
                 },
                 "description": "Constrained: Progress / RPPR / Financial / FFR_SF425 / Final_Progress / Final_Financial / Invention_Statement / Data_Sharing / Equipment_Inventory / Audit_Response / Other",
-                "synonyms": "Deliverable Type, Submission Type"
+                "synonyms": "Report Category"
               },
               "Reporting_Period_Start_Date": {
                 "type": "Date",
@@ -3538,127 +3960,14 @@
                 "required": true,
                 "description": "End of the period the report covers",
                 "synonyms": "Period End, Coverage End"
-              },
-              "Due_Date": {
-                "type": "Date",
-                "required": true,
-                "description": "When the report is due to the sponsor",
-                "synonyms": "Submission Deadline, Report Deadline"
-              },
-              "Submitted_Date": {
-                "type": "Date",
-                "required": false,
-                "conditional_required": "Required when Report_Status is 'Submitted', 'Accepted', or 'Returned_for_Revision'",
-                "description": "Required when Report_Status is 'Submitted', 'Accepted', or 'Returned_for_Revision': the report has reached the sponsor",
-                "synonyms": "Submission Date"
-              },
-              "Submitted_By_Personnel_ID": {
-                "type": "ID",
-                "required": false,
-                "references": {
-                  "table": "Personnel",
-                  "column": "Personnel_ID"
-                },
-                "conditional_required": "Required when Report_Status is 'Submitted', 'Accepted', or 'Returned_for_Revision'",
-                "description": "Required when Report_Status is 'Submitted', 'Accepted', or 'Returned_for_Revision': the report has reached the sponsor"
-              },
-              "Sponsor_Confirmation_Number": {
-                "type": "ShortName",
-                "required": false,
-                "description": "Sponsor-issued upon receipt",
-                "synonyms": "Confirmation Receipt, Submission Confirmation"
-              },
-              "Report_Status": {
-                "type": "Status",
-                "required": true,
-                "allowed_values": [
-                  "Pending",
-                  "Drafted",
-                  "Submitted",
-                  "Accepted",
-                  "Returned_for_Revision",
-                  "Late",
-                  "Waived"
-                ],
-                "value_definitions": {
-                  "Pending": {
-                    "definition": "Due and not started",
-                    "set_by": "Scheduled from the award terms",
-                    "next": [
-                      "Drafted",
-                      "Late",
-                      "Waived"
-                    ]
-                  },
-                  "Drafted": {
-                    "definition": "In preparation by the project team",
-                    "set_by": "The project team",
-                    "next": [
-                      "Submitted",
-                      "Late",
-                      "Waived"
-                    ]
-                  },
-                  "Submitted": {
-                    "definition": "Sent to the sponsor",
-                    "set_by": "The submitter",
-                    "next": [
-                      "Accepted",
-                      "Returned_for_Revision"
-                    ]
-                  },
-                  "Accepted": {
-                    "definition": "The sponsor accepted it",
-                    "set_by": "Recorded from the sponsor's communication",
-                    "next": []
-                  },
-                  "Returned_for_Revision": {
-                    "definition": "The sponsor sent it back for changes",
-                    "set_by": "Recorded from the sponsor's communication",
-                    "next": [
-                      "Drafted",
-                      "Submitted"
-                    ]
-                  },
-                  "Late": {
-                    "definition": "Past its due date and not submitted",
-                    "set_by": "Date-driven when Due_Date passes",
-                    "next": [
-                      "Drafted",
-                      "Submitted",
-                      "Waived"
-                    ]
-                  },
-                  "Waived": {
-                    "definition": "The sponsor no longer requires it",
-                    "set_by": "Recorded from the sponsor's communication",
-                    "next": []
-                  }
-                },
-                "description": "Constrained: Pending / Drafted / Submitted / Accepted / Returned_for_Revision / Late / Waived"
-              },
-              "Acceptance_Date": {
-                "type": "Date",
-                "required": false,
-                "conditional_required": "Required when Report_Status = 'Accepted'",
-                "description": "Required when Report_Status = 'Accepted'"
-              },
-              "Linked_Document_ID": {
-                "type": "ID",
-                "required": false,
-                "references": {
-                  "table": "Document",
-                  "column": "Document_ID"
-                },
-                "description": "The report file itself"
               }
             },
             "constraints": [
               {
-                "rule": "Exactly one of Award_ID or Subaward_ID is non-null."
+                "rule": "Deliverable_ID is unique: one Report per Deliverable."
               },
               {
-                "rule": "Submitted_Date and Submitted_By_Personnel_ID are required when Report_Status in {Submitted, Accepted, Returned_for_Revision}; Acceptance_Date is required when Report_Status = 'Accepted'."
+                "rule": "The referenced Deliverable has Deliverable_Type = 'Report'."
               }
             ]
           },
@@ -3706,9 +4015,9 @@
                 "required": true,
                 "allowed_values": [
                   "Not_Required",
-                  "Pending",
+                  "Not_Started",
                   "Submitted",
-                  "Accepted"
+                  "Fulfilled"
                 ],
                 "value_definitions": {
                   "Not_Required": {
@@ -3716,7 +4025,7 @@
                     "set_by": "Sponsored programs office",
                     "next": []
                   },
-                  "Pending": {
+                  "Not_Started": {
                     "definition": "Due and not yet submitted",
                     "set_by": "Sponsored programs office",
                     "next": [
@@ -3727,23 +4036,23 @@
                     "definition": "Sent to the sponsor",
                     "set_by": "The submitter",
                     "next": [
-                      "Accepted"
+                      "Fulfilled"
                     ]
                   },
-                  "Accepted": {
-                    "definition": "The sponsor accepted it",
+                  "Fulfilled": {
+                    "definition": "The sponsor reviewed and approved it",
                     "set_by": "Recorded from the sponsor's communication",
                     "next": []
                   }
                 },
-                "description": "Constrained: Not_Required / Pending / Submitted / Accepted"
+                "description": "Constrained: Not_Required / Not_Started / Submitted / Fulfilled"
               },
               "Final_Invoice_Status": {
                 "type": "Status",
                 "required": true,
                 "allowed_values": [
                   "Not_Required",
-                  "Pending",
+                  "Not_Started",
                   "Submitted",
                   "Paid"
                 ],
@@ -3753,7 +4062,7 @@
                     "set_by": "The financial office",
                     "next": []
                   },
-                  "Pending": {
+                  "Not_Started": {
                     "definition": "Due and not yet submitted",
                     "set_by": "The financial office",
                     "next": [
@@ -3761,19 +4070,19 @@
                     ]
                   },
                   "Submitted": {
-                    "definition": "Sent to the sponsor",
+                    "definition": "Sent to the sponsor, or received from the subrecipient",
                     "set_by": "The financial office",
                     "next": [
                       "Paid"
                     ]
                   },
                   "Paid": {
-                    "definition": "The sponsor paid it",
+                    "definition": "Paid by the sponsor, or paid to the subrecipient",
                     "set_by": "The financial office",
                     "next": []
                   }
                 },
-                "description": "Constrained: Not_Required / Pending / Submitted / Paid"
+                "description": "Constrained: Not_Required / Not_Started / Submitted / Paid"
               },
               "Equipment_Disposition_Status": {
                 "type": "Status",
@@ -3865,7 +4174,7 @@
               "Records_Retention_Start_Date": {
                 "type": "Date",
                 "required": false,
-                "description": "Typically the date the final FFR is accepted",
+                "description": "Typically the date the final financial report is submitted",
                 "synonyms": "Retention Start, Retention Begin"
               },
               "Records_Retention_End_Date": {
@@ -3919,7 +4228,7 @@
                     ]
                   },
                   "Reopened": {
-                    "definition": "Reopened after completion, for an audit finding or a late adjustment",
+                    "definition": "Closeout resumed because the agreement returned to Active or went to Adjusting",
                     "set_by": "Sponsored programs office",
                     "next": [
                       "In_Progress"
@@ -4046,7 +4355,7 @@
               "Each transmission is one SubmissionAttempt row. Re-submissions add attempts; the attempt history is the row sequence by Attempt_Number.",
               "Proposal.Submission_Status is the newest attempt's Attempt_Status; Proposal.Submission_Date and Submission_Version derive from the attempts.",
               "Sponsor tracking and confirmation identifiers live on the attempt, indexed, not in free text.",
-              "Package assembly artifacts, connection profiles, and retry mechanics are submission-tooling internals and live in the System of Engagement. The transmitted package itself is a Document attached to the attempt; its hash is Package_Hash.",
+              "Package assembly artifacts, connection profiles, and retry mechanics are submission-tooling internals and live in the System of Action. The transmitted package itself is a Document attached to the attempt; its hash is Package_Hash.",
               "A later minor release may add the sponsor's system as a named channel value; the Channel vocabulary is institution-extensible."
             ]
           }
@@ -4072,14 +4381,14 @@
             "sql": "CREATE VIEW vw_Subaward_With_Prime AS\nSELECT\n  s.Subaward_ID,\n  s.Subaward_Number,\n  s.Subaward_Status,\n  s.Subrecipient_Organization_ID,\n  s.Total_Subaward_Amount,\n  s.Original_Start_Date AS Sub_Start_Date,\n  s.Current_End_Date AS Sub_Current_End_Date,\n  s.Current_PI_Personnel_ID AS Sub_Current_PI_Personnel_ID,\n  p.Award_ID AS Prime_Award_ID,\n  p.Award_Number AS Prime_Award_Number,\n  p.FAIN AS Prime_FAIN,\n  p.Award_Status AS Prime_Award_Status,\n  p.Sponsor_Organization_ID AS Prime_Sponsor_Organization_ID\nFROM Subaward s\nLEFT JOIN Award p ON s.Prime_Award_ID = p.Award_ID\nWHERE s.Is_Active = true;"
           },
           {
-            "name": "vw_Overdue_Reports",
-            "purpose": "Reports whose Due_Date is in the past and whose Report_Status indicates they have not been accepted or waived.",
+            "name": "vw_Overdue_Deliverables",
+            "purpose": "Deliverables whose Due_Date is in the past and whose Deliverable_Status indicates they have not been fulfilled or waived, with report details where they apply.",
             "dialect": "mysql",
-            "sql": "CREATE VIEW vw_Overdue_Reports AS\nSELECT\n  r.Report_ID,\n  r.Award_ID,\n  r.Subaward_ID,\n  r.Report_Type,\n  r.Reporting_Period_Start_Date,\n  r.Reporting_Period_End_Date,\n  r.Due_Date,\n  r.Report_Status,\n  DATEDIFF(CURRENT_DATE, r.Due_Date) AS Days_Overdue\nFROM Report r\nWHERE r.Due_Date < CURRENT_DATE\n  AND r.Report_Status IN ('Pending', 'Drafted', 'Returned_for_Revision', 'Late')\n  AND r.Is_Active = true;"
+            "sql": "CREATE VIEW vw_Overdue_Deliverables AS\nSELECT\n  d.Deliverable_ID,\n  d.Award_ID,\n  d.Subaward_ID,\n  d.Deliverable_Type,\n  d.Description,\n  r.Report_Type,\n  r.Reporting_Period_Start_Date,\n  r.Reporting_Period_End_Date,\n  d.Due_Date,\n  d.Deliverable_Status,\n  DATEDIFF(CURRENT_DATE, d.Due_Date) AS Days_Overdue\nFROM Deliverable d\nLEFT JOIN Report r ON r.Deliverable_ID = d.Deliverable_ID\nWHERE d.Due_Date < CURRENT_DATE\n  AND d.Deliverable_Status IN ('Not_Started', 'Drafted', 'Returned_for_Revision', 'Late')\n  AND d.Is_Active = true;"
           },
           {
             "name": "vw_Award_Budget_Summary",
-            "purpose": "Original vs Current funding and end-date for each Award, showing the net effect of approved Modifications.",
+            "purpose": "Original vs Current funding and end-date for each Award, showing the net effect of Approved and Not_Required Modifications.",
             "dialect": "mysql",
             "sql": "CREATE VIEW vw_Award_Budget_Summary AS\nSELECT\n  a.Award_ID,\n  a.Award_Number,\n  a.Original_Total_Funded,\n  a.Current_Total_Funded,\n  (a.Current_Total_Funded - a.Original_Total_Funded) AS Net_Modification_Amount,\n  a.Original_End_Date,\n  a.Current_End_Date,\n  DATEDIFF(a.Current_End_Date, a.Original_End_Date) AS Days_Extended\nFROM Award a\nWHERE a.Is_Active = true;"
           },
@@ -4088,6 +4397,18 @@
             "purpose": "Approved Modifications with the Event_Type resolved to its canonical code and the financial / date impact surfaced. Excludes Reversed Modifications.",
             "dialect": "mysql",
             "sql": "CREATE VIEW vw_Approved_Modifications AS\nSELECT\n  m.Modification_ID,\n  m.Award_ID,\n  m.Subaward_ID,\n  m.Modification_Number,\n  m.Effective_Date,\n  av.Value_Code AS Event_Type_Code,\n  av.Canonical_Value_Code AS Canonical_Event_Type,\n  m.Funding_Change_Amount,\n  m.New_End_Date,\n  m.Approval_Status,\n  m.Description\nFROM Modification m\nJOIN AllowedValues av ON m.Event_Type_Value_ID = av.AllowedValue_ID\nWHERE m.Approval_Status = 'Approved'\n  AND m.Is_Active = true;"
+          },
+          {
+            "name": "vw_HERD_Expenditures",
+            "purpose": "R&D spending on sponsored awards, one row per transaction, with the HERD survey's categories worked out. Query it by fiscal year. See vignettes/herd-report.md.",
+            "dialect": "mysql",
+            "sql": "CREATE VIEW vw_HERD_Expenditures AS\nSELECT\n  t.Transaction_ID,\n  t.Transaction_Date,\n  a.Award_ID,\n  t.Transaction_Amount AS Amount,\n  o.Organization_ID AS Origin_Organization_ID,\n  (o.Sponsor_Type = 'Federal' AND ty.Code <> 'Cost_Share') AS Is_Federal,\n  CASE\n    WHEN ty.Code = 'Cost_Share' OR o.Sponsor_Type = 'Internal' THEN 'Institutional'\n    WHEN o.Sponsor_Type = 'Federal' THEN 'Federal'\n    WHEN o.Sponsor_Type IN ('State', 'Local') THEN 'State_Local'\n    WHEN o.Sponsor_Type = 'Industry' THEN 'Business'\n    WHEN o.Sponsor_Type = 'Nonprofit' THEN 'Nonprofit'\n    ELSE 'All_Other'\n  END AS Source_Of_Funds,\n  CASE\n    WHEN ty.Code = 'Cost_Share' THEN NULL\n    WHEN o.Sponsor_Type = 'Foreign_Government' THEN 'Foreign_Government'\n    WHEN o.Is_Foreign = true AND o.Sponsor_Type = 'Industry' THEN 'Business'\n    WHEN o.Is_Foreign = true AND o.Sponsor_Type = 'Nonprofit' THEN 'Nonprofit'\n    WHEN o.Is_Foreign = true AND o.Sponsor_Type = 'Higher_Ed' THEN 'Higher_Education'\n    WHEN o.Is_Foreign = true THEN 'All_Other'\n    ELSE NULL\n  END AS Foreign_Source,\n  CASE WHEN a.Instrument_Type = 'Contract' THEN 'Contract' ELSE 'Grant_Or_Other' END AS Agreement_Group,\n  a.Research_Character,\n  a.Is_Clinical_Trial,\n  a.Is_Flow_Through,\n  p.Sponsor_Type AS Passing_Sponsor_Type,\n  u.Is_Medical_School,\n  COALESCE(c.HERD_Cost_Type, 'Unmapped') AS HERD_Cost_Type,\n  r.Sponsor_Type AS Subrecipient_Sponsor_Type\nFROM Transaction t\nJOIN (\n  SELECT AllowedValue_ID, COALESCE(Canonical_Value_Code, Value_Code) AS Code\n  FROM AllowedValues\n) ty ON ty.AllowedValue_ID = t.Transaction_Type_Value_ID\nLEFT JOIN Subaward s ON s.Subaward_ID = t.Subaward_ID\nJOIN Award a ON a.Award_ID = COALESCE(t.Award_ID, s.Prime_Award_ID)\nJOIN Organization p ON p.Organization_ID = a.Sponsor_Organization_ID\nJOIN Organization o ON o.Organization_ID = CASE\n  WHEN a.Is_Flow_Through = true THEN a.Prime_Sponsor_Organization_ID\n  ELSE a.Sponsor_Organization_ID\nEND\nLEFT JOIN Organization u ON u.Organization_ID = a.Administering_Organization_ID\nLEFT JOIN Organization r ON r.Organization_ID = s.Subrecipient_Organization_ID\nLEFT JOIN Budget b ON b.Budget_ID = t.Budget_ID\nLEFT JOIN BudgetCategory c ON c.BudgetCategory_ID = b.Budget_Category_ID\nWHERE a.Activity_Type = 'Organized_Research'\n  AND ty.Code IN ('Expense', 'Cost_Transfer_In', 'Cost_Transfer_Out', 'Adjustment', 'Reversal', 'Cost_Share')\n  AND t.Is_Active = true;"
+          },
+          {
+            "name": "vw_HERD_Expenditures_By_Field",
+            "purpose": "vw_HERD_Expenditures with the HERD field of R&D, prorated by Allocation_Percent. Awards without a field show as Unmapped.",
+            "dialect": "mysql",
+            "sql": "CREATE VIEW vw_HERD_Expenditures_By_Field AS\nSELECT\n  h.Transaction_ID,\n  h.Transaction_Date,\n  h.Award_ID,\n  COALESCE(f.Value_Code, 'Unmapped') AS HERD_Field,\n  h.Amount * COALESCE(f.Allocation_Percent, 100) / 100 AS Amount,\n  h.Origin_Organization_ID,\n  h.Is_Federal,\n  h.Source_Of_Funds,\n  h.HERD_Cost_Type\nFROM vw_HERD_Expenditures h\nLEFT JOIN Classification f\n  ON f.Related_Entity_Type = 'Award'\n  AND f.Related_Entity_ID = h.Award_ID\n  AND f.Scheme = 'HERD_Field';"
           }
         ]
       },
@@ -4171,7 +4492,6 @@
                   "Co_I",
                   "Multi_PI",
                   "Coordinator",
-                  "Key_Personnel",
                   "Cohort_Participant",
                   "Coach",
                   "Mentor",
@@ -4603,7 +4923,7 @@
                     ]
                   },
                   "Current": {
-                    "definition": "The budget as revised by approved modifications",
+                    "definition": "The budget as revised by Approved or Not_Required modifications",
                     "set_by": "Sponsored programs office",
                     "next": [
                       "Current",
@@ -5110,7 +5430,8 @@
                 "required": false,
                 "allowed_values": [
                   "Offset",
-                  "Additive"
+                  "Additive",
+                  "Cost_Sharing"
                 ],
                 "value_definitions": {
                   "Offset": {
@@ -5118,10 +5439,13 @@
                   },
                   "Additive": {
                     "definition": "Program income adds to the project funds"
+                  },
+                  "Cost_Sharing": {
+                    "definition": "Program income counts toward the required cost share"
                   }
                 },
                 "conditional_required": "Required when Transaction_Type resolves to project income",
-                "description": "Constrained when present: Offset / Additive. Required when Transaction_Type resolves to project income",
+                "description": "Constrained when present: Offset / Additive / Cost_Sharing. Required when Transaction_Type resolves to project income",
                 "synonyms": "Project Income Handling, Income Disposition"
               },
               "Activity_Description": {
@@ -5340,7 +5664,7 @@
             }
           },
           "Payment": {
-            "description": "Payment records covering scheduled, invoiced, received, and reconciled stages.",
+            "description": "Money moving between the parties to an award or subaward, as the agreement's payment terms provide. This covers sponsor payments to the institution, institution payments to a subrecipient, and refunds. Ordinary expenses on the award, such as vendors, consultants, and salaries, are Transaction rows.",
             "columns": {
               "Payment_ID": {
                 "type": "ID",
@@ -5354,7 +5678,7 @@
                 "allowed_values": [
                   "Scheduled",
                   "Invoiced",
-                  "Received",
+                  "Paid",
                   "Reconciled"
                 ],
                 "value_definitions": {
@@ -5362,18 +5686,19 @@
                     "definition": "Expected under the payment terms; nothing billed yet",
                     "set_by": "The financial office",
                     "next": [
-                      "Invoiced"
+                      "Invoiced",
+                      "Paid"
                     ]
                   },
                   "Invoiced": {
                     "definition": "Billed; carries the invoice number",
                     "set_by": "The financial office",
                     "next": [
-                      "Received"
+                      "Paid"
                     ]
                   },
-                  "Received": {
-                    "definition": "Funds received",
+                  "Paid": {
+                    "definition": "The money has moved between the parties. An unplanned refund can start here",
                     "set_by": "The financial office",
                     "next": [
                       "Reconciled"
@@ -5385,7 +5710,7 @@
                     "next": []
                   }
                 },
-                "description": "Constrained: Scheduled / Invoiced / Received / Reconciled"
+                "description": "Constrained: Scheduled / Invoiced / Paid / Reconciled"
               },
               "Previous_Payment_ID": {
                 "type": "ID",
@@ -5419,6 +5744,23 @@
                   "Award_ID"
                 ],
                 "description": "Exactly one of Award_ID or Subaward_ID is non-null"
+              },
+              "Payment_Direction": {
+                "type": "Status",
+                "required": true,
+                "allowed_values": [
+                  "Incoming",
+                  "Outgoing"
+                ],
+                "value_definitions": {
+                  "Incoming": {
+                    "definition": "Money coming to the institution"
+                  },
+                  "Outgoing": {
+                    "definition": "Money leaving the institution"
+                  }
+                },
+                "description": "Which way the money moves. An Outgoing payment on an Award is a refund to the sponsor, and an Incoming payment on a Subaward is a refund from the subrecipient"
               },
               "Budget_ID": {
                 "type": "ID",
@@ -5459,69 +5801,49 @@
               "Actual_Date": {
                 "type": "Date",
                 "required": false,
-                "conditional_required": "Required when Lifecycle_Stage = 'Received' or later",
-                "description": "Required when Lifecycle_Stage = 'Received' or later",
+                "conditional_required": "Required when Lifecycle_Stage = 'Paid' or later",
+                "description": "Required when Lifecycle_Stage = 'Paid' or later",
                 "synonyms": "Payment Received Date, Receipt Date"
               },
               "Actual_Amount": {
                 "type": "Money",
                 "required": false,
-                "conditional_required": "Required when Lifecycle_Stage = 'Received' or later",
-                "description": "Required when Lifecycle_Stage = 'Received' or later",
+                "conditional_required": "Required when Lifecycle_Stage = 'Paid' or later",
+                "description": "Required when Lifecycle_Stage = 'Paid' or later",
                 "synonyms": "Amount Received, Paid Amount"
               },
               "Payment_Status": {
                 "type": "Status",
                 "required": true,
                 "allowed_values": [
-                  "Open",
-                  "Submitted",
-                  "Paid",
+                  "Clear",
                   "Disputed",
                   "Cancelled"
                 ],
                 "value_definitions": {
-                  "Open": {
-                    "definition": "Expected or billed; not yet paid",
+                  "Clear": {
+                    "definition": "Nothing is wrong with the payment",
                     "set_by": "The financial office",
                     "next": [
-                      "Submitted",
-                      "Paid",
                       "Disputed",
                       "Cancelled"
-                    ]
-                  },
-                  "Submitted": {
-                    "definition": "The invoice or draw request has gone to the payer",
-                    "set_by": "The financial office",
-                    "next": [
-                      "Paid",
-                      "Disputed",
-                      "Cancelled"
-                    ]
-                  },
-                  "Paid": {
-                    "definition": "Settled",
-                    "set_by": "The financial office",
-                    "next": [
-                      "Disputed"
                     ]
                   },
                   "Disputed": {
-                    "definition": "The payer or payee contests it",
+                    "definition": "The payer or payee contests the payment",
                     "set_by": "The financial office",
                     "next": [
-                      "Paid",
+                      "Clear",
                       "Cancelled"
                     ]
                   },
                   "Cancelled": {
-                    "definition": "Withdrawn; no payment will occur",
+                    "definition": "No payment will occur",
                     "set_by": "The financial office",
                     "next": []
                   }
                 },
-                "description": "Disposition; orthogonal to Lifecycle_Stage"
+                "description": "Whether anything is wrong with the payment; independent of Lifecycle_Stage, which says how far it has gone"
               }
             },
             "constraints": [
@@ -5535,7 +5857,7 @@
                 "rule": "Invoice_Number is required when Lifecycle_Stage = 'Invoiced' and later; unique within the parent agreement."
               },
               {
-                "rule": "Actual_Date and Actual_Amount are required when Lifecycle_Stage = 'Received' and later."
+                "rule": "Actual_Date and Actual_Amount are required when Lifecycle_Stage = 'Paid' and later."
               }
             ]
           },
@@ -5887,12 +6209,12 @@
         "conventions": [
           {
             "name": "Modification effect on the Budget chain",
-            "description": "A Modification creates a new Current-stage Budget row when it changes any Budget column. The discriminator is which Modification column is non-null, not the event type: Funding_Change_Amount marks a funding change, New_End_Date marks an end-date change. A Modification with both non-null gets both behaviors.",
+            "description": "A Modification creates a new Current-stage Budget row when it changes any Budget column. The discriminator is which Modification column is non-null, not the event type: Funding_Change_Amount marks a funding change, New_End_Date marks an end-date change. The exception is a Rebudget, or a Budget_Revision that does not change the total, which has neither and still changes category amounts. A Modification with both non-null gets both behaviors.",
             "discriminator_by_event_class": {
               "funding_changing": {
                 "events": [
                   "Funding_Change_Amount non-null",
-                  "typically Incremental_Funding, Supplement, Budget_Revision, Rebudget"
+                  "typically Incremental_Funding, Supplement, Budget_Revision"
                 ],
                 "behavior": "Change Amount-class columns. New Current row chains via Previous_Budget_ID to the prior Current row (or Approved if no Current exists) for the affected period; Period_End_Date matches the predecessor."
               },
@@ -5903,16 +6225,23 @@
                 ],
                 "behavior": "Change Period_End_Date on the last existing budget period of the affected anchor. New Current row chains from the prior latest Current row for that last period, Period_End_Date is set to match the new Award.Current_End_Date (or Subaward.Current_End_Date), and amounts stay unchanged."
               },
+              "category_moving": {
+                "events": [
+                  "Event type Rebudget, or a Budget_Revision that does not change the total",
+                  "Funding_Change_Amount null"
+                ],
+                "behavior": "Change Amount on the Current rows of the categories it moves money between, with the changes netting to zero. New Current rows chain via Previous_Budget_ID as for a funding change. Funding_Change_Amount stays null, so Current_Total_Funded does not change."
+              },
               "award_state_only": {
                 "events": [
-                  "Funding_Change_Amount and New_End_Date both null",
+                  "Funding_Change_Amount and New_End_Date both null, and not a category-moving event",
                   "PI_Change",
                   "Scope_Change"
                 ],
                 "behavior": "Change no Budget column. Do not create a new Budget row; change Award/Subaward state only (TeamRole row history for PI_Change, Award metadata for Scope_Change)."
               }
             },
-            "version_number_rule": "Version_Number increments per revision on the same (Proposal_ID, post-award anchor, Period_Start_Date) key for both funding-changing and end-date-changing events.",
+            "version_number_rule": "Version_Number increments per revision on the same (Proposal_ID, post-award anchor, Period_Start_Date) key for funding-changing, category-moving, and end-date-changing events.",
             "chain_identity": "Because Budget.Proposal_ID is required at every Lifecycle_Stage, the chain identity is stable across Proposed -> Approved -> Current -> Actual; Award_ID / Subaward_ID is added at Approved+ as the post-award disambiguation anchor without invalidating the Proposal anchor.",
             "current_stage_immutability": "Chain immutability extends to same-stage parenting on Current: once a Current row has a Current descendant via Previous_Budget_ID, the predecessor's amounts and period dates are frozen.",
             "reversal": "When a Modification's Approval_Status becomes Reversed, the Current-stage Budget rows it created are marked Is_Active = false, and the prior Current row for each affected period becomes the active leaf again. No row is edited. The derived Award and Subaward columns already exclude a Reversed Modification, so the chain and the derivations agree."
@@ -5936,7 +6265,7 @@
                 "primary_key": true,
                 "required": true,
                 "description": "PK",
-                "synonyms": "Protocol ID, Compliance ID, Requirement ID"
+                "synonyms": "Compliance ID, Requirement ID"
               },
               "Previous_ComplianceRequirement_ID": {
                 "type": "ID",
@@ -6473,7 +6802,7 @@
             ]
           },
           "OtherSupport": {
-            "description": "A Personnel record's external research support (current, pending, in-kind). The fact of outside support, person-anchored.",
+            "description": "A Personnel record's research support in an other-support disclosure (current, pending, in-kind) that isn't already recorded as a Proposal or Award. A complete disclosure combines these rows with the person's own proposals and awards. Person-anchored.",
             "columns": {
               "OtherSupport_ID": {
                 "type": "ID",
@@ -6657,7 +6986,7 @@
             }
           },
           "PolicyException": {
-            "description": "An institutionally granted exception to a sponsor or institutional policy rule: PI-eligibility waivers, COI management exceptions, cost-share waivers, indirect-rate exceptions. Scoped to a Personnel record, optionally narrowed to one Proposal, Award, or Subaward; all three scope FKs null means a blanket exception for the person.",
+            "description": "An institutionally granted exception to a sponsor or institutional policy rule: PI-eligibility waivers, COI management exceptions, cost-share waivers, indirect-rate exceptions. Scoped to a person, to one Proposal, Award, or Subaward, or to a person within one of those. A person with all three scope FKs null means a blanket exception for that person.",
             "columns": {
               "PolicyException_ID": {
                 "type": "ID",
@@ -6667,12 +6996,12 @@
               },
               "Personnel_ID": {
                 "type": "ID",
-                "required": true,
+                "required": false,
                 "references": {
                   "table": "Personnel",
                   "column": "Personnel_ID"
                 },
-                "description": "The person to whom the exception is granted"
+                "description": "The person to whom the exception is granted; null when the exception belongs to a Proposal, Award, or Subaward rather than a person"
               },
               "Policy_Rule_Code": {
                 "type": "ShortCode",
@@ -6807,7 +7136,7 @@
             },
             "constraints": [
               {
-                "rule": "At most one of Proposal_ID, Award_ID, Subaward_ID is non-null. All three null means a blanket exception scoped to the person.",
+                "rule": "At most one of Proposal_ID, Award_ID, Subaward_ID is non-null. At least one of Personnel_ID, Proposal_ID, Award_ID, Subaward_ID is non-null. Personnel_ID with all three null means a blanket exception scoped to the person.",
                 "structured": {
                   "type": "at_most_one_of",
                   "columns": [
@@ -6851,7 +7180,7 @@
             "description": "Three tables touch outside-relationship facts; each answers a different question.",
             "tables": {
               "ConflictOfInterest": "What did this person disclose to the institution's COI office, and what was the review outcome. Personal disclosure with Relationship_Type (Financial / Consulting / Employment / Equity / Royalty / Board_Membership) and Review_Outcome.",
-              "OtherSupport": "What active and pending support does this person have on a sponsor biosketch. Sponsor-facing, with Support_Type (Current / Pending / In_Kind) and effort commitment.",
+              "OtherSupport": "What active and pending support does this person have in an other-support disclosure, beyond what is already recorded as a Proposal or Award. A complete disclosure combines these rows with the person's own proposals and awards. Sponsor-facing, with Support_Type (Current / Pending / In_Kind) and effort commitment.",
               "ComplianceRequirement with Requirement_Type = 'COI'": "What is the institutional COI compliance regime under which the disclosures are filed (the annual attestation cycle, the training requirement, the policy artifact)."
             },
             "link_rule": "When ConflictOfInterest and OtherSupport describe the same engagement, the ConflictOfInterest.OtherSupport_ID FK links them. The link is optional; many COI disclosures (royalties, board memberships without active support) have no OtherSupport counterpart.",
@@ -6908,7 +7237,7 @@
                   "Budget",
                   "Negotiation",
                   "Terms",
-                  "Report",
+                  "Deliverable",
                   "Closeout",
                   "Equipment"
                 ],
@@ -6958,8 +7287,8 @@
                   "Terms": {
                     "definition": "An agreement's terms"
                   },
-                  "Report": {
-                    "definition": "A report"
+                  "Deliverable": {
+                    "definition": "A deliverable"
                   },
                   "Closeout": {
                     "definition": "A closeout"
@@ -6968,7 +7297,7 @@
                     "definition": "An equipment item"
                   }
                 },
-                "description": "Constrained: Award / Subaward / Proposal / SubmissionAttempt / Approval / PreAwardAuthorization / Personnel / PersonnelCredential / ComplianceRequirement / Modification / Action / Restriction / Budget / Negotiation / Terms / Report / Closeout / Equipment"
+                "description": "Constrained: Award / Subaward / Proposal / SubmissionAttempt / Approval / PreAwardAuthorization / Personnel / PersonnelCredential / ComplianceRequirement / Modification / Action / Restriction / Budget / Negotiation / Terms / Deliverable / Closeout / Equipment"
               },
               "Related_Entity_ID": {
                 "type": "ID",
@@ -7087,7 +7416,7 @@
                   "ComplianceRequirement",
                   "Personnel",
                   "Closeout",
-                  "Report"
+                  "Deliverable"
                 ],
                 "value_definitions": {
                   "Award": {
@@ -7123,11 +7452,11 @@
                   "Closeout": {
                     "definition": "A closeout"
                   },
-                  "Report": {
-                    "definition": "A report"
+                  "Deliverable": {
+                    "definition": "A deliverable"
                   }
                 },
-                "description": "Constrained: Award / Subaward / Proposal / SubmissionAttempt / RFA / Modification / Negotiation / Terms / ComplianceRequirement / Personnel / Closeout / Report"
+                "description": "Constrained: Award / Subaward / Proposal / SubmissionAttempt / RFA / Modification / Negotiation / Terms / ComplianceRequirement / Personnel / Closeout / Deliverable"
               },
               "Related_Entity_ID": {
                 "type": "ID",
@@ -7412,7 +7741,7 @@
                   "Modification",
                   "RFA",
                   "Closeout",
-                  "Report",
+                  "Deliverable",
                   "Communication"
                 ],
                 "value_definitions": {
@@ -7440,14 +7769,14 @@
                   "Closeout": {
                     "definition": "A closeout"
                   },
-                  "Report": {
-                    "definition": "A report"
+                  "Deliverable": {
+                    "definition": "A deliverable"
                   },
                   "Communication": {
                     "definition": "A communication"
                   }
                 },
-                "description": "Constrained: Award / Subaward / Proposal / Approval / ComplianceRequirement / Modification / RFA / Closeout / Report / Communication"
+                "description": "Constrained: Award / Subaward / Proposal / Approval / ComplianceRequirement / Modification / RFA / Closeout / Deliverable / Communication"
               },
               "Related_Entity_ID": {
                 "type": "ID",
@@ -7588,6 +7917,7 @@
                 "required": true,
                 "allowed_values": [
                   "NSF_Science_Code",
+                  "HERD_Field",
                   "NIH_MeSH",
                   "Institution_Research_Area",
                   "Free_Tag"
@@ -7604,9 +7934,12 @@
                   },
                   "Free_Tag": {
                     "definition": "A free-form tag"
+                  },
+                  "HERD_Field": {
+                    "definition": "A field of R&D from the HERD survey's list"
                   }
                 },
-                "description": "Constrained: NSF_Science_Code / NIH_MeSH / Institution_Research_Area / Free_Tag"
+                "description": "Constrained: NSF_Science_Code / HERD_Field / NIH_MeSH / Institution_Research_Area / Free_Tag"
               },
               "Value_Code": {
                 "type": "ShortName",
@@ -7622,11 +7955,21 @@
                 "type": "Count",
                 "required": false,
                 "description": "When the entity carries multiple classifications, the order to display them"
+              },
+              "Allocation_Percent": {
+                "type": "Percent",
+                "required": false,
+                "description": "The share of the entity in this classification, for prorating across fields. Values for one entity and scheme total 100 when present"
               }
-            }
+            },
+            "constraints": [
+              {
+                "rule": "Allocation_Percent is between 0 and 100, and when present the values for one entity and Scheme total 100."
+              }
+            ]
           },
           "Action": {
-            "description": "Work items attached to entities: deliverables, checklist items, service requests, modification approvals, compliance renewals, training requirements. Worklist-style: tells you WHAT and WHO.",
+            "description": "Work items attached to entities: checklist items, service requests, modification approvals, compliance renewals, training requirements. Worklist-style: tells you WHAT and WHO.",
             "columns": {
               "Action_ID": {
                 "type": "ID",
@@ -7649,7 +7992,7 @@
                   "Negotiation",
                   "Terms",
                   "Closeout",
-                  "Report",
+                  "Deliverable",
                   "Equipment"
                 ],
                 "value_definitions": {
@@ -7686,14 +8029,14 @@
                   "Closeout": {
                     "definition": "A closeout"
                   },
-                  "Report": {
-                    "definition": "A report"
+                  "Deliverable": {
+                    "definition": "A deliverable"
                   },
                   "Equipment": {
                     "definition": "An equipment item"
                   }
                 },
-                "description": "Constrained: Award / Subaward / Proposal / Approval / PreAwardAuthorization / Personnel / ComplianceRequirement / Modification / Negotiation / Terms / Closeout / Report / Equipment"
+                "description": "Constrained: Award / Subaward / Proposal / Approval / PreAwardAuthorization / Personnel / ComplianceRequirement / Modification / Negotiation / Terms / Closeout / Deliverable / Equipment"
               },
               "Related_Entity_ID": {
                 "type": "ID",
@@ -7709,7 +8052,6 @@
                 },
                 "value_group": "ActionType",
                 "recommended_values": [
-                  "Deliverable",
                   "Checklist_Item",
                   "Service_Request",
                   "Modification_Approval",
@@ -7717,6 +8059,7 @@
                   "Training_Required",
                   "Training_Completion",
                   "Subrecipient_Risk_Review",
+                  "Monitoring_Exception",
                   "Cost_Transfer_Approval",
                   "JIT_Request",
                   "Other"
@@ -7771,7 +8114,7 @@
                   "Blocked",
                   "Completed",
                   "Cancelled",
-                  "Failed"
+                  "Unsuccessful"
                 ],
                 "value_definitions": {
                   "Open": {
@@ -7782,7 +8125,7 @@
                       "Blocked",
                       "Completed",
                       "Cancelled",
-                      "Failed"
+                      "Unsuccessful"
                     ]
                   },
                   "In_Progress": {
@@ -7792,7 +8135,7 @@
                       "Blocked",
                       "Completed",
                       "Cancelled",
-                      "Failed"
+                      "Unsuccessful"
                     ]
                   },
                   "Blocked": {
@@ -7809,17 +8152,17 @@
                     "next": []
                   },
                   "Cancelled": {
-                    "definition": "Abandoned without an attempt",
+                    "definition": "The task was stopped before it finished and won't be completed",
                     "set_by": "The requester or assignee",
                     "next": []
                   },
-                  "Failed": {
-                    "definition": "Attempted and did not achieve its outcome",
+                  "Unsuccessful": {
+                    "definition": "The task was attempted and did not achieve its outcome",
                     "set_by": "The assignee",
                     "next": []
                   }
                 },
-                "description": "The work item's state. Blocked is waiting on something outside the assignee's control; Completed and Failed are the terminal outcomes of an attempted action; Cancelled is abandoned without an attempt"
+                "description": "The work item's state. Blocked is waiting on something outside the assignee's control; Completed and Unsuccessful are the outcomes of an attempted action; Cancelled was stopped before it finished"
               },
               "Priority": {
                 "type": "Status",
@@ -7850,8 +8193,8 @@
               "Completed_Date": {
                 "type": "Date",
                 "required": false,
-                "conditional_required": "Required when Action_Status is 'Completed' or 'Failed'",
-                "description": "The date the action reached its terminal outcome. Required when Action_Status is 'Completed' or 'Failed'"
+                "conditional_required": "Required when Action_Status is 'Completed' or 'Unsuccessful'",
+                "description": "The date the action reached its terminal outcome. Required when Action_Status is 'Completed' or 'Unsuccessful'"
               },
               "Origin": {
                 "type": "Status",
@@ -7915,7 +8258,7 @@
                   "Subaward",
                   "PreAwardAuthorization",
                   "Closeout",
-                  "Report"
+                  "Deliverable"
                 ],
                 "value_definitions": {
                   "Proposal": {
@@ -7933,11 +8276,11 @@
                   "Closeout": {
                     "definition": "Closeout sign-offs"
                   },
-                  "Report": {
-                    "definition": "Internal sign-off on a report before submission"
+                  "Deliverable": {
+                    "definition": "Internal sign-off on a deliverable before submission"
                   }
                 },
-                "description": "Constrained: Proposal / Modification / Subaward / PreAwardAuthorization / Closeout / Report. The kind of record being routed"
+                "description": "Constrained: Proposal / Modification / Subaward / PreAwardAuthorization / Closeout / Deliverable. The kind of record being routed"
               },
               "Related_Entity_ID": {
                 "type": "ID",
@@ -8353,7 +8696,7 @@
         "conventions": [
           {
             "name": "Deadline vs first-class due dates",
-            "description": "Several entities carry their own due-date columns (Report.Due_Date, Closeout milestones, RFA.Submission_Deadline, RFA.LOI_Deadline, ComplianceRequirement.Expiration_Date). The Deadline attachment is for ad-hoc obligations that don't have a first-class entity. Use Deadline only for obligations that don't otherwise have a structured home."
+            "description": "Several entities carry their own due-date columns (Deliverable.Due_Date, Closeout milestones, RFA.Submission_Deadline, RFA.LOI_Deadline, ComplianceRequirement.Expiration_Date). The Deadline attachment is for ad-hoc obligations that don't have a first-class entity. Use Deadline only for obligations that don't otherwise have a structured home."
           },
           {
             "name": "Attachments vs row properties",
@@ -8419,6 +8762,15 @@
                 "required": true,
                 "description": "PK",
                 "primary_key": true
+              },
+              "ComplianceRequirement_ID": {
+                "type": "ID",
+                "required": true,
+                "references": {
+                  "table": "ComplianceRequirement",
+                  "column": "ComplianceRequirement_ID"
+                },
+                "description": "The core approval this protocol details. The ComplianceRequirement is authoritative for the approval number and dates that awards rely on"
               },
               "Parent_Protocol_ID": {
                 "type": "ID",
@@ -8628,6 +8980,9 @@
                     "Approved_Date"
                   ]
                 }
+              },
+              {
+                "rule": "Where Protocol and its ComplianceRequirement disagree on the approval number or dates, the ComplianceRequirement is authoritative."
               }
             ]
           },
@@ -10944,6 +11299,43 @@
             "type": "Boolean",
             "required": true,
             "description": "True for direct-cost categories; false for indirect-cost categories"
+          },
+          "HERD_Cost_Type": {
+            "type": "Status",
+            "required": false,
+            "allowed_values": [
+              "Salaries_Wages_Fringe",
+              "Noncapitalized_Software",
+              "Capitalized_Software",
+              "Capitalized_Equipment",
+              "Pass_Through",
+              "Other_Direct",
+              "Indirect"
+            ],
+            "value_definitions": {
+              "Salaries_Wages_Fringe": {
+                "definition": "Compensation for R&D personnel, including fringe benefits"
+              },
+              "Noncapitalized_Software": {
+                "definition": "Software purchases and license fees below the capitalization threshold"
+              },
+              "Capitalized_Software": {
+                "definition": "Software above the capitalization threshold"
+              },
+              "Capitalized_Equipment": {
+                "definition": "Movable equipment above the capitalization threshold, including delivery and setup"
+              },
+              "Pass_Through": {
+                "definition": "Funds passed to subrecipients"
+              },
+              "Other_Direct": {
+                "definition": "Other direct costs, such as travel, tuition, consulting, computer usage, and supplies"
+              },
+              "Indirect": {
+                "definition": "Indirect costs"
+              }
+            },
+            "description": "The HERD survey's type of cost for this category. Constrained when present: Salaries_Wages_Fringe / Noncapitalized_Software / Capitalized_Software / Capitalized_Equipment / Pass_Through / Other_Direct / Indirect"
           }
         }
       }

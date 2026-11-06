@@ -32,3 +32,6 @@ docs/assets/index-*.css
 docs/data/
 docs/schemas/
 docs/ddl/
+
+# Python bytecode
+__pycache__/

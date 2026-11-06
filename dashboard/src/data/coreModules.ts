@@ -35,6 +35,7 @@ export const coreModuleGroups: CoreModuleGroup[] = [
       'Subaward',
       'Negotiation',
       'Terms',
+      'Deliverable',
       'Report',
       'Closeout',
     ],

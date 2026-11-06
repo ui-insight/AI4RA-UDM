@@ -39,7 +39,7 @@ JOIN Award a ON a.Award_ID = ar.Award_ID
 JOIN Organization org ON org.Organization_ID = a.Sponsor_Organization_ID
 JOIN AllowedValues av ON av.AllowedValue_ID = ar.Role_Value_ID
 WHERE av.Value_Code IN ('Primary_Investigator', 'Contact_PI', 'Multi_PI')
-  AND a.Award_Status NOT IN ('Closed', 'Terminated')
+  AND a.Award_Status NOT IN ('Closed', 'Adjusting', 'Terminated')
   AND (ar.End_Date IS NULL OR ar.End_Date > CURRENT_DATE);
 ```
 
@@ -74,7 +74,7 @@ SELECT
   MAX(CASE WHEN ac.Requirement_Type = 'IBC' THEN 'Covered' ELSE 'Missing' END) AS IBC_Status
 FROM Award a
 LEFT JOIN active_coverage ac ON ac.Award_ID = a.Award_ID
-WHERE a.Award_Status NOT IN ('Closed', 'Terminated')
+WHERE a.Award_Status NOT IN ('Closed', 'Adjusting', 'Terminated')
 GROUP BY a.Award_ID, a.Award_Title;
 ```
 
@@ -154,11 +154,11 @@ SELECT
   a.Award_Title,
   a.Original_Total_Funded,
   COALESCE(
-    a.Original_Total_Funded + SUM(m.Funding_Change_Amount) FILTER (WHERE m.Approval_Status = 'Approved'),
+    a.Original_Total_Funded + SUM(m.Funding_Change_Amount) FILTER (WHERE m.Approval_Status IN ('Approved', 'Not_Required')),
     a.Original_Total_Funded
   ) AS Calculated_Current_Total_Funded,
   COALESCE(
-    MAX(m.Approved_End_Date) FILTER (WHERE m.Approval_Status = 'Approved' AND m.Event_Type_Value_ID = (SELECT AllowedValue_ID FROM AllowedValues WHERE Value_Code = 'NCE')),
+    MAX(m.Approved_End_Date) FILTER (WHERE m.Approval_Status IN ('Approved', 'Not_Required') AND m.Event_Type_Value_ID = (SELECT AllowedValue_ID FROM AllowedValues WHERE Value_Code = 'NCE')),
     a.Original_End_Date
   ) AS Calculated_Current_End_Date,
   a.Current_Total_Funded AS Stored_Current_Total_Funded,
@@ -216,7 +216,7 @@ SELECT
     WHEN 'Proposal' THEN (SELECT Proposal_Title FROM Proposal WHERE Proposal_ID = d.Related_Entity_ID)
     WHEN 'Award' THEN (SELECT Award_Title FROM Award WHERE Award_ID = d.Related_Entity_ID)
     WHEN 'ComplianceRequirement' THEN (SELECT Compliance_Number FROM ComplianceRequirement WHERE ComplianceRequirement_ID = d.Related_Entity_ID)
-    WHEN 'Report' THEN (SELECT Report_Type FROM Report WHERE Report_ID = d.Related_Entity_ID)
+    WHEN 'Deliverable' THEN (SELECT Deliverable_Type FROM Deliverable WHERE Deliverable_ID = d.Related_Entity_ID)
     ELSE NULL
   END AS Subject_Display
 FROM Deadline d
@@ -356,7 +356,8 @@ FROM Proposal p
 JOIN RFARequirement r ON r.RFA_ID = p.RFA_ID
 LEFT JOIN proposal_docs pd ON pd.Proposal_ID = p.Proposal_ID AND pd.Document_Type_Code = r.Requirement_Code
 LEFT JOIN proposal_compliance pc ON pc.Proposal_ID = p.Proposal_ID
-WHERE p.Internal_Approval_Status NOT IN ('Withdrawn', 'Rejected')
+WHERE p.Internal_Approval_Status <> 'Rejected'
+  AND p.Decision_Status <> 'Withdrawn'
 ORDER BY p.Proposal_ID, r.Sort_Order;
 ```
 

@@ -16,10 +16,11 @@ Application infrastructure that is not source-of-truth research-admin data and i
 - **In-flight wizard drafts.** Partial form data being saved between page transitions or autosaves, before the data is finalized into UDM.
 - **Application configuration.** Feature flags, UI preferences, institutional branding, integration endpoint URLs.
 - **Observability events.** Operator actions, page views, telemetry events, audit traces of explicit user behavior that are not row changes to UDM data.
-- **Notifications and inbox state.** Front-end notification queues, read/unread state, user notification preferences.
-- **Job queues and worker state.** Background-job records, retry counts, dead-letter queues.
+- **Inbox state.** Read/unread state and user notification preferences.
 
-The SoE is the OLTP layer in the three-layer architecture: optimized for many small writes, indexed point-lookups, sub-second response, ACID transactions, high concurrency on individual rows. PostgreSQL is the typical choice; any transactional database with appropriate semantics works.
+Automated work belongs to the System of Action rather than here: workflow and job runs, retry counts, dead-letter queues, submission tooling, and sending notifications. An institution may run both on the same database, but they answer different questions: the SoE is where people do the work, and the System of Action is where software does it on their behalf.
+
+The SoE is the OLTP layer in the four-layer architecture: optimized for many small writes, indexed point-lookups, sub-second response, ACID transactions, high concurrency on individual rows. PostgreSQL is the typical choice; any transactional database with appropriate semantics works.
 
 ---
 
