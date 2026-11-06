@@ -13,10 +13,16 @@ interface Tip {
   left: number;
   top?: number; // below the box
   bottom?: number; // above the box, when there's no room below
+  fill: string;
+  stroke: string;
+  color: string;
 }
 
 const TIP_WIDTH = 320;
 const TIP_MARGIN = 8;
+// Withdrawn's box is half amber and half red, and a tooltip can't use its gradient.
+const SOLID_FILL = '#fef3c7';
+const SOLID_STROKE = '#b45309';
 const TIP_ROOM = 220; // room to leave below a box before the tooltip moves above it
 
 // Every "Table.Column=Value" reference in the glossary, in lower case.
@@ -85,11 +91,19 @@ export default function StatusChart({ svg, idPrefix, minWidth }: Props) {
 
     const show = (box: SVGGElement, term: GlossaryTerm) => {
       const r = box.getBoundingClientRect();
+      const shape = box.querySelector('rect');
+      const fill = shape?.getAttribute('fill') ?? '';
+      const stroke = shape?.getAttribute('stroke') ?? '';
+      const colors = {
+        fill: fill.startsWith('url') ? SOLID_FILL : fill,
+        stroke: stroke.startsWith('url') ? SOLID_STROKE : stroke,
+        color: box.querySelector('text')?.getAttribute('fill') ?? '#1e293b',
+      };
       const left = Math.max(TIP_MARGIN, Math.min(r.left, window.innerWidth - Math.min(TIP_WIDTH, window.innerWidth - 2 * TIP_MARGIN) - TIP_MARGIN));
       setTip(
         r.bottom + TIP_ROOM > window.innerHeight
-          ? { term, left, bottom: window.innerHeight - r.top + TIP_MARGIN }
-          : { term, left, top: r.bottom + TIP_MARGIN },
+          ? { term, left, bottom: window.innerHeight - r.top + TIP_MARGIN, ...colors }
+          : { term, left, top: r.bottom + TIP_MARGIN, ...colors },
       );
     };
     const hide = () => setTip(null);
@@ -134,7 +148,8 @@ export default function StatusChart({ svg, idPrefix, minWidth }: Props) {
           style={{
             position: 'fixed', left: tip.left, top: tip.top, bottom: tip.bottom, zIndex: 1000,
             width: TIP_WIDTH, maxWidth: `calc(100vw - ${2 * TIP_MARGIN}px)`,
-            background: '#1e293b', color: 'white', borderRadius: 6, padding: '0.6rem 0.8rem',
+            background: tip.fill, color: tip.color, border: `1.5px solid ${tip.stroke}`,
+            borderRadius: 6, padding: '0.6rem 0.8rem',
             fontSize: '0.85rem', lineHeight: 1.45, boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
             pointerEvents: 'none',
           }}
