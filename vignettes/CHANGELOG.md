@@ -7,7 +7,7 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 - **MINOR** when entities or columns are added in a backward-compatible way
 - **PATCH** for documentation, convention clarifications, or fixes to non-load-bearing rules
 
-## [6.0.0] - 2026-11-06
+## [6.1.0] - 2026-11-06
 
 - **`Submission_Status` drops `Unapproved` (breaking).** `Internal_Approval_Status` already holds that fact, so a proposal that isn't approved is `Unsubmitted`. No attempt can be created until the proposal is approved.
 - **`Submitting` is removed from `Submission_Status` and `Attempt_Status` (breaking).** A transmission takes moments and is the sending application's concern, so the UDM records the result, `Submitted` or `Failed`. The glossary keeps the term, and the chart shows it as an arrow label.
