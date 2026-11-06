@@ -5,6 +5,7 @@ Check glossary.json against udm_schema.json.
 Fails when:
   - a term's "udm" reference names a table, column, or value the schema lacks
   - a status value on a lifecycle column has no glossary term
+  - a box on a status chart has no glossary term for its tooltip
   - terms are duplicated, unsorted, missing a field, or in an undeclared domain
   - a definition states a dollar amount or a year
   - dashboard/src/data/glossary.ts is out of date
@@ -35,7 +36,41 @@ LIFECYCLE_COLUMNS = [
     ("Payment", "Payment_Status"),
     ("Deliverable", "Deliverable_Status"),
     ("Action", "Action_Status"),
+    ("ComplianceRequirement", "Requirement_Status"),
+    ("Closeout", "Closeout_Status"),
+    ("Budget", "Lifecycle_Stage"),
+    ("Effort", "Lifecycle_Stage"),
+    ("CostShare", "Lifecycle_Stage"),
 ]
+
+CHARTS = sorted((ROOT / "dashboard" / "src" / "assets").glob("*status*.svg")) + sorted(
+    (ROOT / "dashboard" / "src" / "assets").glob("*lifecycle*.svg")
+)
+CHART_RECORD = re.compile(r'<text x="[\d.]+" y="([\d.]+)" font-size="12" fill="#64748b">([^<]*)</text>')
+CHART_COLUMN = re.compile(r'<text x="[\d.]+" y="([\d.]+)"[^>]*font-family="Menlo[^>]*>([^<]*)</text>')
+CHART_BOX = re.compile(r'<rect x="[\d.]+" y="([\d.]+)" width="[\d.]+" height="\d+" rx="7"[^>]*/><text[^>]*font-weight="600"[^>]*>([^<]*)</text>')
+
+
+def chart_problems(path, referenced):
+    """Name the chart boxes the dashboard could not match to a glossary term.
+
+    Follows the lookup in dashboard/src/components/Statuses/StatusChart.tsx.
+    """
+    text = path.read_text(encoding="utf-8")
+    records = [(float(y), name) for y, name in CHART_RECORD.findall(text)]
+    columns = [(float(y), name) for y, name in CHART_COLUMN.findall(text)]
+    boxes = CHART_BOX.findall(text)
+    if not boxes:
+        return [f"{path.name}: found no status boxes"]
+    known = {ref.lower() for ref in referenced}
+    problems = []
+    for y, label in boxes:
+        record = [name for top, name in records if top - 60 <= float(y)][-1]
+        column = [name for top, name in columns if top - 40 <= float(y)][-1]
+        key = f"{record}.{column}={label.replace(' ', '_')}".lower()
+        if key not in known and not any(ref.startswith(key + "_") for ref in known):
+            problems.append(f"{path.name}: no glossary term for the {label} box ({record}.{column})")
+    return problems
 
 
 def collect_tables(node, tables):
@@ -100,6 +135,8 @@ def main():
         for value in tables[table]["columns"][column].get("allowed_values", []):
             if f"{table}.{column}={value}" not in referenced:
                 errors.append(f"no glossary term for {table}.{column}={value}")
+    for chart in CHARTS:
+        errors.extend(chart_problems(chart, referenced))
     if TS_OUT.read_text(encoding="utf-8") != render_ts(data):
         errors.append("dashboard/src/data/glossary.ts is out of date; run scripts/generate_glossary.py")
     for error in errors:
