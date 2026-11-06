@@ -43,6 +43,11 @@ export default function GlossaryTab() {
           source systems, and on research analytics dashboards. For the tables and columns themselves,
           see the Data Dictionary tab.
         </p>
+        <p style={{ color: '#546e7a', marginBottom: '1.5rem' }}>
+          A record holds one value in each status field at a time. A proposal has several status
+          fields, one for each stage, and they move separately. The Infrastructure tab charts how
+          the statuses connect.
+        </p>
 
         <input
           type="search"
