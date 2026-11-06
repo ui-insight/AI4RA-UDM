@@ -22,6 +22,8 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 - **`vignettes/allowedvalues.md` is generated from the schema** by `scripts/generate_allowed_values_doc.py`, and CI fails if it's out of date. It replaces a document describing tables from before v2.
 - **Dashboard: Design tab.** Ontology & Design is renamed Design. Its two pattern sections are merged, and it explains how the medallion layers relate to the System of Record and states the rules for keeping meaning consistent.
 - **Dashboard: endpoints.** Home points to the list on Infrastructure, which now includes `example-views.json`.
+- **`vignettes/ontology.md` is current.** It no longer names a fixed version, uses the current award statuses, lists every example view, and describes the schema as engine-neutral.
+- **Workshop slide deck removed from the site.** It described an earlier version of the model. It's kept on the `presentation/2026-workshop-deck` branch to update later.
 - **CI runs on pull requests.** The checks and build now run on pull requests into `main`, without deploying.
 
 ### Statuses (breaking)
