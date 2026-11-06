@@ -154,11 +154,11 @@ SELECT
   a.Award_Title,
   a.Original_Total_Funded,
   COALESCE(
-    a.Original_Total_Funded + SUM(m.Funding_Change_Amount) FILTER (WHERE m.Approval_Status = 'Approved'),
+    a.Original_Total_Funded + SUM(m.Funding_Change_Amount) FILTER (WHERE m.Approval_Status IN ('Approved', 'Not_Required')),
     a.Original_Total_Funded
   ) AS Calculated_Current_Total_Funded,
   COALESCE(
-    MAX(m.Approved_End_Date) FILTER (WHERE m.Approval_Status = 'Approved' AND m.Event_Type_Value_ID = (SELECT AllowedValue_ID FROM AllowedValues WHERE Value_Code = 'NCE')),
+    MAX(m.Approved_End_Date) FILTER (WHERE m.Approval_Status IN ('Approved', 'Not_Required') AND m.Event_Type_Value_ID = (SELECT AllowedValue_ID FROM AllowedValues WHERE Value_Code = 'NCE')),
     a.Original_End_Date
   ) AS Calculated_Current_End_Date,
   a.Current_Total_Funded AS Stored_Current_Total_Funded,

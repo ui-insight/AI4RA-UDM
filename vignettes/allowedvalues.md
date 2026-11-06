@@ -131,7 +131,7 @@ The following tables use CHECK constraints for standardized enumerations:
 - Rationale: Federal indirect cost rate bases
 
 ### Subaward
-- **Subaward_Status**: `'Proposed','In_Setup','Active','Suspended','Closing','Closed','Adjusting','Terminated'`
+- **Subaward_Status**: `'Proposed','In_Setup','Active','Suspended','Closing','Closed','Adjusting','Terminated','Not_Issued'`
 - **Risk_Level**: `'Low','Medium','High'`
 - Rationale: Standard subaward lifecycle and risk classifications
 

@@ -227,15 +227,16 @@ Structural mechanisms (`Previous_*_ID`, `Parent_*_ID`, `Proposal_ID`, `Prime_Awa
 
 **Originating_*_ID semantics for root rows.** `Originating_Proposal_ID` and `Originating_Award_ID` are derived stored columns that point at the root of the `Previous_*_ID` chain. They are **null when the row is itself the root** (i.e., `Previous_*_ID` is null). Queries for "all rows in this lineage chain" use `COALESCE(Originating_*_ID, *_ID)` to handle both cases uniformly. Example: `SELECT * FROM Award WHERE COALESCE(Originating_Award_ID, Award_ID) = COALESCE(:x_originating, :x_award_id)`.
 
-**Modification effect on the Budget chain.** A Modification creates a new Current-stage Budget row when it changes any Budget column. The discriminator is which Modification column is non-null, not the event type: `Funding_Change_Amount` marks a funding change, `New_End_Date` marks an end-date change. A Modification with both non-null gets both behaviors.
+**Modification effect on the Budget chain.** A Modification creates a new Current-stage Budget row when it changes any Budget column. The discriminator is which Modification column is non-null, not the event type: `Funding_Change_Amount` marks a funding change, `New_End_Date` marks an end-date change. The exception is a Rebudget, or a Budget_Revision that does not change the total, which has neither and still changes category amounts. A Modification with both non-null gets both behaviors.
 
-- **Funding-changing Modifications** (`Funding_Change_Amount` non-null; typically Incremental_Funding, Supplement, Budget_Revision, Rebudget) change `Amount`-class columns. The new Current row chains via `Previous_Budget_ID` to the prior Current row (or to the Approved row if no Current exists yet) for the affected period; `Period_End_Date` matches the predecessor.
+- **Funding-changing Modifications** (`Funding_Change_Amount` non-null; typically Incremental_Funding, Supplement, Budget_Revision) change `Amount`-class columns. The new Current row chains via `Previous_Budget_ID` to the prior Current row (or to the Approved row if no Current exists yet) for the affected period; `Period_End_Date` matches the predecessor.
 - **End-date-changing Modifications** (`New_End_Date` non-null; typically No_Cost_Extension, Sponsor_Transfer, a Supplement that extends the period) change `Period_End_Date` on the **last existing budget period** of the affected anchor. The new Current row chains from the prior latest Current row for that last period, `Period_End_Date` is set to match the new `Award.Current_End_Date` (or `Subaward.Current_End_Date`), and amounts stay unchanged.
-- **Award-state-only Modifications** (both columns null; typically PI_Change, Scope_Change) change no Budget column. They do not create a new Budget row; they change Award/Subaward state only (TeamRole row history for PI_Change, Award metadata for Scope_Change).
+- **Category-moving Modifications** (event type Rebudget, or a Budget_Revision that does not change the total; `Funding_Change_Amount` null) change `Amount` on the Current rows of the categories they move money between, with the changes netting to zero. New Current rows chain via `Previous_Budget_ID` as for a funding change, and `Current_Total_Funded` does not change.
+- **Award-state-only Modifications** (both columns null and not category-moving; typically PI_Change, Scope_Change) change no Budget column. They do not create a new Budget row; they change Award/Subaward state only (TeamRole row history for PI_Change, Award metadata for Scope_Change).
 
 **Reversal.** When a Modification's `Approval_Status` becomes `Reversed`, the Current-stage Budget rows it created are marked `Is_Active = false`, and the prior Current row for each affected period becomes the active leaf again. No row is edited. The derived Award and Subaward columns already exclude a Reversed Modification, so the chain and the derivations agree.
 
-`Version_Number` increments per revision on the same `(Proposal_ID, post-award anchor, Period_Start_Date)` key for both funding-changing and end-date-changing events. Because `Budget.Proposal_ID` is required at every Lifecycle_Stage, the chain identity is stable across Proposed → Approved → Current → Actual; `Award_ID` / `Subaward_ID` is added at Approved+ as the post-award disambiguation anchor without invalidating the Proposal anchor. Chain immutability extends to same-stage parenting on Current: once a Current row has a Current descendant via `Previous_Budget_ID`, the predecessor's amounts and period dates are frozen.
+`Version_Number` increments per revision on the same `(Proposal_ID, post-award anchor, Period_Start_Date)` key for funding-changing, category-moving, and end-date-changing events. Because `Budget.Proposal_ID` is required at every Lifecycle_Stage, the chain identity is stable across Proposed → Approved → Current → Actual; `Award_ID` / `Subaward_ID` is added at Approved+ as the post-award disambiguation anchor without invalidating the Proposal anchor. Chain immutability extends to same-stage parenting on Current: once a Current row has a Current descendant via `Previous_Budget_ID`, the predecessor's amounts and period dates are frozen.
 
 **TeamRole role-bearer changes.** When a role-bearer on an Award or Subaward changes (a `PI_Change` Modification, a coordinator handoff, an off-boarding), the predecessor's TeamRole row is end-dated and a new TeamRole row is inserted for the successor. The predecessor's `End_Date` is the day **before** the successor's `Start_Date` (no day-of-transition overlap); the successor's `Start_Date` is the first day in role. TeamRole rows are not mutated in place; the row history is the canonical record of "who held this role on date D" (`Start_Date <= D AND (End_Date IS NULL OR End_Date >= D)`). Because predecessor.End_Date < successor.Start_Date, exactly one row matches a given date and the active-rows sum-to-100 constraint holds across the transition without double-counting. Because TeamRole is the canonical source for the PI on an Award, the same insert-and-end-date pattern applies to PI changes. On award creation every active proposal-stage TeamRole row for the proposal is copied as a new row carrying `Award_ID` or `Subaward_ID` and pointing back through `Previous_TeamRole_ID`; the proposal-stage row is not mutated and remains the record of the proposed team.
 
@@ -269,7 +270,7 @@ New tables added to the spec follow the same rule.
 **TeamRole vs OrganizationRole vs ProtocolRole.** Three parallel "person-in-role" tables, each answering a different question:
 
 - **TeamRole** answers "who is on the team performing this Award" (PI, Co_I, Coordinator, etc., with effort and credit allocation).
-- **OrganizationRole** answers "who holds a role at this Organization" (committee member, program officer at the sponsor, Authorized Official at the subrecipient, financial contact at the vendor, institutional Sponsored Programs liaison). Optionally scoped to an Award, Subaward, or RFA.
+- **OrganizationRole** answers "who holds a role at this Organization" (committee member, program officer at the sponsor, Authorized Official at the subrecipient, financial contact at the vendor, institutional Sponsored Programs liaison). Optionally scoped to a Proposal, Award, Subaward, or RFA.
 - **ProtocolRole** answers "who is on the team for this compliance protocol" (Primary_Investigator, Co_Investigator, study coordinator, lab manager, TCP-cleared personnel).
 
 An external Co-Investigator at a subrecipient institution is recorded as **both** an TeamRole row (their scientific role on the Award or Subaward, with credit allocation) and an OrganizationRole row scoped to the Subaward (their administrative role at the subrecipient organization for that subaward). Queries about "the science" use TeamRole; queries about "the administrative contact" use OrganizationRole. A person who is the responsible PI on an IRB protocol covering an Award has both an TeamRole row (PI on the Award) and a ProtocolRole row (Primary_Investigator on the protocol).
@@ -307,7 +308,7 @@ No single entity captures "the decision" abstractly; the three representations t
 **Submission attempts.** The *fact* that a proposal went to a sponsor is research-administration data; the *mechanics* of how the submission tooling assembled and transmitted it are not.
 
 - Each transmission is one `SubmissionAttempt` row. Re-submissions add attempts; the attempt history is the row sequence by `Attempt_Number`.
-- `Proposal.Submission_Status` is the newest attempt's `Attempt_Status` once an attempt has left Unsubmitted on the current package; before that it is Unapproved, Unsubmitted, or Signed_Off. `Proposal.Submission_Date` and `Submission_Version` derive from the attempts.
+- `Proposal.Submission_Status` is the newest attempt's `Attempt_Status` once an attempt has left Unsubmitted, as long as it is in transmission or with the sponsor or the current package still matches it; before that it is Unapproved, Unsubmitted, or Signed_Off. `Proposal.Submission_Date` and `Submission_Version` derive from the attempts.
 - Sponsor tracking and confirmation identifiers live on the attempt, indexed, not in free text.
 - Package assembly artifacts, connection profiles, and retry mechanics are submission-tooling internals and live in the System of Engagement. The transmitted package itself is a `Document` attached to the attempt; its hash is `Package_Hash`.
 
@@ -369,14 +370,14 @@ Universal status taxonomies are listed here in one place. The JSON artifact carr
 | Field | Allowed values |
 |---|---|
 | `Award_Status` | In_Setup, Active, Suspended, Closing, Closed, Adjusting, Terminating, Terminated |
-| `Subaward_Status` | Proposed, In_Setup, Active, Suspended, Closing, Closed, Adjusting, Terminated |
+| `Subaward_Status` | Proposed, In_Setup, Active, Suspended, Closing, Closed, Adjusting, Terminated, Not_Issued |
 | `Proposal.Internal_Approval_Status` | Draft, In_Review, Returned, Approved, Rejected |
 | `Proposal.Submission_Status` | Unapproved, Unsubmitted, Signed_Off, Submitting, Submitted, Received, Validated, Invalid, Accepted, Failed, Recalled (derived) |
 | `Proposal.Decision_Status` | Unrequested, Pending, Intent_to_Award, Awarded, Declined, Not_Reviewed, Withdrawn |
 | `SubmissionAttempt.Attempt_Status` | Unsubmitted, Submitting, Submitted, Received, Validated, Invalid, Accepted, Failed, Recalled |
 | `RFA_Status` | Active, Closed, Superseded, Cancelled |
 | `Negotiation_Status` | Pending, Active, On_Hold, Resolved, Abandoned |
-| `Modification.Approval_Status` | Requested, Approved, Rejected, Withdrawn, Not_Required, Reversed (an approved Modification that was later withdrawn by sponsor or invalidated by institutional correction; excluded from derivations of `Award.Current_End_Date` and `Award.Current_Total_Funded`) |
+| `Modification.Approval_Status` | Requested, Approved, Rejected, Withdrawn, Not_Required, Reversed (an Approved or Not_Required Modification that was later withdrawn by sponsor or invalidated by institutional correction; excluded from derivations of `Award.Current_End_Date` and `Award.Current_Total_Funded`) |
 | `Modification.Continuation_Type` (optional) | Competing, Non_Competing, Supplement, Other |
 | `Payment_Status` | Clear, Disputed, Cancelled (see note below) |
 | `Requirement_Status` (Compliance) | Draft, Submitted, In_Review, Approved, Expired, Conditional_Approval, Disapproved, Terminated, Suspended, Not_Applicable |
@@ -434,15 +435,15 @@ Some columns are derived from other data. The model specifies the rule; the impl
 | Derived column | Rule | Recomputation triggers |
 |---|---|---|
 | `Award.Subject_To_Federal_Funding` | True if the Award's Sponsor has Sponsor_Type='Federal', OR Is_Flow_Through is true and the Prime Sponsor has Sponsor_Type='Federal' | On insert/update of Award, Sponsor's Sponsor_Type, Prime Sponsor's Sponsor_Type |
-| `Award.Current_End_Date` | The Award's `Original_End_Date` adjusted by the latest approved Modification that changes the end date. Computed as: among Modifications where `Award_ID` = the Award, `Approval_Status = 'Approved'`, `Is_Active = true`, and `New_End_Date` is non-null, take the one with the latest `Effective_Date`, breaking ties by the highest `Modification_Number`, and use its `New_End_Date`. If no such Modification exists, use the Award's `Original_End_Date`. | On insert/update of any Modification on the Award, including a change to its `Is_Active`; on insert/update of Award |
+| `Award.Current_End_Date` | The Award's `Original_End_Date` adjusted by the latest Approved or Not_Required Modification that changes the end date. Computed as: among Modifications where `Award_ID` = the Award, `Approval_Status` is Approved or Not_Required, `Is_Active = true`, and `New_End_Date` is non-null, take the one with the latest `Effective_Date`, breaking ties by the highest `Modification_Number`, and use its `New_End_Date`. If no such Modification exists, use the Award's `Original_End_Date`. | On insert/update of any Modification on the Award, including a change to its `Is_Active`; on insert/update of Award |
 | `Subaward.Current_End_Date` | Symmetric to Award.Current_End_Date but scoped to Modifications where `Subaward_ID` = the Subaward. Falls back to the Subaward's `Original_End_Date` when no qualifying Modification exists. | On insert/update of any qualifying Modification, on insert/update of Subaward |
-| `Award.Current_Total_Funded` | The Award's `Original_Total_Funded` plus the sum of `Funding_Change_Amount` across Modifications where `Award_ID` = the Award, `Approval_Status = 'Approved'`, and `Is_Active = true`. Modifications with null Funding_Change_Amount (non-financial event types) contribute 0. | On insert/update of any Modification on the Award, including a change to its `Is_Active`; on insert/update of Award |
+| `Award.Current_Total_Funded` | The Award's `Original_Total_Funded` plus the sum of `Funding_Change_Amount` across Modifications where `Award_ID` = the Award, `Approval_Status` is Approved or Not_Required, and `Is_Active = true`. Modifications with null Funding_Change_Amount (non-financial event types) contribute 0. | On insert/update of any Modification on the Award, including a change to its `Is_Active`; on insert/update of Award |
 | `Award.Originating_Award_ID` | Walk the `Previous_Award_ID` chain back from this Award until reaching an Award with null `Previous_Award_ID`; that Award's `Award_ID` is the originating Award. Null when this Award is itself the root (its own `Previous_Award_ID` is null). Parallels `Proposal.Originating_Proposal_ID`. | On insert/update of Award.Previous_Award_ID |
 | `Award.Current_PI_Personnel_ID` | The `Personnel_ID` of the unique active TeamRole row on this Award where `Role_Value_ID` resolves (via Canonical_Value_Code) to `PI` and the row is active on today's date (`Start_Date <= today AND (End_Date IS NULL OR End_Date >= today)`). Null when no such row exists — either the Award is in Multi_PI mode (one or more active rows resolving to `Multi_PI`) or no PI/Multi_PI rows are active (community-partner Subaward case). The exclusivity rule on TeamRole (PI vs Multi_PI is exclusive) guarantees at most one active PI row in single-PI mode | On insert/update of any TeamRole row on this Award; on the daily rollover that may change which rows are active on today's date |
 | `Subaward.Current_PI_Personnel_ID` | Symmetric to Award.Current_PI_Personnel_ID but scoped to TeamRole rows where `Subaward_ID` equals this Subaward. | On insert/update of any TeamRole row on this Subaward; on the daily rollover |
-| `Proposal.Submission_Status` | Unapproved while `Internal_Approval_Status` is not Approved. When Approved: the `Attempt_Status` of the newest SubmissionAttempt made since the latest approval, if it has left Unsubmitted and the current package matches its `Package_Hash`; otherwise Signed_Off when a Final_Sign_off on the current package is Approved, with any Release_to_Submit that follows it; otherwise Unsubmitted | On insert/update of `Proposal.Internal_Approval_Status`; on insert/update of any SubmissionAttempt or Approval row for the Proposal; when the current package changes |
+| `Proposal.Submission_Status` | Unapproved while `Internal_Approval_Status` is not Approved. When Approved: the `Attempt_Status` of the newest SubmissionAttempt made since the latest approval, if it has left Unsubmitted and either the attempt is in transmission or with the sponsor (Submitting, Submitted, Received, Validated, or Accepted) or the current package matches its `Package_Hash`; otherwise Signed_Off when a Final_Sign_off on the current package is Approved, with any Release_to_Submit that follows it; otherwise Unsubmitted | On insert/update of `Proposal.Internal_Approval_Status`; on insert/update of any SubmissionAttempt or Approval row for the Proposal; when the current package changes |
 | `Proposal.Submission_Version` | The count of SubmissionAttempt rows for the Proposal; 0 before the first attempt | On insert/delete of a SubmissionAttempt for the Proposal |
-| `Proposal.Submission_Date` | The date of `Submitted_At` on the newest SubmissionAttempt whose `Attempt_Status` is Submitted, Received, Validated, Invalid, or Accepted; null when no attempt has reached Submitted | On insert/update of any SubmissionAttempt for the Proposal |
+| `Proposal.Submission_Date` | The date of `Submitted_At` on the newest SubmissionAttempt whose `Attempt_Status` is Submitted, Received, Validated, Invalid, Accepted, or Recalled; null when no attempt has reached Submitted | On insert/update of any SubmissionAttempt for the Proposal |
 | `Proposal.Internal_Approval_Status` | Draft when no Approval row exists for the Proposal; otherwise, over the rows of the highest `Approval_Round`: Rejected if any row is Rejected; Returned if any is Returned_for_Revision; Approved if every row other than Final_Sign_off and Release_to_Submit is Approved or Bypassed; In_Review otherwise | On insert/update of any Approval row on the Proposal |
 
 Common implementation choices: generated column, trigger that maintains the value, view that computes it, or application-layer compute on read. The model accepts any approach that produces the correct value at the moment a consumer reads it.
@@ -461,34 +462,37 @@ The following rules require enforcement beyond what a single column declaration 
 | ContactDetails | Exactly one of `Personnel_ID` or `Organization_ID` is non-null |
 | Communication | Exactly one of `External_Personnel_ID` or `External_Party_Name` is non-null. Every Communication row identifies its external party either via FK to Personnel or via free-text name |
 | ContactDetails | At most one row per (referenced entity, `Contact_Type_Value_ID`) has `Is_Primary = true` |
-| Proposal | `Decision_Status` is Unrequested while no SubmissionAttempt made since the latest approval has `Attempt_Status` Accepted, or while the newest attempt is Recalled, unless the `Decision_Status` is Withdrawn; otherwise it is Pending, Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn |
+| Proposal | `Decision_Status` is Unrequested while no SubmissionAttempt made since the latest approval has `Attempt_Status` Accepted, or while the newest attempt is Recalled, unless a sponsor outcome or a withdrawal is recorded (Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn); otherwise it is Pending or one of those recorded values. A recorded outcome stays when material is re-approved |
 | Proposal | `Decision_Status = 'Withdrawn'` only when at least one SubmissionAttempt for the Proposal was sent. When a withdrawn proposal is revised, a Returned_for_Revision Approval row returns `Internal_Approval_Status` to Returned and `Decision_Status` becomes Unrequested |
 | Proposal | `Decision_Status = 'Awarded'` only when `Internal_Approval_Status = 'Approved'` |
 | SubmissionAttempt | `Attempt_Number` is unique within the Proposal and consecutive from 1 |
 | SubmissionAttempt | `Submitted_At` is required when `Attempt_Status` is Submitted, Received, Validated, Invalid, Accepted, or Recalled |
+| SubmissionAttempt | `Package_Hash` is required when `Attempt_Status` is any value other than Unsubmitted |
 | SubmissionAttempt | At most one SubmissionAttempt per Proposal has `Attempt_Status` Unsubmitted or Submitting: one attempt is in flight at a time |
 | SubmissionAttempt | A SubmissionAttempt is created only while the Proposal's `Internal_Approval_Status` is Approved and, when its chain has a Final_Sign_off, the current package is signed off. Earlier attempts stay as history if the proposal later leaves Approved |
 | SubmissionAttempt | An attempt becomes Recalled only while the Proposal's `Decision_Status` is Unrequested or Pending |
-| PreAwardAuthorization | The Proposal referenced by `Proposal_ID` has `Decision_Status` Pending or Intent_to_Award |
+| PreAwardAuthorization | `Authorization_Date` and `Authorizing_Personnel_ID` are required when `Authorization_Status` is Approved, Converted_To_Award, or Expired_Unused, and kept if an approved authorization is later Revoked |
+| PreAwardAuthorization | While `Authorization_Status` is Requested or Approved, the Proposal referenced by `Proposal_ID` has `Decision_Status` Pending or Intent_to_Award |
+| PreAwardAuthorization | When `Authorization_Status` is Converted_To_Award, the Proposal referenced by `Proposal_ID` has `Decision_Status` Awarded |
 | Approval | `Approver_Personnel_ID` and `Action_Date` are required when `Approval_Status` is Approved, Rejected, Bypassed, or Returned_for_Revision |
 | Approval | `Review_Topic_Value_ID` is required when `Step_Type` resolves to Supplementary_Review; `Signed_Package_Hash` when it resolves to Final_Sign_off and the step is Approved; `Delegate_Personnel_ID` when it resolves to Release_to_Submit and the step is Approved |
 | Approval | Blocks: within one (`Related_Entity_Type`, `Related_Entity_ID`, `Approval_Round`), no row leaves Pending while a row with a lower `Approval_Step_Order` is Pending |
 | Approval | Rounds: a step that is Returned_for_Revision is not reopened; the rerun steps are new rows with `Approval_Round` one higher, consecutive from 1 within the record |
 | Approval | Voiding: a Final_Sign_off whose `Signed_Package_Hash` no longer equals the record's current package hash becomes Voided, and any Release_to_Submit that followed it in the same round becomes Voided with it |
 | Proposal | The `Previous_Proposal_ID` chain is acyclic: following it from any row reaches a row whose `Previous_Proposal_ID` is null |
-| Award | `FAIN` is required when the Sponsor's `Sponsor_Type = 'Federal'`; `FAIN` is unique within the institution when not null |
+| Award | `FAIN` is required when the Sponsor's `Sponsor_Type = 'Federal'` and the award is financial assistance, such as a grant or cooperative agreement; contracts do not need one. `FAIN` is unique within the institution when not null |
 | Award | Referenced `Sponsor_Organization_ID` has an OrganizationCapability with Capability resolving to `Sponsor` |
 | Award | Referenced `Prime_Sponsor_Organization_ID` has an OrganizationCapability with Capability resolving to `Sponsor` (or `Prime_Sponsor`) |
 | Award | The Proposal referenced by `Proposal_ID` has `Decision_Status = 'Awarded'`. Award rows exist only after the originating Proposal has been Awarded by the sponsor |
 | Award | The `Previous_Award_ID` chain is acyclic: following it from any row reaches a row whose `Previous_Award_ID` is null |
-| Award | `Award_Status` is Closed only when every Subaward whose `Prime_Award_ID` is the Award has `Subaward_Status` Closed or Terminated |
+| Award | `Award_Status` is Closed only when every Subaward whose `Prime_Award_ID` is the Award has `Subaward_Status` Closed, Terminated, or Not_Issued |
 | Award | An Award at Adjusting returns to the `Award_Status` it came from, Closed or Terminated |
 | Award | `Termination_Basis` is required when `Award_Status` is Terminating or Terminated, and null otherwise |
 | Subaward | `Termination_Basis` is required when `Subaward_Status` is Terminated, and null otherwise |
 | Subaward | A Subaward at Adjusting returns to the `Subaward_Status` it came from, Closed or Terminated |
 | Modification | `Prior_Approval_Granted_Date` is required when `Requires_Prior_Approval = true` and `Approval_Status = 'Approved'` |
 | Modification | `Carryover_Amount` is required when the Event_Type value resolves to a carryover event |
-| Modification | `Funding_Change_Amount` is required for funding-changing event types (Incremental_Funding, Budget_Revision, Supplement); null is permitted for non-financial event types (No_Cost_Extension, PI_Change, Scope_Change). When the modification does not change funding, the value is null (not zero) |
+| Modification | `Funding_Change_Amount` is required for Incremental_Funding and Supplement, and for a Budget_Revision that changes the total; null is permitted for non-financial event types (No_Cost_Extension, PI_Change, Scope_Change), Rebudget, and a Budget_Revision that does not change the total. When the modification does not change funding, the value is null (not zero) |
 | Modification | Exactly one of `Award_ID` or `Subaward_ID` is non-null |
 | Modification | `Modification_Number` is unique within the parent agreement (Award or Subaward) |
 | Subaward | Referenced `Subrecipient_Organization_ID` has an OrganizationCapability with Capability resolving to `Subrecipient` |
@@ -530,7 +534,7 @@ The following rules require enforcement beyond what a single column declaration 
 | Report | `Submitted_Date` and `Submitted_By_Personnel_ID` are required when `Report_Status` ∈ {Submitted, Fulfilled, Returned_for_Revision}; `Acceptance_Date` is required when `Report_Status = 'Fulfilled'` |
 | Closeout | Exactly one of `Award_ID` or `Subaward_ID` is non-null; one Closeout per parent agreement |
 | Closeout | `Final_Closeout_Date` is required when `Closeout_Status = 'Complete'` |
-| Subaward | `Proposal_ID` required when `Subaward_Status = 'Proposed'`; `Prime_Award_ID` required when `Subaward_Status` is any value other than 'Proposed'. Both columns may be non-null at the same time after transition so the originating-proposal link persists alongside the prime-award link |
+| Subaward | `Proposal_ID` required when `Subaward_Status = 'Proposed'`; `Prime_Award_ID` required when `Subaward_Status` is any value other than 'Proposed' or 'Not_Issued'. Both columns may be non-null at the same time after transition so the originating-proposal link persists alongside the prime-award link |
 | Effort | When `Lifecycle_Stage = 'Certified'`, all of: `Certification_Method`, `Certifier_Personnel_ID`, `Certification_Date`, `Certification_Statement_Text` are required |
 | Effort | Effort at `Lifecycle_Stage` Proposed references a TeamRole row whose `Award_ID` and `Subaward_ID` are null; Effort at Approved, Charged, or Certified references a TeamRole row with an agreement |
 | ComplianceRequirement | `Approved_Date` is required when `Requirement_Status = 'Approved'` |
@@ -558,8 +562,9 @@ What happens to a parent's children when its status becomes `Closed` or `Termina
 | `Award_Status` or `Subaward_Status` becomes Closed or Terminated | Open TeamRole rows on the agreement (`End_Date` null) are end-dated on the date of the status change |
 | `Award_Status` or `Subaward_Status` becomes Closed or Terminated | Active Restrictions on the agreement become Expired when they lapse by date or Lifted when removed by decision; a closed agreement carries no Active restriction |
 | `Award_Status` or `Subaward_Status` becomes Closed or Terminated | Open ComplianceCoverage rows for the agreement (`Coverage_End_Date` null) are end-dated on the date of the status change |
-| `Award_Status` becomes Closed | Every Subaward whose `Prime_Award_ID` is the Award is already Closed or Terminated. The prime closes last; this is a constraint on Award |
+| `Award_Status` becomes Closed | Every Subaward whose `Prime_Award_ID` is the Award is already Closed, Terminated, or Not_Issued. The prime closes last; this is a constraint on Award |
 | `Award_Status` becomes Terminated | Every Subaward whose `Prime_Award_ID` is the Award and whose `Subaward_Status` is Active or Suspended becomes Terminated on the same date |
+| `Award_Status` or `Subaward_Status` returns to Active from Closed or Terminated | Nothing ended by the closure comes back automatically. The institution creates new TeamRole and ComplianceCoverage rows as needed, so the earlier rows stay as history, and reinstates or leaves terminated each Subaward that ended with the Award |
 | `Award_Status` or `Subaward_Status` becomes Closed or Terminated | Actions, Deadlines, and Reports attached to the agreement are unchanged. They complete, are met, waived, or cancelled on their own terms; final reports and closeout work are due after the status change |
 
 A child not named here is unchanged by its parent's status change.
@@ -812,14 +817,14 @@ A formal request for funding submitted to a sponsor.
 | Internal_Approval_Status | Status | required | Where the proposal's material stands in the institution's internal approval chain: Draft, In_Review, Returned, Approved, Rejected. Approved counts every step except Final_Sign_off and Release_to_Submit; sign-off to submit is a separate gate, tracked in `Submission_Status` |
 | Submission_Status | Status | derived | Where the proposal stands with the sponsor's submission system: Unapproved until the approval chain reaches Approved; Unsubmitted once approved and before the current package is signed off; Signed_Off once it is ready to send; then the newest SubmissionAttempt's `Attempt_Status` |
 | Decision_Status | Status | required | The outcome of the funding request: Unrequested, Pending, Intent_to_Award, Awarded, Declined, Not_Reviewed, Withdrawn. Unrequested and Pending follow the submission stage; the rest are recorded by the institution. Withdrawn means a submitted proposal was pulled from the sponsor's consideration; the institution then stops there, or revises it, and internal approval returns to Returned and the decision to Unrequested |
-| Decision_Date | Date | optional | When the sponsor's disposition was received: the Intent_to_Award, Awarded, or Declined date |
+| Decision_Date | Date | optional | When the proposal's outcome was recorded: the Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn date |
 | Risk_Level | Status | optional | See Status taxonomy |
 | Proposal_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'ProposalType'`. Recommended values: New / Resubmission / Renewal / Continuation / Revision / Task_Order |
 | Mechanism_Value_ID | ID | optional | → AllowedValues with `Value_Group = 'FundingMechanism'`. The funding mechanism / activity code the proposal targets |
 
 #### SubmissionAttempt
 
-One transmission of a proposal to a sponsor's submission system. `Proposal.Submission_Status` shows the newest attempt's `Attempt_Status` once it has left Unsubmitted on the current package. The attempt records what was sent, by whom, when, and what the sponsor's system said; package assembly, connection profiles, and retry mechanics stay in the System of Engagement.
+One transmission of a proposal to a sponsor's submission system. `Proposal.Submission_Status` shows the newest attempt's `Attempt_Status` once it has left Unsubmitted, as long as it is in transmission or with the sponsor or the current package still matches it. The attempt records what was sent, by whom, when, and what the sponsor's system said; package assembly, connection profiles, and retry mechanics stay in the System of Engagement.
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
@@ -829,11 +834,11 @@ One transmission of a proposal to a sponsor's submission system. `Proposal.Submi
 | Channel_Value_ID | ID | optional | → AllowedValues with `Value_Group = 'SubmissionChannel'`. Recommended values: Federal_Portal / Sponsor_Portal / Email / Paper / Other |
 | Submitted_By_Personnel_ID | ID | required | → Personnel. Who transmitted the attempt: the authorized organizational representative, or the person they released it to |
 | Submitted_At | Timestamp | conditional | When the transmission was sent. Required when `Attempt_Status` is Submitted, Received, Validated, Invalid, Accepted, or Recalled |
-| Attempt_Status | Status | required | Constrained: Unsubmitted / Submitting / Submitted / Received / Validated / Invalid / Accepted / Failed / Recalled. The attempt's state as the sponsor's system reports it; Recalled means it was pulled back to be corrected and resent |
+| Attempt_Status | Status | required | Constrained: Unsubmitted / Submitting / Submitted / Received / Validated / Invalid / Accepted / Failed / Recalled. The attempt's state as reported by the submission tooling or the sponsor's system; Recalled means it was pulled back to be corrected and resent |
 | Tracking_Identifier | ShortCode | optional | The identifier the sponsor's system assigned to this transmission |
 | Sponsor_Acknowledged_At | Timestamp | optional | When the sponsor's system acknowledged receipt |
-| Package_Hash | Hash | optional | SHA-256 of the assembled package as transmitted, so a sign-off can be matched to what went out |
-| Notes | LongText | optional | Validation messages, the reason for a withdrawal |
+| Package_Hash | Hash | conditional | SHA-256 of the assembled package as transmitted, so a sign-off can be matched to what went out. Required when `Attempt_Status` is any value other than Unsubmitted |
+| Notes | LongText | optional | Validation messages, the reason for a recall |
 
 #### PreAwardAuthorization
 
@@ -844,10 +849,10 @@ An institutional pre-award authorization to spend at-risk on a Proposal that has
 | PreAwardAuthorization_ID | ID | required | PK |
 | Proposal_ID | ID | required | → Proposal |
 | Maximum_Amount | Money | required | The institution-approved at-risk spending ceiling |
-| Authorization_Date | Date | required | |
+| Authorization_Date | Date | conditional | When the at-risk spending was authorized. Required when `Authorization_Status` is Approved, Converted_To_Award, or Expired_Unused; kept if an approved authorization is later Revoked |
 | Effective_Start_Date | Date | required | |
 | Effective_End_Date | Date | required | |
-| Authorizing_Personnel_ID | ID | required | → Personnel. The institutional officer who authorized the at-risk spending |
+| Authorizing_Personnel_ID | ID | conditional | → Personnel. The institutional officer who authorized the at-risk spending. Required when `Authorization_Status` is Approved, Converted_To_Award, or Expired_Unused; kept if an approved authorization is later Revoked |
 | Authorization_Status | Status | required | Constrained: Requested / Approved / Revoked / Converted_To_Award / Expired_Unused |
 | Converted_To_Award_ID | ID | conditional | → Award. Required when `Authorization_Status = 'Converted_To_Award'`; otherwise null. Populated once the Proposal becomes an Award and the pre-award authorization is folded into the executed funding |
 | Notes | LongText | optional | |
@@ -871,7 +876,7 @@ A funded grant, contract, or cooperative agreement. The central post-award entit
 | Previous_Award_ID | ID | optional | → Award (self-referencing). Competing renewal lineage: when a new award supersedes an earlier award through a competing renewal, the new award references its predecessor. Parallels Proposal.Previous_Proposal_ID |
 | Originating_Award_ID | ID | optional | → Award. The root of this Award's `Previous_Award_ID` chain. Derived, stored. Null when this Award is itself the root (no predecessor). Auto-updates if `Previous_Award_ID` is ever corrected. Parallels `Proposal.Originating_Proposal_ID`. Used for lineage queries without recursive CTE traversal |
 | RFA_ID | ID | optional | → RFA |
-| FAIN | ShortCode | conditional | Federal Award Identification Number. Required when the Sponsor has Sponsor_Type = 'Federal'. Unique within the institution when not null |
+| FAIN | ShortCode | conditional | Federal Award Identification Number. Required when the Sponsor has Sponsor_Type = 'Federal' and the award is financial assistance, such as a grant or cooperative agreement; contracts do not need one. Unique within the institution when not null |
 | Assistance_Listing_Number | ShortCode | optional | Federal program identifier (formerly CFDA) |
 | Mechanism_Value_ID | ID | optional | → AllowedValues with `Value_Group = 'FundingMechanism'`. The funding mechanism / activity code (R01, R21, R03, P01, P30, U54, K01, K23, K99, T32, F31, F32, Cooperative_Agreement, Contract_BAA, Contract_RFP, OT_Other_Transaction, etc.). A major analytics dimension; institutions populate with their sponsor-recognized mechanism taxonomy |
 | Funding_Mechanism_Description | MediumName | optional | Free-text description for mechanisms not in the canonical taxonomy |
@@ -879,7 +884,7 @@ A funded grant, contract, or cooperative agreement. The central post-award entit
 | Original_End_Date | Date | required | End of the originally authorized Period of Performance at award execution. Frozen; not adjusted by Modifications. To query the live end date after extensions, use `Current_End_Date` |
 | Current_End_Date | Date | derived | Current end after Modifications. Derivation rule documented in *Derived values* |
 | Original_Total_Funded | Money | required | The funded amount at award execution. Frozen; not adjusted by Modifications |
-| Current_Total_Funded | Money | derived | Originally funded amount plus the sum of approved funding-changing Modifications. Derivation rule documented in *Derived values* |
+| Current_Total_Funded | Money | derived | Originally funded amount plus the sum of Approved or Not_Required funding-changing Modifications. Derivation rule documented in *Derived values* |
 | Current_PI_Personnel_ID | ID | derived | → Personnel. The current PI on this Award when the agreement is in single-PI mode; null when in Multi_PI mode (multiple Multi_PI rows are active) or when no PI is active (community-partner Subaward case). Derivation rule documented in *Derived values*. The canonical source for "who is on this team" remains TeamRole; this column is a query-convenience denormalization parallel to Current_End_Date and Current_Total_Funded |
 | Total_Anticipated_Funding | Money | optional | |
 | Award_Status | Status | required | The award's lifecycle state: In_Setup, Active, Suspended, Closing, Closed, Adjusting, Terminating, Terminated. Terminating means termination is being processed; Adjusting is a late correction after Closed or Terminated, not open for spending |
@@ -903,11 +908,11 @@ A change to an Award or Subaward after initial funding. Modification is XOR-atta
 | Is_In_Effect | Boolean | derived | True when `Approval_Status` is Approved or Not_Required and `Effective_Date` has arrived. The award's current totals and dates do not use it |
 | Event_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'ModificationEventType'`. Recommended values: Incremental_Funding / No_Cost_Extension / Budget_Revision / PI_Change / Scope_Change / Carryover / Rebudget / Sponsor_Transfer / Supplement / Cost_Transfer_Authorization / Advance_Funding |
 | Continuation_Type | Status | optional | Constrained when present: Competing / Non_Competing / Supplement / Other |
-| Approval_Status | Status | required | Requested, Approved, Rejected, Withdrawn, Not_Required, Reversed. Withdrawn before a decision; Reversed after approval and excluded from the derived award totals and dates |
+| Approval_Status | Status | required | Requested, Approved, Rejected, Withdrawn, Not_Required, Reversed. Withdrawn before a decision; Reversed after approval or after being recorded as Not_Required, and excluded from the derived award totals and dates |
 | Priority | Status | required | Constrained: Low / Medium / High / Critical. Processing priority the office assigned, Medium unless set; Critical is a rush |
 | Requires_Prior_Approval | Boolean | required | |
 | Prior_Approval_Granted_Date | Date | conditional | Required when Requires_Prior_Approval is true and Approval_Status is Approved |
-| Funding_Change_Amount | Money | conditional | Positive for adds, negative for reductions. Required for funding-changing event types; null for non-financial event types |
+| Funding_Change_Amount | Money | conditional | Positive for adds, negative for reductions. Required for Incremental_Funding and Supplement, and for a Budget_Revision that changes the total; null for non-financial event types, Rebudget, and a Budget_Revision that does not change the total |
 | New_End_Date | Date | conditional | The revised end date of the parent agreement after this Modification takes effect. Non-null exactly when the Modification changes the end date; null when it does not. Required when `Event_Type` resolves to No_Cost_Extension. Used by the derived `Award.Current_End_Date` and `Subaward.Current_End_Date` rules |
 | Carryover_Amount | Money | conditional | Required when the Event_Type resolves to Carryover |
 | Carryforward_Amount | Money | optional | Companion of Carryover depending on accounting policy |
@@ -922,7 +927,7 @@ A subaward agreement between the institution and a subrecipient. Subaward exists
 |---|---|---|---|
 | Subaward_ID | ID | required | PK |
 | Proposal_ID | ID | conditional | → Proposal. The proposal that planned this subaward. Required when Subaward_Status = 'Proposed'. Persists after the transition to In_Setup/Active so the originating-proposal link is preserved across the subaward lifecycle |
-| Prime_Award_ID | ID | conditional | → Award (the parent inbound award). Required when Subaward_Status is any value other than 'Proposed', that is, once the prime award has been received. Null while Subaward_Status = 'Proposed' |
+| Prime_Award_ID | ID | conditional | → Award (the parent inbound award). Required when Subaward_Status is any value other than 'Proposed' or 'Not_Issued', that is, once the prime award has been received. Null while Subaward_Status = 'Proposed'; a Not_Issued subaward keeps whatever it had |
 | Parent_Subaward_ID | ID | optional | → Subaward (self-referencing). For cascading or amended subawards where one subaward succeeds another under the same prime |
 | Group_ID | ShortCode | optional | A grouping label that ties related Subawards together under one longitudinal identity. Pre-filled at Subaward insert from the Prime Award's `Group_ID` (or from the originating Proposal's `Group_ID` at the Proposed stage when no Prime_Award_ID is set yet). The institution may override afterward; no enforced equality with the Prime or originating-Proposal value. Parallels `Award.Group_ID` and `Proposal.Group_ID`. Subaward renewal lineage flows through the Prime Award chain (`Subaward.Prime_Award_ID → Award.Previous_Award_ID + same Subrecipient_Organization_ID`); no dedicated `Previous_Subaward_ID` column is needed |
 | Subrecipient_Organization_ID | ID | required | → Organization. Referenced Organization has an OrganizationCapability with Capability = 'Subrecipient' |
@@ -936,7 +941,7 @@ A subaward agreement between the institution and a subrecipient. Subaward exists
 | Current_End_Date | Date | derived | Current end after modifications. Derivation rule documented in *Derived values* |
 | Current_PI_Personnel_ID | ID | derived | → Personnel. The current PI on this Subaward when the agreement is in single-PI mode; null when in Multi_PI mode or when no PI is active (community-partner Subaward case). Derivation rule documented in *Derived values*. Parallels Award.Current_PI_Personnel_ID |
 | Risk_Level | Status | required | See Status taxonomy |
-| Subaward_Status | Status | required | Proposed, In_Setup, Active, Suspended, Closing, Closed, Adjusting, Terminated. Proposed while planned in the proposal; In_Setup once the prime award exists and the agreement is being issued; Closing once closeout has begun; Adjusting is a late correction after Closed or Terminated |
+| Subaward_Status | Status | required | Proposed, In_Setup, Active, Suspended, Closing, Closed, Adjusting, Terminated, Not_Issued. Proposed while planned in the proposal; In_Setup once the prime award exists and the agreement is being issued; Closing once closeout has begun; Not_Issued when the agreement was never issued; Adjusting is a late correction after Closed or Terminated |
 | Termination_Basis | Status | conditional | Why the subaward was terminated: Noncompliance / Mutual_Agreement / Recipient_Request / Sponsor_Priorities / Prime_Terminated. Required when `Subaward_Status` is Terminated; cleared on reinstatement |
 | Monitoring_Frequency_Months | Count | optional | How often subrecipient monitoring is performed |
 
@@ -1007,12 +1012,12 @@ The closeout workflow object for an Award or Subaward. Each closeout coordinates
 | Award_ID | ID | optional | → Award. Exactly one of `Award_ID` or `Subaward_ID` is non-null. One Closeout row per parent agreement |
 | Subaward_ID | ID | optional | → Subaward. Exactly one of `Award_ID` or `Subaward_ID` is non-null |
 | Closeout_Initiated_Date | Date | required | |
-| Final_Report_Status | Status | required | Constrained: Not_Required / Pending / Submitted / Accepted |
-| Final_Invoice_Status | Status | required | Constrained: Not_Required / Pending / Submitted / Paid |
+| Final_Report_Status | Status | required | Constrained: Not_Required / Not_Started / Submitted / Fulfilled |
+| Final_Invoice_Status | Status | required | Constrained: Not_Required / Not_Started / Submitted / Paid |
 | Equipment_Disposition_Status | Status | required | Constrained: Not_Applicable / In_Progress / Complete |
 | IP_Closeout_Status | Status | required | Constrained: Not_Applicable / In_Progress / Complete |
 | COI_Closeout_Status | Status | required | Constrained: Not_Applicable / In_Progress / Complete |
-| Records_Retention_Start_Date | Date | optional | Beginning of the retention window (typically the date the final FFR is accepted) |
+| Records_Retention_Start_Date | Date | optional | Beginning of the retention window (typically the date the final financial report is submitted) |
 | Records_Retention_End_Date | Date | derived | When the records retention obligation ends. Derived: `Records_Retention_Start_Date` plus `Terms.Record_Retention_Years` for the agreement this Closeout belongs to; null while the start date is null |
 | Final_Closeout_Date | Date | conditional | Required when Closeout_Status = 'Complete' |
 | Closeout_Status | Status | required | Constrained: In_Progress / Pending_Sponsor_Final_Audit / Complete / Reopened |
@@ -1646,7 +1651,7 @@ Institutions with substantial ticket volume that need structured analysis beyond
 - Hub entities: Personnel, Organization, Proposal, Award, AllowedValues.
 - Lifecycle_Stage tables: Budget, Effort, CostShare, Payment. Lifecycle_Stage is authoritative for these tables' state; once a row has a later-stage descendant, its primary fields are immutable.
 - Polymorphic Attachment tables: Document, Communication, Restriction, Deadline, Classification, Action, Approval. These generalize the everyday "attach a document to an award" idea to all the records that accumulate around an entity. Deadline tracks *when* an obligation is due; Action tracks *what* work to do.
-- Subaward spans pre-award (Proposal_ID, Subaward_Status='Proposed') and post-award (Prime_Award_ID, any Subaward_Status other than Proposed) on a single row identity. Subaward is a first-class parent for Terms, Budget, Payment, Modification, Transaction, CostShare, Equipment, Report, Closeout, and all Attachment tables via the two-FK exclusive-or attachment pattern. Subaward carries Administering_Organization_ID and Parent_Subaward_ID to match Award's structure.
+- Subaward spans pre-award (Proposal_ID, Subaward_Status='Proposed') and post-award (Prime_Award_ID, any Subaward_Status other than Proposed or Not_Issued) on a single row identity. Subaward is a first-class parent for Terms, Budget, Payment, Modification, Transaction, CostShare, Equipment, Report, Closeout, and all Attachment tables via the two-FK exclusive-or attachment pattern. Subaward carries Administering_Organization_ID and Parent_Subaward_ID to match Award's structure.
 - Award.Parent_Award_ID groups incremental segments under one award identity; Award.Previous_Award_ID points at the predecessor on a competing renewal (parallel to Proposal.Previous_Proposal_ID). Award.Originating_Award_ID is a derived stored column pointing at the root of the Previous_Award_ID chain (parallel to Proposal.Originating_Proposal_ID), so lineage queries do not require recursive CTE traversal. Subaward renewal lineage flows through the Prime Award chain (no dedicated `Previous_Subaward_ID`); Subaward.Parent_Subaward_ID handles within-prime cascading/amended subawards. The discriminator between Modification, Parent_Award_ID, and Previous_Award_ID is documented in *Semantic conventions*.
 - Organization_Type carries structural classification (Department / College / School / Institute / Center / External). Functional roles (Sponsor, Subrecipient, Vendor, Committee, Prime_Sponsor, Program_Office, Pass_Through_Entity) are recorded as OrganizationCapability rows so a single Organization can play multiple roles across contexts.
 - Three parallel "person-in-role" tables capture personnel relationships: TeamRole (institutional staff on an Award or Subaward), OrganizationRole (anyone playing a role at an Organization: committee member, sponsor program officer, subrecipient AO, vendor contact, institutional liaison), and ProtocolRole (personnel on a compliance protocol, including the responsible PI). Each uses a Role_Value_ID FK to AllowedValues with its own canonical Value_Group.

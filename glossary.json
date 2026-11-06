@@ -1152,7 +1152,7 @@
     {
       "term": "Failed",
       "also": "",
-      "definition": "A submission status: the attempt did not reach the sponsor's system, so the same package can be resent. Its sign-off stands.",
+      "definition": "A submission status: the attempt did not reach the sponsor's system, so the same package can be resent. Its sign-off stands. If the package changes, the status returns to Unsubmitted.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Submission_Status=Failed"
@@ -1363,7 +1363,7 @@
     {
       "term": "In effect",
       "also": "",
-      "definition": "A modification that is Approved or Not_Required and whose Effective_Date has arrived. Is_In_Effect records this. An award's current totals and dates count every approved modification from approval, even before its effective date.",
+      "definition": "A modification that is Approved or Not_Required and whose Effective_Date has arrived. Is_In_Effect records this. An award's current totals and dates count these modifications once approved or recorded, even before their effective date.",
       "domain": "Award & lifecycle",
       "udm": [
         "Modification.Is_In_Effect"
@@ -1479,9 +1479,11 @@
     {
       "term": "Internal PI",
       "also": "PI of record",
-      "definition": "The person the institution holds accountable as principal investigator, under its own PI eligibility policy.",
+      "definition": "The person the institution holds accountable as principal investigator, under its own PI eligibility policy. The UDM records the sponsor-facing PI in TeamRole. A difference from the internal PI isn't modeled; record an approved exception in PolicyException.",
       "domain": "People & organizations",
-      "udm": []
+      "udm": [
+        "PolicyException"
+      ]
     },
     {
       "term": "Invalid",
@@ -1706,9 +1708,18 @@
       "source_url": "https://www.ecfr.gov/current/title-2/section-200.308"
     },
     {
+      "term": "Not Issued",
+      "also": "",
+      "definition": "A subaward status: the subaward was planned or being set up, but the agreement was never issued. This is where a planned subaward ends if its proposal is not funded.",
+      "domain": "Subawards",
+      "udm": [
+        "Subaward.Subaward_Status=Not_Issued"
+      ]
+    },
+    {
       "term": "Not Required",
       "also": "",
-      "definition": "A modification status: no approval was needed, and the modification is kept for the record.",
+      "definition": "A modification status: no approval was needed. It counts in the award's current totals and dates once recorded.",
       "domain": "Award & lifecycle",
       "udm": [
         "Modification.Approval_Status=Not_Required"
@@ -1829,7 +1840,7 @@
     {
       "term": "Package",
       "also": "",
-      "definition": "The set of files and forms assembled to send to the sponsor. If the package changes, its sign-off no longer applies.",
+      "definition": "The set of files and forms assembled to send to the sponsor. If the package changes, its sign-off no longer applies. Changes do not affect an attempt in transmission or with the sponsor; sending them takes a recall, a new sign-off, and a new attempt.",
       "domain": "Proposal",
       "udm": [
         "SubmissionAttempt.Package_Hash"
@@ -2271,7 +2282,7 @@
     {
       "term": "Reinstated",
       "also": "",
-      "definition": "A termination is called off or overturned, and the award or subaward returns to Active.",
+      "definition": "A termination is called off or overturned, and the award or subaward returns to Active. People, compliance coverage, and subawards ended earlier do not come back automatically; the institution sets them up again.",
       "domain": "Award & lifecycle",
       "udm": [
         "Award.Award_Status=Active",
@@ -2309,7 +2320,7 @@
     {
       "term": "Reopened",
       "also": "",
-      "definition": "An award or subaward that has started or finished closing returns to Active and can spend again.",
+      "definition": "An award or subaward that has started or finished closing returns to Active and can spend again. People, compliance coverage, and subawards ended earlier do not come back automatically; the institution sets them up again.",
       "domain": "Award & lifecycle",
       "udm": [
         "Award.Award_Status=Active",
@@ -2404,7 +2415,7 @@
     {
       "term": "Reversed",
       "also": "",
-      "definition": "A modification status: an approved modification was later withdrawn by the sponsor or invalidated by correction. It no longer counts in the award's totals and dates, and its budget rows are unwound.",
+      "definition": "A modification status: an Approved or Not_Required modification was later withdrawn by the sponsor or invalidated by correction. It no longer counts in the award's totals and dates, and its budget rows are unwound.",
       "domain": "Award & lifecycle",
       "udm": [
         "Modification.Approval_Status=Reversed"
@@ -2578,7 +2589,9 @@
       "also": "",
       "definition": "The person the sponsor recognizes as principal investigator on an award, under the sponsor's rules. This is often the same person as the internal PI, but not always.",
       "domain": "People & organizations",
-      "udm": []
+      "udm": [
+        "TeamRole.Role_Value_ID=PI"
+      ]
     },
     {
       "term": "Sponsor report",

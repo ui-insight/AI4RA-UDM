@@ -230,8 +230,8 @@ Twelve lineage-adjacent columns exist across Proposal, Award, and Subaward. Each
 Some columns are computed from other data. The model specifies the rule; the implementation chooses recomputation timing (generated column, trigger, view, or application-layer compute on read).
 
 Derivations include:
-- `Award.Current_End_Date` — Original_End_Date adjusted by latest approved end-date-changing Modification
-- `Award.Current_Total_Funded` — Original_Total_Funded plus sum of approved Funding_Change_Amounts
+- `Award.Current_End_Date`: Original_End_Date adjusted by latest Approved or Not_Required end-date-changing Modification
+- `Award.Current_Total_Funded`: Original_Total_Funded plus sum of Approved or Not_Required Funding_Change_Amounts
 - `Award.Current_PI_Personnel_ID` — the active PI from TeamRole (null when in Multi_PI mode)
 - `Award.Originating_Award_ID` — root of Previous_Award_ID chain
 - `Award.Subject_To_Federal_Funding` — derived from Sponsor.Sponsor_Type and Prime Sponsor
@@ -327,7 +327,7 @@ An institutional authorization to spend at-risk on a Proposal that has been favo
 
 The central post-award entity. Funded grants, contracts, cooperative agreements. Every Award originates from a Proposal (`Proposal_ID` required). Carries:
 - `Original_End_Date`, `Original_Total_Funded` (frozen at execution)
-- `Current_End_Date`, `Current_Total_Funded`, `Current_PI_Personnel_ID` (derived from approved Modifications and active TeamRoles)
+- `Current_End_Date`, `Current_Total_Funded`, `Current_PI_Personnel_ID` (derived from Approved or Not_Required Modifications and active TeamRoles)
 - Lineage: `Parent_Award_ID` (incremental segments), `Previous_Award_ID` (competing renewals), `Originating_Award_ID` (derived chain root), `Group_ID`
 
 Status: Pending → Active → Closing → Closed / Suspended / Terminated.
@@ -336,11 +336,11 @@ Status: Pending → Active → Closing → Closed / Suspended / Terminated.
 
 A change to an Award or Subaward after initial funding (XOR-attached). Covers NCEs, supplements, budget revisions, PI changes, scope changes, carryovers, rebudgets, sponsor transfers, and continuations. Sub-side amendments use the same table — no separate SubawardModification.
 
-`Approval_Status` includes a `Reversed` value for approved Modifications later withdrawn or invalidated; Reversed Modifications fall out of derived rollups.
+`Approval_Status` includes a `Reversed` value for Approved or Not_Required Modifications later withdrawn or invalidated; Reversed Modifications fall out of derived rollups.
 
 ### Subaward
 
-A subaward agreement between the institution and a subrecipient. Subaward exists at two scopes on a single row identity: a *planned* subaward (`Subaward_Status = 'Proposed'`, Proposal_ID set) and an *executed* subaward (`Subaward_Status ≥ 'Pending'`, Prime_Award_ID set). The transition is a status change on the same row; the originating Proposal_ID persists alongside the new Prime_Award_ID.
+A subaward agreement between the institution and a subrecipient. Subaward exists at two scopes on a single row identity: a *planned* subaward (`Subaward_Status = 'Proposed'`, Proposal_ID set) and an *executed* subaward (`Subaward_Status` past `In_Setup`, Prime_Award_ID set). A subaward that never reaches execution ends as `Not_Issued`. The transition is a status change on the same row; the originating Proposal_ID persists alongside the new Prime_Award_ID.
 
 Subaward renewal lineage flows through the Prime Award chain — no dedicated `Previous_Subaward_ID` column. When the prime renews, a new Subaward at the same subrecipient is created under the new Prime.
 

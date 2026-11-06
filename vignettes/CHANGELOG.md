@@ -20,11 +20,22 @@ Migrate by column, not by a find-and-replace on a word, because some words chang
 - **`Submission_Status` and `Attempt_Status`: `Withdrawn` becomes `Recalled`.** It means one attempt was pulled back to be corrected and resent, and it requires `Decision_Status` to be `Unrequested` or `Pending`. Migration: decide for each `Withdrawn` attempt whether the proposal was being resent (the attempt becomes `Recalled`) or pulled for good (also set `Decision_Status` to `Withdrawn`).
 - **`Decision_Status` gains `Withdrawn` and `Not_Reviewed`, and now means the outcome of the funding request.** `Not_Reviewed` means the sponsor removed the proposal from consideration without reviewing it. The institution either stops at `Withdrawn` or revises the proposal, which returns internal approval to `Returned` and the decision to `Unrequested`. `Intent_to_Award` no longer returns to `Unrequested`.
 - **`Accepted` and `Failed` are redefined.** `Accepted` means the sponsor took the proposal in for consideration. `Failed` means the attempt did not reach the sponsor's system, and the same package can be resent. An `Invalid` or `Recalled` attempt returns to `Unsubmitted`.
+- **A recorded sponsor outcome stays.** Re-approving material no longer returns `Intent_to_Award`, `Awarded`, `Declined`, or `Not_Reviewed` to `Unrequested`.
+- **Package changes after sending.** While an attempt is in transmission or with the sponsor, changes on the institution's side leave `Submission_Status` alone. After `Failed`, `Invalid`, or `Recalled`, a changed package returns it to `Unsubmitted`, so `Failed` gains that move. `Package_Hash` is required once an attempt leaves `Unsubmitted`.
 - **New attempt moves.** `Submitted` and `Received` can go directly to `Accepted`, for channels that report nothing in between, and `Validated` can go to `Invalid`.
 
 **Award and subaward**
 
 - **`Award_Status`: `Pending` becomes `In_Setup`.** `Subaward_Status`: `Pending` becomes `In_Setup`.
+- **`Subaward_Status` gains `Not_Issued`.** A subaward planned or being set up whose agreement is never issued ends here, replacing `Terminated` as the exit from `Proposed` and `In_Setup`. It has no `Termination_Basis`, needs no `Prime_Award_ID`, and doesn't block its award from closing.
+- **`Not_Required` modifications now count.** `Award.Current_End_Date`, `Award.Current_Total_Funded`, and `Subaward.Current_End_Date` count `Approved` and `Not_Required` modifications, so a change needing no approval moves the award's dates and totals. `Reversed` can undo either.
+- **Early setup can convert.** The limit to `Pending` or `Intent_to_Award` now applies only while an authorization is `Requested` or `Approved`. `Converted_To_Award` requires `Awarded`.
+- **Early setup requests no longer need an authorizer.** `Authorization_Date` and `Authorizing_Personnel_ID` are required once a request is approved.
+- **`FAIN` applies to financial assistance.** Federal contracts no longer need one.
+- **Returning to `Active`.** People, compliance coverage, and subawards ended by closure or termination don't come back automatically. The institution sets them up again.
+- **Rebudgets have their own budget rule.** A `Rebudget` has no `Funding_Change_Amount`, so total funding doesn't change, and it creates new Current budget rows for the categories it moves money between, netting to zero.
+- **`Budget_Revision` is a catch-all.** It covers a budget change with no more specific value, and `Funding_Change_Amount` is required only when the total changes.
+- **Closeout statuses match.** `Final_Report_Status` becomes `Not_Started`, `Submitted`, `Fulfilled`, and `Final_Invoice_Status` uses `Not_Started` and also fits subaward invoices. Records retention now typically starts when the final financial report is submitted, per 2 CFR 200.334.
 - **Both gain `Adjusting`.** A closed or terminated agreement can take a late correction, such as an audit finding or a late charge, without opening for spending, and then returns to the status it came from. Views that exclude closed awards now exclude this status too.
 - **Reopening and reinstatement.** A `Closed` award or subaward reopens to `Active`, not `Closing`. `Terminated` can be reinstated to `Active`, and an award at `Terminating` can return to `Active`.
 - **`Termination_Basis` is new on `Award` and `Subaward`.** Values are `Noncompliance`, `Mutual_Agreement`, `Recipient_Request`, and `Sponsor_Priorities`, which covers executive orders; `Subaward` adds `Prime_Terminated`. `Terminating` no longer requires a received notice.

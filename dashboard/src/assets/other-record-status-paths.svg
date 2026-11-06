@@ -50,8 +50,8 @@
 <path d="M614 548L700 500" fill="none" stroke="#334155" stroke-width="1.6" marker-end="url(#a)"/>
 <path d="M614 500L900 548" fill="none" stroke="#334155" stroke-width="1.6" marker-end="url(#a)"/>
 <path d="M614 559H900" fill="none" stroke="#334155" stroke-width="1.6" marker-end="url(#a)"/>
-<path d="M252 510V592H962V580" fill="none" stroke="#334155" stroke-width="1.6" marker-end="url(#a)"/>
-<path d="M402 510V592" fill="none" stroke="#334155" stroke-width="1.6"/>
+<path d="M290 510V538" fill="none" stroke="#334155" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M365 510V538" fill="none" stroke="#334155" stroke-width="1.6" marker-end="url(#a)"/>
 <rect x="20" y="620" width="1170" height="172" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
 <text x="34" y="648" font-size="15" font-weight="700" fill="#1e293b">Payment</text>
 <text x="34" y="668" font-size="12" fill="#64748b">Payment</text>
@@ -117,6 +117,7 @@
 <rect x="900" y="468" width="124" height="42" rx="7" fill="#dcfce7" stroke="#15803d" stroke-width="1.5"/><text x="962.0" y="494" font-size="13.5" font-weight="600" fill="#14532d" text-anchor="middle">Closed</text>
 <rect x="490" y="538" width="124" height="42" rx="7" fill="#ffffff" stroke="#94a3b8" stroke-width="1.5"/><text x="552.0" y="564" font-size="13.5" font-weight="600" fill="#1e293b" text-anchor="middle">Suspended</text>
 <rect x="900" y="538" width="124" height="42" rx="7" fill="#fee2e2" stroke="#991b1b" stroke-width="1.5"/><text x="962.0" y="564" font-size="13.5" font-weight="600" fill="#7f1d1d" text-anchor="middle">Terminated</text>
+<rect x="265" y="538" width="124" height="42" rx="7" fill="#fee2e2" stroke="#991b1b" stroke-width="1.5"/><text x="327.0" y="564" font-size="13.5" font-weight="600" fill="#7f1d1d" text-anchor="middle">Not Issued</text>
 <rect x="1056" y="468" width="124" height="42" rx="7" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/><text x="1118.0" y="494" font-size="13.5" font-weight="600" fill="#78350f" text-anchor="middle">Adjusting</text>
 <rect x="1056" y="538" width="124" height="42" rx="7" fill="#fef3c7" stroke="#b45309" stroke-width="1.5"/><text x="1118.0" y="564" font-size="13.5" font-weight="600" fill="#78350f" text-anchor="middle">Adjusting</text>
 <rect x="200" y="658" width="124" height="42" rx="7" fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/><text x="262.0" y="684" font-size="13.5" font-weight="600" fill="#1e3a8a" text-anchor="middle">Scheduled</text>
