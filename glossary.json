@@ -3358,7 +3358,7 @@
     {
       "term": "Termination basis",
       "also": "",
-      "definition": "Why an award or subaward was terminated: Noncompliance, Mutual_Agreement, Recipient_Request, Sponsor_Priorities, or, for a subaward, Prime_Terminated. Executive orders use Sponsor_Priorities. The value is cleared on reinstatement.",
+      "definition": "Why an award or subaward was terminated: Noncompliance, Mutual_Agreement, Recipient_Request, Sponsor_Priorities, or, for a subaward, Prime_Terminated. A sponsor ending an award because its priorities changed uses Sponsor_Priorities. The value is cleared on reinstatement.",
       "domain": "Award & lifecycle",
       "udm": [
         "Award.Termination_Basis",
