@@ -125,10 +125,10 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
                 fontSize: '0.95rem',
               }}
             >
-              Join the AI4RA forum
+              Join the AI4RA list
             </a>
             <span style={{ color: 'rgba(255,255,255,0.9)' }}>
-              and post under #UDM.{' '}
+              and post using the #UDM hashtag.{' '}
               <a href={FORUM_UDM_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'white', fontWeight: 600 }}>
                 See #UDM posts
               </a>
@@ -312,9 +312,9 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
               rel="noopener noreferrer"
               style={{ color: '#667eea' }}
             >
-              Issues &amp; discussions
+              Issues
             </a>:{' '}
-            Propose tables, columns, or conventions
+            Report problems and bugs
           </li>
         </ul>
       </Card>

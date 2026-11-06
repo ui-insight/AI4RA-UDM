@@ -24,7 +24,7 @@ While the UDM is in active development and has no production adopters, breaking 
 - **Dashboard: proposal and award chart.** It removes `Unapproved` and the note under `Recalled`, and adds `Sent Back`.
 - **Glossary sources.** `Award rate` and `Effective F&A rate` replace dead links, and `Award rate` now states only what NIH publishes. `Key personnel` credits NSF for its wording, `Export control` cites the regulation, and `Research Performance Progress Report` says agencies may use the format, not that they must.
 - **Dashboard: landing page for research administrators.** Home opens with a short "Start here" section. "Help us evaluate it" replaces "Share your feedback", points to the AI4RA forum and `#UDM`, and moves above Core Modules. The GitHub button is gone, the survey and email remain, and the header's Give Feedback button goes to the forum. The tab bar and header no longer widen the page on a phone.
-- **README and CONTRIBUTING: Feedback section.** Both point to the AI4RA forum and `#UDM`.
+- **README and CONTRIBUTING: the list comes first.** Design conversations move to the AI4RA list under `#UDM`, so people without GitHub can join them. The guide now says the spec is written by hand and lists every check.
 - **`FundingMechanism` wording.** The spec now says no government-wide list was found, not that none exists.
 - **`vignettes/udm-architecture.md` is marked as the v2 design record.** Sections 2 to 10 name tables that aren't in the current model.
 
