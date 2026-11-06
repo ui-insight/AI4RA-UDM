@@ -238,6 +238,10 @@ graph TD
 | **Animal Research / Human Subjects / Biosafety modules** | Per-regime protocol detail on the spine | **Released in 2.3.0** ([specs](vignettes/modules/)) |
 | **Clinical Trials, Agreements** | Registration/enrollment records; MTA / DUA / NDA lifecycles | Future candidates |
 
+## Feedback
+
+Join the [AI4RA forum](https://groups.ai4ra.uidaho.edu/g/main/join) and post questions, feedback, and proposed changes under [#UDM](https://groups.ai4ra.uidaho.edu/g/main/search?q=%23UDM&ct=1). GitHub issues and pull requests remain the route for concrete schema changes.
+
 ## Contributing
 
 The UDM improves through community input: open a [GitHub Issue](https://github.com/ui-insight/AI4RA-UDM/issues) to suggest a change, use [GitHub Discussions](https://github.com/ui-insight/AI4RA-UDM/discussions) for broader questions, or take the short [practitioner survey](https://bit.ly/4b5b21q). See [CONTRIBUTING.md](CONTRIBUTING.md) for how to make a change and the license terms that apply to contributions.
