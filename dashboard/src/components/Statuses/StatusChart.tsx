@@ -45,7 +45,7 @@ function findTerm(record: string, column: string, label: string): GlossaryTerm |
 }
 
 function lastAtOrAbove(labels: { y: number; text: string }[], y: number, reach: number) {
-  return labels.filter((l) => l.y - reach <= y).at(-1)?.text ?? '';
+  return labels.filter((l) => l.y - reach <= y).pop()?.text ?? '';
 }
 
 export default function StatusChart({ svg, idPrefix, minWidth }: Props) {
