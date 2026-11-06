@@ -70,6 +70,7 @@
 <text x="850" y="439" font-size="11.5" fill="#15803d" text-anchor="middle" paint-order="stroke" stroke="#ffffff" stroke-width="3">Accepted starts the sponsor decision</text>
 <path d="M314 531H340" fill="none" stroke="#334155" stroke-width="1.6" marker-end="url(#a)"/>
 <path d="M464 531H560" fill="none" stroke="#334155" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M560 542H465" fill="none" stroke="#64748b" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#b)"/>
 <path d="M684 531H780" fill="none" stroke="#334155" stroke-width="1.6" marker-end="url(#a)"/>
 <path d="M442 510C442 474 842 474 842 510" fill="none" stroke="#334155" stroke-width="1.6" marker-end="url(#a)"/>
 <path d="M250 552L282 600" fill="none" stroke="#334155" stroke-width="1.6" marker-end="url(#a)"/>

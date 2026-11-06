@@ -1900,12 +1900,13 @@
                     ]
                   },
                   "Intent_to_Award": {
-                    "definition": "The sponsor signalled funding before an agreement exists; at-risk spending may be authorized",
+                    "definition": "The sponsor signalled funding before an agreement exists; at-risk spending may be authorized. The sponsor can walk the signal back, which returns the decision to Pending",
                     "set_by": "Recorded from the sponsor's communication",
                     "next": [
                       "Awarded",
                       "Declined",
-                      "Withdrawn"
+                      "Withdrawn",
+                      "Pending"
                     ]
                   },
                   "Awarded": {
@@ -1937,7 +1938,7 @@
               "Decision_Date": {
                 "type": "Date",
                 "required": false,
-                "description": "When the proposal's outcome was recorded: the Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn date"
+                "description": "When the proposal's outcome was recorded: the Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn date. Cleared if Intent_to_Award returns to Pending"
               },
               "Risk_Level": {
                 "type": "Status",
