@@ -1589,7 +1589,7 @@
     {
       "term": "IBC",
       "also": "Institutional Biosafety Committee",
-      "definition": "The committee that reviews research with recombinant or synthetic nucleic acid molecules, and often other biological hazards under institutional policy.",
+      "definition": "The committee that reviews the biosafety of research, including research with recombinant or synthetic nucleic acid molecules under NIH's rules.",
       "domain": "Compliance & research security",
       "udm": [
         "Committee.Committee_Type=IBC",
@@ -2059,7 +2059,7 @@
     {
       "term": "NSF PAPPG",
       "also": "Proposal and Award Policies and Procedures Guide",
-      "definition": "NSF's rulebook for proposals and awards.",
+      "definition": "NSF's rulebook for proposals and awards. NSF plans to replace it, so check NSF for the current guide.",
       "domain": "Federal identifiers & rules",
       "udm": [],
       "source": "NSF PAPPG",
