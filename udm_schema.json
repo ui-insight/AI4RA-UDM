@@ -2788,7 +2788,7 @@
                     "definition": "Ended at the recipient's request"
                   },
                   "Sponsor_Priorities": {
-                    "definition": "Ended because the agreement no longer serves the sponsor's program goals or priorities, including under an executive order"
+                    "definition": "Ended because the agreement no longer serves the sponsor's program goals or priorities"
                   }
                 },
                 "description": "Why the agreement was terminated. Required when the status is Terminating or Terminated; cleared on reinstatement, with earlier values kept by versioned storage"
@@ -3151,7 +3151,7 @@
                     "definition": "Ended at the recipient's request"
                   },
                   "Sponsor_Priorities": {
-                    "definition": "Ended because the agreement no longer serves the sponsor's program goals or priorities, including under an executive order"
+                    "definition": "Ended because the agreement no longer serves the sponsor's program goals or priorities"
                   },
                   "Prime_Terminated": {
                     "definition": "Ended because the prime award was terminated"
@@ -3449,7 +3449,7 @@
                     "definition": "Ended at the recipient's request"
                   },
                   "Sponsor_Priorities": {
-                    "definition": "Ended because the agreement no longer serves the sponsor's program goals or priorities, including under an executive order"
+                    "definition": "Ended because the agreement no longer serves the sponsor's program goals or priorities"
                   },
                   "Prime_Terminated": {
                     "definition": "Ended because the prime award was terminated"
