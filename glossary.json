@@ -1985,7 +1985,9 @@
       "udm": [
         "Award.Proposal_ID",
         "Proposal.Proposal_Type_Value_ID=New"
-      ]
+      ],
+      "source": "HHS Grants Policy Statement 2.3.1",
+      "source_url": "https://www.hhs.gov/sites/default/files/hhs-grants-policy-statement.pdf"
     },
     {
       "term": "No-cost extension",
@@ -3224,7 +3226,9 @@
       "udm": [
         "Modification.Event_Type_Value_ID=Supplement",
         "Modification.Requires_Peer_Review"
-      ]
+      ],
+      "source": "HHS Grants Policy Statement 2.3.1",
+      "source_url": "https://www.hhs.gov/sites/default/files/hhs-grants-policy-statement.pdf"
     },
     {
       "term": "Suspended (award)",
