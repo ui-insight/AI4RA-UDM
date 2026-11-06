@@ -45,8 +45,8 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
         </p>
         <p style={{ color: '#546e7a', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
           <strong>New here?</strong> Research administrators: start with the{' '}
-          <NavLink onClick={() => onNavigate('dictionary')}>Data Dictionary</NavLink> to see the
-          entities in plain language. Data engineers and IT: start with{' '}
+          <NavLink onClick={() => onNavigate('glossary')}>Glossary</NavLink> for what terms mean and{' '}
+          <NavLink onClick={() => onNavigate('statuses')}>Statuses</NavLink> for how records move. Data engineers and IT: start with{' '}
           <NavLink onClick={() => onNavigate('infrastructure')}>Infrastructure</NavLink> for how the
           UDM fits your stack, then grab the JSON endpoints below.
         </p>
@@ -213,6 +213,16 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
           }}
         >
           <NavCard
+            title="Glossary"
+            desc="Plain-language definitions of research administration terms, with sources and links to the model."
+            onClick={() => onNavigate('glossary')}
+          />
+          <NavCard
+            title="Statuses"
+            desc="Charts of how proposals, awards, and other records move through their statuses."
+            onClick={() => onNavigate('statuses')}
+          />
+          <NavCard
             title="Data Dictionary"
             desc="Summary table of every entity with field counts, descriptions, parents, children, and core module."
             onClick={() => onNavigate('dictionary')}
@@ -256,20 +266,20 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
           <li>
             <a href="data/udm_schema.json" style={{ color: '#667eea' }}>
               /data/udm_schema.json
-            </a>{' '}
-            — the current schema: semantic conventions, cross-row constraints, derived values, example views
+            </a>:{' '}
+            The current schema: semantic conventions, cross-row constraints, derived values, example views
           </li>
           <li>
             <a href="data/data-dictionary.json" style={{ color: '#667eea' }}>
               /data/data-dictionary.json
-            </a>{' '}
-            — table and column descriptions, synonyms, PII flags (regenerated from the schema)
+            </a>:{' '}
+            Table and column descriptions, synonyms, PII flags (regenerated from the schema)
           </li>
           <li>
             <a href="data/relationships.json" style={{ color: '#667eea' }}>
               /data/relationships.json
-            </a>{' '}
-            — foreign-key relationships ready for ERD or validation tooling
+            </a>:{' '}
+            Foreign-key relationships ready for ERD or validation tooling
           </li>
         </ul>
       </Card>
@@ -282,7 +292,7 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
           The UDM is developed by <strong>AI4RA</strong> (AI for Research Administration) at the
           University of Idaho. It is openly licensed (CC BY 4.0 for the standard, Apache-2.0 for
           the code) and improves through community
-          input — suggest changes, report issues, or join the discussion on GitHub.
+          input: suggest changes, report issues, or join the discussion on GitHub.
         </p>
         <ul style={{ paddingLeft: '1.25rem', color: '#546e7a', lineHeight: 1.8 }}>
           <li>
@@ -293,14 +303,14 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
               style={{ color: '#667eea' }}
             >
               AI4RA project site
-            </a>{' '}
-            — the broader AI for Research Administration initiative
+            </a>:{' '}
+            The broader AI for Research Administration initiative
           </li>
           <li>
             <a href={REPO_URL} target="_blank" rel="noopener noreferrer" style={{ color: '#667eea' }}>
               GitHub repository
-            </a>{' '}
-            — source of truth for the schema, spec, and this dashboard
+            </a>:{' '}
+            Source of truth for the schema, spec, and this dashboard
           </li>
           <li>
             <a
@@ -310,8 +320,8 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
               style={{ color: '#667eea' }}
             >
               Changelog
-            </a>{' '}
-            — what changed in each release, with migration guidance
+            </a>:{' '}
+            What changed in each release, with migration guidance
           </li>
           <li>
             <a
@@ -321,8 +331,8 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
               style={{ color: '#667eea' }}
             >
               Issues &amp; discussions
-            </a>{' '}
-            — propose tables, columns, or conventions
+            </a>:{' '}
+            Propose tables, columns, or conventions
           </li>
         </ul>
       </Card>

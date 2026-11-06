@@ -13,6 +13,10 @@ export default function ExampleViewsTab() {
         <p style={{ color: '#546e7a', marginBottom: '2rem' }}>
           The UDM includes pre-built SQL views that combine data from multiple tables for common reporting needs.
           These views simplify complex queries and provide ready-to-use data for dashboards and reports.
+          To produce the NSF HERD survey, see the{' '}
+          <a href="https://github.com/ui-insight/AI4RA-UDM/blob/main/vignettes/herd-report.md" style={{ color: '#667eea' }}>
+            HERD report guide
+          </a>.
         </p>
 
         {exampleViews.map(view => (

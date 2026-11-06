@@ -41,4 +41,5 @@ export type TabName =
   | 'views'
   | 'ontology'
   | 'glossary'
+  | 'statuses'
   | 'infrastructure';

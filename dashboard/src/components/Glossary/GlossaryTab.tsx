@@ -45,8 +45,8 @@ export default function GlossaryTab() {
         </p>
         <p style={{ color: '#546e7a', marginBottom: '1.5rem' }}>
           A record holds one value in each status field at a time. A proposal has several status
-          fields, one for each stage, and they move separately. The Infrastructure tab charts how
-          the statuses connect.
+          fields, one for each stage, and they move separately. The Statuses tab charts how
+          they connect.
         </p>
 
         <input

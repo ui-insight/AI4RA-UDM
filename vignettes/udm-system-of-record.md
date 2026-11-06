@@ -35,12 +35,13 @@ Where the spec says "is unique," "must reference," "sums to N," or "is required,
 | Layer | Standard term | Holds | Tech profile | Examples |
 |---|---|---|---|---|
 | 1 | System of Record | UDM source-of-truth research administration data | Versioned OLAP storage with transaction metadata capture | Apache Iceberg + Nessie, Dolt, PostgreSQL temporal tables |
-| 2 | System of Insight | Derived data: review findings, dashboards, reports, computed aggregates | View / projection layer inside the System of Record's query engine | Trino views, materialized views |
-| 3 | System of Engagement | Non-UDM application infrastructure: authentication, session state, submission tooling, in-flight drafts, observability | OLTP, transactional, user-facing | PostgreSQL or equivalent |
+| 2 | System of Engagement | Non-UDM application infrastructure: authentication, session state, in-flight drafts, observability | OLTP, transactional, user-facing | PostgreSQL or equivalent |
+| 3 | System of Insight | Derived data: review findings, dashboards, reports, computed aggregates | View / projection layer inside the System of Record's query engine | Trino views, materialized views |
+| 4 | System of Action | Automated work and its run state: workflow runs, scheduled jobs, submission tooling, notifications, automated agents | Event-driven or scheduled, with run logs and human approval where needed | Workflow engines, job schedulers, integration tools, AI agents |
 
-ETL or streaming pipelines carry finalized application data from the System of Engagement into the System of Record. The System of Insight requires no data movement; it lives entirely inside the System of Record's query engine.
+ETL or streaming pipelines carry finalized application data from the System of Engagement into the System of Record. The System of Insight requires no data movement; it lives entirely inside the System of Record's query engine. It reads only from the System of Record, by design, so its views can be rebuilt at any time. The System of Action reads from the System of Record and the System of Insight to decide what to do, works within limits people set, and keeps a record of what it did. Results that are research administration facts, such as a SubmissionAttempt, go back into the System of Record; its run state stays in the System of Action.
 
-**The regeneration test.** Data belongs in UDM only if it is source-of-truth research administration data that cannot be regenerated from other UDM data plus engine logic. Derived data (review findings, requirement-satisfaction checklists, computed aggregates) lives in the System of Insight. Infrastructure data (sessions, submission tooling artifacts, telemetry) lives in the System of Engagement. Row history lives in the storage layer's versioned history; UDM has no audit-log entity for this reason.
+**The regeneration test.** Data belongs in UDM only if it is source-of-truth research administration data that cannot be regenerated from other UDM data plus engine logic. Derived data (review findings, requirement-satisfaction checklists, computed aggregates) lives in the System of Insight. Infrastructure data (sessions, telemetry) lives in the System of Engagement. Automation run state (submission tooling artifacts, workflow and job runs) lives in the System of Action. Row history lives in the storage layer's versioned history; UDM has no audit-log entity for this reason.
 
 **Where logic lives.** Logic follows the same layering as data. The UDM fully specifies the logic the System of Record owns, ships reference implementations for the System of Insight, and deliberately leaves workflow logic to the institution.
 
@@ -48,8 +49,8 @@ ETL or streaming pipelines carry finalized application data from the System of E
 |---|---|---|---|
 | Invariants (validation) | Two-FK exclusive-or, lifecycle chain rules, conditional-required columns | System of Record enforcement; mechanism (constraint, trigger, scheduled check) is the institution's choice | Typed cross-row constraints, machine-readable |
 | Derivation | Current_End_Date, Current_Total_Funded, lineage roots | Write-path recompute against the System of Record | Derived-value rules with documented recompute triggers |
-| Business / analytical | Active awards, overdue reports, requirement satisfaction, review findings | System of Insight views over UDM data | Example views as reference implementations; finding and checklist shapes documented as patterns |
-| Workflow / process | Approval gating, reviewer auto-assignment, escalation | System of Engagement application code, reading Insight views | Deliberately unspecified; the spec documents the data the workflow reads, never the workflow itself |
+| Business / analytical | Active awards, overdue deliverables, requirement satisfaction, review findings | System of Insight views over UDM data | Example views as reference implementations; finding and checklist shapes documented as patterns |
+| Workflow / process | Approval gating, reviewer auto-assignment, escalation | System of Action, reading Insight views | Deliberately unspecified; the spec documents the data the workflow reads, never the workflow itself |
 | Usage conventions | Modification vs new Award, role-bearer changes, submission events | Consumers and integrators | Semantic conventions |
 
 **The module taxonomy.** Everything specified is a module: a named, fully specified, versioned slice of research administration capability. An implementation is described by what it adopts.
@@ -310,7 +311,7 @@ No single entity captures "the decision" abstractly; the three representations t
 - Each transmission is one `SubmissionAttempt` row. Re-submissions add attempts; the attempt history is the row sequence by `Attempt_Number`.
 - `Proposal.Submission_Status` is the newest attempt's `Attempt_Status` once an attempt has left Unsubmitted, as long as it is in transmission or with the sponsor or the current package still matches it; before that it is Unapproved, Unsubmitted, or Signed_Off. `Proposal.Submission_Date` and `Submission_Version` derive from the attempts.
 - Sponsor tracking and confirmation identifiers live on the attempt, indexed, not in free text.
-- Package assembly artifacts, connection profiles, and retry mechanics are submission-tooling internals and live in the System of Engagement. The transmitted package itself is a `Document` attached to the attempt; its hash is `Package_Hash`.
+- Package assembly artifacts, connection profiles, and retry mechanics are submission-tooling internals and live in the System of Action. The transmitted package itself is a `Document` attached to the attempt; its hash is `Package_Hash`.
 
 ---
 
@@ -829,7 +830,7 @@ A formal request for funding submitted to a sponsor.
 
 #### SubmissionAttempt
 
-One transmission of a proposal to a sponsor's submission system. `Proposal.Submission_Status` shows the newest attempt's `Attempt_Status` once it has left Unsubmitted, as long as it is in transmission or with the sponsor or the current package still matches it. The attempt records what was sent, by whom, when, and what the sponsor's system said; package assembly, connection profiles, and retry mechanics stay in the System of Engagement.
+One transmission of a proposal to a sponsor's submission system. `Proposal.Submission_Status` shows the newest attempt's `Attempt_Status` once it has left Unsubmitted, as long as it is in transmission or with the sponsor or the current package still matches it. The attempt records what was sent, by whom, when, and what the sponsor's system said; package assembly, connection profiles, and retry mechanics stay in the System of Action.
 
 | Column | Type | Required | Notes |
 |---|---|---|---|

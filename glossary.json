@@ -2894,23 +2894,32 @@
       ]
     },
     {
+      "term": "System of Action",
+      "also": "",
+      "definition": "Where software carries out work on people's behalf, such as workflows, scheduled jobs, and automated agents, within limits people set and with a record of what it did. This is different from an Action in the UDM, which is a logged work item.",
+      "domain": "Systems & identifiers",
+      "udm": [],
+      "source": "Forrester, Insight Was Never The Point: Arise, Systems Of Action",
+      "source_url": "https://www.forrester.com/blogs/insight-was-never-the-point-arise-systems-of-action/"
+    },
+    {
       "term": "System of Engagement",
       "also": "SoE, operational system, front-end application",
-      "definition": "The tools people use to get the work done day to day, such as proposal routing, forms, and task tools.",
+      "definition": "Where people do the work: the tools they use to view data, collaborate, and complete tasks, along with what those tools need to run.",
       "domain": "Systems & identifiers",
       "udm": []
     },
     {
       "term": "System of Insight",
       "also": "SoI, analytics layer, reporting layer, BI",
-      "definition": "Where data is turned into reports, dashboards, and analysis.",
+      "definition": "Where data is analyzed to show what it means, such as reports and dashboards. In the UDM's architecture, it reads only from the System of Record, so it can be rebuilt at any time.",
       "domain": "Systems & identifiers",
       "udm": []
     },
     {
       "term": "System of Record",
       "also": "SoR, source of truth, authoritative system",
-      "definition": "The official place where a piece of information lives. When two reports disagree, the System of Record wins.",
+      "definition": "Where the official version of the data is stored. When two reports disagree, the System of Record wins.",
       "domain": "Systems & identifiers",
       "udm": []
     },

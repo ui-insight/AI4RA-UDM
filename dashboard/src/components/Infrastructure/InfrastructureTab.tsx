@@ -1,6 +1,4 @@
 import { useMemo } from 'react';
-import statusPathUrl from '../../assets/proposal-award-status-path.svg';
-import otherRecordPathsUrl from '../../assets/other-record-status-paths.svg';
 import {
   ReactFlow,
   Background,
@@ -56,7 +54,7 @@ function buildMedallionDiagram(): { nodes: Node[]; edges: Edge[] } {
     makeGroup('g_sources', 'Sources', colX(0), 0, gw, gh, colors.sources),
     makeGroup('g_bronze', 'Bronze', colX(1), 0, gw, gh, colors.bronze),
     makeGroup('g_silver', 'Silver', colX(2), 0, gw, gh, colors.silver),
-    makeGroup('g_gold', 'Gold — UDM', colX(3), 0, gw, gh, colors.gold),
+    makeGroup('g_gold', 'Gold: UDM', colX(3), 0, gw, gh, colors.gold),
     makeGroup('g_platinum', 'Platinum', colX(4), 0, gw, gh, colors.platinum),
     makeGroup('g_apps', 'Applications', colX(5), 0, gw, gh, colors.apps),
 
@@ -149,10 +147,10 @@ export default function InfrastructureTab() {
           Medallion Architecture
         </h3>
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
-          The most common pattern uses a medallion (Bronze/Silver/Gold/Platinum) architecture. Institutional
+          A common pattern uses a medallion (Bronze/Silver/Gold/Platinum) architecture. Institutional
           source systems feed raw data into a Bronze layer. The Silver layer maps each source's fields to UDM
           column names. The Gold layer unions Silver tables across sources into unified UDM tables. The
-          Platinum layer provides application-specific views — joins, filters, and aggregations built on Gold —
+          Platinum layer provides application-specific views, with joins, filters, and aggregations built on Gold,
           that any application can query.
         </p>
 
@@ -221,46 +219,11 @@ export default function InfrastructureTab() {
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)', marginBottom: '2rem',
       }}>
         <h3 style={{ color: '#2c3e50', marginBottom: '1rem', fontSize: '1.3rem' }}>
-          Proposal and Award Status Path
-        </h3>
-        <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
-          A proposal has three status stages, and the award that follows has its own. The status that
-          ends one stage starts the next. Definitions are in the Glossary and Data Dictionary tabs.
-        </p>
-        <div style={{ overflowX: 'auto' }}>
-          <img
-            src={statusPathUrl}
-            alt="Flow chart of the status path. Internal approval ends at Approved, which starts sponsor submission at Unsubmitted. Sponsor submission ends at Accepted, which starts sponsor decision at Pending. Sponsor decision ends at Awarded, which starts the award at In Setup."
-            style={{ display: 'block', width: '100%', minWidth: 900, height: 'auto' }}
-          />
-        </div>
-
-        <h3 style={{ color: '#2c3e50', margin: '2rem 0 1rem', fontSize: '1.3rem' }}>
-          Other Record Status Paths
-        </h3>
-        <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
-          Early setup, modifications, subawards, payments, deliverables, and actions run alongside the
-          proposal and award, each with its own statuses.
-        </p>
-        <div style={{ overflowX: 'auto' }}>
-          <img
-            src={otherRecordPathsUrl}
-            alt="Flow chart of status paths for six records: early setup, modification, subaward, payment, deliverable, and action."
-            style={{ display: 'block', width: '100%', minWidth: 800, height: 'auto' }}
-          />
-        </div>
-      </div>
-
-      <div style={{
-        background: 'white', padding: '2rem', borderRadius: 8,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)', marginBottom: '2rem',
-      }}>
-        <h3 style={{ color: '#2c3e50', marginBottom: '1rem', fontSize: '1.3rem' }}>
           Crosswalks: Mapping Source Fields to the UDM
         </h3>
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
           A <strong>crosswalk</strong> is a declarative mapping between a source system's vocabulary and the
-          UDM's — one row per source field listing the target UDM column, any value translation, and
+          UDM's, with one row per source field listing the target UDM column, any value translation, and
           transformation notes. In a medallion architecture the crosswalk <em>is</em> the Silver layer.
         </p>
 
@@ -276,9 +239,9 @@ export default function InfrastructureTab() {
               </tr>
             </thead>
             <tbody>
-              <CrosswalkRow src="grantNumber" tgt="Award.Award_ID" note="direct" />
-              <CrosswalkRow src="pi_email" tgt={'ContactDetails.Contact_Value\u00A0(Contact_Type=Email)'} note="pivot to ContactDetails row" />
-              <CrosswalkRow src="STATUS_CD = 'A'" tgt="Award.Award_Status = 'Active'" note="value lookup via AllowedValues" />
+              <CrosswalkRow src="grantNumber" tgt="Award.Award_Number" note="direct" />
+              <CrosswalkRow src="pi_email" tgt={'ContactDetails.Contact_Value\u00A0(Contact_Type_Value_ID=Email)'} note="pivot to ContactDetails row" />
+              <CrosswalkRow src="STATUS_CD = 'A'" tgt="Award.Award_Status = 'Active'" note="value translation to the fixed status list" />
               <CrosswalkRow src="proj_start (MM/DD/YYYY)" tgt="Proposal.Proposed_Start_Date" note="parse to DATE" />
               <CrosswalkRow src="FOA_NUM" tgt="RFA.RFA_Number" note="synonym match (column synonyms)" />
             </tbody>
@@ -300,7 +263,7 @@ export default function InfrastructureTab() {
           marginTop: '1.25rem', padding: '0.85rem 1rem', borderRadius: 6,
           background: '#eef2ff', border: '1px solid #c7d2fe', color: '#3730a3', fontSize: '0.9rem',
         }}>
-          <strong>In progress:</strong> AI-assisted / dynamic crosswalk generation — using the{' '}
+          <strong>In progress:</strong> AI-assisted, dynamic crosswalk generation, using the{' '}
           <code>synonyms</code> and <code>description</code> fields plus table context to auto-propose
           mappings from a source schema to UDM columns, with confidence scores and human review. See{' '}
           <a href="https://github.com/ui-insight/AI4RA-UDM/issues/33" style={{ color: '#4f46e5' }}>
@@ -313,25 +276,13 @@ export default function InfrastructureTab() {
         background: 'white', padding: '2rem', borderRadius: 8,
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)', marginBottom: '2rem',
       }}>
-        <h3 style={{ color: '#2c3e50', marginBottom: '0.5rem', fontSize: '1.3rem' }}>
-          Terms
-        </h3>
-        <p style={{ color: '#546e7a' }}>
-          Definitions of integration, data, and research administration terms are in the Glossary tab.
-        </p>
-      </div>
-
-      <div style={{
-        background: 'white', padding: '2rem', borderRadius: 8,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)', marginBottom: '2rem',
-      }}>
         <h3 style={{ color: '#2c3e50', marginBottom: '1rem', fontSize: '1.3rem' }}>
           Direct Database Implementation
         </h3>
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
           For institutions that want a simpler approach, the UDM can be implemented directly as database tables.
-          Run <code>scripts/generate_ddl.py --dialect &lt;engine&gt;</code> to generate CREATE TABLE statements for your platform, or map the abstract types yourself
-          (MySQL, PostgreSQL, SQLite, SQL Server) and load data via ETL.
+          Run <code>scripts/generate_ddl.py --dialect &lt;engine&gt;</code> to generate CREATE TABLE statements for MySQL or PostgreSQL.
+          For other platforms, map the abstract types yourself. Then load data via ETL.
         </p>
         <div style={{ background: '#f8f9fa', borderRadius: 8, height: 200 }}>
           <ReactFlow
@@ -372,7 +323,7 @@ export default function InfrastructureTab() {
           <LayerCard title="Query Engine" color={colors.gold}
             desc="Dremio, DuckDB, Trino, Spark SQL, native database SQL, MongoDB aggregation" />
           <LayerCard title="App Views" color={colors.platinum}
-            desc="Platinum views tailored per app — SQL views, dbt models, materialized views, or semantic layers" />
+            desc="Platinum views tailored per app: SQL views, dbt models, materialized views, or semantic layers" />
           <LayerCard title="Applications" color={colors.apps}
             desc="Tableau, Power BI, custom dashboards, LLM integrations, REST APIs" />
         </div>
@@ -385,7 +336,7 @@ export default function InfrastructureTab() {
         <h3 style={{ color: '#2c3e50', marginBottom: '1rem', fontSize: '1.3rem' }}>Accessing the UDM Programmatically</h3>
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
           The UDM schema is published as a machine-readable JSON file via GitHub Pages. You can fetch it directly
-          in any language or tool — no authentication required.
+          in any language or tool, with no authentication required.
         </p>
         <div style={{
           background: '#1e1e1e', borderRadius: 8, padding: '1.25rem', marginBottom: '1rem',
@@ -393,20 +344,20 @@ export default function InfrastructureTab() {
         }}>
           <div style={{ color: '#6a9955', marginBottom: '0.5rem' }}># Fetch the UDM schema</div>
           <div>curl https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json</div>
-          <div style={{ color: '#6a9955', marginTop: '1rem', marginBottom: '0.5rem' }}># Python — load as a dictionary</div>
+          <div style={{ color: '#6a9955', marginTop: '1rem', marginBottom: '0.5rem' }}># Python: load as a dictionary</div>
           <div><span style={{ color: '#c586c0' }}>import</span> requests</div>
           <div>schema = requests.get(<span style={{ color: '#ce9178' }}>"https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json"</span>).json()</div>
-          <div style={{ color: '#6a9955', marginTop: '1rem', marginBottom: '0.5rem' }}># JavaScript — fetch in browser or Node.js</div>
+          <div style={{ color: '#6a9955', marginTop: '1rem', marginBottom: '0.5rem' }}># JavaScript: fetch in browser or Node.js</div>
           <div><span style={{ color: '#c586c0' }}>const</span> schema = <span style={{ color: '#c586c0' }}>await</span> fetch(<span style={{ color: '#ce9178' }}>"https://ui-insight.github.io/AI4RA-UDM/data/udm_schema.json"</span>)</div>
           <div>{'  '}.then(r =&gt; r.json());</div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
           <LayerCard title="Schema Endpoint" color={colors.udm}
-            desc="ui-insight.github.io/AI4RA-UDM/data/udm_schema.json — the complete UDM definition: tables, columns, types, foreign keys, semantic conventions, cross-row constraints, derived values, column synonyms, and example views." />
+            desc="ui-insight.github.io/AI4RA-UDM/data/udm_schema.json: the complete UDM definition: tables, columns, types, foreign keys, semantic conventions, cross-row constraints, derived values, column synonyms, and example views." />
           <LayerCard title="Data Dictionary" color={colors.udm}
-            desc="ui-insight.github.io/AI4RA-UDM/data/data-dictionary.json — pre-processed table and column metadata for building tools and documentation." />
+            desc="ui-insight.github.io/AI4RA-UDM/data/data-dictionary.json: pre-processed table and column metadata for building tools and documentation." />
           <LayerCard title="Relationships" color={colors.udm}
-            desc="ui-insight.github.io/AI4RA-UDM/data/relationships.json — all foreign key relationships extracted from the schema, ready for ERD generation or validation." />
+            desc="ui-insight.github.io/AI4RA-UDM/data/relationships.json: all foreign key relationships extracted from the schema, ready for ERD generation or validation." />
         </div>
         <p style={{ color: '#546e7a', marginTop: '1rem', fontSize: '0.9rem' }}>
           These endpoints always reflect the latest version of the UDM. Use them to generate DDL for your database platform,

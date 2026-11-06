@@ -2031,7 +2031,7 @@
             ]
           },
           "SubmissionAttempt": {
-            "description": "One transmission of a proposal to a sponsor's submission system. Proposal.Submission_Status follows the newest attempt's Attempt_Status under its derived rule. The attempt records what was sent, by whom, when, and what the sponsor's system said; package assembly, connection profiles, and retry mechanics stay in the System of Engagement.",
+            "description": "One transmission of a proposal to a sponsor's submission system. Proposal.Submission_Status follows the newest attempt's Attempt_Status under its derived rule. The attempt records what was sent, by whom, when, and what the sponsor's system said; package assembly, connection profiles, and retry mechanics stay in the System of Action.",
             "columns": {
               "SubmissionAttempt_ID": {
                 "type": "ID",
@@ -4355,7 +4355,7 @@
               "Each transmission is one SubmissionAttempt row. Re-submissions add attempts; the attempt history is the row sequence by Attempt_Number.",
               "Proposal.Submission_Status is the newest attempt's Attempt_Status; Proposal.Submission_Date and Submission_Version derive from the attempts.",
               "Sponsor tracking and confirmation identifiers live on the attempt, indexed, not in free text.",
-              "Package assembly artifacts, connection profiles, and retry mechanics are submission-tooling internals and live in the System of Engagement. The transmitted package itself is a Document attached to the attempt; its hash is Package_Hash.",
+              "Package assembly artifacts, connection profiles, and retry mechanics are submission-tooling internals and live in the System of Action. The transmitted package itself is a Document attached to the attempt; its hash is Package_Hash.",
               "A later minor release may add the sponsor's system as a named channel value; the Channel vocabulary is institution-extensible."
             ]
           }
