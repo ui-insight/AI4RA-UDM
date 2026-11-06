@@ -8,7 +8,7 @@ const tabs: { id: TabName; label: string }[] = [
   { id: 'tables', label: 'Explorer' },
   { id: 'erd', label: 'ERD Visualization' },
   { id: 'views', label: 'Example Views' },
-  { id: 'ontology', label: 'Ontology & Design' },
+  { id: 'ontology', label: 'Design' },
   { id: 'infrastructure', label: 'Infrastructure' },
 ];
 

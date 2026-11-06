@@ -2,7 +2,7 @@
 
 A universal data model for research administration that any institution can adopt.
 
-**Current version: v4.0.0** (released 2026-11-05). Earlier versions are fixed commits under [GitHub Releases](https://github.com/ui-insight/AI4RA-UDM/releases); see [Versions](#versions).
+**Current version: v4.0.0** (released 2026-11-06). Earlier versions are fixed commits under [GitHub Releases](https://github.com/ui-insight/AI4RA-UDM/releases); see [Versions](#versions).
 
 ## Mission
 

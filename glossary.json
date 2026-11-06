@@ -280,6 +280,15 @@
       "source_url": "https://www.casrai.org/dictionary/term/burn-rate-grant"
     },
     {
+      "term": "Awaiting Sponsor",
+      "also": "",
+      "definition": "A closeout status: everything is submitted, and the closeout is waiting on the sponsor's acceptance or final audit.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Closeout.Closeout_Status=Awaiting_Sponsor"
+      ]
+    },
+    {
       "term": "Award",
       "also": "Grant, contract, project, sponsored project",
       "definition": "Funding the institution has received for a project.",
@@ -546,6 +555,15 @@
       "domain": "Award & lifecycle",
       "udm": [
         "Award.Award_Status=Closed"
+      ]
+    },
+    {
+      "term": "Closed (compliance)",
+      "also": "",
+      "definition": "A compliance status: the work finished and the approval was closed.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ComplianceRequirement.Requirement_Status=Closed"
       ]
     },
     {
@@ -3170,6 +3188,15 @@
       "domain": "Award & lifecycle",
       "udm": [
         "Deliverable.Deliverable_Status=Waived"
+      ]
+    },
+    {
+      "term": "Withdrawn (compliance)",
+      "also": "",
+      "definition": "A compliance status: the submission was pulled back from the reviewing authority before a decision. Trying again starts a new requirement.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ComplianceRequirement.Requirement_Status=Withdrawn"
       ]
     },
     {

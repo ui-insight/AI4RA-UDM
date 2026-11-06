@@ -20,6 +20,9 @@ export default function ExampleViewsTab({ views }: { views: ExampleView[] }) {
           generated from <code>udm_schema.json</code>. To produce the NSF HERD survey, see the{' '}
           <a href="https://github.com/ui-insight/AI4RA-UDM/blob/main/vignettes/herd-report.md" style={{ color: '#667eea' }}>
             HERD report guide
+          </a>. For the Glossary's metrics, such as burn rate and funding rate, see the{' '}
+          <a href="https://github.com/ui-insight/AI4RA-UDM/blob/main/vignettes/udm-system-of-insight-views.md" style={{ color: '#667eea' }}>
+            sample queries
           </a>.
         </p>
 

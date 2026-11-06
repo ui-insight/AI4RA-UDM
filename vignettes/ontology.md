@@ -362,7 +362,7 @@ The report details of a Deliverable: progress reports, RPPR, FFR (SF425), final 
 
 ### Closeout
 
-The closeout workflow object for an Award or Subaward. Coordinates several subworkflows (final report, final invoice, equipment disposition, IP closeout, COI closeout, records retention). Structured rather than narrative because federal closeout reporting requires a defined end state.
+The closeout workflow object for an Award or Subaward. Coordinates several subworkflows (final invoice, equipment disposition, IP closeout, COI closeout, records retention). Final reports are tracked as Deliverable rows. Structured rather than narrative because federal closeout reporting requires a defined end state.
 
 ## Effort
 

@@ -200,6 +200,10 @@ export default function InfrastructureTab() {
         </div>
 
         <div style={{ marginTop: '2rem' }}>
+          <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
+            Gold is the System of Record, and Platinum views are the System of Insight. The Design tab
+            explains those layers, along with the Systems of Engagement and Action.
+          </p>
           <h3 style={{ color: '#2c3e50', marginBottom: '1rem', fontSize: '1.3rem' }}>Layer Responsibilities</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '1rem' }}>
             <LayerCard title="Bronze" color={colors.bronze}
@@ -358,6 +362,8 @@ export default function InfrastructureTab() {
             desc="ui-insight.github.io/AI4RA-UDM/data/data-dictionary.json: pre-processed table and column metadata for building tools and documentation." />
           <LayerCard title="Relationships" color={colors.udm}
             desc="ui-insight.github.io/AI4RA-UDM/data/relationships.json: all foreign key relationships extracted from the schema, ready for ERD generation or validation." />
+          <LayerCard title="Example Views" color={colors.udm}
+            desc="ui-insight.github.io/AI4RA-UDM/data/example-views.json: each example view's purpose and SQL." />
         </div>
         <p style={{ color: '#546e7a', marginTop: '1rem', fontSize: '0.9rem' }}>
           These endpoints always reflect the latest version of the UDM. Use them to generate DDL for your database platform,

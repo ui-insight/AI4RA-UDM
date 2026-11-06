@@ -122,7 +122,7 @@ Four tables carry a `Lifecycle_Stage` column that distinguishes records of the s
 |---|---|
 | Budget | Proposed → Approved → Current → Actual |
 | Effort | Proposed → Approved → Charged → Certified |
-| CostShare | Proposed → Committed → Met → Waived |
+| CostShare | Proposed → Committed → Met / Waived |
 | Payment | Scheduled → Invoiced → Paid → Reconciled |
 
 Later-stage rows store a `Previous_*_ID` value pointing at the earlier-stage row they descend from. The stage order is canonical; stages may be skipped (e.g., Effort may jump from Proposed straight to Charged if no separate Approved record exists). When a stage is skipped, the later-stage row's `Previous_*_ID` points at the nearest existing earlier row. A row with no earlier-stage predecessor has `Previous_*_ID` set to null.
@@ -380,7 +380,7 @@ Universal status taxonomies are listed here in one place. The JSON artifact carr
 | `Negotiation_Status` | Pending, Active, On_Hold, Resolved, Abandoned |
 | `Modification.Approval_Status` | Requested, Approved, Rejected, Withdrawn, Not_Required, Reversed (an Approved or Not_Required Modification that was later withdrawn by sponsor or invalidated by institutional correction; excluded from derivations of `Award.Current_End_Date` and `Award.Current_Total_Funded`) |
 | `Payment_Status` | Clear, Disputed, Cancelled (see note below) |
-| `Requirement_Status` (Compliance) | Draft, Submitted, In_Review, Approved, Expired, Conditional_Approval, Disapproved, Terminated, Suspended, Not_Applicable |
+| `Requirement_Status` (Compliance) | Draft, Submitted, In_Review, Approved, Expired, Conditional_Approval, Disapproved, Terminated, Suspended, Not_Applicable, Closed, Withdrawn |
 | `Risk_Level` (Award, Proposal, Subaward) | Low, Medium, High |
 | `Restriction_Status` | Active, Expired, Lifted, Pending_Review |
 | `Deadline_Status` | Open, Approaching, Overdue, Met, Waived |
@@ -1023,7 +1023,7 @@ The report details of a Deliverable: which kind of report it is and the period i
 
 #### Closeout
 
-The closeout workflow object for an Award or Subaward. Each closeout coordinates several subworkflows (final report, final invoice, equipment disposition, IP closeout, COI closeout, records retention start). Closeout is structured rather than narrative because federal closeout reporting requires a defined end state.
+The closeout workflow object for an Award or Subaward. Each closeout coordinates several subworkflows (final invoice, equipment disposition, IP closeout, COI closeout, records retention start). Closeout is structured rather than narrative because federal closeout reporting requires a defined end state.
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
@@ -1031,7 +1031,6 @@ The closeout workflow object for an Award or Subaward. Each closeout coordinates
 | Award_ID | ID | optional | → Award. Exactly one of `Award_ID` or `Subaward_ID` is non-null. One Closeout row per parent agreement |
 | Subaward_ID | ID | optional | → Subaward. Exactly one of `Award_ID` or `Subaward_ID` is non-null |
 | Closeout_Initiated_Date | Date | required | |
-| Final_Report_Status | Status | required | Constrained: Not_Required / Not_Started / Submitted / Fulfilled |
 | Final_Invoice_Status | Status | required | Constrained: Not_Required / Not_Started / Submitted / Paid |
 | Equipment_Disposition_Status | Status | required | Constrained: Not_Applicable / In_Progress / Complete |
 | IP_Closeout_Status | Status | required | Constrained: Not_Applicable / In_Progress / Complete |
@@ -1039,7 +1038,7 @@ The closeout workflow object for an Award or Subaward. Each closeout coordinates
 | Records_Retention_Start_Date | Date | optional | Beginning of the retention window (typically the date the final financial report is submitted) |
 | Records_Retention_End_Date | Date | derived | When the records retention obligation ends. Derived: `Records_Retention_Start_Date` plus `Terms.Record_Retention_Years` for the agreement this Closeout belongs to; null while the start date is null |
 | Final_Closeout_Date | Date | conditional | Required when Closeout_Status = 'Complete' |
-| Closeout_Status | Status | required | Constrained: In_Progress / Pending_Sponsor_Final_Audit / Complete / Reopened |
+| Closeout_Status | Status | required | Constrained: In_Progress / Awaiting_Sponsor / Complete / Reopened |
 
 ### Effort
 

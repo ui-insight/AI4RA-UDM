@@ -2,7 +2,7 @@
   "metadata": {
     "name": "UDM",
     "version": "4.0.0",
-    "released": "2026-11-05",
+    "released": "2026-11-06",
     "description": "Vendor-neutral research administration data model. This JSON is the machine-readable serialization of the specification in vignettes/udm-system-of-record.md: modules, tables, columns in the abstract type vocabulary, constraints, conventions, and derivation rules. It names no database engine; types.dialects maps the abstract types to native ones per engine.",
     "spec_source": "vignettes/udm-system-of-record.md",
     "changelog": "vignettes/CHANGELOG.md",
@@ -3972,7 +3972,7 @@
             ]
           },
           "Closeout": {
-            "description": "The closeout workflow object for an Award or Subaward. Coordinates several subworkflows (final report, final invoice, equipment disposition, IP closeout, COI closeout, records retention).",
+            "description": "The closeout workflow object for an Award or Subaward. Coordinates several subworkflows (final invoice, equipment disposition, IP closeout, COI closeout, records retention). Final reports are tracked as Deliverable rows.",
             "columns": {
               "Closeout_ID": {
                 "type": "ID",
@@ -4009,43 +4009,6 @@
                 "required": true,
                 "description": "When closeout was initiated",
                 "synonyms": "Closeout Start"
-              },
-              "Final_Report_Status": {
-                "type": "Status",
-                "required": true,
-                "allowed_values": [
-                  "Not_Required",
-                  "Not_Started",
-                  "Submitted",
-                  "Fulfilled"
-                ],
-                "value_definitions": {
-                  "Not_Required": {
-                    "definition": "The terms require no final report",
-                    "set_by": "Sponsored programs office",
-                    "next": []
-                  },
-                  "Not_Started": {
-                    "definition": "Due and not yet submitted",
-                    "set_by": "Sponsored programs office",
-                    "next": [
-                      "Submitted"
-                    ]
-                  },
-                  "Submitted": {
-                    "definition": "Sent to the sponsor",
-                    "set_by": "The submitter",
-                    "next": [
-                      "Fulfilled"
-                    ]
-                  },
-                  "Fulfilled": {
-                    "definition": "The sponsor reviewed and approved it",
-                    "set_by": "Recorded from the sponsor's communication",
-                    "next": []
-                  }
-                },
-                "description": "Constrained: Not_Required / Not_Started / Submitted / Fulfilled"
               },
               "Final_Invoice_Status": {
                 "type": "Status",
@@ -4199,7 +4162,7 @@
                 "required": true,
                 "allowed_values": [
                   "In_Progress",
-                  "Pending_Sponsor_Final_Audit",
+                  "Awaiting_Sponsor",
                   "Complete",
                   "Reopened"
                 ],
@@ -4208,11 +4171,11 @@
                     "definition": "Closeout subworkflows are under way",
                     "set_by": "Sponsored programs office",
                     "next": [
-                      "Pending_Sponsor_Final_Audit",
+                      "Awaiting_Sponsor",
                       "Complete"
                     ]
                   },
-                  "Pending_Sponsor_Final_Audit": {
+                  "Awaiting_Sponsor": {
                     "definition": "Everything is submitted; waiting on the sponsor's final audit or acceptance",
                     "set_by": "Sponsored programs office",
                     "next": [
@@ -4235,7 +4198,7 @@
                     ]
                   }
                 },
-                "description": "Constrained: In_Progress / Pending_Sponsor_Final_Audit / Complete / Reopened"
+                "description": "Constrained: In_Progress / Awaiting_Sponsor / Complete / Reopened"
               }
             },
             "constraints": [
@@ -6382,7 +6345,9 @@
                   "Disapproved",
                   "Terminated",
                   "Suspended",
-                  "Not_Applicable"
+                  "Not_Applicable",
+                  "Closed",
+                  "Withdrawn"
                 ],
                 "value_definitions": {
                   "Draft": {
@@ -6396,7 +6361,8 @@
                     "definition": "Sent to the reviewing authority",
                     "set_by": "The investigator",
                     "next": [
-                      "In_Review"
+                      "In_Review",
+                      "Withdrawn"
                     ]
                   },
                   "In_Review": {
@@ -6406,7 +6372,8 @@
                       "Approved",
                       "Conditional_Approval",
                       "Disapproved",
-                      "Not_Applicable"
+                      "Not_Applicable",
+                      "Withdrawn"
                     ]
                   },
                   "Approved": {
@@ -6415,7 +6382,8 @@
                     "next": [
                       "Expired",
                       "Suspended",
-                      "Terminated"
+                      "Terminated",
+                      "Closed"
                     ]
                   },
                   "Expired": {
@@ -6453,9 +6421,19 @@
                     "definition": "A determination found no requirement applies",
                     "set_by": "The reviewing authority",
                     "next": []
+                  },
+                  "Closed": {
+                    "definition": "The work finished and the approval was closed",
+                    "set_by": "The investigator or the reviewing authority",
+                    "next": []
+                  },
+                  "Withdrawn": {
+                    "definition": "Pulled back from the reviewing authority before a decision; a new attempt is a new requirement row",
+                    "set_by": "The investigator",
+                    "next": []
                   }
                 },
-                "description": "The approval state of this requirement with its reviewing authority. Expired once Expiration_Date passes without renewal; Not_Applicable when a determination found no requirement applies"
+                "description": "The approval state of this requirement with its reviewing authority. Expired once Expiration_Date passes without renewal; Not_Applicable when a determination found no requirement applies; Closed when the work finished and the approval was closed; Withdrawn when pulled back before a decision"
               },
               "Compliance_Classification_Level_Value_ID": {
                 "type": "ID",

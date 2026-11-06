@@ -7,7 +7,22 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 - **MINOR** when entities or columns are added in a backward-compatible way
 - **PATCH** for documentation, convention clarifications, or fixes to non-load-bearing rules
 
-## [4.0.0] - 2026-11-05
+## [4.0.0] - 2026-11-06
+
+### Compliance and closeout (breaking)
+
+- **`Closeout.Final_Report_Status` is removed.** Final reports are `Deliverable` rows with their own status, and an award can owe several. `v_final_reports` in the sample views shows how to read them.
+- **`Closeout_Status`: `Pending_Sponsor_Final_Audit` becomes `Awaiting_Sponsor`.** Most closeouts wait on the sponsor accepting final reports, with no audit involved.
+- **`Requirement_Status` gains `Closed` and `Withdrawn`.** `Closed` is the normal ending when the work finishes. `Withdrawn` comes from `Submitted` or `In_Review`, and a new attempt is a new row.
+
+### Documentation, dashboard, and CI
+
+- **Dashboard: third status chart.** The Statuses tab now covers compliance, closeout, budget, effort, and cost share.
+- **Metric queries.** `vignettes/udm-system-of-insight-views.md` adds samples 10 to 13, which calculate the Glossary's balance, burn rate, funding rate, award dollar, and operations metrics. Samples 3, 4, 5, 6, and 9 no longer use columns and values that aren't in the schema.
+- **`vignettes/allowedvalues.md` is generated from the schema** by `scripts/generate_allowed_values_doc.py`, and CI fails if it's out of date. It replaces a document describing tables from before v2.
+- **Dashboard: Design tab.** Ontology & Design is renamed Design. Its two pattern sections are merged, and it explains how the medallion layers relate to the System of Record and states the rules for keeping meaning consistent.
+- **Dashboard: endpoints.** Home points to the list on Infrastructure, which now includes `example-views.json`.
+- **CI runs on pull requests.** The checks and build now run on pull requests into `main`, without deploying.
 
 ### Statuses (breaking)
 
