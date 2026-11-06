@@ -48,9 +48,3 @@ NAMES
   The names "AI4RA Unified Data Model" and "AI4RA UDM" are reserved for
   conforming versions. Neither license grants rights in these names. See
   NAME-POLICY.md.
-
-THIRD-PARTY MATERIAL
-
-  Third-party material keeps its own license. docs/presentation/reveal/
-  is reveal.js, Copyright (C) 2011-2024 Hakim El Hattab, under the MIT
-  License.

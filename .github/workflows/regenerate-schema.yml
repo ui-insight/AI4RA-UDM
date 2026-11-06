@@ -11,6 +11,8 @@ on:
       - 'scripts/generate_dashboard_data.py'
       - 'scripts/generate_glossary.py'
       - 'scripts/check_glossary.py'
+      - 'scripts/generate_allowed_values_doc.py'
+      - 'vignettes/allowedvalues.md'
       - 'scripts/validate_schema.py'
       - 'scripts/check_spec_sync.py'
       - 'scripts/check_conformance.py'
@@ -20,6 +22,9 @@ on:
       - 'dashboard/**'
       - 'docs/**'
       - '.github/workflows/regenerate-schema.yml'
+  # Pull requests run every check and the build, and never deploy.
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 # The site is deployed from this workflow, not from a branch. Nothing is
@@ -30,7 +35,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.ref) || 'pages' }}
   cancel-in-progress: true
 
 jobs:
@@ -61,6 +66,9 @@ jobs:
       - name: Check the glossary against the schema
         run: python scripts/check_glossary.py
 
+      - name: Check the allowed values document against the schema
+        run: python scripts/generate_allowed_values_doc.py --check
+
       - name: Generate dashboard data files from udm_schema.json
         run: python scripts/generate_dashboard_data.py
 
@@ -84,13 +92,16 @@ jobs:
         run: cd dashboard && npm run build
 
       - uses: actions/configure-pages@v5
+        if: github.event_name != 'pull_request'
 
       - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
         with:
           path: docs
 
   deploy:
     needs: build
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

@@ -123,6 +123,12 @@ export default function OntologyTab() {
             </tbody>
           </table>
         </div>
+        <p style={{ color: '#546e7a', marginBottom: '1.5rem' }}>
+          These layers say what kind of data lives where. The medallion layers on the Infrastructure tab
+          say how data gets into the System of Record: Bronze holds raw extracts, Silver maps them to UDM
+          names, and Gold is the UDM tables, which are the System of Record. Platinum views are the System
+          of Insight.
+        </p>
         <h3 style={{ color: '#2c3e50', marginBottom: '0.75rem' }}>Data needs by layer</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
           <PatternCard title="System of Record: the durable facts">
@@ -247,6 +253,16 @@ export default function OntologyTab() {
       </Section>
 
       <Section>
+        <SectionTitle>How Meaning Is Kept Consistent</SectionTitle>
+        <ul style={{ listStyle: 'none', padding: 0 }}>
+          <ConventionItem><strong>The Glossary is the reference for meaning.</strong> When a definition and the schema disagree, the schema is checked against the definition, not the other way around.</ConventionItem>
+          <ConventionItem><strong>Similar counts get different names.</strong> A number counted a different way is a different term, such as burn rate and committed burn rate.</ConventionItem>
+          <ConventionItem><strong>Metrics follow sponsors' published methods where they exist,</strong> and say which method they follow. The NSF HERD survey is the default reference for spending.</ConventionItem>
+          <li style={{ padding: '0.75rem 0' }}><strong>A word means one thing.</strong> Values may repeat across records only when they mean the same thing, and statuses name a state rather than an event.</li>
+        </ul>
+      </Section>
+
+      <Section>
         <SectionTitle>Naming Conventions</SectionTitle>
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
           The UDM follows consistent naming patterns to ensure clarity and predictability across the schema.
@@ -306,30 +322,8 @@ export default function OntologyTab() {
 
       <Section>
         <SectionTitle>Design Patterns</SectionTitle>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1rem', marginTop: '1rem' }}>
-          <PatternCard title="AllowedValues Table">
-            <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Extensible controlled vocabulary for enumerations that may change or vary by institution.</p>
-            <p style={{ color: '#546e7a', fontSize: '0.9rem' }}><strong>Pattern:</strong> columns ending in <code>_Value_ID</code></p>
-          </PatternCard>
-          <PatternCard title="Self-Referential Foreign Keys">
-            <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Tables that reference themselves to represent hierarchies.</p>
-            <p style={{ color: '#546e7a', fontSize: '0.9rem' }}><strong>Pattern:</strong> <code>Parent_TableName_ID</code></p>
-          </PatternCard>
-          <PatternCard title="Bridge/Junction Tables">
-            <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Many-to-many relationships use compound names.</p>
-            <p style={{ color: '#546e7a', fontSize: '0.9rem' }}><strong>Example:</strong> <code>ComplianceCoverage</code> (links ComplianceRequirement to Award/Subaward)</p>
-          </PatternCard>
-          <PatternCard title="Status vs Type">
-            <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}><strong>Status:</strong> Current state, which often changes. A fixed list, enforced with a CHECK constraint or ENUM</p>
-            <p style={{ color: '#546e7a', fontSize: '0.9rem' }}><strong>Type:</strong> A category, which rarely changes. Ending in <code>_Type</code> means a fixed list. Ending in <code>_Value_ID</code> means the list is in AllowedValues, and institutions can add to it</p>
-          </PatternCard>
-        </div>
-      </Section>
-
-      <Section>
-        <SectionTitle>UDM Patterns</SectionTitle>
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
-          The four patterns below do the most structural work and recur across the most tables. Each one is documented in detail in the prose spec
+          The patterns below recur across the model. Each one is documented in detail in the prose spec
           (see <code>vignettes/udm-system-of-record.md</code>) and in the structured constraint
           catalog in <code>udm_schema.json</code>.
         </p>
@@ -375,6 +369,22 @@ export default function OntologyTab() {
               <strong>Examples:</strong> <code>Award.Current_End_Date</code>, <code>Award.Current_Total_Funded</code>,
               <code>Proposal.Originating_Proposal_ID</code>, <code>Award.Subject_To_Federal_Funding</code>.
             </p>
+          </PatternCard>
+          <PatternCard title="AllowedValues Table">
+            <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Extensible controlled vocabulary for enumerations that may change or vary by institution.</p>
+            <p style={{ color: '#546e7a', fontSize: '0.9rem' }}><strong>Pattern:</strong> columns ending in <code>_Value_ID</code></p>
+          </PatternCard>
+          <PatternCard title="Self-Referential Foreign Keys">
+            <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Tables that reference themselves to represent hierarchies.</p>
+            <p style={{ color: '#546e7a', fontSize: '0.9rem' }}><strong>Pattern:</strong> <code>Parent_TableName_ID</code></p>
+          </PatternCard>
+          <PatternCard title="Bridge/Junction Tables">
+            <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}>Many-to-many relationships use compound names.</p>
+            <p style={{ color: '#546e7a', fontSize: '0.9rem' }}><strong>Example:</strong> <code>ComplianceCoverage</code> (links ComplianceRequirement to Award/Subaward)</p>
+          </PatternCard>
+          <PatternCard title="Status vs Type">
+            <p style={{ color: '#546e7a', fontSize: '0.9rem', marginBottom: '0.5rem' }}><strong>Status:</strong> Current state, which often changes. A fixed list, enforced with a CHECK constraint or ENUM</p>
+            <p style={{ color: '#546e7a', fontSize: '0.9rem' }}><strong>Type:</strong> A category, which rarely changes. Ending in <code>_Type</code> means a fixed list. Ending in <code>_Value_ID</code> means the list is in AllowedValues, and institutions can add to it</p>
           </PatternCard>
         </div>
       </Section>

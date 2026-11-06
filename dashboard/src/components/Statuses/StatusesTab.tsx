@@ -1,5 +1,6 @@
 import statusPathUrl from '../../assets/proposal-award-status-path.svg';
 import otherRecordPathsUrl from '../../assets/other-record-status-paths.svg';
+import complianceLifecycleUrl from '../../assets/compliance-closeout-lifecycle-paths.svg';
 
 const card = {
   background: 'white', padding: '2rem', borderRadius: 8,
@@ -42,6 +43,21 @@ export default function StatusesTab() {
           <img
             src={otherRecordPathsUrl}
             alt="Flow chart of status paths for six records: early setup, modification, subaward, payment, deliverable, and action."
+            style={{ display: 'block', width: '100%', minWidth: 800, height: 'auto' }}
+          />
+        </div>
+
+        <h3 style={{ color: '#2c3e50', margin: '2rem 0 1rem', fontSize: '1.3rem' }}>
+          Compliance, Closeout, and Lifecycle Stage Paths
+        </h3>
+        <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
+          Compliance requirements and closeouts have their own statuses. Budget, effort, and cost share
+          move through lifecycle stages, keeping each earlier stage as history.
+        </p>
+        <div style={{ overflowX: 'auto' }}>
+          <img
+            src={complianceLifecycleUrl}
+            alt="Flow chart of paths for compliance requirements and closeout, and lifecycle stages for budget, effort, and cost share."
             style={{ display: 'block', width: '100%', minWidth: 800, height: 'auto' }}
           />
         </div>

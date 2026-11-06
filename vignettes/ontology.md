@@ -1,8 +1,8 @@
 # UDM Ontology
 
-This document describes the structure, conventions, and purpose of every entity in the AI4RA Unified Data Model, version 2. The UDM contains **47 tables** organized into **6 core modules** plus two implementation tables, along with **12 reference views**.
+This document describes the structure, conventions, and purpose of every entity in the AI4RA Unified Data Model. The current version is in the [VERSION](../VERSION) file. The UDM contains **47 tables** organized into **6 core modules** plus two implementation tables, along with reference views.
 
-For the canonical machine-readable specification, see [udm-system-of-record.md](udm-system-of-record.md) (prose) and [udm_schema.json](../udm_schema.json) (MySQL/MariaDB serialization at the repository root).
+For the canonical machine-readable specification, see [udm-system-of-record.md](udm-system-of-record.md) (prose) and [udm_schema.json](../udm_schema.json) (at the repository root, in an engine-neutral type vocabulary).
 
 ## Scope
 
@@ -11,7 +11,7 @@ The UDM models **research administration business data** — the entities, relat
 - **ETL or data pipelines** — how data gets into the UDM is an implementation concern, not a schema concern. See the [lakehouse](https://github.com/ui-insight/lakehouse) project for adapter patterns.
 - **Business process definitions** — workflow steps, approval routing, and process templates belong in process management tools, not in the data model. See the [ProcessMapping](https://github.com/ui-insight/ProcessMapping) project.
 - **Application-specific operational state** — ticketing system internals, user sessions, and UI state are outside scope. v1 of the ontology had `ApplicationSystem` and `ServiceRequest` tables despite the stated philosophy; v2 enforces the philosophy by moving those concerns to local extensions.
-- **Storage engine, SQL dialect, enforcement mechanism** — the specification is deliberately implementation-agnostic. The companion JSON ships a MySQL/MariaDB example implementation; other dialects are equally valid.
+- **Storage engine, SQL dialect, enforcement mechanism:** the specification is deliberately implementation-agnostic. The companion JSON uses an engine-neutral type vocabulary, with type mappings for MySQL and PostgreSQL; other dialects are equally valid.
 - **Numeric precision, rounding, tolerance** — runtime data-quality concerns, not modeling.
 - **UI, query patterns, performance tuning, denormalization for read efficiency** — out of scope.
 
@@ -26,12 +26,12 @@ If you read the v1 ontology, the most visible changes:
 - **ProjectRole became three tables.** `TeamRole` (people on the work), `OrganizationRole` (people at an Organization), `ProtocolRole` (people on a compliance protocol). Each answers a different question.
 - **Budget unified.** `ProposalBudget` + `AwardBudgetPeriod` + `AwardBudget` collapsed into a single `Budget` table with a `Lifecycle_Stage` discriminator (Proposed → Approved → Current → Actual).
 - **Invoice became a Payment Lifecycle_Stage.** Same data, more disciplined modeling.
-- **AwardDeliverable → Report.** Scope clarified.
+- **AwardDeliverable → Deliverable and Report.** `Deliverable` holds anything owed to the sponsor, and `Report` holds the details of a report.
 - **ProposalChecklistItem → Action.** Generalized into a polymorphic worklist attachment.
 - **ProjectCohort, CohortParticipation, ApplicationSystem, ServiceRequest, SubmissionAttachment, SubmissionEvent dropped from the canonical model.** Cohort tracking, IT inventory, ticketing, and granular submission audit events live in dedicated systems or local extensions.
 - **New canonical entities added** — see *Domains* below.
 - **Five new universal patterns** — Two-FK XOR attachment, Lifecycle_Stage discriminator with chain immutability, polymorphic attachment with enforcement contract, derived columns with documented recompute triggers, lineage mechanisms.
-- **Cross-row constraint catalog** — about 70 explicit invariants documented in one place.
+- **Cross-row constraint catalog:** explicit invariants documented in one place.
 
 ## Naming Conventions
 
@@ -163,7 +163,7 @@ The six polymorphic attachment tables (CommunicationResponse, the seventh Attach
 - `Restriction` — operational constraints (CUI, CMMC, ITAR, etc.)
 - `Deadline` — ad-hoc obligations that don't have a first-class entity
 - `Classification` — subject tags and research-area codes
-- `Action` — work items (deliverables, checklist items, service requests)
+- `Action`: work items (checklist items, service requests)
 
 Each attachment table's allowed `Related_Entity_Type` list is enumerated in its column reference. Enforcement is left to the institution (triggers, application logic, scheduled checks) but minimum conformance behavior is documented: no dangling refs on write, parent removal preserves attachments (soft delete), type-stable references.
 
@@ -330,7 +330,7 @@ The central post-award entity. Funded grants, contracts, cooperative agreements.
 - `Current_End_Date`, `Current_Total_Funded`, `Current_PI_Personnel_ID` (derived from Approved or Not_Required Modifications and active TeamRoles)
 - Lineage: `Parent_Award_ID` (incremental segments), `Previous_Award_ID` (competing renewals), `Originating_Award_ID` (derived chain root), `Group_ID`
 
-Status: Pending → Active → Closing → Closed / Suspended / Terminated.
+Status: In_Setup → Active → Closing → Closed, or Terminating → Terminated when an award ends early. An active award can be Suspended, and a closed or terminated one can go to Adjusting for a late correction. The dashboard's Statuses tab charts every move.
 
 ### Modification
 
@@ -362,7 +362,7 @@ The report details of a Deliverable: progress reports, RPPR, FFR (SF425), final 
 
 ### Closeout
 
-The closeout workflow object for an Award or Subaward. Coordinates several subworkflows (final report, final invoice, equipment disposition, IP closeout, COI closeout, records retention). Structured rather than narrative because federal closeout reporting requires a defined end state.
+The closeout workflow object for an Award or Subaward. Coordinates several subworkflows (final invoice, equipment disposition, IP closeout, COI closeout, records retention). Final reports are tracked as Deliverable rows. Structured rather than narrative because federal closeout reporting requires a defined end state.
 
 ## Effort
 
@@ -498,13 +498,13 @@ Subject tags and research-area codes attached to entities. Schemes include NSF S
 
 ### Action
 
-Worklist items attached to entities: deliverables, checklist items, service requests, modification approvals, compliance renewals, training requirements, JIT requests, cost-transfer approvals, subrecipient risk reviews. Tells you *what* needs to be done and *who* is on it. Distinct from Deadline (which tells you *when*).
+Worklist items attached to entities: checklist items, service requests, modification approvals, compliance renewals, training requirements, JIT requests, cost-transfer approvals, subrecipient risk reviews. Tells you *what* needs to be done and *who* is on it. Distinct from Deadline (which tells you *when*).
 
 `Action_Type_Value_ID` resolves to AllowedValues; the recommended values list is documented per institution-extensibility.
 
 ## Semantic Conventions
 
-Beyond the universal patterns, the schema documents 20 semantic conventions covering rules that no column constraint can express. Highlights:
+Beyond the universal patterns, the schema documents semantic conventions covering rules that no column constraint can express. Highlights:
 
 - **Modification vs Parent_Award_ID vs Previous_Award_ID** — when sponsor action issues a new Award_Number, it's a new Award; otherwise it's a Modification.
 - **TeamRole role-bearer changes** — when a PI (or other role-bearer) changes, end-date the prior row and insert a new one. No mutation in place.
@@ -526,7 +526,7 @@ Cross-institution analytics happen at a federation layer above the database, not
 
 ## Reference Views
 
-The companion JSON ships 12 worked CREATE VIEW examples, written against the MySQL dialect mapping.
+The companion JSON ships worked CREATE VIEW examples, written against the MySQL dialect mapping.
 
 | View | Purpose |
 |---|---|
@@ -540,10 +540,14 @@ The companion JSON ships 12 worked CREATE VIEW examples, written against the MyS
 | `vw_Effort_Certification_Status` | Per-period effort completeness, flagging Charged-but-not-Certified |
 | `vw_Approved_Modifications` | Approved Modifications with resolved Event_Type (excludes Reversed) |
 | `vw_Active_Restrictions` | Currently-in-force Restriction rows across all attachable entities |
+| `vw_All_ContactDetails` | Contact details for personnel and organizations in one list |
+| `vw_Active_Personnel_Roles` | Active personnel assignments with role and effort |
+| `vw_HERD_Expenditures` | R&D spending per transaction, with the HERD survey's categories worked out |
+| `vw_HERD_Expenditures_By_Field` | The same, with the HERD field of R&D, prorated |
 
 ## Optional Extensions
 
-Areas the v2 model deliberately does not include in the canonical schema. Institutions that need these capabilities add local extensions and reference them from canonical entities.
+Areas the model deliberately does not include in the canonical schema. Institutions that need these capabilities add local extensions and reference them from canonical entities.
 
 - **Detailed Export Control workflow** — TCPs, ECCN classification, BIS/DDTC licenses, foreign-national screening events
 - **Foreign-engagement and research-security disclosures (NSPM-33)** — foreign affiliations, foreign appointments, talent-program participation, foreign-component flags

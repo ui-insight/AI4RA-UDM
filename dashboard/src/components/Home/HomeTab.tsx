@@ -232,7 +232,7 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
             onClick={() => onNavigate('views')}
           />
           <NavCard
-            title="Ontology & Design"
+            title="Design"
             desc="Naming conventions, design patterns, and the rationale behind the schema's structure."
             onClick={() => onNavigate('ontology')}
           />
@@ -245,38 +245,13 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
       </Card>
 
       <Card>
-        <h3 style={{ color: '#2c3e50', fontSize: '1.3rem', marginBottom: '0.75rem' }}>
+        <h3 style={{ color: '#2c3e50', fontSize: '1.3rem', marginBottom: '1rem' }}>
           Machine-readable endpoints
         </h3>
-        <p style={{ color: '#546e7a', marginBottom: '0.75rem' }}>
-          The full schema and its derivatives are published as JSON and can be fetched directly.
+        <p style={{ color: '#546e7a' }}>
+          The full schema and its derivatives are published as JSON and can be fetched directly. See{' '}
+          <NavLink onClick={() => onNavigate('infrastructure')}>Infrastructure</NavLink> for the list.
         </p>
-        <ul style={{ paddingLeft: '1.25rem', color: '#546e7a', lineHeight: 1.8 }}>
-          <li>
-            <a href="data/udm_schema.json" style={{ color: '#667eea' }}>
-              /data/udm_schema.json
-            </a>:{' '}
-            The current schema: semantic conventions, cross-row constraints, derived values, example views
-          </li>
-          <li>
-            <a href="data/data-dictionary.json" style={{ color: '#667eea' }}>
-              /data/data-dictionary.json
-            </a>:{' '}
-            Table and column descriptions, synonyms, PII flags (regenerated from the schema)
-          </li>
-          <li>
-            <a href="data/relationships.json" style={{ color: '#667eea' }}>
-              /data/relationships.json
-            </a>:{' '}
-            Foreign-key relationships ready for ERD or validation tooling
-          </li>
-          <li>
-            <a href="data/example-views.json" style={{ color: '#667eea' }}>
-              /data/example-views.json
-            </a>:{' '}
-            Example views, with each view's purpose and SQL
-          </li>
-        </ul>
       </Card>
 
       <Card>

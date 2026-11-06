@@ -2,7 +2,7 @@
   "metadata": {
     "name": "UDM",
     "version": "4.0.0",
-    "released": "2026-11-05",
+    "released": "2026-11-06",
     "description": "Vendor-neutral research administration data model. This JSON is the machine-readable serialization of the specification in vignettes/udm-system-of-record.md: modules, tables, columns in the abstract type vocabulary, constraints, conventions, and derivation rules. It names no database engine; types.dialects maps the abstract types to native ones per engine.",
     "spec_source": "vignettes/udm-system-of-record.md",
     "changelog": "vignettes/CHANGELOG.md",
@@ -1643,10 +1643,10 @@
                 "type": "Count",
                 "required": true,
                 "default": 0,
-                "description": "The number of submission attempts made for this proposal. Derived from SubmissionAttempt",
+                "description": "The number of times this proposal has been sent. Attempts never sent do not count. Derived from SubmissionAttempt",
                 "derived": {
-                  "rule": "The count of SubmissionAttempt rows whose Proposal_ID is this Proposal; 0 before the first attempt.",
-                  "recompute_triggers": "On insert/delete of a SubmissionAttempt for the Proposal."
+                  "rule": "The count of SubmissionAttempt rows whose Proposal_ID is this Proposal and whose Attempt_Status has left Unsubmitted; 0 before the first attempt is sent.",
+                  "recompute_triggers": "On insert/update of a SubmissionAttempt for the Proposal."
                 }
               },
               "Proposed_Start_Date": {
@@ -1706,7 +1706,8 @@
                     "definition": "Being prepared; not yet routed for approval",
                     "set_by": "Derived: no Approval rows exist yet",
                     "next": [
-                      "In_Review"
+                      "In_Review",
+                      "Rejected"
                     ]
                   },
                   "In_Review": {
@@ -1722,7 +1723,8 @@
                     "definition": "An approval step sent it back for revision, approved material changed, or a withdrawn proposal is being revised; it must be rerouted",
                     "set_by": "Derived from the Approval rows of the current round",
                     "next": [
-                      "In_Review"
+                      "In_Review",
+                      "Rejected"
                     ]
                   },
                   "Approved": {
@@ -1730,16 +1732,17 @@
                     "set_by": "Derived from the Approval rows of the current round",
                     "next": [
                       "In_Review",
-                      "Returned"
+                      "Returned",
+                      "Rejected"
                     ]
                   },
                   "Rejected": {
-                    "definition": "An approval step refused it; the proposal does not proceed",
+                    "definition": "Refused inside the institution, by an approval step or by the PI deciding not to submit; the proposal does not proceed",
                     "set_by": "Derived from the Approval rows of the current round",
                     "next": []
                   }
                 },
-                "description": "Where the proposal's material stands in the institution's internal approval chain. Draft until routed; In_Review while steps are pending; Returned when a step sent it back for revision, approved material changed, or a withdrawn proposal is being revised; Approved once every step except Final_Sign_off and Release_to_Submit has approved; Rejected when a step refused it. Sign-off to submit is a separate gate, tracked in Submission_Status",
+                "description": "Where the proposal's material stands in the institution's internal approval chain. Draft until routed; In_Review while steps are pending; Returned when a step sent it back for revision, approved material changed, or a withdrawn proposal is being revised; Approved once every step except Final_Sign_off and Release_to_Submit has approved; Rejected when a step or the PI refused it, at any point before it was sent. Sign-off to submit is a separate gate, tracked in Submission_Status",
                 "synonyms": "Internal Routing Status, OSP Approval",
                 "derived": {
                   "rule": "Draft when no Approval row exists for the Proposal; otherwise, over the rows of the highest Approval_Round: Rejected if any row is Rejected; Returned if any row is Returned_for_Revision; Approved if every row other than Final_Sign_off and Release_to_Submit is Approved or Bypassed; In_Review otherwise.",
@@ -1865,7 +1868,7 @@
                 },
                 "description": "Where the proposal stands with the sponsor's submission system. Unapproved until the internal approval chain reaches Approved; Unsubmitted once approved and before the current package is signed off; Signed_Off once it is ready to send; then the newest SubmissionAttempt's Attempt_Status. Derived",
                 "derived": {
-                  "rule": "Unapproved while Internal_Approval_Status is not Approved. When Approved: the Attempt_Status of the newest SubmissionAttempt made since the latest approval, if it has left Unsubmitted and either the attempt is in transmission or with the sponsor (Submitting, Submitted, Received, Validated, or Accepted) or the current package matches its Package_Hash; otherwise Signed_Off when a Final_Sign_off on the current package is Approved, with any Release_to_Submit that follows it; otherwise Unsubmitted.",
+                  "rule": "Unapproved while Internal_Approval_Status is not Approved. When Approved: the Attempt_Status of the newest SubmissionAttempt made since the latest approval that has left Unsubmitted, if it is in transmission or with the sponsor (Submitting, Submitted, Received, Validated, or Accepted) or the current package matches its Package_Hash; otherwise Signed_Off when a Final_Sign_off on the current package is Approved, with any Release_to_Submit that follows it; otherwise Unsubmitted.",
                   "recompute_triggers": "On insert/update of Proposal.Internal_Approval_Status; on insert/update of any SubmissionAttempt or Approval row for the Proposal; when the current package changes."
                 }
               },
@@ -2103,7 +2106,7 @@
                 ],
                 "value_definitions": {
                   "Unsubmitted": {
-                    "definition": "Assembled but not transmitted",
+                    "definition": "Assembled but not transmitted. If a newer attempt follows, it stays here as a record of a package that never went out",
                     "set_by": "The submitter",
                     "next": [
                       "Submitting"
@@ -2228,13 +2231,13 @@
                 "rule": "Package_Hash is required when Attempt_Status is any value other than Unsubmitted."
               },
               {
-                "rule": "At most one SubmissionAttempt per Proposal has Attempt_Status Unsubmitted or Submitting: one attempt is in flight at a time.",
+                "rule": "At most one SubmissionAttempt per Proposal has Attempt_Status Submitting: one attempt is in transit at a time. An attempt assembled and never sent stays at Unsubmitted as history, and the newest attempt is current.",
                 "structured": {
                   "type": "unique_scope",
                   "columns": [
                     "Proposal_ID"
                   ],
-                  "condition": "Attempt_Status IN ('Unsubmitted', 'Submitting')"
+                  "condition": "Attempt_Status = 'Submitting'"
                 }
               },
               {
@@ -2952,9 +2955,11 @@
                   "Sponsor_Transfer",
                   "Supplement",
                   "Cost_Transfer_Authorization",
-                  "Advance_Funding"
+                  "Advance_Funding",
+                  "Partial_Suspension",
+                  "Partial_Termination"
                 ],
-                "description": "What kind of change the modification makes. Advance_Funding records the institution's approval of spending ahead of a sponsor amendment; a prior-approval request is a Modification in Requested, not a kind of modification",
+                "description": "What kind of change the modification makes. Advance_Funding records the institution's approval of spending ahead of a sponsor amendment; a prior-approval request is a Modification in Requested, not a kind of modification. Partial_Suspension and Partial_Termination record a sponsor or institution stopping part of an agreement: the agreement's status stays Active, the Description says which part, and a lifted suspension or overturned termination moves to Reversed",
                 "synonyms": "Modification Type, Amendment Type, Change Type"
               },
               "Approval_Status": {
@@ -3081,6 +3086,36 @@
                 "type": "LongText",
                 "required": false,
                 "description": "Free-text description of the change"
+              },
+              "Termination_Basis": {
+                "type": "Status",
+                "required": false,
+                "allowed_values": [
+                  "Noncompliance",
+                  "Mutual_Agreement",
+                  "Recipient_Request",
+                  "Sponsor_Priorities",
+                  "Prime_Terminated"
+                ],
+                "value_definitions": {
+                  "Noncompliance": {
+                    "definition": "Ended because a party failed to comply with the terms of the agreement"
+                  },
+                  "Mutual_Agreement": {
+                    "definition": "Ended by agreement of both parties"
+                  },
+                  "Recipient_Request": {
+                    "definition": "Ended at the recipient's request"
+                  },
+                  "Sponsor_Priorities": {
+                    "definition": "Ended because the agreement no longer serves the sponsor's program goals or priorities, including under an executive order"
+                  },
+                  "Prime_Terminated": {
+                    "definition": "Ended because the prime award was terminated"
+                  }
+                },
+                "conditional_required": "Required when Event_Type resolves to Partial_Termination; null otherwise",
+                "description": "Why part of the agreement was terminated. Required when Event_Type resolves to Partial_Termination; null otherwise. The whole agreement's basis is on Award or Subaward"
               }
             },
             "constraints": [
@@ -3105,6 +3140,9 @@
               },
               {
                 "rule": "Modification_Number is unique within the parent agreement (Award or Subaward)."
+              },
+              {
+                "rule": "Termination_Basis is required when Event_Type resolves to Partial_Termination, and null otherwise."
               }
             ]
           },
@@ -3972,7 +4010,7 @@
             ]
           },
           "Closeout": {
-            "description": "The closeout workflow object for an Award or Subaward. Coordinates several subworkflows (final report, final invoice, equipment disposition, IP closeout, COI closeout, records retention).",
+            "description": "The closeout workflow object for an Award or Subaward. Coordinates several subworkflows (final invoice, equipment disposition, IP closeout, COI closeout, records retention). Final reports are tracked as Deliverable rows.",
             "columns": {
               "Closeout_ID": {
                 "type": "ID",
@@ -4009,43 +4047,6 @@
                 "required": true,
                 "description": "When closeout was initiated",
                 "synonyms": "Closeout Start"
-              },
-              "Final_Report_Status": {
-                "type": "Status",
-                "required": true,
-                "allowed_values": [
-                  "Not_Required",
-                  "Not_Started",
-                  "Submitted",
-                  "Fulfilled"
-                ],
-                "value_definitions": {
-                  "Not_Required": {
-                    "definition": "The terms require no final report",
-                    "set_by": "Sponsored programs office",
-                    "next": []
-                  },
-                  "Not_Started": {
-                    "definition": "Due and not yet submitted",
-                    "set_by": "Sponsored programs office",
-                    "next": [
-                      "Submitted"
-                    ]
-                  },
-                  "Submitted": {
-                    "definition": "Sent to the sponsor",
-                    "set_by": "The submitter",
-                    "next": [
-                      "Fulfilled"
-                    ]
-                  },
-                  "Fulfilled": {
-                    "definition": "The sponsor reviewed and approved it",
-                    "set_by": "Recorded from the sponsor's communication",
-                    "next": []
-                  }
-                },
-                "description": "Constrained: Not_Required / Not_Started / Submitted / Fulfilled"
               },
               "Final_Invoice_Status": {
                 "type": "Status",
@@ -4199,7 +4200,7 @@
                 "required": true,
                 "allowed_values": [
                   "In_Progress",
-                  "Pending_Sponsor_Final_Audit",
+                  "Awaiting_Sponsor",
                   "Complete",
                   "Reopened"
                 ],
@@ -4208,11 +4209,11 @@
                     "definition": "Closeout subworkflows are under way",
                     "set_by": "Sponsored programs office",
                     "next": [
-                      "Pending_Sponsor_Final_Audit",
+                      "Awaiting_Sponsor",
                       "Complete"
                     ]
                   },
-                  "Pending_Sponsor_Final_Audit": {
+                  "Awaiting_Sponsor": {
                     "definition": "Everything is submitted; waiting on the sponsor's final audit or acceptance",
                     "set_by": "Sponsored programs office",
                     "next": [
@@ -4235,7 +4236,7 @@
                     ]
                   }
                 },
-                "description": "Constrained: In_Progress / Pending_Sponsor_Final_Audit / Complete / Reopened"
+                "description": "Constrained: In_Progress / Awaiting_Sponsor / Complete / Reopened"
               }
             },
             "constraints": [
@@ -6382,7 +6383,9 @@
                   "Disapproved",
                   "Terminated",
                   "Suspended",
-                  "Not_Applicable"
+                  "Not_Applicable",
+                  "Closed",
+                  "Withdrawn"
                 ],
                 "value_definitions": {
                   "Draft": {
@@ -6396,7 +6399,8 @@
                     "definition": "Sent to the reviewing authority",
                     "set_by": "The investigator",
                     "next": [
-                      "In_Review"
+                      "In_Review",
+                      "Withdrawn"
                     ]
                   },
                   "In_Review": {
@@ -6406,7 +6410,8 @@
                       "Approved",
                       "Conditional_Approval",
                       "Disapproved",
-                      "Not_Applicable"
+                      "Not_Applicable",
+                      "Withdrawn"
                     ]
                   },
                   "Approved": {
@@ -6415,7 +6420,8 @@
                     "next": [
                       "Expired",
                       "Suspended",
-                      "Terminated"
+                      "Terminated",
+                      "Closed"
                     ]
                   },
                   "Expired": {
@@ -6453,9 +6459,19 @@
                     "definition": "A determination found no requirement applies",
                     "set_by": "The reviewing authority",
                     "next": []
+                  },
+                  "Closed": {
+                    "definition": "The work finished and the approval was closed",
+                    "set_by": "The investigator or the reviewing authority",
+                    "next": []
+                  },
+                  "Withdrawn": {
+                    "definition": "Pulled back from the reviewing authority before a decision; a new attempt is a new requirement row",
+                    "set_by": "The investigator",
+                    "next": []
                   }
                 },
-                "description": "The approval state of this requirement with its reviewing authority. Expired once Expiration_Date passes without renewal; Not_Applicable when a determination found no requirement applies"
+                "description": "The approval state of this requirement with its reviewing authority. Expired once Expiration_Date passes without renewal; Not_Applicable when a determination found no requirement applies; Closed when the work finished and the approval was closed; Withdrawn when pulled back before a decision"
               },
               "Compliance_Classification_Level_Value_ID": {
                 "type": "ID",
