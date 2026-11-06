@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import type { DataDictionary, Relationship, TabName } from '../../types';
 import { coreModuleGroups, getCoreModule } from '../../data/coreModules';
+import surveyQrUrl from '../../assets/udm-survey-qr.png';
 
 // Temporary survey link (original: https://bit.ly/4b2ruQ3, to be restored later)
 const SURVEY_URL = 'https://bit.ly/4b5b21q';
@@ -119,16 +120,21 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
           flexWrap: 'wrap',
         }}
       >
-        <div style={{ flexShrink: 0, textAlign: 'center' }}>
+        <a
+          href={SURVEY_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ flexShrink: 0, textAlign: 'center', textDecoration: 'none' }}
+        >
           <img
-            src="assets/udm-survey-qr.png"
-            alt="QR code for UDM feedback survey"
+            src={surveyQrUrl}
+            alt="QR code for the UDM feedback survey. Select to open the survey."
             style={{ width: 140, height: 140, borderRadius: 8, background: 'white', padding: 6, display: 'block' }}
           />
-          <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.8rem', marginTop: '0.4rem' }}>
-            Scan to open the survey
+          <div style={{ color: 'white', fontWeight: 700, fontSize: '0.95rem', marginTop: '0.4rem' }}>
+            Get involved
           </div>
-        </div>
+        </a>
         <div style={{ flex: 1, minWidth: 220 }}>
           <h3 style={{ color: 'white', fontSize: '1.3rem', margin: '0 0 0.5rem' }}>
             Share your feedback
@@ -139,23 +145,6 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
             account), or email us directly.
           </p>
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <a
-              href={SURVEY_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'inline-block',
-                background: 'white',
-                color: '#667eea',
-                fontWeight: 700,
-                padding: '0.5rem 1.25rem',
-                borderRadius: 6,
-                textDecoration: 'none',
-                fontSize: '0.95rem',
-              }}
-            >
-              Get involved
-            </a>
             <a
               href={`${REPO_URL}/discussions/59#new_comment_field`}
               target="_blank"
