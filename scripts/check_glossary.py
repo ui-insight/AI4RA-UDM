@@ -6,17 +6,22 @@ Fails when:
   - a term's "udm" reference names a table, column, or value the schema lacks
   - a status value on a lifecycle column has no glossary term
   - terms are duplicated, unsorted, missing a field, or in an undeclared domain
+  - a definition states a dollar amount or a year
   - dashboard/src/data/glossary.ts is out of date
 
 References use the forms Table, Table.Column, and Table.Column=Value.
 """
 
 import json
+import re
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from generate_glossary import ROOT, SOURCE, TS_OUT, render_ts  # noqa: E402
+
+# Definitions say what a thing is. Amounts and dates change, so they stay in the cited source.
+SPECIFICS = re.compile(r"\$\d|\b(?:19|20)\d{2}\b")
 
 LIFECYCLE_COLUMNS = [
     ("Proposal", "Internal_Approval_Status"),
@@ -84,6 +89,8 @@ def main():
             errors.append(f"{term['term']}: undeclared domain {term.get('domain')}")
         if "—" in json.dumps(term, ensure_ascii=False):
             errors.append(f"{term['term']}: contains an em dash")
+        if SPECIFICS.search(term.get("definition", "")):
+            errors.append(f"{term['term']}: states an amount or year; define it and point to the source instead")
         for ref in term.get("udm", []):
             problem = check_reference(ref, tables)
             if problem:

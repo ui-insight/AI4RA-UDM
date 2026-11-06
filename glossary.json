@@ -306,7 +306,7 @@
     {
       "term": "Budget period",
       "also": "Funding period, budget year",
-      "definition": "A slice of the period of performance, often one year, for which money is budgeted and released.",
+      "definition": "A slice of the period of performance for which money is budgeted and released.",
       "domain": "Award & lifecycle",
       "udm": [
         "Budget.Period_Start_Date"
@@ -443,7 +443,7 @@
     {
       "term": "CMMC",
       "also": "Cybersecurity Maturity Model Certification",
-      "definition": "The Defense Department's cybersecurity program, with levels 1 to 3 checked by self-assessment or outside assessment, required for some defense contracts and subcontracts.",
+      "definition": "The Defense Department's cybersecurity assessment program, required for some defense contracts and subcontracts. Check the Defense Department for current levels and requirements.",
       "domain": "Compliance & research security",
       "udm": [],
       "source": "32 CFR 170.3",
@@ -470,7 +470,7 @@
     {
       "term": "Cognizant agency",
       "also": "Cognizant agency for indirect costs",
-      "definition": "The federal agency that reviews and negotiates an institution's indirect cost rates for all federal agencies, normally HHS or the Defense Department's Office of Naval Research for universities. The agency overseeing its audits may be a different one.",
+      "definition": "The federal agency that reviews and negotiates an institution's indirect cost rates on behalf of federal agencies. The agency overseeing its audits may be a different one.",
       "domain": "Budget & costing",
       "udm": [
         "RateAgreement.Cognizant_Agency_Organization_ID"
@@ -547,8 +547,8 @@
     },
     {
       "term": "Continuation",
-      "also": "Non-competing continuation, Type 5",
-      "definition": "Funding for the next year of an existing award without a new competition.",
+      "also": "Non-competing continuation",
+      "definition": "Funding for a later period of an existing award without a new competition.",
       "domain": "Award & lifecycle",
       "udm": [
         "Proposal.Proposal_Type_Value_ID=Continuation"
@@ -557,7 +557,7 @@
     {
       "term": "Continuing review",
       "also": "Annual review, protocol renewal",
-      "definition": "A periodic re-review of an approved protocol, at intervals set by the governing rule. Under the current Common Rule, many minimal-risk human studies no longer need it.",
+      "definition": "A periodic re-review of an approved protocol. Whether and how often it is needed depends on the governing rule.",
       "domain": "Compliance & research security",
       "udm": [
         "ProtocolContinuingReview"
@@ -891,7 +891,7 @@
     {
       "term": "Equipment",
       "also": "Capital equipment",
-      "definition": "A major item bought for a project that lasts more than a year and costs at least $10,000 per unit under federal rules, or less if the institution's capitalization threshold is lower.",
+      "definition": "A major item bought for a project that meets a cost and useful-life threshold. Check 2 CFR 200.1 and the institution's capitalization policy for current thresholds.",
       "domain": "Budget & costing",
       "udm": [
         "Equipment"
@@ -911,7 +911,7 @@
     {
       "term": "eRA Commons",
       "also": "",
-      "definition": "The online system run by NIH where applicants, recipients, and federal staff at NIH and some other agencies handle grant administration. Applications generally go in through Grants.gov and are then retrieved into Commons.",
+      "definition": "NIH's online system where applicants, recipients, and federal staff handle grant administration.",
       "domain": "Federal identifiers & rules",
       "udm": [],
       "source": "NIH Grants Policy Statement 2.2",
@@ -1021,7 +1021,7 @@
     {
       "term": "Fiscal year",
       "also": "FY",
-      "definition": "The institution's 12-month accounting year, which often starts July 1.",
+      "definition": "The institution's yearly accounting period.",
       "domain": "Research metrics & reporting",
       "udm": []
     },
@@ -1062,7 +1062,7 @@
     {
       "term": "Funding mechanism",
       "also": "Activity code, award type, grant type",
-      "definition": "The kind of funding vehicle, such as an NIH R01 research grant, R21 exploratory grant, T32 training grant, a cooperative agreement, or a contract.",
+      "definition": "The kind of funding vehicle, such as a research grant, training grant, cooperative agreement, or contract.",
       "domain": "Proposal",
       "udm": [
         "RFA.Funding_Mechanism_Description"
@@ -1107,7 +1107,7 @@
     {
       "term": "Grants.gov",
       "also": "",
-      "definition": "The federal website for finding and applying to most federal grant opportunities.",
+      "definition": "The federal website for finding and applying to federal grant opportunities.",
       "domain": "Federal identifiers & rules",
       "udm": [],
       "source": "Grants.gov",
@@ -1116,7 +1116,7 @@
     {
       "term": "HERD survey",
       "also": "Higher Education Research and Development Survey",
-      "definition": "The annual NSF survey of university research spending, used for national rankings.",
+      "definition": "The NSF survey of university research spending.",
       "domain": "Research metrics & reporting",
       "udm": [],
       "source": "NSF NCSES",
@@ -1349,7 +1349,7 @@
     {
       "term": "Letter of credit",
       "also": "LOC",
-      "definition": "An older name for the federal arrangement that lets an institution draw funds as it needs them, now handled through payment systems such as ASAP and PMS.",
+      "definition": "A federal arrangement that lets an institution draw funds as it needs them. Check the sponsor for its current payment system.",
       "domain": "Agreements",
       "udm": [
         "Terms.Payment_Method=Letter_of_Credit"
@@ -1400,7 +1400,7 @@
     {
       "term": "Modified total direct costs",
       "also": "MTDC",
-      "definition": "The cost base most federal indirect rates apply to: direct costs minus items like equipment, tuition, rent, participant support, and the part of each subaward above a set amount.",
+      "definition": "The cost base most federal indirect rates apply to: direct costs minus certain excluded items. Check 2 CFR 200.1 for the current exclusions.",
       "domain": "Budget & costing",
       "udm": [],
       "source": "2 CFR 200.1",
@@ -1409,7 +1409,7 @@
     {
       "term": "Modular budget",
       "also": "",
-      "definition": "A budget requested in fixed blocks (for NIH, $25,000 modules) without detailed line items.",
+      "definition": "A budget requested in fixed blocks without detailed line items. Check the sponsor's guidance for current block sizes and limits.",
       "domain": "Budget & costing",
       "udm": [
         "Budget.Module_Count"
@@ -1680,7 +1680,7 @@
     {
       "term": "Person-months",
       "also": "Calendar months, PM",
-      "definition": "Effort expressed in months: the effort percentage times the months in the appointment (12 calendar, 9 academic, 3 summer).",
+      "definition": "Effort expressed in months: the effort percentage times the months in the appointment.",
       "domain": "Effort",
       "udm": [
         "Effort.Person_Months"
@@ -2178,7 +2178,7 @@
     {
       "term": "Single Audit",
       "also": "Uniform Guidance audit",
-      "definition": "The yearly audit required of states, local governments, tribes, universities, and nonprofits that spend $1,000,000 or more in federal awards in a fiscal year. For-profit organizations are not covered.",
+      "definition": "A yearly organization-wide audit of federal award spending, required of non-federal organizations above a spending threshold. Check 2 CFR 200.501 for the current threshold and who is covered.",
       "domain": "Federal identifiers & rules",
       "udm": [],
       "source": "2 CFR 200.501",
@@ -2565,7 +2565,7 @@
     {
       "term": "Unique Entity Identifier",
       "also": "UEI, SAM UEI",
-      "definition": "The 12-character ID SAM.gov assigns to organizations that register there or request one, used to identify those receiving federal awards and subawards. It replaced the DUNS number in 2022.",
+      "definition": "The ID SAM.gov assigns to organizations, used to identify those receiving federal awards and subawards.",
       "domain": "Federal identifiers & rules",
       "udm": [
         "OrganizationIdentifier"

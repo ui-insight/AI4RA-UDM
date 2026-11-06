@@ -10,7 +10,7 @@ The UDM improves through community input.
 
 A change to the standard edits `udm_schema.json`. The prose spec and the module vignettes are generated from it and sync-checked in CI, so edit the JSON and regenerate rather than editing the prose by hand. Run `scripts/validate_schema.py` and `scripts/check_spec_sync.py` before opening a pull request. When `udm_schema.json` changes on `main`, CI regenerates the dashboard data files served via GitHub Pages.
 
-The glossary's source is `glossary.json`. Edit it, run `scripts/generate_glossary.py`, and run `scripts/check_glossary.py`, which confirms that each term's references exist in the schema and that every lifecycle status has a term. A schema change that renames a status fails this check until the glossary is updated. Cite a published source for any fact taken from a federal or sponsor rule.
+The glossary's source is `glossary.json`. Edit it, run `scripts/generate_glossary.py`, and run `scripts/check_glossary.py`, which confirms that each term's references exist in the schema and that every lifecycle status has a term. A schema change that renames a status fails this check until the glossary is updated. Definitions say what a thing is, without amounts, dates, or other details that change; point to the governing source for those. Cite a published source for any fact taken from a federal or sponsor rule.
 
 A change to the standard must pass the conformance checker before a release may carry the AI4RA UDM name. See [NAME-POLICY.md](NAME-POLICY.md).
 
