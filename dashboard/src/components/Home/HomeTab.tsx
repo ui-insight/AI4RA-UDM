@@ -81,7 +81,7 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
       >
         <div style={{ flex: 1, minWidth: 220 }}>
           <h3 style={{ color: 'white', fontSize: '1.3rem', margin: '0 0 0.5rem' }}>
-            Tell us what you think
+            Tell us what you think!
           </h3>
           <p style={{ color: 'rgba(255,255,255,0.9)', margin: '0 0 0.5rem', lineHeight: 1.5 }}>
             We want the Unified Data Model to be useful to everyone, and we need your help! You don't have to adopt it to give us feedback. Just compare it with your own work and tell us:
@@ -160,61 +160,6 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
               <div style={{ fontSize: '0.85rem', color: '#546e7a' }}>{d.tables.join(', ')}</div>
             </div>
           ))}
-        </div>
-      </Card>
-
-
-      <Card>
-        <h3 style={{ color: '#2c3e50', fontSize: '1.3rem', marginBottom: '1rem' }}>
-          Where to start
-        </h3>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-            gap: '1rem',
-          }}
-        >
-          <NavCard
-            title="Glossary"
-            desc="Plain-language definitions of research administration terms, with sources and links to the model."
-            onClick={() => onNavigate('glossary')}
-          />
-          <NavCard
-            title="Statuses"
-            desc="Charts of how proposals, awards, and other records move through their statuses."
-            onClick={() => onNavigate('statuses')}
-          />
-          <NavCard
-            title="Data Dictionary"
-            desc="Summary table of every entity with field counts, descriptions, parents, children, and core module."
-            onClick={() => onNavigate('dictionary')}
-          />
-          <NavCard
-            title="Explorer"
-            desc="Drill down into individual tables column-by-column. Navigate foreign keys with a breadcrumb trail."
-            onClick={() => onNavigate('tables')}
-          />
-          <NavCard
-            title="ERD Visualization"
-            desc="Interactive entity-relationship diagram. Zoom, pan, and highlight neighbourhoods of related tables."
-            onClick={() => onNavigate('erd')}
-          />
-          <NavCard
-            title="Example Views"
-            desc="Reference SQL views for common reporting: active awards, overdue deliverables, and HERD survey spending."
-            onClick={() => onNavigate('views')}
-          />
-          <NavCard
-            title="Design"
-            desc="Naming conventions, design patterns, and the rationale behind the schema's structure."
-            onClick={() => onNavigate('ontology')}
-          />
-          <NavCard
-            title="Infrastructure"
-            desc="Medallion-architecture guidance (Bronze / Silver / Gold / Platinum) and the JSON endpoints served by this site."
-            onClick={() => onNavigate('infrastructure')}
-          />
         </div>
       </Card>
 
@@ -315,24 +260,6 @@ function Stat({ value, label, accent }: { value: number; label: string; accent: 
         {value.toLocaleString()}
       </div>
       <div style={{ fontSize: '0.85rem', color: '#546e7a', marginTop: '0.35rem' }}>{label}</div>
-    </div>
-  );
-}
-
-function NavCard({ title, desc, onClick }: { title: string; desc: string; onClick: () => void }) {
-  return (
-    <div
-      onClick={onClick}
-      style={{
-        background: '#f8f9fa',
-        padding: '1rem',
-        borderRadius: 6,
-        borderLeft: '4px solid #667eea',
-        cursor: 'pointer',
-      }}
-    >
-      <h4 style={{ color: '#2c3e50', marginBottom: '0.35rem' }}>{title}</h4>
-      <p style={{ color: '#546e7a', fontSize: '0.9rem', margin: 0 }}>{desc}</p>
     </div>
   );
 }
