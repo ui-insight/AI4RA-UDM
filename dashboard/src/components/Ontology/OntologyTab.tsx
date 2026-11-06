@@ -340,7 +340,7 @@ export default function OntologyTab() {
               post-award Lifecycle_Stages (both FKs are null at Proposed).
             </p>
             <p style={{ color: '#546e7a', fontSize: '0.9rem' }}>
-              <strong>Used by:</strong> Payment, Modification, Transaction, Equipment, Report,
+              <strong>Used by:</strong> Payment, Modification, Transaction, Equipment, Deliverable,
               Closeout, Terms, TeamRole, ComplianceCoverage, and (stage-conditionally) Budget and
               CostShare. ContactDetails and Negotiation use the same mechanics with different parents.
             </p>

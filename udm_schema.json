@@ -240,7 +240,7 @@
           ]
         },
         {
-          "table": "Report",
+          "table": "Deliverable",
           "fks": [
             "Award_ID",
             "Subaward_ID"
@@ -407,7 +407,7 @@
         },
         {
           "when": "Award_Status or Subaward_Status becomes Closed or Terminated",
-          "then": "Actions, Deadlines, and Reports attached to the agreement are unchanged. They complete, are met, waived, or cancelled on their own terms; final reports and closeout work are due after the status change."
+          "then": "Actions, Deadlines, and Deliverables attached to the agreement are unchanged. They complete, are met, waived, or cancelled on their own terms; final reports and closeout work are due after the status change."
         }
       ],
       "default": "A child not named here is unchanged by its parent's status change."
@@ -417,7 +417,7 @@
         "name": "Lifecycle_Stage vs *_Status",
         "criterion": "Whether the row's shape changes between states.",
         "lifecycle_stage_use": "Used when different stages require different columns to be populated (Budget at Modular vs Approved-with-period, Effort at Charged adds Charged_Amount, Effort at Certified adds Statement/Signature, Payment at Invoiced adds Invoice_Number). The Previous_*_ID chain plus chain immutability is justified by the row's shape changing as the stage advances.",
-        "bare_status_use": "Used when the row carries the same columns at every state (Award_Status, Subaward_Status, Requirement_Status, Report_Status, Modification.Approval_Status). No chain immutability is required because corrections at a status point don't conflict with later rows of different shape."
+        "bare_status_use": "Used when the row carries the same columns at every state (Award_Status, Subaward_Status, Requirement_Status, Deliverable_Status, Modification.Approval_Status). No chain immutability is required because corrections at a status point don't conflict with later rows of different shape."
       },
       {
         "name": "TeamRole vs OrganizationRole vs ProtocolRole",
@@ -815,12 +815,13 @@
                   "Federal",
                   "State",
                   "Local",
-                  "Foundation",
+                  "Nonprofit",
                   "Industry",
-                  "Higher_Ed_PassThrough",
-                  "Foreign",
+                  "Higher_Ed",
+                  "Foreign_Government",
                   "Tribal",
-                  "Internal"
+                  "Internal",
+                  "Other"
                 ],
                 "value_definitions": {
                   "Federal": {
@@ -832,33 +833,46 @@
                   "Local": {
                     "definition": "County, city, or other local government"
                   },
-                  "Foundation": {
-                    "definition": "Private foundation or nonprofit"
+                  "Nonprofit": {
+                    "definition": "Foundation or other nonprofit organization, other than a college or university"
                   },
                   "Industry": {
-                    "definition": "Commercial company"
+                    "definition": "For-profit company"
                   },
-                  "Higher_Ed_PassThrough": {
-                    "definition": "Another university passing through prime funding"
+                  "Higher_Ed": {
+                    "definition": "College or university"
                   },
-                  "Foreign": {
-                    "definition": "Non-United States government or entity"
+                  "Foreign_Government": {
+                    "definition": "Government outside the United States"
                   },
                   "Tribal": {
                     "definition": "Tribal government"
                   },
                   "Internal": {
                     "definition": "The institution funding itself"
+                  },
+                  "Other": {
+                    "definition": "Another kind of organization, such as an international organization"
                   }
                 },
-                "conditional_required": "Required when the Organization has an OrganizationCapability row with Capability = 'Sponsor'",
-                "description": "Constrained when present: Federal / State / Local / Foundation / Industry / Higher_Ed_PassThrough / Foreign / Tribal / Internal. Required when the Organization has an OrganizationCapability row with Capability = 'Sponsor'",
+                "conditional_required": "Required when the Organization has an OrganizationCapability row with Capability = 'Sponsor' or 'Subrecipient'",
+                "description": "Constrained when present: Federal / State / Local / Nonprofit / Industry / Higher_Ed / Foreign_Government / Tribal / Internal / Other. It says what kind of organization this is. How money reached the institution is on the Award (Is_Flow_Through). Required when the Organization has an OrganizationCapability row with Capability = 'Sponsor' or 'Subrecipient'",
                 "synonyms": "Funder Type, Funding Source Type, Sponsor Category"
+              },
+              "Is_Foreign": {
+                "type": "Boolean",
+                "required": false,
+                "description": "Whether the organization is outside the United States and its territories. Foreign_Government organizations are always foreign"
+              },
+              "Is_Medical_School": {
+                "type": "Boolean",
+                "required": false,
+                "description": "Whether this unit is the institution's medical school or part of it. Set on the school and on each unit within it"
               }
             },
             "constraints": [
               {
-                "rule": "Sponsor_Type is required when the Organization has an OrganizationCapability row with Capability_Value resolving to Sponsor."
+                "rule": "Sponsor_Type is required when the Organization has an OrganizationCapability row with Capability_Value resolving to Sponsor or Subrecipient."
               }
             ]
           },
@@ -1593,7 +1607,7 @@
                   "column": "Organization_ID"
                 },
                 "description": "The unit managing finances",
-                "synonyms": "Admin Unit, OSP, Sponsored Programs"
+                "synonyms": "Admin Unit, Managing Unit"
               },
               "Previous_Proposal_ID": {
                 "type": "ID",
@@ -1977,6 +1991,28 @@
                 "value_group": "FundingMechanism",
                 "description": "The sponsor's funding mechanism applied for",
                 "synonyms": "Funding Mechanism, Activity Code, Award Type"
+              },
+              "Activity_Type": {
+                "type": "Status",
+                "required": true,
+                "allowed_values": [
+                  "Organized_Research",
+                  "Instruction",
+                  "Other_Sponsored_Activity"
+                ],
+                "value_definitions": {
+                  "Organized_Research": {
+                    "definition": "Research and development that is separately budgeted and accounted for, including research training"
+                  },
+                  "Instruction": {
+                    "definition": "Sponsored teaching and training, other than research training"
+                  },
+                  "Other_Sponsored_Activity": {
+                    "definition": "Externally funded work other than instruction and research, such as health service or community service projects"
+                  }
+                },
+                "description": "What kind of work this funds, using the major functions in 2 CFR 200 Appendix III. Constrained: Organized_Research / Instruction / Other_Sponsored_Activity. Organized_Research is what the HERD survey counts as sponsored research",
+                "synonyms": "Sponsored Activity Type, Type of Activity"
               }
             },
             "constraints": [
@@ -2385,7 +2421,7 @@
                   "column": "Organization_ID"
                 },
                 "description": "Referenced Organization has Capability = 'Sponsor'",
-                "synonyms": "Funder, Funding Agency, Direct Sponsor"
+                "synonyms": "Funder, Funding Agency, Direct Sponsor, Pass-Through Sponsor"
               },
               "Prime_Sponsor_Organization_ID": {
                 "type": "ID",
@@ -2395,7 +2431,7 @@
                   "column": "Organization_ID"
                 },
                 "description": "Original funder for pass-through awards",
-                "synonyms": "Pass-Through Sponsor, Original Funder, Ultimate Funder, Prime"
+                "synonyms": "Original Funder, Ultimate Funder, Prime"
               },
               "Administering_Organization_ID": {
                 "type": "ID",
@@ -2405,7 +2441,7 @@
                   "column": "Organization_ID"
                 },
                 "description": "Institutional unit managing finances",
-                "synonyms": "Admin Unit, OSP, Sponsored Programs Office"
+                "synonyms": "Admin Unit, Managing Unit"
               },
               "Parent_Award_ID": {
                 "type": "ID",
@@ -2453,7 +2489,7 @@
               "FAIN": {
                 "type": "ShortCode",
                 "required": false,
-                "conditional_required": "Required when Sponsor.Sponsor_Type = 'Federal' and the award is financial assistance, such as a grant or cooperative agreement; contracts do not need one. Unique within the institution when not null.",
+                "conditional_required": "Required when Sponsor.Sponsor_Type = 'Federal' and Instrument_Type is Grant or Cooperative_Agreement; other instruments do not need one. Unique within the institution when not null.",
                 "description": "Federal Award Identification Number",
                 "synonyms": "Federal Award ID, Federal Identifier, USA Spending ID"
               },
@@ -2473,6 +2509,84 @@
                 "value_group": "FundingMechanism",
                 "description": "The sponsor's funding mechanism for the award, for example R01, R21, P01, T32, Cooperative_Agreement, Contract_BAA",
                 "synonyms": "Funding Mechanism, Activity Code, Award Type"
+              },
+              "Instrument_Type": {
+                "type": "Status",
+                "required": true,
+                "allowed_values": [
+                  "Grant",
+                  "Cooperative_Agreement",
+                  "Contract",
+                  "Other_Transaction",
+                  "Other"
+                ],
+                "value_definitions": {
+                  "Grant": {
+                    "definition": "Funding to carry out a project, with limited sponsor involvement in the work"
+                  },
+                  "Cooperative_Agreement": {
+                    "definition": "Funding with substantial sponsor involvement in the work"
+                  },
+                  "Contract": {
+                    "definition": "A binding agreement in which the sponsor buys specific work or deliverables"
+                  },
+                  "Other_Transaction": {
+                    "definition": "A federal other transaction agreement, neither a grant, cooperative agreement, nor procurement contract"
+                  },
+                  "Other": {
+                    "definition": "Another kind of agreement"
+                  }
+                },
+                "description": "The legal kind of agreement. Constrained: Grant / Cooperative_Agreement / Contract / Other_Transaction / Other. Mechanism_Value_ID holds the detailed code",
+                "synonyms": "Agreement Type, Instrument"
+              },
+              "Activity_Type": {
+                "type": "Status",
+                "required": true,
+                "allowed_values": [
+                  "Organized_Research",
+                  "Instruction",
+                  "Other_Sponsored_Activity"
+                ],
+                "value_definitions": {
+                  "Organized_Research": {
+                    "definition": "Research and development that is separately budgeted and accounted for, including research training"
+                  },
+                  "Instruction": {
+                    "definition": "Sponsored teaching and training, other than research training"
+                  },
+                  "Other_Sponsored_Activity": {
+                    "definition": "Externally funded work other than instruction and research, such as health service or community service projects"
+                  }
+                },
+                "description": "What kind of work this funds, using the major functions in 2 CFR 200 Appendix III. Constrained: Organized_Research / Instruction / Other_Sponsored_Activity. Organized_Research is what the HERD survey counts as sponsored research",
+                "synonyms": "Sponsored Activity Type, Type of Activity"
+              },
+              "Research_Character": {
+                "type": "Status",
+                "required": false,
+                "allowed_values": [
+                  "Basic_Research",
+                  "Applied_Research",
+                  "Experimental_Development"
+                ],
+                "value_definitions": {
+                  "Basic_Research": {
+                    "definition": "Work done mainly to gain new knowledge of underlying foundations, with no particular application in view"
+                  },
+                  "Applied_Research": {
+                    "definition": "Original investigation directed mainly toward a specific, practical aim"
+                  },
+                  "Experimental_Development": {
+                    "definition": "Systematic work directed at producing new products or processes or improving existing ones"
+                  }
+                },
+                "description": "The kind of research, as the HERD survey defines it. Applies only when Activity_Type = Organized_Research. Constrained when present: Basic_Research / Applied_Research / Experimental_Development"
+              },
+              "Is_Clinical_Trial": {
+                "type": "Boolean",
+                "required": false,
+                "description": "Whether the award funds a Phase I, II, or III clinical trial with human patients. Phase IV post-market studies do not count"
               },
               "Funding_Mechanism_Description": {
                 "type": "MediumName",
@@ -2712,11 +2826,11 @@
             },
             "constraints": [
               {
-                "rule": "FAIN is required when the Sponsor's Sponsor_Type = 'Federal' and the award is financial assistance, such as a grant or cooperative agreement; contracts do not need one. FAIN is unique within the institution when not null.",
+                "rule": "FAIN is required when the Sponsor's Sponsor_Type = 'Federal' and Instrument_Type is Grant or Cooperative_Agreement; other instruments do not need one. FAIN is unique within the institution when not null.",
                 "structured": {
                   "type": "conditional_required",
                   "column": "FAIN",
-                  "when": "Sponsor.Sponsor_Type = 'Federal' and the award is financial assistance"
+                  "when": "Sponsor.Sponsor_Type = 'Federal' and Instrument_Type in (Grant, Cooperative_Agreement)"
                 }
               },
               {
@@ -2758,6 +2872,9 @@
               },
               {
                 "rule": "Termination_Basis is required when Award_Status is Terminating or Terminated, and null otherwise."
+              },
+              {
+                "rule": "Research_Character is null unless Activity_Type = 'Organized_Research'."
               }
             ]
           },
@@ -2839,31 +2956,6 @@
                 ],
                 "description": "What kind of change the modification makes. Advance_Funding records the institution's approval of spending ahead of a sponsor amendment; a prior-approval request is a Modification in Requested, not a kind of modification",
                 "synonyms": "Modification Type, Amendment Type, Change Type"
-              },
-              "Continuation_Type": {
-                "type": "Status",
-                "required": false,
-                "allowed_values": [
-                  "Competing",
-                  "Non_Competing",
-                  "Supplement",
-                  "Other"
-                ],
-                "value_definitions": {
-                  "Competing": {
-                    "definition": "A competing continuation; a new competition"
-                  },
-                  "Non_Competing": {
-                    "definition": "A non-competing continuation; the next budget period"
-                  },
-                  "Supplement": {
-                    "definition": "A supplement to the current period"
-                  },
-                  "Other": {
-                    "definition": "Another kind of continuation"
-                  }
-                },
-                "description": "Constrained when present: Competing / Non_Competing / Supplement / Other"
               },
               "Approval_Status": {
                 "type": "Status",
@@ -2977,17 +3069,12 @@
                 "required": false,
                 "conditional_required": "Required when the Event_Type resolves to Carryover",
                 "description": "Required when the Event_Type resolves to Carryover",
-                "synonyms": "Carry-Forward, Unobligated Balance"
-              },
-              "Carryforward_Amount": {
-                "type": "Money",
-                "required": false,
-                "description": "Companion of Carryover depending on accounting policy"
+                "synonyms": "Carry-Forward"
               },
               "Pre_Award_Costs_Amount": {
                 "type": "Money",
                 "required": false,
-                "description": "At-risk spending captured at the modification level",
+                "description": "Costs incurred before the award's start date that this modification covers; at the institution's risk until the award is made",
                 "synonyms": "Pre-Award Spending, At-Risk Amount"
               },
               "Description": {
@@ -3516,7 +3603,7 @@
                     "definition": "A fixed-price agreement"
                   },
                   "Letter_of_Credit": {
-                    "definition": "Draws against a federal letter of credit"
+                    "definition": "Draws through a federal payment system, historically a letter of credit"
                   },
                   "Payment_Request": {
                     "definition": "Payment on request by schedule or milestone"
@@ -3604,10 +3691,10 @@
               }
             ]
           },
-          "Report": {
-            "description": "A scheduled or ad hoc deliverable to the sponsor: progress report, RPPR, FFR, final report, invention statement, data-sharing plan update.",
+          "Deliverable": {
+            "description": "Something owed to the sponsor under an award: a report, or a work product such as a prototype, dataset, software, or samples. Tracks what is due and where it stands. Kinds with their own details have child tables, such as Report.",
             "columns": {
-              "Report_ID": {
+              "Deliverable_ID": {
                 "type": "ID",
                 "primary_key": true,
                 "required": true,
@@ -3637,83 +3724,44 @@
                 ],
                 "description": "Exactly one of Award_ID or Subaward_ID is non-null"
               },
-              "Report_Type": {
+              "Deliverable_Type": {
                 "type": "Status",
                 "required": true,
                 "allowed_values": [
-                  "Progress",
-                  "RPPR",
-                  "Financial",
-                  "FFR_SF425",
-                  "Final_Progress",
-                  "Final_Financial",
-                  "Invention_Statement",
-                  "Data_Sharing",
-                  "Equipment_Inventory",
-                  "Audit_Response",
+                  "Report",
+                  "Work_Product",
                   "Other"
                 ],
                 "value_definitions": {
-                  "Progress": {
-                    "definition": "A periodic technical progress report"
+                  "Report": {
+                    "definition": "A report to the sponsor; it has a Report row"
                   },
-                  "RPPR": {
-                    "definition": "NIH Research Performance Progress Report"
-                  },
-                  "Financial": {
-                    "definition": "A periodic financial report"
-                  },
-                  "FFR_SF425": {
-                    "definition": "Federal Financial Report on the SF-425"
-                  },
-                  "Final_Progress": {
-                    "definition": "The final technical report"
-                  },
-                  "Final_Financial": {
-                    "definition": "The final financial report"
-                  },
-                  "Invention_Statement": {
-                    "definition": "The final invention statement"
-                  },
-                  "Data_Sharing": {
-                    "definition": "A data-sharing or data-management report"
-                  },
-                  "Equipment_Inventory": {
-                    "definition": "An equipment inventory report"
-                  },
-                  "Audit_Response": {
-                    "definition": "A response to an audit finding"
+                  "Work_Product": {
+                    "definition": "A work product such as a prototype, dataset, software, or samples"
                   },
                   "Other": {
-                    "definition": "A report not listed"
+                    "definition": "Another kind of deliverable"
                   }
                 },
-                "description": "Constrained: Progress / RPPR / Financial / FFR_SF425 / Final_Progress / Final_Financial / Invention_Statement / Data_Sharing / Equipment_Inventory / Audit_Response / Other",
-                "synonyms": "Deliverable Type, Submission Type"
+                "description": "Constrained: Report / Work_Product / Other",
+                "synonyms": "Deliverable Category"
               },
-              "Reporting_Period_Start_Date": {
-                "type": "Date",
+              "Description": {
+                "type": "LongText",
                 "required": true,
-                "description": "Start of the period the report covers",
-                "synonyms": "Period Start, Coverage Start"
-              },
-              "Reporting_Period_End_Date": {
-                "type": "Date",
-                "required": true,
-                "description": "End of the period the report covers",
-                "synonyms": "Period End, Coverage End"
+                "description": "What is owed to the sponsor"
               },
               "Due_Date": {
                 "type": "Date",
                 "required": true,
-                "description": "When the report is due to the sponsor",
+                "description": "When the deliverable is due to the sponsor",
                 "synonyms": "Submission Deadline, Report Deadline"
               },
               "Submitted_Date": {
                 "type": "Date",
                 "required": false,
-                "conditional_required": "Required when Report_Status is 'Submitted', 'Fulfilled', or 'Returned_for_Revision'",
-                "description": "Required when Report_Status is 'Submitted', 'Fulfilled', or 'Returned_for_Revision': the report has reached the sponsor",
+                "conditional_required": "Required when Deliverable_Status is 'Submitted', 'Fulfilled', or 'Returned_for_Revision'",
+                "description": "Required when Deliverable_Status is 'Submitted', 'Fulfilled', or 'Returned_for_Revision': the deliverable has reached the sponsor",
                 "synonyms": "Submission Date"
               },
               "Submitted_By_Personnel_ID": {
@@ -3723,8 +3771,8 @@
                   "table": "Personnel",
                   "column": "Personnel_ID"
                 },
-                "conditional_required": "Required when Report_Status is 'Submitted', 'Fulfilled', or 'Returned_for_Revision'",
-                "description": "Required when Report_Status is 'Submitted', 'Fulfilled', or 'Returned_for_Revision': the report has reached the sponsor"
+                "conditional_required": "Required when Deliverable_Status is 'Submitted', 'Fulfilled', or 'Returned_for_Revision'",
+                "description": "Required when Deliverable_Status is 'Submitted', 'Fulfilled', or 'Returned_for_Revision': the deliverable has reached the sponsor"
               },
               "Sponsor_Confirmation_Number": {
                 "type": "ShortName",
@@ -3732,7 +3780,7 @@
                 "description": "Sponsor-issued upon receipt",
                 "synonyms": "Confirmation Receipt, Submission Confirmation"
               },
-              "Report_Status": {
+              "Deliverable_Status": {
                 "type": "Status",
                 "required": true,
                 "allowed_values": [
@@ -3804,8 +3852,8 @@
               "Acceptance_Date": {
                 "type": "Date",
                 "required": false,
-                "conditional_required": "Required when Report_Status = 'Fulfilled'",
-                "description": "Required when Report_Status = 'Fulfilled'"
+                "conditional_required": "Required when Deliverable_Status = 'Fulfilled'",
+                "description": "Required when Deliverable_Status = 'Fulfilled'"
               },
               "Linked_Document_ID": {
                 "type": "ID",
@@ -3814,7 +3862,7 @@
                   "table": "Document",
                   "column": "Document_ID"
                 },
-                "description": "The report file itself"
+                "description": "The deliverable's file or transmittal, when there is one"
               }
             },
             "constraints": [
@@ -3822,7 +3870,104 @@
                 "rule": "Exactly one of Award_ID or Subaward_ID is non-null."
               },
               {
-                "rule": "Submitted_Date and Submitted_By_Personnel_ID are required when Report_Status in {Submitted, Fulfilled, Returned_for_Revision}; Acceptance_Date is required when Report_Status = 'Fulfilled'."
+                "rule": "Submitted_Date and Submitted_By_Personnel_ID are required when Deliverable_Status in {Submitted, Fulfilled, Returned_for_Revision}; Acceptance_Date is required when Deliverable_Status = 'Fulfilled'."
+              },
+              {
+                "rule": "Every Deliverable with Deliverable_Type = 'Report' has one Report row."
+              }
+            ]
+          },
+          "Report": {
+            "description": "The report details of a Deliverable: which kind of report it is and the period it covers. Progress report, RPPR, federal financial report, final report, invention statement, or data-sharing report. Status and due date are on the Deliverable.",
+            "columns": {
+              "Report_ID": {
+                "type": "ID",
+                "primary_key": true,
+                "required": true,
+                "description": "PK"
+              },
+              "Deliverable_ID": {
+                "type": "ID",
+                "required": true,
+                "references": {
+                  "table": "Deliverable",
+                  "column": "Deliverable_ID"
+                },
+                "description": "The Deliverable this report details"
+              },
+              "Report_Type": {
+                "type": "Status",
+                "required": true,
+                "allowed_values": [
+                  "Progress",
+                  "RPPR",
+                  "Financial",
+                  "FFR_SF425",
+                  "Final_Progress",
+                  "Final_Financial",
+                  "Invention_Statement",
+                  "Data_Sharing",
+                  "Equipment_Inventory",
+                  "Audit_Response",
+                  "Other"
+                ],
+                "value_definitions": {
+                  "Progress": {
+                    "definition": "A periodic technical progress report"
+                  },
+                  "RPPR": {
+                    "definition": "Research Performance Progress Report, the standard federal format"
+                  },
+                  "Financial": {
+                    "definition": "A periodic financial report"
+                  },
+                  "FFR_SF425": {
+                    "definition": "Federal Financial Report on the SF-425"
+                  },
+                  "Final_Progress": {
+                    "definition": "The final technical report"
+                  },
+                  "Final_Financial": {
+                    "definition": "The final financial report"
+                  },
+                  "Invention_Statement": {
+                    "definition": "The final invention statement"
+                  },
+                  "Data_Sharing": {
+                    "definition": "A data-sharing or data-management report"
+                  },
+                  "Equipment_Inventory": {
+                    "definition": "An equipment inventory report"
+                  },
+                  "Audit_Response": {
+                    "definition": "A response to an audit finding"
+                  },
+                  "Other": {
+                    "definition": "A report not listed"
+                  }
+                },
+                "description": "Constrained: Progress / RPPR / Financial / FFR_SF425 / Final_Progress / Final_Financial / Invention_Statement / Data_Sharing / Equipment_Inventory / Audit_Response / Other",
+                "synonyms": "Report Category"
+              },
+              "Reporting_Period_Start_Date": {
+                "type": "Date",
+                "required": true,
+                "description": "Start of the period the report covers",
+                "synonyms": "Period Start, Coverage Start"
+              },
+              "Reporting_Period_End_Date": {
+                "type": "Date",
+                "required": true,
+                "description": "End of the period the report covers",
+                "synonyms": "Period End, Coverage End"
+              }
+            },
+            "constraints": [
+              {
+                "rule": "Deliverable_ID is unique: one Report per Deliverable."
+              },
+              {
+                "rule": "The referenced Deliverable has Deliverable_Type = 'Report'."
               }
             ]
           },
@@ -4083,7 +4228,7 @@
                     ]
                   },
                   "Reopened": {
-                    "definition": "Reopened after completion, for an audit finding or a late adjustment",
+                    "definition": "Closeout resumed because the agreement returned to Active or went to Adjusting",
                     "set_by": "Sponsored programs office",
                     "next": [
                       "In_Progress"
@@ -4236,10 +4381,10 @@
             "sql": "CREATE VIEW vw_Subaward_With_Prime AS\nSELECT\n  s.Subaward_ID,\n  s.Subaward_Number,\n  s.Subaward_Status,\n  s.Subrecipient_Organization_ID,\n  s.Total_Subaward_Amount,\n  s.Original_Start_Date AS Sub_Start_Date,\n  s.Current_End_Date AS Sub_Current_End_Date,\n  s.Current_PI_Personnel_ID AS Sub_Current_PI_Personnel_ID,\n  p.Award_ID AS Prime_Award_ID,\n  p.Award_Number AS Prime_Award_Number,\n  p.FAIN AS Prime_FAIN,\n  p.Award_Status AS Prime_Award_Status,\n  p.Sponsor_Organization_ID AS Prime_Sponsor_Organization_ID\nFROM Subaward s\nLEFT JOIN Award p ON s.Prime_Award_ID = p.Award_ID\nWHERE s.Is_Active = true;"
           },
           {
-            "name": "vw_Overdue_Reports",
-            "purpose": "Reports whose Due_Date is in the past and whose Report_Status indicates they have not been fulfilled or waived.",
+            "name": "vw_Overdue_Deliverables",
+            "purpose": "Deliverables whose Due_Date is in the past and whose Deliverable_Status indicates they have not been fulfilled or waived, with report details where they apply.",
             "dialect": "mysql",
-            "sql": "CREATE VIEW vw_Overdue_Reports AS\nSELECT\n  r.Report_ID,\n  r.Award_ID,\n  r.Subaward_ID,\n  r.Report_Type,\n  r.Reporting_Period_Start_Date,\n  r.Reporting_Period_End_Date,\n  r.Due_Date,\n  r.Report_Status,\n  DATEDIFF(CURRENT_DATE, r.Due_Date) AS Days_Overdue\nFROM Report r\nWHERE r.Due_Date < CURRENT_DATE\n  AND r.Report_Status IN ('Not_Started', 'Drafted', 'Returned_for_Revision', 'Late')\n  AND r.Is_Active = true;"
+            "sql": "CREATE VIEW vw_Overdue_Deliverables AS\nSELECT\n  d.Deliverable_ID,\n  d.Award_ID,\n  d.Subaward_ID,\n  d.Deliverable_Type,\n  d.Description,\n  r.Report_Type,\n  r.Reporting_Period_Start_Date,\n  r.Reporting_Period_End_Date,\n  d.Due_Date,\n  d.Deliverable_Status,\n  DATEDIFF(CURRENT_DATE, d.Due_Date) AS Days_Overdue\nFROM Deliverable d\nLEFT JOIN Report r ON r.Deliverable_ID = d.Deliverable_ID\nWHERE d.Due_Date < CURRENT_DATE\n  AND d.Deliverable_Status IN ('Not_Started', 'Drafted', 'Returned_for_Revision', 'Late')\n  AND d.Is_Active = true;"
           },
           {
             "name": "vw_Award_Budget_Summary",
@@ -4252,6 +4397,18 @@
             "purpose": "Approved Modifications with the Event_Type resolved to its canonical code and the financial / date impact surfaced. Excludes Reversed Modifications.",
             "dialect": "mysql",
             "sql": "CREATE VIEW vw_Approved_Modifications AS\nSELECT\n  m.Modification_ID,\n  m.Award_ID,\n  m.Subaward_ID,\n  m.Modification_Number,\n  m.Effective_Date,\n  av.Value_Code AS Event_Type_Code,\n  av.Canonical_Value_Code AS Canonical_Event_Type,\n  m.Funding_Change_Amount,\n  m.New_End_Date,\n  m.Approval_Status,\n  m.Description\nFROM Modification m\nJOIN AllowedValues av ON m.Event_Type_Value_ID = av.AllowedValue_ID\nWHERE m.Approval_Status = 'Approved'\n  AND m.Is_Active = true;"
+          },
+          {
+            "name": "vw_HERD_Expenditures",
+            "purpose": "R&D spending on sponsored awards, one row per transaction, with the HERD survey's categories worked out. Query it by fiscal year. See vignettes/herd-report.md.",
+            "dialect": "mysql",
+            "sql": "CREATE VIEW vw_HERD_Expenditures AS\nSELECT\n  t.Transaction_ID,\n  t.Transaction_Date,\n  a.Award_ID,\n  t.Transaction_Amount AS Amount,\n  o.Organization_ID AS Origin_Organization_ID,\n  (o.Sponsor_Type = 'Federal' AND ty.Code <> 'Cost_Share') AS Is_Federal,\n  CASE\n    WHEN ty.Code = 'Cost_Share' OR o.Sponsor_Type = 'Internal' THEN 'Institutional'\n    WHEN o.Sponsor_Type = 'Federal' THEN 'Federal'\n    WHEN o.Sponsor_Type IN ('State', 'Local') THEN 'State_Local'\n    WHEN o.Sponsor_Type = 'Industry' THEN 'Business'\n    WHEN o.Sponsor_Type = 'Nonprofit' THEN 'Nonprofit'\n    ELSE 'All_Other'\n  END AS Source_Of_Funds,\n  CASE\n    WHEN ty.Code = 'Cost_Share' THEN NULL\n    WHEN o.Sponsor_Type = 'Foreign_Government' THEN 'Foreign_Government'\n    WHEN o.Is_Foreign = true AND o.Sponsor_Type = 'Industry' THEN 'Business'\n    WHEN o.Is_Foreign = true AND o.Sponsor_Type = 'Nonprofit' THEN 'Nonprofit'\n    WHEN o.Is_Foreign = true AND o.Sponsor_Type = 'Higher_Ed' THEN 'Higher_Education'\n    WHEN o.Is_Foreign = true THEN 'All_Other'\n    ELSE NULL\n  END AS Foreign_Source,\n  CASE WHEN a.Instrument_Type = 'Contract' THEN 'Contract' ELSE 'Grant_Or_Other' END AS Agreement_Group,\n  a.Research_Character,\n  a.Is_Clinical_Trial,\n  a.Is_Flow_Through,\n  p.Sponsor_Type AS Passing_Sponsor_Type,\n  u.Is_Medical_School,\n  COALESCE(c.HERD_Cost_Type, 'Unmapped') AS HERD_Cost_Type,\n  r.Sponsor_Type AS Subrecipient_Sponsor_Type\nFROM Transaction t\nJOIN (\n  SELECT AllowedValue_ID, COALESCE(Canonical_Value_Code, Value_Code) AS Code\n  FROM AllowedValues\n) ty ON ty.AllowedValue_ID = t.Transaction_Type_Value_ID\nLEFT JOIN Subaward s ON s.Subaward_ID = t.Subaward_ID\nJOIN Award a ON a.Award_ID = COALESCE(t.Award_ID, s.Prime_Award_ID)\nJOIN Organization p ON p.Organization_ID = a.Sponsor_Organization_ID\nJOIN Organization o ON o.Organization_ID = CASE\n  WHEN a.Is_Flow_Through = true THEN a.Prime_Sponsor_Organization_ID\n  ELSE a.Sponsor_Organization_ID\nEND\nLEFT JOIN Organization u ON u.Organization_ID = a.Administering_Organization_ID\nLEFT JOIN Organization r ON r.Organization_ID = s.Subrecipient_Organization_ID\nLEFT JOIN Budget b ON b.Budget_ID = t.Budget_ID\nLEFT JOIN BudgetCategory c ON c.BudgetCategory_ID = b.Budget_Category_ID\nWHERE a.Activity_Type = 'Organized_Research'\n  AND ty.Code IN ('Expense', 'Cost_Transfer_In', 'Cost_Transfer_Out', 'Adjustment', 'Reversal', 'Cost_Share')\n  AND t.Is_Active = true;"
+          },
+          {
+            "name": "vw_HERD_Expenditures_By_Field",
+            "purpose": "vw_HERD_Expenditures with the HERD field of R&D, prorated by Allocation_Percent. Awards without a field show as Unmapped.",
+            "dialect": "mysql",
+            "sql": "CREATE VIEW vw_HERD_Expenditures_By_Field AS\nSELECT\n  h.Transaction_ID,\n  h.Transaction_Date,\n  h.Award_ID,\n  COALESCE(f.Value_Code, 'Unmapped') AS HERD_Field,\n  h.Amount * COALESCE(f.Allocation_Percent, 100) / 100 AS Amount,\n  h.Origin_Organization_ID,\n  h.Is_Federal,\n  h.Source_Of_Funds,\n  h.HERD_Cost_Type\nFROM vw_HERD_Expenditures h\nLEFT JOIN Classification f\n  ON f.Related_Entity_Type = 'Award'\n  AND f.Related_Entity_ID = h.Award_ID\n  AND f.Scheme = 'HERD_Field';"
           }
         ]
       },
@@ -4335,7 +4492,6 @@
                   "Co_I",
                   "Multi_PI",
                   "Coordinator",
-                  "Key_Personnel",
                   "Cohort_Participant",
                   "Coach",
                   "Mentor",
@@ -5274,7 +5430,8 @@
                 "required": false,
                 "allowed_values": [
                   "Offset",
-                  "Additive"
+                  "Additive",
+                  "Cost_Sharing"
                 ],
                 "value_definitions": {
                   "Offset": {
@@ -5282,10 +5439,13 @@
                   },
                   "Additive": {
                     "definition": "Program income adds to the project funds"
+                  },
+                  "Cost_Sharing": {
+                    "definition": "Program income counts toward the required cost share"
                   }
                 },
                 "conditional_required": "Required when Transaction_Type resolves to project income",
-                "description": "Constrained when present: Offset / Additive. Required when Transaction_Type resolves to project income",
+                "description": "Constrained when present: Offset / Additive / Cost_Sharing. Required when Transaction_Type resolves to project income",
                 "synonyms": "Project Income Handling, Income Disposition"
               },
               "Activity_Description": {
@@ -6105,7 +6265,7 @@
                 "primary_key": true,
                 "required": true,
                 "description": "PK",
-                "synonyms": "Protocol ID, Compliance ID, Requirement ID"
+                "synonyms": "Compliance ID, Requirement ID"
               },
               "Previous_ComplianceRequirement_ID": {
                 "type": "ID",
@@ -6642,7 +6802,7 @@
             ]
           },
           "OtherSupport": {
-            "description": "A Personnel record's external research support (current, pending, in-kind). The fact of outside support, person-anchored.",
+            "description": "A Personnel record's research support in an other-support disclosure (current, pending, in-kind) that isn't already recorded as a Proposal or Award. A complete disclosure combines these rows with the person's own proposals and awards. Person-anchored.",
             "columns": {
               "OtherSupport_ID": {
                 "type": "ID",
@@ -6826,7 +6986,7 @@
             }
           },
           "PolicyException": {
-            "description": "An institutionally granted exception to a sponsor or institutional policy rule: PI-eligibility waivers, COI management exceptions, cost-share waivers, indirect-rate exceptions. Scoped to a Personnel record, optionally narrowed to one Proposal, Award, or Subaward; all three scope FKs null means a blanket exception for the person.",
+            "description": "An institutionally granted exception to a sponsor or institutional policy rule: PI-eligibility waivers, COI management exceptions, cost-share waivers, indirect-rate exceptions. Scoped to a person, to one Proposal, Award, or Subaward, or to a person within one of those. A person with all three scope FKs null means a blanket exception for that person.",
             "columns": {
               "PolicyException_ID": {
                 "type": "ID",
@@ -6836,12 +6996,12 @@
               },
               "Personnel_ID": {
                 "type": "ID",
-                "required": true,
+                "required": false,
                 "references": {
                   "table": "Personnel",
                   "column": "Personnel_ID"
                 },
-                "description": "The person to whom the exception is granted"
+                "description": "The person to whom the exception is granted; null when the exception belongs to a Proposal, Award, or Subaward rather than a person"
               },
               "Policy_Rule_Code": {
                 "type": "ShortCode",
@@ -6976,7 +7136,7 @@
             },
             "constraints": [
               {
-                "rule": "At most one of Proposal_ID, Award_ID, Subaward_ID is non-null. All three null means a blanket exception scoped to the person.",
+                "rule": "At most one of Proposal_ID, Award_ID, Subaward_ID is non-null. At least one of Personnel_ID, Proposal_ID, Award_ID, Subaward_ID is non-null. Personnel_ID with all three null means a blanket exception scoped to the person.",
                 "structured": {
                   "type": "at_most_one_of",
                   "columns": [
@@ -7020,7 +7180,7 @@
             "description": "Three tables touch outside-relationship facts; each answers a different question.",
             "tables": {
               "ConflictOfInterest": "What did this person disclose to the institution's COI office, and what was the review outcome. Personal disclosure with Relationship_Type (Financial / Consulting / Employment / Equity / Royalty / Board_Membership) and Review_Outcome.",
-              "OtherSupport": "What active and pending support does this person have on a sponsor biosketch. Sponsor-facing, with Support_Type (Current / Pending / In_Kind) and effort commitment.",
+              "OtherSupport": "What active and pending support does this person have in an other-support disclosure, beyond what is already recorded as a Proposal or Award. A complete disclosure combines these rows with the person's own proposals and awards. Sponsor-facing, with Support_Type (Current / Pending / In_Kind) and effort commitment.",
               "ComplianceRequirement with Requirement_Type = 'COI'": "What is the institutional COI compliance regime under which the disclosures are filed (the annual attestation cycle, the training requirement, the policy artifact)."
             },
             "link_rule": "When ConflictOfInterest and OtherSupport describe the same engagement, the ConflictOfInterest.OtherSupport_ID FK links them. The link is optional; many COI disclosures (royalties, board memberships without active support) have no OtherSupport counterpart.",
@@ -7077,7 +7237,7 @@
                   "Budget",
                   "Negotiation",
                   "Terms",
-                  "Report",
+                  "Deliverable",
                   "Closeout",
                   "Equipment"
                 ],
@@ -7127,8 +7287,8 @@
                   "Terms": {
                     "definition": "An agreement's terms"
                   },
-                  "Report": {
-                    "definition": "A report"
+                  "Deliverable": {
+                    "definition": "A deliverable"
                   },
                   "Closeout": {
                     "definition": "A closeout"
@@ -7137,7 +7297,7 @@
                     "definition": "An equipment item"
                   }
                 },
-                "description": "Constrained: Award / Subaward / Proposal / SubmissionAttempt / Approval / PreAwardAuthorization / Personnel / PersonnelCredential / ComplianceRequirement / Modification / Action / Restriction / Budget / Negotiation / Terms / Report / Closeout / Equipment"
+                "description": "Constrained: Award / Subaward / Proposal / SubmissionAttempt / Approval / PreAwardAuthorization / Personnel / PersonnelCredential / ComplianceRequirement / Modification / Action / Restriction / Budget / Negotiation / Terms / Deliverable / Closeout / Equipment"
               },
               "Related_Entity_ID": {
                 "type": "ID",
@@ -7256,7 +7416,7 @@
                   "ComplianceRequirement",
                   "Personnel",
                   "Closeout",
-                  "Report"
+                  "Deliverable"
                 ],
                 "value_definitions": {
                   "Award": {
@@ -7292,11 +7452,11 @@
                   "Closeout": {
                     "definition": "A closeout"
                   },
-                  "Report": {
-                    "definition": "A report"
+                  "Deliverable": {
+                    "definition": "A deliverable"
                   }
                 },
-                "description": "Constrained: Award / Subaward / Proposal / SubmissionAttempt / RFA / Modification / Negotiation / Terms / ComplianceRequirement / Personnel / Closeout / Report"
+                "description": "Constrained: Award / Subaward / Proposal / SubmissionAttempt / RFA / Modification / Negotiation / Terms / ComplianceRequirement / Personnel / Closeout / Deliverable"
               },
               "Related_Entity_ID": {
                 "type": "ID",
@@ -7581,7 +7741,7 @@
                   "Modification",
                   "RFA",
                   "Closeout",
-                  "Report",
+                  "Deliverable",
                   "Communication"
                 ],
                 "value_definitions": {
@@ -7609,14 +7769,14 @@
                   "Closeout": {
                     "definition": "A closeout"
                   },
-                  "Report": {
-                    "definition": "A report"
+                  "Deliverable": {
+                    "definition": "A deliverable"
                   },
                   "Communication": {
                     "definition": "A communication"
                   }
                 },
-                "description": "Constrained: Award / Subaward / Proposal / Approval / ComplianceRequirement / Modification / RFA / Closeout / Report / Communication"
+                "description": "Constrained: Award / Subaward / Proposal / Approval / ComplianceRequirement / Modification / RFA / Closeout / Deliverable / Communication"
               },
               "Related_Entity_ID": {
                 "type": "ID",
@@ -7757,6 +7917,7 @@
                 "required": true,
                 "allowed_values": [
                   "NSF_Science_Code",
+                  "HERD_Field",
                   "NIH_MeSH",
                   "Institution_Research_Area",
                   "Free_Tag"
@@ -7773,9 +7934,12 @@
                   },
                   "Free_Tag": {
                     "definition": "A free-form tag"
+                  },
+                  "HERD_Field": {
+                    "definition": "A field of R&D from the HERD survey's list"
                   }
                 },
-                "description": "Constrained: NSF_Science_Code / NIH_MeSH / Institution_Research_Area / Free_Tag"
+                "description": "Constrained: NSF_Science_Code / HERD_Field / NIH_MeSH / Institution_Research_Area / Free_Tag"
               },
               "Value_Code": {
                 "type": "ShortName",
@@ -7791,11 +7955,21 @@
                 "type": "Count",
                 "required": false,
                 "description": "When the entity carries multiple classifications, the order to display them"
+              },
+              "Allocation_Percent": {
+                "type": "Percent",
+                "required": false,
+                "description": "The share of the entity in this classification, for prorating across fields. Values for one entity and scheme total 100 when present"
               }
-            }
+            },
+            "constraints": [
+              {
+                "rule": "Allocation_Percent is between 0 and 100, and when present the values for one entity and Scheme total 100."
+              }
+            ]
           },
           "Action": {
-            "description": "Work items attached to entities: deliverables, checklist items, service requests, modification approvals, compliance renewals, training requirements. Worklist-style: tells you WHAT and WHO.",
+            "description": "Work items attached to entities: checklist items, service requests, modification approvals, compliance renewals, training requirements. Worklist-style: tells you WHAT and WHO.",
             "columns": {
               "Action_ID": {
                 "type": "ID",
@@ -7818,7 +7992,7 @@
                   "Negotiation",
                   "Terms",
                   "Closeout",
-                  "Report",
+                  "Deliverable",
                   "Equipment"
                 ],
                 "value_definitions": {
@@ -7855,14 +8029,14 @@
                   "Closeout": {
                     "definition": "A closeout"
                   },
-                  "Report": {
-                    "definition": "A report"
+                  "Deliverable": {
+                    "definition": "A deliverable"
                   },
                   "Equipment": {
                     "definition": "An equipment item"
                   }
                 },
-                "description": "Constrained: Award / Subaward / Proposal / Approval / PreAwardAuthorization / Personnel / ComplianceRequirement / Modification / Negotiation / Terms / Closeout / Report / Equipment"
+                "description": "Constrained: Award / Subaward / Proposal / Approval / PreAwardAuthorization / Personnel / ComplianceRequirement / Modification / Negotiation / Terms / Closeout / Deliverable / Equipment"
               },
               "Related_Entity_ID": {
                 "type": "ID",
@@ -7878,7 +8052,6 @@
                 },
                 "value_group": "ActionType",
                 "recommended_values": [
-                  "Deliverable",
                   "Checklist_Item",
                   "Service_Request",
                   "Modification_Approval",
@@ -8085,7 +8258,7 @@
                   "Subaward",
                   "PreAwardAuthorization",
                   "Closeout",
-                  "Report"
+                  "Deliverable"
                 ],
                 "value_definitions": {
                   "Proposal": {
@@ -8103,11 +8276,11 @@
                   "Closeout": {
                     "definition": "Closeout sign-offs"
                   },
-                  "Report": {
-                    "definition": "Internal sign-off on a report before submission"
+                  "Deliverable": {
+                    "definition": "Internal sign-off on a deliverable before submission"
                   }
                 },
-                "description": "Constrained: Proposal / Modification / Subaward / PreAwardAuthorization / Closeout / Report. The kind of record being routed"
+                "description": "Constrained: Proposal / Modification / Subaward / PreAwardAuthorization / Closeout / Deliverable. The kind of record being routed"
               },
               "Related_Entity_ID": {
                 "type": "ID",
@@ -8523,7 +8696,7 @@
         "conventions": [
           {
             "name": "Deadline vs first-class due dates",
-            "description": "Several entities carry their own due-date columns (Report.Due_Date, Closeout milestones, RFA.Submission_Deadline, RFA.LOI_Deadline, ComplianceRequirement.Expiration_Date). The Deadline attachment is for ad-hoc obligations that don't have a first-class entity. Use Deadline only for obligations that don't otherwise have a structured home."
+            "description": "Several entities carry their own due-date columns (Deliverable.Due_Date, Closeout milestones, RFA.Submission_Deadline, RFA.LOI_Deadline, ComplianceRequirement.Expiration_Date). The Deadline attachment is for ad-hoc obligations that don't have a first-class entity. Use Deadline only for obligations that don't otherwise have a structured home."
           },
           {
             "name": "Attachments vs row properties",
@@ -8589,6 +8762,15 @@
                 "required": true,
                 "description": "PK",
                 "primary_key": true
+              },
+              "ComplianceRequirement_ID": {
+                "type": "ID",
+                "required": true,
+                "references": {
+                  "table": "ComplianceRequirement",
+                  "column": "ComplianceRequirement_ID"
+                },
+                "description": "The core approval this protocol details. The ComplianceRequirement is authoritative for the approval number and dates that awards rely on"
               },
               "Parent_Protocol_ID": {
                 "type": "ID",
@@ -8798,6 +8980,9 @@
                     "Approved_Date"
                   ]
                 }
+              },
+              {
+                "rule": "Where Protocol and its ComplianceRequirement disagree on the approval number or dates, the ComplianceRequirement is authoritative."
               }
             ]
           },
@@ -11114,6 +11299,43 @@
             "type": "Boolean",
             "required": true,
             "description": "True for direct-cost categories; false for indirect-cost categories"
+          },
+          "HERD_Cost_Type": {
+            "type": "Status",
+            "required": false,
+            "allowed_values": [
+              "Salaries_Wages_Fringe",
+              "Noncapitalized_Software",
+              "Capitalized_Software",
+              "Capitalized_Equipment",
+              "Pass_Through",
+              "Other_Direct",
+              "Indirect"
+            ],
+            "value_definitions": {
+              "Salaries_Wages_Fringe": {
+                "definition": "Compensation for R&D personnel, including fringe benefits"
+              },
+              "Noncapitalized_Software": {
+                "definition": "Software purchases and license fees below the capitalization threshold"
+              },
+              "Capitalized_Software": {
+                "definition": "Software above the capitalization threshold"
+              },
+              "Capitalized_Equipment": {
+                "definition": "Movable equipment above the capitalization threshold, including delivery and setup"
+              },
+              "Pass_Through": {
+                "definition": "Funds passed to subrecipients"
+              },
+              "Other_Direct": {
+                "definition": "Other direct costs, such as travel, tuition, consulting, computer usage, and supplies"
+              },
+              "Indirect": {
+                "definition": "Indirect costs"
+              }
+            },
+            "description": "The HERD survey's type of cost for this category. Constrained when present: Salaries_Wages_Fringe / Noncapitalized_Software / Capitalized_Software / Capitalized_Equipment / Pass_Through / Other_Direct / Indirect"
           }
         }
       }

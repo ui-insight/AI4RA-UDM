@@ -33,7 +33,7 @@ LIFECYCLE_COLUMNS = [
     ("Modification", "Approval_Status"),
     ("Payment", "Lifecycle_Stage"),
     ("Payment", "Payment_Status"),
-    ("Report", "Report_Status"),
+    ("Deliverable", "Deliverable_Status"),
     ("Action", "Action_Status"),
 ]
 

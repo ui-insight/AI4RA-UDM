@@ -23,6 +23,8 @@ The UDM is defined in two complementary artifacts:
 
 The two are kept in exact sync; the prose spec is authoritative on intent, the JSON on machine-consumable detail. An architectural overview lives in [`vignettes/ontology.md`](vignettes/ontology.md), and the version history in [`vignettes/CHANGELOG.md`](vignettes/CHANGELOG.md).
 
+To produce the NSF HERD survey from UDM data, see [`vignettes/herd-report.md`](vignettes/herd-report.md), which goes question by question.
+
 The UDM is a normalized model, in the Inmon tradition: the standard defines the integrated System of Record, and star schemas are derived from it by each adopter as views ([why](vignettes/udm-architecture.md#16-a-normalized-core-is-the-standard-star-schemas-are-the-adopters-choice)). Modules extend the standard and are conformance-checked; marts are deployment specific and are not part of it.
 
 ### Core Modules
@@ -32,7 +34,7 @@ The model's 48 tables are 46 in six core modules (the universal capabilities of 
 | Core module | Tables | Purpose |
 |--------|--------|---------|
 | **Actors** | Personnel, PersonnelCredential, Organization, OrganizationCapability, OrganizationIdentifier, OrganizationRole, ContactDetails | People, organizations, their roles, credentials, and contact information |
-| **Funding Cycle** | RFA, RFARequirement, Proposal, SubmissionAttempt, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout | The full lifecycle from funding opportunity through proposal, award, and closeout |
+| **Funding Cycle** | RFA, RFARequirement, Proposal, SubmissionAttempt, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Deliverable, Report, Closeout | The full lifecycle from funding opportunity through proposal, award, and closeout |
 | **Effort** | TeamRole, Effort | Who is on a proposal or award, and effort certification |
 | **Finance** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment | Budgets, accounting, transactions, rates, and capital assets |
 | **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure, PolicyException | IRB/IACUC protocols, COI, other support, policy exceptions, and regulatory tracking |
@@ -40,7 +42,7 @@ The model's 48 tables are 46 in six core modules (the universal capabilities of 
 
 **Implementation tables** (not a core module): `AllowedValues` (institution-specific controlled vocabularies with cross-institution canonical codes) and `BudgetCategory` (shared budget category reference). Core modules are research-administration capabilities; these two tables support the model's mechanics.
 
-The model also includes **12 example views** (e.g., `vw_Active_Awards`, `vw_Award_Lineage`, `vw_Overdue_Reports`) as reference query implementations that institutions can adopt or adapt for dashboards and reporting. They are written against the MySQL dialect mapping; each carries a `dialect` field, and date functions need adapting for other engines.
+The model also includes **14 example views** (e.g., `vw_Active_Awards`, `vw_Award_Lineage`, `vw_Overdue_Deliverables`) as reference query implementations that institutions can adopt or adapt for dashboards and reporting. They are written against the MySQL dialect mapping; each carries a `dialect` field, and date functions need adapting for other engines.
 
 Browse the full model interactively at the [UDM Dashboard](https://ui-insight.github.io/AI4RA-UDM/). Its Infrastructure tab charts how a proposal and award move through their statuses, and how early setup, modifications, subawards, payments, deliverables, and actions move through theirs. Its Glossary tab defines the terms in plain language. The glossary's source is [`glossary.json`](glossary.json), and a CSV copy is served at `data/glossary.csv`.
 
@@ -62,7 +64,7 @@ For full ontology documentation, see [`vignettes/ontology.md`](vignettes/ontolog
 The UDM rests on a small set of universal patterns applied consistently across the model:
 
 - **Lifecycle_Stage discriminator** — one table carries a record through its whole life (Budget: Proposed → Approved → Current → Actual; likewise Effort, CostShare, Payment), with revisions chained through `Previous_*_ID`.
-- **Two-FK exclusive-or attachment** — satellite tables (Modification, Report, Transaction, Terms, Closeout, and others) attach to either an Award or a Subaward via two nullable FKs, keeping inbound and outbound funding symmetric.
+- **Two-FK exclusive-or attachment:** satellite tables (Modification, Deliverable, Transaction, Terms, Closeout, and others) attach to either an Award or a Subaward via two nullable FKs, keeping inbound and outbound funding symmetric.
 - **Polymorphic attachment** — six Records tables reference any permitted entity via `Related_Entity_Type` + `Related_Entity_ID`, with documented minimum-conformance enforcement behavior.
 - **Flexible vs. fixed enumerations** — institution-specific vocabularies live in the `AllowedValues` table (with `Canonical_Value_Code` for cross-institution normalization); universal standards use CHECK constraints. See [allowedvalues.md](vignettes/allowedvalues.md).
 - **Derived columns with recompute triggers** — convenience columns like `Award.Current_End_Date` are documented as derived, with the rules to recompute them.
@@ -365,10 +367,11 @@ graph TD
     RFA-->Organization
     RFARequirement-->RFA
     RateAgreement-->Organization
-    Report-->Award
-    Report-->Document
-    Report-->Personnel
-    Report-->Subaward
+    Deliverable-->Award
+    Deliverable-->Document
+    Deliverable-->Personnel
+    Deliverable-->Subaward
+    Report-->Deliverable
     Restriction-->AllowedValues
     Restriction-->Personnel
     Subaward-->Award

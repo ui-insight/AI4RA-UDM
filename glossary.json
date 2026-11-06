@@ -73,6 +73,18 @@
       ]
     },
     {
+      "term": "Activity type",
+      "also": "Sponsored activity type",
+      "definition": "What kind of work an award or proposal funds: organized research, instruction, or another sponsored activity.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Activity_Type",
+        "Proposal.Activity_Type"
+      ],
+      "source": "2 CFR 200 Appendix III",
+      "source_url": "https://www.ecfr.gov/current/title-2/part-200/appendix-Appendix%20III%20to%20Part%20200"
+    },
+    {
       "term": "Adjusting (award)",
       "also": "",
       "definition": "An award status: the award has ended and a late correction is under way, such as an audit finding or a late charge. It is not open for spending. It returns to the status it came from.",
@@ -156,7 +168,9 @@
       "also": "",
       "definition": "Original investigation done to gain new knowledge, directed mainly toward a specific, practical aim or objective.",
       "domain": "Research metrics & reporting",
-      "udm": [],
+      "udm": [
+        "Award.Research_Character=Applied_Research"
+      ],
       "source": "NSF HERD questionnaire",
       "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
     },
@@ -341,7 +355,9 @@
       "also": "",
       "definition": "Experimental or theoretical work done mainly to gain new knowledge of the foundations of phenomena and observable facts, with no particular application or use in view.",
       "domain": "Research metrics & reporting",
-      "udm": [],
+      "udm": [
+        "Award.Research_Character=Basic_Research"
+      ],
       "source": "NSF HERD questionnaire",
       "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
     },
@@ -470,6 +486,7 @@
       "definition": "Payments for movable equipment above the institution's capitalization threshold, including delivery and setup, as the HERD survey counts them. Check the institution's capitalization policy for its threshold.",
       "domain": "Budget & costing",
       "udm": [
+        "BudgetCategory.HERD_Cost_Type=Capitalized_Equipment",
         "Equipment"
       ],
       "source": "NSF HERD questionnaire",
@@ -510,6 +527,17 @@
       "udm": [
         "Payment.Payment_Status=Clear"
       ]
+    },
+    {
+      "term": "Clinical trial",
+      "also": "",
+      "definition": "A research study of the effects of drugs, vaccines, devices, tests, or other therapies on patients. For the HERD survey, it means Phase I, II, or III trials with human patients.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Is_Clinical_Trial"
+      ],
+      "source": "NSF HERD questionnaire",
+      "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
     },
     {
       "term": "Closed (award)",
@@ -698,7 +726,7 @@
       "domain": "Award & lifecycle",
       "udm": [
         "Proposal.Proposal_Type_Value_ID=Continuation",
-        "Modification.Continuation_Type=Non_Competing"
+        "Modification.Event_Type_Value_ID=Incremental_Funding"
       ]
     },
     {
@@ -719,6 +747,7 @@
       "definition": "A legally binding agreement in which the sponsor buys specific work or deliverables, usually with stricter terms.",
       "domain": "Agreements",
       "udm": [
+        "Award.Instrument_Type=Contract",
         "Award.Mechanism_Value_ID"
       ],
       "source": "2 CFR 200.1",
@@ -761,6 +790,7 @@
       "definition": "Funding in which the sponsor is substantially involved in doing the work alongside the institution.",
       "domain": "Agreements",
       "udm": [
+        "Award.Instrument_Type=Cooperative_Agreement",
         "Award.Mechanism_Value_ID"
       ],
       "source": "2 CFR 200.1",
@@ -791,7 +821,7 @@
     {
       "term": "Credential",
       "also": "Person credential",
-      "definition": "A fact about a person the institution needs on file: citizenship or visa status, sponsor-system login, completed training, clearance, background check, or a standing authority.",
+      "definition": "A fact about a person the institution needs on file: citizenship or visa status, sponsor-system login, completed training, clearance, background check, or a standing authority. For employees, HR facts such as citizenship stay in the HR system.",
       "domain": "People & organizations",
       "udm": [
         "PersonnelCredential"
@@ -942,6 +972,16 @@
       ]
     },
     {
+      "term": "Deliverable",
+      "also": "Sponsor deliverable",
+      "definition": "Something owed to the sponsor under an award: a report, or a work product such as a prototype, dataset, software, or samples.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Deliverable",
+        "Deliverable.Deliverable_Type"
+      ]
+    },
+    {
       "term": "Derived value",
       "also": "Calculated field, computed value",
       "definition": "A value worked out from other records rather than typed in, such as an award's current end date.",
@@ -992,7 +1032,7 @@
       "definition": "A deliverable status: the project team is preparing it.",
       "domain": "Award & lifecycle",
       "udm": [
-        "Report.Report_Status=Drafted"
+        "Deliverable.Deliverable_Status=Drafted"
       ]
     },
     {
@@ -1105,7 +1145,9 @@
       "also": "",
       "definition": "Systematic work, drawing on research and practical experience and producing additional knowledge, directed at producing new products or processes or improving existing ones.",
       "domain": "Research metrics & reporting",
-      "udm": [],
+      "udm": [
+        "Award.Research_Character=Experimental_Development"
+      ],
       "source": "NSF HERD questionnaire",
       "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
     },
@@ -1196,7 +1238,10 @@
       "also": "",
       "definition": "The research discipline that R&D spending is reported under, from the HERD survey's list of fields. A project spanning several fields is prorated where possible.",
       "domain": "Research metrics & reporting",
-      "udm": [],
+      "udm": [
+        "Classification.Scheme=HERD_Field",
+        "Classification.Allocation_Percent"
+      ],
       "source": "NSF HERD questionnaire",
       "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
     },
@@ -1236,7 +1281,7 @@
       "definition": "A deliverable status: the sponsor reviewed and approved the deliverable, and the obligation is met.",
       "domain": "Award & lifecycle",
       "udm": [
-        "Report.Report_Status=Fulfilled"
+        "Deliverable.Deliverable_Status=Fulfilled"
       ]
     },
     {
@@ -1295,6 +1340,7 @@
       "definition": "Money given to carry out a project, with the sponsor having limited involvement in the work.",
       "domain": "Agreements",
       "udm": [
+        "Award.Instrument_Type=Grant",
         "Award.Mechanism_Value_ID"
       ],
       "source": "2 CFR 200.1",
@@ -1323,9 +1369,11 @@
     {
       "term": "HERD survey",
       "also": "Higher Education Research and Development Survey",
-      "definition": "The NSF survey of university research spending.",
+      "definition": "The NSF survey of university research spending. See the HERD report guide in the repository for how each answer comes from UDM data.",
       "domain": "Research metrics & reporting",
-      "udm": [],
+      "udm": [
+        "Award.Activity_Type"
+      ],
       "source": "NSF NCSES",
       "source_url": "https://ncses.nsf.gov/pubs/nsf26305"
     },
@@ -1450,6 +1498,17 @@
       "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
     },
     {
+      "term": "Instrument type",
+      "also": "Agreement type",
+      "definition": "The legal kind of an award: a grant, cooperative agreement, contract, or other transaction. A funding mechanism such as R01 is a more detailed code within one of these.",
+      "domain": "Agreements",
+      "udm": [
+        "Award.Instrument_Type"
+      ],
+      "source": "2 CFR 200.1",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
+    },
+    {
       "term": "Intent to Award",
       "also": "",
       "definition": "A decision status: the sponsor has signaled funding, but no agreement exists yet.",
@@ -1570,7 +1629,7 @@
       "definition": "A deliverable status: it is past its due date and has not been submitted.",
       "domain": "Award & lifecycle",
       "udm": [
-        "Report.Report_Status=Late"
+        "Deliverable.Deliverable_Status=Late"
       ]
     },
     {
@@ -1740,7 +1799,7 @@
       "definition": "A deliverable status: the deliverable is due and work has not started.",
       "domain": "Award & lifecycle",
       "udm": [
-        "Report.Report_Status=Not_Started"
+        "Deliverable.Deliverable_Status=Not_Started"
       ]
     },
     {
@@ -1818,6 +1877,30 @@
       ]
     },
     {
+      "term": "Organized research",
+      "also": "",
+      "definition": "Research and development that is separately budgeted and accounted for, including research training. On an award, it is what the HERD survey counts as sponsored research.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Activity_Type=Organized_Research",
+        "Proposal.Activity_Type=Organized_Research"
+      ],
+      "source": "2 CFR 200 Appendix III",
+      "source_url": "https://www.ecfr.gov/current/title-2/part-200/appendix-Appendix%20III%20to%20Part%20200"
+    },
+    {
+      "term": "Other sponsored activity",
+      "also": "",
+      "definition": "Externally funded work other than instruction and research, such as health service or community service projects.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Activity_Type=Other_Sponsored_Activity",
+        "Proposal.Activity_Type=Other_Sponsored_Activity"
+      ],
+      "source": "2 CFR 200 Appendix III",
+      "source_url": "https://www.ecfr.gov/current/title-2/part-200/appendix-Appendix%20III%20to%20Part%20200"
+    },
+    {
       "term": "Other support",
       "also": "Current and pending support",
       "definition": "All current and pending resources that support a person's research, wherever based and whether or not they have monetary value, which sponsors require disclosed.",
@@ -1834,7 +1917,7 @@
       "definition": "A required report not submitted by its due date.",
       "domain": "Research metrics & reporting",
       "udm": [
-        "Report.Report_Status=Late"
+        "Deliverable.Deliverable_Status=Late"
       ]
     },
     {
@@ -1861,6 +1944,7 @@
       "definition": "R&D funds an institution sends to a subrecipient to carry out part of the work. Payments to contractors or vendors for goods and services do not count.",
       "domain": "Budget & costing",
       "udm": [
+        "BudgetCategory.HERD_Cost_Type=Pass_Through",
         "Subaward"
       ],
       "source": "NSF HERD questionnaire",
@@ -2197,7 +2281,9 @@
       "also": "Research expenditures, research spend",
       "definition": "Spending on research and development that is separately accounted for in the institution's current operating funds, as the HERD survey counts it. It includes sponsored research, institutionally funded research, committed cost sharing, recovered and unrecovered indirect costs, equipment bought from R&D accounts, and funds passed through to subrecipients. It leaves out public service, non-research training grants, and capital projects. Check the current questionnaire for the full rules.",
       "domain": "Research metrics & reporting",
-      "udm": [],
+      "udm": [
+        "Award.Activity_Type=Organized_Research"
+      ],
       "source": "NSF HERD questionnaire",
       "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
     },
@@ -2266,7 +2352,10 @@
       "also": "F&A recovery, indirect cost recovery, overhead recovery",
       "definition": "Indirect costs reimbursed by external sponsors.",
       "domain": "Budget & costing",
-      "udm": [],
+      "udm": [
+        "BudgetCategory.HERD_Cost_Type=Indirect",
+        "BudgetCategory.Is_Direct_Cost"
+      ],
       "source": "NSF HERD questionnaire",
       "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
     },
@@ -2313,7 +2402,6 @@
       "definition": "An award that gives an existing project a further period of funding won through a new competition. A continuation, by contrast, involves no new competition.",
       "domain": "Research metrics & reporting",
       "udm": [
-        "Modification.Continuation_Type=Competing",
         "Proposal.Proposal_Type_Value_ID=Renewal"
       ]
     },
@@ -2409,7 +2497,7 @@
       "definition": "A deliverable status: the sponsor sent it back for changes.",
       "domain": "Award & lifecycle",
       "udm": [
-        "Report.Report_Status=Returned_for_Revision"
+        "Deliverable.Deliverable_Status=Returned_for_Revision"
       ]
     },
     {
@@ -2536,6 +2624,7 @@
       "domain": "Research metrics & reporting",
       "udm": [
         "Organization.Sponsor_Type",
+        "Organization.Is_Foreign",
         "Award.Prime_Sponsor_Organization_ID"
       ],
       "source": "NSF HERD questionnaire",
@@ -2595,12 +2684,24 @@
     },
     {
       "term": "Sponsor report",
-      "also": "Deliverable, required report",
-      "definition": "A report owed to the sponsor, such as a progress, financial, final, invention, data-sharing, or equipment report.",
+      "also": "Required report",
+      "definition": "A deliverable that is a report owed to the sponsor, such as a progress, financial, final, invention, data-sharing, or equipment report.",
       "domain": "Award & lifecycle",
       "udm": [
         "Report"
       ]
+    },
+    {
+      "term": "Sponsored instruction",
+      "also": "Sponsored training",
+      "definition": "Teaching or training set up by a grant, contract, or cooperative agreement, other than research training.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Award.Activity_Type=Instruction",
+        "Proposal.Activity_Type=Instruction"
+      ],
+      "source": "2 CFR 200 Appendix III",
+      "source_url": "https://www.ecfr.gov/current/title-2/part-200/appendix-Appendix%20III%20to%20Part%20200"
     },
     {
       "term": "Sponsored programs office",
@@ -2693,7 +2794,7 @@
       "definition": "A deliverable status: it was sent to the sponsor.",
       "domain": "Award & lifecycle",
       "udm": [
-        "Report.Report_Status=Submitted"
+        "Deliverable.Deliverable_Status=Submitted"
       ]
     },
     {
@@ -2771,8 +2872,7 @@
       "definition": "Extra money added to an existing award for added or expanded work. Unlike incremental funding, it wasn't part of the planned total.",
       "domain": "Award & lifecycle",
       "udm": [
-        "Modification.Event_Type_Value_ID=Supplement",
-        "Modification.Continuation_Type=Supplement"
+        "Modification.Event_Type_Value_ID=Supplement"
       ]
     },
     {
@@ -3060,7 +3160,7 @@
       "definition": "A deliverable status: the sponsor no longer requires it.",
       "domain": "Award & lifecycle",
       "udm": [
-        "Report.Report_Status=Waived"
+        "Deliverable.Deliverable_Status=Waived"
       ]
     },
     {
@@ -3088,6 +3188,15 @@
       "domain": "Records & workflow",
       "udm": [
         "Action"
+      ]
+    },
+    {
+      "term": "Work product",
+      "also": "",
+      "definition": "A deliverable that isn't a report, such as a prototype, dataset, software, or samples.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Deliverable.Deliverable_Type=Work_Product"
       ]
     }
   ]

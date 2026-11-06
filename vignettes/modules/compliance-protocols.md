@@ -20,6 +20,7 @@ The standing regulatory record. Exists independently of any single funded projec
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | Protocol_ID | ID | required | PK |
+| ComplianceRequirement_ID | ID | required | → ComplianceRequirement. The core approval this protocol details. The ComplianceRequirement is authoritative for the approval number and dates that awards rely on |
 | Parent_Protocol_ID | ID | optional | → Protocol. Self-referencing renewal chain; a renewal points to its predecessor, null for the first instance |
 | Regime | Status | required | Constrained: Animal_Use / Human_Subjects / Biosafety / Other |
 | Protocol_Number | ID | optional | The authority-issued identifier (IACUC number, IRB number, IBC registration). Unique within (Reviewing_Authority_Organization_ID, Regime) when not null |

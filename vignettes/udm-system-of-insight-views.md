@@ -216,7 +216,7 @@ SELECT
     WHEN 'Proposal' THEN (SELECT Proposal_Title FROM Proposal WHERE Proposal_ID = d.Related_Entity_ID)
     WHEN 'Award' THEN (SELECT Award_Title FROM Award WHERE Award_ID = d.Related_Entity_ID)
     WHEN 'ComplianceRequirement' THEN (SELECT Compliance_Number FROM ComplianceRequirement WHERE ComplianceRequirement_ID = d.Related_Entity_ID)
-    WHEN 'Report' THEN (SELECT Report_Type FROM Report WHERE Report_ID = d.Related_Entity_ID)
+    WHEN 'Deliverable' THEN (SELECT Deliverable_Type FROM Deliverable WHERE Deliverable_ID = d.Related_Entity_ID)
     ELSE NULL
   END AS Subject_Display
 FROM Deadline d

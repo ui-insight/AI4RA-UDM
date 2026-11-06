@@ -116,7 +116,7 @@ These are not repeated in the per-table reference; assume them present everywher
 
 ### PolicyException
 
-An institutionally granted exception to a sponsor or institutional policy rule: PI-eligibility waivers, COI management exceptions, cost-share waivers. Scoped to a Personnel record, optionally narrowed to one Proposal, Award, or Subaward; all three scope FKs null means a blanket personal exception. Carries the rule code, justification, decision authority, and effective period. Lifecycle: Pending / Approved / Denied / Withdrawn / Expired.
+An institutionally granted exception to a sponsor or institutional policy rule: PI-eligibility waivers, COI management exceptions, cost-share waivers. Scoped to a person, to one Proposal, Award, or Subaward, or to a person within one of those; a person with all three scope FKs null means a blanket personal exception. Carries the rule code, justification, decision authority, and effective period. Lifecycle: Pending / Approved / Denied / Withdrawn / Expired.
 
 ### AllowedValues vs fixed Status enums
 
@@ -148,7 +148,7 @@ Chains to an earlier row of the same table use `Previous_TableName_ID` instead, 
 Some tables attach to one of two possible parents using two nullable FK columns with a constraint that exactly one is non-null. Used to keep Award and Subaward symmetrical without duplicating satellite tables.
 
 Tables using this pattern:
-- `Modification`, `Terms`, `Payment`, `Transaction`, `Equipment`, `Report`, `Closeout`, `TeamRole`, `ComplianceCoverage` — Award_ID XOR Subaward_ID
+- `Modification`, `Terms`, `Payment`, `Transaction`, `Equipment`, `Deliverable`, `Closeout`, `TeamRole`, `ComplianceCoverage`: Award_ID XOR Subaward_ID
 - `Budget`, `CostShare` — Award_ID XOR Subaward_ID at later Lifecycle_Stages
 - `ContactDetails` — Personnel_ID XOR Organization_ID
 - `Negotiation` — at-least-one of Proposal_ID / Award_ID / Subaward_ID
@@ -254,7 +254,7 @@ The 47 tables organize into 6 core modules plus two implementation tables:
 | Core module | Tables |
 |---|---|
 | **Actors** | Personnel, PersonnelCredential, Organization, OrganizationCapability, OrganizationIdentifier, OrganizationRole, ContactDetails |
-| **Funding Cycle** | RFA, RFARequirement, Proposal, SubmissionAttempt, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Report, Closeout |
+| **Funding Cycle** | RFA, RFARequirement, Proposal, SubmissionAttempt, PreAwardAuthorization, Award, Modification, Subaward, Negotiation, Terms, Deliverable, Report, Closeout |
 | **Effort** | TeamRole, Effort |
 | **Finance** | Budget, Fund, Account, FinanceCode, Transaction, RateAgreement, IndirectRate, Payment, CostShare, Equipment |
 | **Compliance** | ComplianceRequirement, ComplianceCoverage, ProtocolRole, ConflictOfInterest, OtherSupport, OtherSupportDisclosure, PolicyException |
@@ -317,7 +317,7 @@ Carries lineage columns: `Previous_Proposal_ID` (resubmission/renewal/continuati
 
 ### Approval (Records)
 
-One step in an approval chain on a Proposal, Modification, Subaward, PreAwardAuthorization, Closeout, or Report. Each step names what is decided and who decides it; steps sharing an order run in parallel as a block; a return reruns steps in a new round; a sign-off records the package hash it approved and is voided when the package changes.
+One step in an approval chain on a Proposal, Modification, Subaward, PreAwardAuthorization, Closeout, or Deliverable. Each step names what is decided and who decides it; steps sharing an order run in parallel as a block; a return reruns steps in a new round; a sign-off records the package hash it approved and is voided when the package changes.
 
 ### PreAwardAuthorization
 
@@ -352,9 +352,13 @@ The bargaining lifecycle between the institution and a counterparty. Covers thre
 
 The contractual terms and conditions of a funded agreement: payment method, invoicing frequency, reporting requirements, cost-sharing obligations, special conditions, property requirements, publication requirements, closeout requirements, record retention. One Terms row per parent agreement.
 
+### Deliverable
+
+Something owed to the sponsor under an award: a report, or a work product such as a prototype, dataset, software, or samples. Distinct from Action (generic worklist item) and Deadline (calendar metadata) because a deliverable has a submission record, sponsor confirmation, and acceptance state. Kinds with their own details have child tables.
+
 ### Report
 
-Scheduled or ad hoc deliverables to the sponsor: progress reports, RPPR, FFR (SF425), final reports, invention statements, data-sharing plan updates. Distinct from Action (generic worklist item) and Deadline (calendar metadata) because Reports have a reporting period, submission record, sponsor confirmation, and acceptance state.
+The report details of a Deliverable: progress reports, RPPR, FFR (SF425), final reports, invention statements, data-sharing reports. Holds the report type and reporting period.
 
 ### Closeout
 
@@ -364,7 +368,7 @@ The closeout workflow object for an Award or Subaward. Coordinates several subwo
 
 ### TeamRole
 
-A person's role on an Award or Subaward (XOR-attached) with effort allocation, date range, credit attribution, and Multi_PI / Contact PI flags. Recommended Role values: PI / Co_PI / Co_I / Multi_PI / Coordinator / Key_Personnel / Cohort_Participant / Coach / Mentor / Trainee.
+A person's role on an Award or Subaward (XOR-attached) with effort allocation, date range, credit attribution, and Multi_PI / Contact PI flags. Recommended Role values: PI / Co_PI / Co_I / Multi_PI / Coordinator / Cohort_Participant / Coach / Mentor / Trainee.
 
 Constraints worth noting:
 - **PI vs Multi_PI mode is exclusive.** An Award is in single-PI mode (exactly one active PI row) or Multi_PI mode (≥2 active Multi_PI rows) or neither (community-partner Subaward with no academic-PI structure). Cannot be both.
@@ -486,7 +490,7 @@ Operational constraints attached to an entity (CUI, CMMC, EAR, ITAR, publication
 
 ### Deadline
 
-Ad-hoc obligations attached to an entity that don't have a first-class entity. If a Report, Closeout milestone, RFA submission deadline, or ComplianceRequirement expiration already has a due date column, the date lives on that entity — Deadline is only for one-off obligations.
+Ad-hoc obligations attached to an entity that don't have a first-class entity. If a Deliverable, Closeout milestone, RFA submission deadline, or ComplianceRequirement expiration already has a due date column, the date lives on that entity. Deadline is only for one-off obligations.
 
 ### Classification
 
@@ -530,7 +534,7 @@ The companion JSON ships 12 worked CREATE VIEW examples, written against the MyS
 | `vw_Award_Lineage` | Lineage root via COALESCE(Originating_Award_ID, Award_ID) |
 | `vw_Subaward_With_Prime` | Subaward joined to its Prime Award (NULL when pre-award) |
 | `vw_Active_IRB_Coverage` | Awards currently covered by an active IRB protocol |
-| `vw_Overdue_Reports` | Reports past due, with days-overdue calculation |
+| `vw_Overdue_Deliverables` | Deliverables past due, with report details where they apply and a days-overdue calculation |
 | `vw_Award_PI_Timeline` | Full PI history per Award via TeamRole + AllowedValues |
 | `vw_Award_Budget_Summary` | Original vs Current funding and end-date per Award |
 | `vw_Effort_Certification_Status` | Per-period effort completeness, flagging Charged-but-not-Certified |
