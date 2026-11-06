@@ -1733,7 +1733,7 @@
                     ]
                   },
                   "Returned": {
-                    "definition": "An approval step sent it back for revision, the institution is reconsidering the opportunity, or a withdrawn proposal is being revised; it must be rerouted",
+                    "definition": "An approval step sent it back for revision, the institution reopened consideration of the opportunity, or a withdrawn proposal is being revised; it must be rerouted",
                     "set_by": "Derived from the Approval rows of the current round",
                     "next": [
                       "In_Review",
@@ -1755,7 +1755,7 @@
                     "next": []
                   }
                 },
-                "description": "Where the proposal stands in the institution's decision to pursue the opportunity. Draft until routed; In_Review while steps are pending; Returned when a step sent it back for revision, the institution is reconsidering the opportunity, or a withdrawn proposal is being revised; Approved once every step except Final_Sign_off and Release_to_Submit has approved; Rejected when a step or the PI refused it, at any point before it was sent. A changed package voids only the sign-off, a separate gate tracked in Submission_Status",
+                "description": "Where the proposal stands in the institution's decision to pursue the opportunity. Draft until routed; In_Review while steps are pending; Returned when a step sent it back for revision, the institution reopened consideration of the opportunity, or a withdrawn proposal is being revised; Approved once every step except Final_Sign_off and Release_to_Submit has approved; Rejected when a step or the PI refused it, at any point before it was sent. A changed package voids only the sign-off, a separate gate tracked in Submission_Status",
                 "synonyms": "Internal Routing Status, OSP Approval",
                 "derived": {
                   "rule": "Draft when no Approval row exists for the Proposal; otherwise, over the rows of the highest Approval_Round: Rejected if any row is Rejected; Returned if any row is Returned_for_Revision; Approved if every row other than Final_Sign_off and Release_to_Submit is Approved or Bypassed; In_Review otherwise.",
