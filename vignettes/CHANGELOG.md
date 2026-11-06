@@ -7,7 +7,7 @@ The UDM follows [Semantic Versioning](https://semver.org/):
 - **MINOR** when entities or columns are added in a backward-compatible way
 - **PATCH** for documentation, convention clarifications, or fixes to non-load-bearing rules
 
-## [Unreleased]
+## [4.1.0] - 2026-11-06
 
 - **`Modification.Requires_Peer_Review` is new and optional.** It separates NIH's administrative supplements from competitive revisions on a `Supplement` event, and stays empty where a sponsor doesn't distinguish them.
 - **Glossary: research security and conflict terms.** Adds `Significant financial interest` and `Malign foreign talent recruitment program`.
