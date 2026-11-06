@@ -207,15 +207,6 @@
       "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
     },
     {
-      "term": "Approval of the material",
-      "also": "",
-      "definition": "The gate that decides whether the content of the proposal is approved. It is tracked in internal approval.",
-      "domain": "Proposal",
-      "udm": [
-        "Proposal.Internal_Approval_Status"
-      ]
-    },
-    {
       "term": "Approval step",
       "also": "Sign-off, routing step",
       "definition": "One decision in an approval chain: who was asked to decide what, and what they decided.",
@@ -449,7 +440,9 @@
       "domain": "Proposal",
       "udm": [
         "Document.Document_Type_Value_ID=Biosketch"
-      ]
+      ],
+      "source": "NIH Biographical Sketch Common Form",
+      "source_url": "https://grants.nih.gov/grants-process/write-application/forms-directory/biosketch"
     },
     {
       "term": "Blocked",
@@ -873,12 +866,14 @@
     {
       "term": "Continuation",
       "also": "Non-competing continuation",
-      "definition": "Funding for a later period of an existing award without a new competition.",
+      "definition": "Funding for a later period of an existing award without a new competition. This follows NIH's definition of a non-competing continuation.",
       "domain": "Award & lifecycle",
       "udm": [
         "Proposal.Proposal_Type_Value_ID=Continuation",
         "Modification.Event_Type_Value_ID=Incremental_Funding"
-      ]
+      ],
+      "source": "NIH Grants Policy Statement 1.2",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_1/1.2_definition_of_terms.htm"
     },
     {
       "term": "Continuing review",
@@ -1057,7 +1052,9 @@
       "domain": "Proposal",
       "udm": [
         "Document.Document_Type_Value_ID=DMP"
-      ]
+      ],
+      "source": "NIH NOT-OD-21-013",
+      "source_url": "https://grants.nih.gov/grants/guide/notice-files/NOT-OD-21-013.html"
     },
     {
       "term": "Data model",
@@ -1221,8 +1218,8 @@
       "udm": [
         "OrganizationIdentifier"
       ],
-      "source": "GSA",
-      "source_url": "https://www.gsa.gov/about-gsa/newsroom/news-releases/gsa-systems-switch-to-unique-entity-id-sam-on-april-4-2022-03162022"
+      "source": "GSA Unique Entity ID FAQ",
+      "source_url": "https://www.gsa.gov/system/files/To_Publish_-_FAQs_from_Unique_Entity_ID_Forum.pdf"
     },
     {
       "term": "Effective F&A rate",
@@ -1682,7 +1679,9 @@
       "domain": "Award & lifecycle",
       "udm": [
         "Modification.Event_Type_Value_ID=Incremental_Funding"
-      ]
+      ],
+      "source": "NSF PAPPG Chapter VI",
+      "source_url": "https://www.nsf.gov/policies/pappg/24-1/ch-6-nsf-awards"
     },
     {
       "term": "Indirect costs",
@@ -1907,7 +1906,9 @@
       "also": "",
       "definition": "Data about data, such as its type, source, owner, freshness, and meaning.",
       "domain": "Data & integration",
-      "udm": []
+      "udm": [],
+      "source": "NIST glossary",
+      "source_url": "https://csrc.nist.gov/glossary/term/metadata"
     },
     {
       "term": "Modification",
@@ -1984,7 +1985,9 @@
       "udm": [
         "Award.Proposal_ID",
         "Proposal.Proposal_Type_Value_ID=New"
-      ]
+      ],
+      "source": "HHS Grants Policy Statement 2.3.1",
+      "source_url": "https://www.hhs.gov/sites/default/files/hhs-grants-policy-statement-oct-2025.pdf"
     },
     {
       "term": "No-cost extension",
@@ -2699,11 +2702,13 @@
     {
       "term": "Renewal",
       "also": "Competing renewal, competing continuation",
-      "definition": "An award that gives an existing project a further period of funding won through a new competition. A continuation, by contrast, involves no new competition.",
+      "definition": "An award that gives an existing project a further period of funding won through a new competition. A continuation, by contrast, involves no new competition. This follows NIH's definition.",
       "domain": "Research metrics & reporting",
       "udm": [
         "Proposal.Proposal_Type_Value_ID=Renewal"
-      ]
+      ],
+      "source": "NIH Grants Policy Statement 1.2",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_1/1.2_definition_of_terms.htm"
     },
     {
       "term": "Reopened",
@@ -2767,9 +2772,11 @@
     {
       "term": "Responsible conduct of research",
       "also": "RCR",
-      "definition": "Required training in research ethics, covering topics such as authorship, data management, and misconduct.",
+      "definition": "Training in research ethics, covering topics such as authorship, data management, and misconduct. Sponsors require it for certain awards.",
       "domain": "Compliance & research security",
-      "udm": []
+      "udm": [],
+      "source": "NIH NOT-OD-10-019",
+      "source_url": "https://grants.nih.gov/grants/guide/notice-files/NOT-OD-10-019.html"
     },
     {
       "term": "Restriction",
@@ -2943,9 +2950,11 @@
     {
       "term": "Software as a Service",
       "also": "SaaS, cloud software, hosted software",
-      "definition": "Software you use over the internet and pay for by subscription, rather than installing and running it yourself.",
+      "definition": "Software you use over the internet, rather than installing and running it yourself.",
       "domain": "Systems & identifiers",
-      "udm": []
+      "udm": [],
+      "source": "NIST glossary",
+      "source_url": "https://csrc.nist.gov/glossary/term/software_as_a_service"
     },
     {
       "term": "Source of funds",
@@ -2962,12 +2971,14 @@
     },
     {
       "term": "Special conditions",
-      "also": "Special terms, award-specific conditions",
+      "also": "Special terms, award-specific conditions, specific conditions",
       "definition": "Conditions that apply to one award beyond the standard terms.",
       "domain": "Agreements",
       "udm": [
         "Terms.Special_Conditions"
-      ]
+      ],
+      "source": "2 CFR 200.211",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.211"
     },
     {
       "term": "Spending",
@@ -3112,7 +3123,7 @@
     {
       "term": "Submission status",
       "also": "",
-      "definition": "Where a proposal stands in submission: unapproved, unsubmitted, signed off, submitting, submitted, received, validated, invalid, accepted, failed, or recalled.",
+      "definition": "Where a proposal stands in submission: unsubmitted, signed off, submitted, received, validated, invalid, accepted, failed, recalled, or sent back.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Submission_Status"
@@ -3215,7 +3226,9 @@
       "udm": [
         "Modification.Event_Type_Value_ID=Supplement",
         "Modification.Requires_Peer_Review"
-      ]
+      ],
+      "source": "HHS Grants Policy Statement 2.3.1",
+      "source_url": "https://www.hhs.gov/sites/default/files/hhs-grants-policy-statement-oct-2025.pdf"
     },
     {
       "term": "Suspended (award)",
@@ -3359,7 +3372,9 @@
       "domain": "Agreements",
       "udm": [
         "Terms"
-      ]
+      ],
+      "source": "NIH Grants Policy Statement 1.2",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_1/1.2_definition_of_terms.htm"
     },
     {
       "term": "Title vesting",
