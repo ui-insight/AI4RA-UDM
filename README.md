@@ -2,7 +2,7 @@
 
 A universal data model for research administration that any institution can adopt.
 
-**Current version: v5.0.0** (released 2026-11-06). Earlier versions are fixed commits under [GitHub Releases](https://github.com/ui-insight/AI4RA-UDM/releases); see [Versions](#versions).
+**Current version: v6.0.0** (released 2026-11-06). Earlier versions are fixed commits under [GitHub Releases](https://github.com/ui-insight/AI4RA-UDM/releases); see [Versions](#versions).
 
 ## Mission
 
@@ -78,7 +78,7 @@ The `udm_schema.json` structure (abbreviated). Everything specified is a module,
 
 ```json
 {
-  "metadata": { "name": "UDM", "version": "5.0.0", "spec_source": "vignettes/udm-system-of-record.md" },
+  "metadata": { "name": "UDM", "version": "6.0.0", "spec_source": "vignettes/udm-system-of-record.md" },
   "types": { "abstract": ["ID", "Money", "..."], "dialects": { "mysql": { "ID": "VARCHAR(50)", "Money": "DECIMAL(18,2)", "...": "..." }, "postgresql": { "...": "..." } } },
   "conventions": { "identifier": {}, "hierarchy": {}, "polymorphic_attachment": {}, "lifecycle_stage": {}, "audit_columns": {}, "constraint_vocabulary": {}, "semantic": [], "...": {} },
   "modules": {

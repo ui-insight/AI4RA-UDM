@@ -1,7 +1,7 @@
 {
   "metadata": {
     "name": "UDM",
-    "version": "5.0.0",
+    "version": "6.0.0",
     "released": "2026-11-06",
     "description": "Vendor-neutral research administration data model. This JSON is the machine-readable serialization of the specification in vignettes/udm-system-of-record.md: modules, tables, columns in the abstract type vocabulary, constraints, conventions, and derivation rules. It names no database engine; types.dialects maps the abstract types to native ones per engine.",
     "spec_source": "vignettes/udm-system-of-record.md",
