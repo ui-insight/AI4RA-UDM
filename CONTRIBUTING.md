@@ -13,8 +13,6 @@ The UDM is a draft, and it needs people who work in research administration to g
 
 Design conversations happen on the list so everyone can join them, with or without GitHub. Please share public material only.
 
-Prefer not to join? Take the short [practitioner survey](https://bit.ly/4b5b21q).
-
 ## Report a problem or bug
 
 Raise problems and bugs as a [GitHub Issue](https://github.com/ui-insight/AI4RA-UDM/issues), such as a broken link, a failing check, or a mismatch between the schema and the docs. If you don't use GitHub, post them on the list.

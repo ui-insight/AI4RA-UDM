@@ -1,9 +1,7 @@
 import { useEffect } from 'react';
 import type { DataDictionary, Relationship, TabName } from '../../types';
 import { coreModuleGroups, getCoreModule } from '../../data/coreModules';
-import surveyQrUrl from '../../assets/udm-survey-qr.png';
 
-const SURVEY_URL = 'https://bit.ly/4b5b21q';
 const REPO_URL = 'https://github.com/ui-insight/AI4RA-UDM';
 const FORUM_JOIN_URL = 'https://groups.ai4ra.uidaho.edu/g/main/join';
 const FORUM_UDM_URL = 'https://groups.ai4ra.uidaho.edu/g/main/search?q=%23UDM&ct=1';
@@ -81,21 +79,6 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
           flexWrap: 'wrap',
         }}
       >
-        <a
-          href={SURVEY_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ flexShrink: 0, textAlign: 'center', textDecoration: 'none' }}
-        >
-          <img
-            src={surveyQrUrl}
-            alt="QR code for the UDM feedback survey. Select to open the survey."
-            style={{ width: 140, height: 140, borderRadius: 8, background: 'white', padding: 6, display: 'block' }}
-          />
-          <div style={{ color: 'white', fontWeight: 700, fontSize: '0.95rem', marginTop: '0.4rem' }}>
-            Anonymous survey
-          </div>
-        </a>
         <div style={{ flex: 1, minWidth: 220 }}>
           <h3 style={{ color: 'white', fontSize: '1.3rem', margin: '0 0 0.5rem' }}>
             Help us evaluate it
@@ -109,7 +92,7 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
             <li>What do you call something that it names differently?</li>
             <li>Would you give us thirty minutes to walk through it against one of your systems?</li>
           </ul>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
             <a
               href={FORUM_JOIN_URL}
               target="_blank"
@@ -135,27 +118,6 @@ export default function HomeTab({ dataDictionary, relationships, onNavigate }: P
               . Please share public material only.
             </span>
           </div>
-          <p style={{ color: 'rgba(255,255,255,0.9)', margin: 0, fontSize: '0.95rem' }}>
-            Prefer not to join?{' '}
-            <a href={SURVEY_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'white', fontWeight: 600 }}>
-              Take the anonymous survey
-            </a>{' '}
-            or{' '}
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                // Assembled at click time so the address never appears in the page source
-                const user = ['nlay', 'man'].join('');
-                const host = ['uidaho', 'edu'].join('.');
-                window.location.href = `mailto:${user}@${host}?subject=${encodeURIComponent('UDM feedback')}`;
-              }}
-              style={{ color: 'white', fontWeight: 600 }}
-            >
-              email us
-            </a>
-            .
-          </p>
         </div>
       </div>
 
