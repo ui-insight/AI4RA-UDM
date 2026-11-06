@@ -309,7 +309,7 @@ No single entity captures "the decision" abstractly; the three representations t
 **Submission attempts.** The *fact* that a proposal went to a sponsor is research-administration data; the *mechanics* of how the submission tooling assembled and transmitted it are not.
 
 - Each transmission is one `SubmissionAttempt` row. Re-submissions add attempts; the attempt history is the row sequence by `Attempt_Number`.
-- `Proposal.Submission_Status` is the `Attempt_Status` of the newest attempt that has left Unsubmitted, as long as it is in transmission or with the sponsor or the current package still matches it; before that it is Unapproved, Unsubmitted, or Signed_Off. `Proposal.Submission_Date` and `Submission_Version` derive from the attempts.
+- `Proposal.Submission_Status` is the `Attempt_Status` of the newest attempt that has left Unsubmitted, as long as it is with the sponsor or the current package still matches it; before that it is Unsubmitted or Signed_Off. `Proposal.Submission_Date` and `Submission_Version` derive from the attempts.
 - Sponsor tracking and confirmation identifiers live on the attempt, indexed, not in free text.
 - Package assembly artifacts, connection profiles, and retry mechanics are submission-tooling internals and live in the System of Action. The transmitted package itself is a `Document` attached to the attempt; its hash is `Package_Hash`.
 
@@ -373,9 +373,9 @@ Universal status taxonomies are listed here in one place. The JSON artifact carr
 | `Award_Status` | In_Setup, Active, Suspended, Closing, Closed, Adjusting, Terminating, Terminated |
 | `Subaward_Status` | Proposed, In_Setup, Active, Suspended, Closing, Closed, Adjusting, Terminated, Not_Issued |
 | `Proposal.Internal_Approval_Status` | Draft, In_Review, Returned, Approved, Rejected |
-| `Proposal.Submission_Status` | Unapproved, Unsubmitted, Signed_Off, Submitting, Submitted, Received, Validated, Invalid, Accepted, Failed, Recalled (derived) |
+| `Proposal.Submission_Status` | Unsubmitted, Signed_Off, Submitted, Received, Validated, Invalid, Accepted, Failed, Recalled (derived) |
 | `Proposal.Decision_Status` | Unrequested, Pending, Intent_to_Award, Awarded, Declined, Not_Reviewed, Withdrawn |
-| `SubmissionAttempt.Attempt_Status` | Unsubmitted, Submitting, Submitted, Received, Validated, Invalid, Accepted, Failed, Recalled |
+| `SubmissionAttempt.Attempt_Status` | Unsubmitted, Submitted, Received, Validated, Invalid, Accepted, Failed, Recalled |
 | `RFA_Status` | Active, Closed, Superseded, Cancelled |
 | `Negotiation_Status` | Pending, Active, On_Hold, Resolved, Abandoned |
 | `Modification.Approval_Status` | Requested, Approved, Rejected, Withdrawn, Not_Required, Reversed (an Approved or Not_Required Modification that was later withdrawn by sponsor or invalidated by institutional correction; excluded from derivations of `Award.Current_End_Date` and `Award.Current_Total_Funded`) |
@@ -441,7 +441,7 @@ Some columns are derived from other data. The model specifies the rule; the impl
 | `Award.Originating_Award_ID` | Walk the `Previous_Award_ID` chain back from this Award until reaching an Award with null `Previous_Award_ID`; that Award's `Award_ID` is the originating Award. Null when this Award is itself the root (its own `Previous_Award_ID` is null). Parallels `Proposal.Originating_Proposal_ID`. | On insert/update of Award.Previous_Award_ID |
 | `Award.Current_PI_Personnel_ID` | The `Personnel_ID` of the unique active TeamRole row on this Award where `Role_Value_ID` resolves (via Canonical_Value_Code) to `PI` and the row is active on today's date (`Start_Date <= today AND (End_Date IS NULL OR End_Date >= today)`). Null when no such row exists — either the Award is in Multi_PI mode (one or more active rows resolving to `Multi_PI`) or no PI/Multi_PI rows are active (community-partner Subaward case). The exclusivity rule on TeamRole (PI vs Multi_PI is exclusive) guarantees at most one active PI row in single-PI mode | On insert/update of any TeamRole row on this Award; on the daily rollover that may change which rows are active on today's date |
 | `Subaward.Current_PI_Personnel_ID` | Symmetric to Award.Current_PI_Personnel_ID but scoped to TeamRole rows where `Subaward_ID` equals this Subaward. | On insert/update of any TeamRole row on this Subaward; on the daily rollover |
-| `Proposal.Submission_Status` | Unapproved while `Internal_Approval_Status` is not Approved. When Approved: the `Attempt_Status` of the newest SubmissionAttempt made since the latest approval that has left Unsubmitted, if it is in transmission or with the sponsor (Submitting, Submitted, Received, Validated, or Accepted) or the current package matches its `Package_Hash`; otherwise Signed_Off when a Final_Sign_off on the current package is Approved, with any Release_to_Submit that follows it; otherwise Unsubmitted | On insert/update of `Proposal.Internal_Approval_Status`; on insert/update of any SubmissionAttempt or Approval row for the Proposal; when the current package changes |
+| `Proposal.Submission_Status` | Unsubmitted while `Internal_Approval_Status` is not Approved. When Approved: the `Attempt_Status` of the newest SubmissionAttempt made since the latest approval that has left Unsubmitted, if it is with the sponsor (Submitted, Received, Validated, or Accepted) or the current package matches its `Package_Hash`; otherwise Signed_Off when a Final_Sign_off on the current package is Approved, with any Release_to_Submit that follows it; otherwise Unsubmitted | On insert/update of `Proposal.Internal_Approval_Status`; on insert/update of any SubmissionAttempt or Approval row for the Proposal; when the current package changes |
 | `Proposal.Submission_Version` | The count of SubmissionAttempt rows for the Proposal whose `Attempt_Status` has left Unsubmitted; 0 before the first attempt is sent | On insert/update of a SubmissionAttempt for the Proposal |
 | `Proposal.Submission_Date` | The date of `Submitted_At` on the newest SubmissionAttempt whose `Attempt_Status` is Submitted, Received, Validated, Invalid, Accepted, or Recalled; null when no attempt has reached Submitted | On insert/update of any SubmissionAttempt for the Proposal |
 | `Proposal.Internal_Approval_Status` | Draft when no Approval row exists for the Proposal; otherwise, over the rows of the highest `Approval_Round`: Rejected if any row is Rejected; Returned if any is Returned_for_Revision; Approved if every row other than Final_Sign_off and Release_to_Submit is Approved or Bypassed; In_Review otherwise | On insert/update of any Approval row on the Proposal |
@@ -462,15 +462,16 @@ The following rules require enforcement beyond what a single column declaration 
 | ContactDetails | Exactly one of `Personnel_ID` or `Organization_ID` is non-null |
 | Communication | Exactly one of `External_Personnel_ID` or `External_Party_Name` is non-null. Every Communication row identifies its external party either via FK to Personnel or via free-text name |
 | ContactDetails | At most one row per (referenced entity, `Contact_Type_Value_ID`) has `Is_Primary = true` |
-| Proposal | `Decision_Status` is Unrequested while no SubmissionAttempt made since the latest approval has `Attempt_Status` Accepted, or while the newest attempt is Recalled, unless a sponsor outcome or a withdrawal is recorded (Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn); otherwise it is Pending or one of those recorded values. A recorded outcome stays when material is re-approved |
+| Proposal | `Decision_Status` is Unrequested while no SubmissionAttempt made since the latest approval has `Attempt_Status` Accepted, or while the newest attempt is Recalled or Failed, unless a sponsor outcome or a withdrawal is recorded (Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn); otherwise it is Pending or one of those recorded values. A recorded outcome stays when the proposal is re-approved |
 | Proposal | `Decision_Status = 'Withdrawn'` only when at least one SubmissionAttempt for the Proposal was sent. When a withdrawn proposal is revised, a Returned_for_Revision Approval row returns `Internal_Approval_Status` to Returned and `Decision_Status` becomes Unrequested |
 | Proposal | `Decision_Status = 'Awarded'` only when `Internal_Approval_Status = 'Approved'` |
 | SubmissionAttempt | `Attempt_Number` is unique within the Proposal and consecutive from 1 |
 | SubmissionAttempt | `Submitted_At` is required when `Attempt_Status` is Submitted, Received, Validated, Invalid, Accepted, or Recalled |
 | SubmissionAttempt | `Package_Hash` is required when `Attempt_Status` is any value other than Unsubmitted |
-| SubmissionAttempt | At most one SubmissionAttempt per Proposal has `Attempt_Status` Submitting: one attempt is in transit at a time. An attempt assembled and never sent stays at Unsubmitted as history, and the newest attempt is current |
+| SubmissionAttempt | An attempt assembled and never sent stays at Unsubmitted as history, and the newest attempt is current |
 | SubmissionAttempt | A SubmissionAttempt is created only while the Proposal's `Internal_Approval_Status` is Approved and, when its chain has a Final_Sign_off, the current package is signed off. Earlier attempts stay as history if the proposal later leaves Approved |
 | SubmissionAttempt | An attempt becomes Recalled only while the Proposal's `Decision_Status` is Unrequested or Pending |
+| SubmissionAttempt | An attempt moves from Accepted to Failed only while the Proposal's `Decision_Status` is Pending |
 | PreAwardAuthorization | `Authorization_Date` and `Authorizing_Personnel_ID` are required when `Authorization_Status` is Approved, Converted_To_Award, or Expired_Unused, and kept if an approved authorization is later Revoked |
 | PreAwardAuthorization | While `Authorization_Status` is Requested or Approved, the Proposal referenced by `Proposal_ID` has `Decision_Status` Pending or Intent_to_Award |
 | PreAwardAuthorization | When `Authorization_Status` is Converted_To_Award, the Proposal referenced by `Proposal_ID` has `Decision_Status` Awarded |
@@ -824,8 +825,8 @@ A formal request for funding submitted to a sponsor.
 | Total_Proposed_Budget | Money | optional | |
 | Submission_Deadline | Date | optional | The sponsor deadline this proposal targets |
 | Submission_Date | Date | derived | The date the proposal last went to the sponsor: `Submitted_At` of the newest SubmissionAttempt that reached Submitted or later; null before then |
-| Internal_Approval_Status | Status | required | Where the proposal's material stands in the institution's internal approval chain: Draft, In_Review, Returned, Approved, Rejected. Approved counts every step except Final_Sign_off and Release_to_Submit; sign-off to submit is a separate gate, tracked in `Submission_Status` |
-| Submission_Status | Status | derived | Where the proposal stands with the sponsor's submission system: Unapproved until the approval chain reaches Approved; Unsubmitted once approved and before the current package is signed off; Signed_Off once it is ready to send; then the newest SubmissionAttempt's `Attempt_Status` |
+| Internal_Approval_Status | Status | required | Where the proposal stands in the institution's decision to pursue the opportunity: Draft, In_Review, Returned, Approved, Rejected. Approved counts every step except Final_Sign_off and Release_to_Submit. A changed package voids only the sign-off, a separate gate tracked in `Submission_Status` |
+| Submission_Status | Status | derived | Where the proposal stands with the sponsor's submission system: Unsubmitted until the current package is signed off, which requires internal approval; Signed_Off once it is ready to send; then the newest SubmissionAttempt's `Attempt_Status` |
 | Decision_Status | Status | required | The outcome of the funding request: Unrequested, Pending, Intent_to_Award, Awarded, Declined, Not_Reviewed, Withdrawn. Unrequested and Pending follow the submission stage; the rest are recorded by the institution. Withdrawn means a submitted proposal was pulled from the sponsor's consideration; the institution then stops there, or revises it, and internal approval returns to Returned and the decision to Unrequested |
 | Decision_Date | Date | optional | When the proposal's outcome was recorded: the Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn date |
 | Risk_Level | Status | optional | See Status taxonomy |
@@ -835,7 +836,7 @@ A formal request for funding submitted to a sponsor.
 
 #### SubmissionAttempt
 
-One transmission of a proposal to a sponsor's submission system. `Proposal.Submission_Status` shows the `Attempt_Status` of the newest attempt that has left Unsubmitted, as long as it is in transmission or with the sponsor or the current package still matches it. The attempt records what was sent, by whom, when, and what the sponsor's system said; package assembly, connection profiles, and retry mechanics stay in the System of Action.
+One transmission of a proposal to a sponsor's submission system. `Proposal.Submission_Status` shows the `Attempt_Status` of the newest attempt that has left Unsubmitted, as long as it is with the sponsor or the current package still matches it. The attempt records what was sent, by whom, when, and what the sponsor's system said; package assembly, connection profiles, and retry mechanics stay in the System of Action.
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
@@ -845,7 +846,7 @@ One transmission of a proposal to a sponsor's submission system. `Proposal.Submi
 | Channel_Value_ID | ID | optional | → AllowedValues with `Value_Group = 'SubmissionChannel'`. Recommended values: Federal_Portal / Sponsor_Portal / Email / Paper / Other |
 | Submitted_By_Personnel_ID | ID | required | → Personnel. Who transmitted the attempt: the authorized organizational representative, or the person they released it to |
 | Submitted_At | Timestamp | conditional | When the transmission was sent. Required when `Attempt_Status` is Submitted, Received, Validated, Invalid, Accepted, or Recalled |
-| Attempt_Status | Status | required | Constrained: Unsubmitted / Submitting / Submitted / Received / Validated / Invalid / Accepted / Failed / Recalled. The attempt's state as reported by the submission tooling or the sponsor's system; Recalled means it was pulled back to be corrected and resent |
+| Attempt_Status | Status | required | Constrained: Unsubmitted / Submitted / Received / Validated / Invalid / Accepted / Failed / Recalled. The attempt's state as reported by the submission tooling or the sponsor's system; Recalled means it was pulled back to be corrected and resent; Failed means it did not reach the sponsor's system, or the sponsor lost it or sent it back after accepting it |
 | Tracking_Identifier | ShortCode | optional | The identifier the sponsor's system assigned to this transmission |
 | Sponsor_Acknowledged_At | Timestamp | optional | When the sponsor's system acknowledged receipt |
 | Package_Hash | Hash | conditional | SHA-256 of the assembled package as transmitted, so a sign-off can be matched to what went out. Required when `Attempt_Status` is any value other than Unsubmitted |
@@ -1614,7 +1615,7 @@ Work items attached to entities: checklist items, service requests, modification
 - `Step_Type_Value_ID` names what is decided; `Approval_Role` names who; `Reviewing_Organization_ID` names the department or college for the per-unit steps.
 - Auto-assignment is application logic: the application resolves each role and unit to a person via OrganizationRole (who chairs the department, who is the dean) and sets `Assigned_Personnel_ID`. Whoever holds the role may act; `Approver_Personnel_ID` records who did.
 - A return reruns the affected steps as new rows in `Approval_Round` 2; nothing is overwritten.
-- Final_Sign_off records `Signed_Package_Hash`. If the package changes afterward, that row and any Release_to_Submit that followed it become Voided, and a new sign-off is needed. Transmitting the package is a SubmissionAttempt. Approval of the material and sign-off to submit are separate gates: a voided sign-off returns `Submission_Status` to Unsubmitted and leaves `Internal_Approval_Status` at Approved.
+- Final_Sign_off records `Signed_Package_Hash`. If the package changes afterward, that row and any Release_to_Submit that followed it become Voided, and a new sign-off is needed. Transmitting the package is a SubmissionAttempt. Approval to pursue the opportunity and sign-off to submit are separate gates: a voided sign-off returns `Submission_Status` to Unsubmitted and leaves `Internal_Approval_Status` at Approved.
 - "This step is always third" is data, not schema: the chain is a row template the application applies. Which block comes first is institutional configuration; the standard does not prescribe it.
 
 ### Correspondence with follow-up: Communication + Action
