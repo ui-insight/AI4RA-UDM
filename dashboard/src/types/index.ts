@@ -40,4 +40,5 @@ export type TabName =
   | 'erd'
   | 'views'
   | 'ontology'
+  | 'glossary'
   | 'infrastructure';

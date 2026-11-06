@@ -7,6 +7,7 @@ import TablesTab from './components/Tables/TablesTab';
 import ERDTab from './components/ERD/ERDTab';
 import ExampleViewsTab from './components/ExampleViews/ExampleViewsTab';
 import OntologyTab from './components/Ontology/OntologyTab';
+import GlossaryTab from './components/Glossary/GlossaryTab';
 import InfrastructureTab from './components/Infrastructure/InfrastructureTab';
 import { useSchemaData } from './hooks/useSchemaData';
 import type { TabName } from './types';
@@ -65,6 +66,9 @@ export default function App() {
       </div>
       <div style={{ display: activeTab === 'ontology' ? 'block' : 'none' }}>
         <OntologyTab />
+      </div>
+      <div style={{ display: activeTab === 'glossary' ? 'block' : 'none' }}>
+        <GlossaryTab />
       </div>
       {activeTab === 'infrastructure' && (
         <InfrastructureTab />
