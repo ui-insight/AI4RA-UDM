@@ -1,6 +1,7 @@
-import statusPathUrl from '../../assets/proposal-award-status-path.svg';
-import otherRecordPathsUrl from '../../assets/other-record-status-paths.svg';
-import complianceLifecycleUrl from '../../assets/compliance-closeout-lifecycle-paths.svg';
+import StatusChart from './StatusChart';
+import statusPathSvg from '../../assets/proposal-award-status-path.svg?raw';
+import otherRecordPathsSvg from '../../assets/other-record-status-paths.svg?raw';
+import complianceLifecycleSvg from '../../assets/compliance-closeout-lifecycle-paths.svg?raw';
 
 const card = {
   background: 'white', padding: '2rem', borderRadius: 8,
@@ -14,7 +15,9 @@ export default function StatusesTab() {
         <h2 style={{ color: '#2c3e50', marginBottom: '0.5rem', fontSize: '1.8rem' }}>Statuses</h2>
         <p style={{ color: '#546e7a', marginBottom: '1.5rem' }}>
           How records move through their stages. A record holds one value in each status field at a
-          time. Definitions are in the Glossary and Data Dictionary tabs.
+          time. Hover over or tap a status to see its definition from the Glossary. The charts show the
+          main paths, not every possible status change. For example, a withdrawn proposal that is revised
+          goes back through internal approval, which the Glossary explains and the chart doesn't draw.
         </p>
 
         <h3 style={{ color: '#2c3e50', marginBottom: '1rem', fontSize: '1.3rem' }}>
@@ -24,13 +27,7 @@ export default function StatusesTab() {
           A proposal has three status stages, and the award that follows has its own. The status that
           ends one stage starts the next.
         </p>
-        <div style={{ overflowX: 'auto' }}>
-          <img
-            src={statusPathUrl}
-            alt="Flow chart of the status path. Internal approval ends at Approved, which starts sponsor submission at Unsubmitted. Sponsor submission ends at Accepted, which starts sponsor decision at Pending. Sponsor decision ends at Awarded, which starts the award at In Setup."
-            style={{ display: 'block', width: '100%', minWidth: 900, height: 'auto' }}
-          />
-        </div>
+        <StatusChart svg={statusPathSvg} idPrefix="proposal" minWidth={900} />
 
         <h3 style={{ color: '#2c3e50', margin: '2rem 0 1rem', fontSize: '1.3rem' }}>
           Other Record Status Paths
@@ -39,13 +36,7 @@ export default function StatusesTab() {
           Early setup, modifications, subawards, payments, deliverables, and actions run alongside the
           proposal and award, each with its own statuses.
         </p>
-        <div style={{ overflowX: 'auto' }}>
-          <img
-            src={otherRecordPathsUrl}
-            alt="Flow chart of status paths for six records: early setup, modification, subaward, payment, deliverable, and action."
-            style={{ display: 'block', width: '100%', minWidth: 800, height: 'auto' }}
-          />
-        </div>
+        <StatusChart svg={otherRecordPathsSvg} idPrefix="other" minWidth={800} />
 
         <h3 style={{ color: '#2c3e50', margin: '2rem 0 1rem', fontSize: '1.3rem' }}>
           Compliance, Closeout, and Lifecycle Stage Paths
@@ -54,13 +45,7 @@ export default function StatusesTab() {
           Compliance requirements and closeouts have their own statuses. Budget, effort, and cost share
           move through lifecycle stages, keeping each earlier stage as history.
         </p>
-        <div style={{ overflowX: 'auto' }}>
-          <img
-            src={complianceLifecycleUrl}
-            alt="Flow chart of paths for compliance requirements and closeout, and lifecycle stages for budget, effort, and cost share."
-            style={{ display: 'block', width: '100%', minWidth: 800, height: 'auto' }}
-          />
-        </div>
+        <StatusChart svg={complianceLifecycleSvg} idPrefix="compliance" minWidth={800} />
       </div>
     </div>
   );

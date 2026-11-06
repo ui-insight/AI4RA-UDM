@@ -96,6 +96,15 @@
       "source_url": "https://www.ecfr.gov/current/title-2/part-200/appendix-Appendix%20III%20to%20Part%20200"
     },
     {
+      "term": "Actual (budget)",
+      "also": "",
+      "definition": "A budget stage: what was actually spent for the period.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Budget.Lifecycle_Stage=Actual"
+      ]
+    },
+    {
       "term": "Adjusting (award)",
       "also": "",
       "definition": "An award status: the award has ended and a late correction is under way, such as an audit finding or a late charge. It is not open for spending. It returns to the status it came from.",
@@ -216,12 +225,39 @@
       ]
     },
     {
+      "term": "Approved (budget)",
+      "also": "",
+      "definition": "A budget stage: the budget as funded in the award.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Budget.Lifecycle_Stage=Approved"
+      ]
+    },
+    {
+      "term": "Approved (compliance)",
+      "also": "",
+      "definition": "A compliance status: in force until its expiration date.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ComplianceRequirement.Requirement_Status=Approved"
+      ]
+    },
+    {
       "term": "Approved (early setup)",
       "also": "",
       "definition": "An early setup status: at-risk spending is authorized up to the maximum amount within the effective window.",
       "domain": "Proposal",
       "udm": [
         "PreAwardAuthorization.Authorization_Status=Approved"
+      ]
+    },
+    {
+      "term": "Approved (effort)",
+      "also": "",
+      "definition": "An effort stage: effort committed in the award as funded.",
+      "domain": "Effort",
+      "udm": [
+        "Effort.Lifecycle_Stage=Approved"
       ]
     },
     {
@@ -549,6 +585,24 @@
       "source_url": "https://www.ecfr.gov/current/title-2/section-200.308"
     },
     {
+      "term": "Certified",
+      "also": "",
+      "definition": "An effort stage: effort attested after the fact by the certifier.",
+      "domain": "Effort",
+      "udm": [
+        "Effort.Lifecycle_Stage=Certified"
+      ]
+    },
+    {
+      "term": "Charged",
+      "also": "",
+      "definition": "An effort stage: salary actually charged for the period.",
+      "domain": "Effort",
+      "udm": [
+        "Effort.Lifecycle_Stage=Charged"
+      ]
+    },
+    {
       "term": "CI/CD",
       "also": "Continuous integration, continuous delivery",
       "definition": "Automating the build, test, and release of software each time a change is committed.",
@@ -687,6 +741,15 @@
       "source_url": "https://www.ecfr.gov/current/title-2/section-200.1"
     },
     {
+      "term": "Committed (cost share)",
+      "also": "",
+      "definition": "A cost share stage: cost share the institution is bound to under the award.",
+      "domain": "Budget & costing",
+      "udm": [
+        "CostShare.Lifecycle_Stage=Committed"
+      ]
+    },
+    {
       "term": "Committed burn rate",
       "also": "",
       "definition": "The same comparison as burn rate, with money set aside for future expenses counted along with money spent. See Spending for what counts as money spent.",
@@ -750,6 +813,15 @@
       "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_1/1.2_definition_of_terms.htm"
     },
     {
+      "term": "Complete (closeout)",
+      "also": "",
+      "definition": "A closeout status: closeout finished, and records retention runs from here.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Closeout.Closeout_Status=Complete"
+      ]
+    },
+    {
       "term": "Completed",
       "also": "",
       "definition": "An action status: the task achieved its outcome.",
@@ -765,6 +837,15 @@
       "domain": "Compliance & research security",
       "udm": [
         "ComplianceRequirement"
+      ]
+    },
+    {
+      "term": "Conditional Approval",
+      "also": "",
+      "definition": "A compliance status: approved subject to conditions the investigator must meet.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ComplianceRequirement.Requirement_Status=Conditional_Approval"
       ]
     },
     {
@@ -903,6 +984,15 @@
       "definition": "A field-by-field mapping from a source system to the UDM, including value translations and notes on any changes. In a medallion lakehouse, it lives in the Silver layer.",
       "domain": "Data & integration",
       "udm": []
+    },
+    {
+      "term": "Current (budget)",
+      "also": "",
+      "definition": "A budget stage: the budget as revised by modifications.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Budget.Lifecycle_Stage=Current"
+      ]
     },
     {
       "term": "Data catalog",
@@ -1070,6 +1160,15 @@
       "source_url": "https://www.ecfr.gov/current/title-2/section-200.413"
     },
     {
+      "term": "Disapproved",
+      "also": "",
+      "definition": "A compliance status: refused by the reviewing authority.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ComplianceRequirement.Requirement_Status=Disapproved"
+      ]
+    },
+    {
       "term": "Disputed",
       "also": "",
       "definition": "A payment status: the payer or payee contests the payment.",
@@ -1094,6 +1193,15 @@
       "domain": "Proposal",
       "udm": [
         "Proposal.Internal_Approval_Status=Draft"
+      ]
+    },
+    {
+      "term": "Draft (compliance)",
+      "also": "",
+      "definition": "A compliance status: being prepared and not yet submitted to the reviewing authority.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ComplianceRequirement.Requirement_Status=Draft"
       ]
     },
     {
@@ -1222,6 +1330,15 @@
       ],
       "source": "NSF HERD questionnaire",
       "source_url": "https://ncses.nsf.gov/1639/assets/0/files/srvyherd-2025.pdf"
+    },
+    {
+      "term": "Expired",
+      "also": "",
+      "definition": "A compliance status: the expiration date passed without renewal. A renewal is a new requirement.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ComplianceRequirement.Requirement_Status=Expired"
+      ]
     },
     {
       "term": "Expired Unused",
@@ -1503,12 +1620,30 @@
       ]
     },
     {
+      "term": "In Progress (closeout)",
+      "also": "",
+      "definition": "A closeout status: closeout work is under way.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Closeout.Closeout_Status=In_Progress"
+      ]
+    },
+    {
       "term": "In Review",
       "also": "",
       "definition": "An internal approval status: the proposal has been routed, and one or more approval steps are open.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Internal_Approval_Status=In_Review"
+      ]
+    },
+    {
+      "term": "In Review (compliance)",
+      "also": "",
+      "definition": "A compliance status: under review by the authority.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ComplianceRequirement.Requirement_Status=In_Review"
       ]
     },
     {
@@ -1759,6 +1894,15 @@
       "udm": []
     },
     {
+      "term": "Met",
+      "also": "",
+      "definition": "A cost share stage: the commitment has been satisfied by documented contributions.",
+      "domain": "Budget & costing",
+      "udm": [
+        "CostShare.Lifecycle_Stage=Met"
+      ]
+    },
+    {
       "term": "Metadata",
       "also": "",
       "definition": "Data about data, such as its type, source, owner, freshness, and meaning.",
@@ -1852,6 +1996,15 @@
       ],
       "source": "2 CFR 200.308",
       "source_url": "https://www.ecfr.gov/current/title-2/section-200.308"
+    },
+    {
+      "term": "Not Applicable",
+      "also": "",
+      "definition": "A compliance status: a determination found that no requirement applies.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ComplianceRequirement.Requirement_Status=Not_Applicable"
+      ]
     },
     {
       "term": "Not Issued",
@@ -2378,6 +2531,33 @@
       ]
     },
     {
+      "term": "Proposed (budget)",
+      "also": "",
+      "definition": "A budget stage: the budget as proposed to the sponsor.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Budget.Lifecycle_Stage=Proposed"
+      ]
+    },
+    {
+      "term": "Proposed (cost share)",
+      "also": "",
+      "definition": "A cost share stage: cost share offered in the proposal.",
+      "domain": "Budget & costing",
+      "udm": [
+        "CostShare.Lifecycle_Stage=Proposed"
+      ]
+    },
+    {
+      "term": "Proposed (effort)",
+      "also": "",
+      "definition": "An effort stage: effort committed in the proposal.",
+      "domain": "Effort",
+      "udm": [
+        "Effort.Lifecycle_Stage=Proposed"
+      ]
+    },
+    {
       "term": "Protocol",
       "also": "IRB protocol, IACUC protocol, IBC registration, study",
       "definition": "The standing approved plan for a line of research reviewed by a committee.",
@@ -2533,6 +2713,15 @@
       "udm": [
         "Award.Award_Status=Active",
         "Subaward.Subaward_Status=Active"
+      ]
+    },
+    {
+      "term": "Reopened (closeout)",
+      "also": "",
+      "definition": "A closeout status: closeout resumed because the agreement returned to Active or went to Adjusting.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Closeout.Closeout_Status=Reopened"
       ]
     },
     {
@@ -2930,6 +3119,15 @@
       ]
     },
     {
+      "term": "Submitted (compliance)",
+      "also": "",
+      "definition": "A compliance status: sent to the reviewing authority.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ComplianceRequirement.Requirement_Status=Submitted"
+      ]
+    },
+    {
       "term": "Submitted (deliverable)",
       "also": "",
       "definition": "A deliverable status: it was sent to the sponsor.",
@@ -3029,6 +3227,15 @@
       ]
     },
     {
+      "term": "Suspended (compliance)",
+      "also": "",
+      "definition": "A compliance status: approval paused by the authority, and work under it must stop.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ComplianceRequirement.Requirement_Status=Suspended"
+      ]
+    },
+    {
       "term": "Suspended (subaward)",
       "also": "",
       "definition": "A subaward status: work was stopped by the institution or the sponsor, and it may resume.",
@@ -3092,6 +3299,15 @@
       "domain": "Award & lifecycle",
       "udm": [
         "Award.Award_Status=Terminated"
+      ]
+    },
+    {
+      "term": "Terminated (compliance)",
+      "also": "",
+      "definition": "A compliance status: approval ended by the authority before it expired.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ComplianceRequirement.Requirement_Status=Terminated"
       ]
     },
     {
@@ -3321,6 +3537,15 @@
       "domain": "Award & lifecycle",
       "udm": [
         "Deliverable.Deliverable_Status=Waived"
+      ]
+    },
+    {
+      "term": "Waived (cost share)",
+      "also": "",
+      "definition": "A cost share stage: the sponsor or the institution released the commitment.",
+      "domain": "Budget & costing",
+      "udm": [
+        "CostShare.Lifecycle_Stage=Waived"
       ]
     },
     {
