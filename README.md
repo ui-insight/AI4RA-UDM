@@ -6,7 +6,7 @@ A shared set of definitions for research administration data, so systems can exc
 
 **Join the conversation:** [join the AI4RA list](https://groups.ai4ra.uidaho.edu/g/main/join), also linked from the [AI4RA website](https://ai4ra.uidaho.edu/), and post using the [#UDM](https://groups.ai4ra.uidaho.edu/g/main/search?q=%23UDM&ct=1) hashtag. You don't need a GitHub account.
 
-**Current version: v5.1.1** (released 2026-11-06).. This is a draft, written by a small team at one institution, and it needs readers from other institutions to get it right.
+**Current version: v5.1.1** (released 2026-11-06). This is a draft, written by a small team at one institution, and it needs readers from other institutions to get it right.
 
 ## Why it exists
 
