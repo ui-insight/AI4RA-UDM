@@ -1993,7 +1993,7 @@
                 },
                 "value_group": "FundingMechanism",
                 "description": "The sponsor's funding mechanism applied for",
-                "synonyms": "Funding Mechanism, Activity Code, Award Type"
+                "synonyms": "Funding Mechanism, Activity Code"
               },
               "Activity_Type": {
                 "type": "Status",
@@ -2511,7 +2511,7 @@
                 },
                 "value_group": "FundingMechanism",
                 "description": "The sponsor's funding mechanism for the award, for example R01, R21, P01, T32, Cooperative_Agreement, Contract_BAA",
-                "synonyms": "Funding Mechanism, Activity Code, Award Type"
+                "synonyms": "Funding Mechanism, Activity Code"
               },
               "Instrument_Type": {
                 "type": "Status",
@@ -2541,7 +2541,7 @@
                   }
                 },
                 "description": "The legal kind of agreement. Constrained: Grant / Cooperative_Agreement / Contract / Other_Transaction / Other. Mechanism_Value_ID holds the detailed code",
-                "synonyms": "Agreement Type, Instrument"
+                "synonyms": "Agreement Type, Instrument, Award Type"
               },
               "Activity_Type": {
                 "type": "Status",
@@ -3049,6 +3049,11 @@
                 "required": true,
                 "description": "Whether the change required sponsor prior approval"
               },
+              "Requires_Peer_Review": {
+                "type": "Boolean",
+                "required": false,
+                "description": "Whether a supplement goes through peer review. Set only when Event_Type resolves to Supplement. False matches NIH's administrative supplement and true its competitive revision; null means the sponsor doesn't distinguish or it isn't known"
+              },
               "Prior_Approval_Granted_Date": {
                 "type": "Date",
                 "required": false,
@@ -3143,6 +3148,9 @@
               },
               {
                 "rule": "Termination_Basis is required when Event_Type resolves to Partial_Termination, and null otherwise."
+              },
+              {
+                "rule": "Requires_Peer_Review is set only when Event_Type resolves to Supplement."
               }
             ]
           },

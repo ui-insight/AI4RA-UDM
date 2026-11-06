@@ -1,5 +1,5 @@
 {
-  "description": "The AI4RA UDM glossary. Edit this file, then run scripts/generate_glossary.py. Each term may list udm references (Table, Table.Column, or Table.Column=Value), which scripts/check_glossary.py validates against udm_schema.json, and a source for facts taken from a published rule.",
+  "description": "The AI4RA UDM glossary. Edit this file, then run scripts/generate_glossary.py. Each term may list udm references (Table, Table.Column, or Table.Column=Value), which scripts/check_glossary.py validates against udm_schema.json, and a source for facts taken from a published rule. The glossary covers terms people need to understand the UDM and its data, even if the model doesn't store them; those terms have no udm references. Definitions say what a thing is and point to the governing source for details that change.",
   "domains": [
     "Systems & identifiers",
     "Federal identifiers & rules",
@@ -114,6 +114,18 @@
       ]
     },
     {
+      "term": "Administrative supplement",
+      "also": "",
+      "definition": "A supplement for increased costs from unforeseen circumstances, without peer review.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Event_Type_Value_ID=Supplement",
+        "Modification.Requires_Peer_Review"
+      ],
+      "source": "NIH Grants Policy Statement 1.2",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_1/1.2_definition_of_terms.htm"
+    },
+    {
       "term": "Advance funding",
       "also": "",
       "definition": "The institution's approval to spend on an existing award ahead of a sponsor amendment. The institution carries the risk until the amendment arrives.",
@@ -136,12 +148,12 @@
     {
       "term": "Adverse event",
       "also": "",
-      "definition": "A harmful or unexpected event on an approved protocol.",
+      "definition": "Any untoward or unfavorable medical occurrence in a research participant during their participation, whether or not it's related to the research or was expected, following OHRP's usage. Federal human subjects rules don't define the term, and definitions vary.",
       "domain": "Compliance & research security",
       "udm": [
         "ProtocolAdverseEvent"
       ],
-      "source": "HHS OHRP",
+      "source": "HHS OHRP guidance (2007)",
       "source_url": "https://www.hhs.gov/ohrp/regulations-and-policy/guidance/reviewing-unanticipated-problems/index.html"
     },
     {
@@ -391,7 +403,7 @@
     {
       "term": "Broad Agency Announcement",
       "also": "BAA",
-      "definition": "A general announcement, common with defense agencies, inviting proposals in broad research areas, often leading to contracts.",
+      "definition": "A general announcement inviting proposals in broad research areas, often leading to contracts.",
       "domain": "Proposal",
       "udm": [
         "RFA"
@@ -463,13 +475,13 @@
     {
       "term": "CAGE code",
       "also": "Commercial and Government Entity code",
-      "definition": "An ID used for organizations doing business with the U.S. government, especially defense.",
+      "definition": "An ID used for organizations doing business with the U.S. government.",
       "domain": "Federal identifiers & rules",
       "udm": [
         "OrganizationIdentifier"
       ],
-      "source": "Defense Logistics Agency",
-      "source_url": "https://www.dla.mil/Working-With-DLA/Applications/Details/Article/2920893/cage-code-commercial-and-government-entity-code/"
+      "source": "FAR 52.204-16",
+      "source_url": "https://www.acquisition.gov/far/52.204-16"
     },
     {
       "term": "Cancelled (action)",
@@ -620,20 +632,24 @@
     {
       "term": "Co-investigator",
       "also": "Co-I",
-      "definition": "A senior researcher who contributes substantially to a project but does not lead it.",
+      "definition": "A person who works with the PI on the scientific development or execution of a project, at the institution or another organization.",
       "domain": "People & organizations",
       "udm": [
         "TeamRole.Role_Value_ID=Co_I"
-      ]
+      ],
+      "source": "NIH Grants Policy Statement 1.2",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_1/1.2_definition_of_terms.htm"
     },
     {
       "term": "Co-principal investigator",
       "also": "Co-PI",
-      "definition": "A person who shares leadership of a project with the PI.",
+      "definition": "A person who shares leadership of a project with the PI. NSF treats PIs and co-PIs as equal in stature, while NIH uses multiple PD/PIs.",
       "domain": "People & organizations",
       "udm": [
         "TeamRole.Role_Value_ID=Co_PI"
-      ]
+      ],
+      "source": "NSF PAPPG 24-1, Exhibit II-3",
+      "source_url": "https://www.nsf.gov/policies/pappg/24-1/ch-2-exhibit-3"
     },
     {
       "term": "Cognizant agency",
@@ -696,6 +712,18 @@
       "udm": [
         "Award.Proposal_ID"
       ]
+    },
+    {
+      "term": "Competitive revision",
+      "also": "",
+      "definition": "A supplement for new or expanded activities, awarded through peer review. It typically starts as a proposal of type Revision.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Modification.Event_Type_Value_ID=Supplement",
+        "Modification.Requires_Peer_Review"
+      ],
+      "source": "NIH Grants Policy Statement 1.2",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_1/1.2_definition_of_terms.htm"
     },
     {
       "term": "Completed",
@@ -1127,11 +1155,13 @@
     {
       "term": "Equipment disposition",
       "also": "",
-      "definition": "Deciding what happens to equipment at the end of an award.",
+      "definition": "Deciding what happens to equipment once the project no longer needs it, such as keeping, selling, or transferring it.",
       "domain": "Award & lifecycle",
       "udm": [
         "Closeout.Equipment_Disposition_Status"
-      ]
+      ],
+      "source": "2 CFR 200.313",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.313"
     },
     {
       "term": "eRA Commons",
@@ -1237,8 +1267,8 @@
       "udm": [
         "Report.Report_Type=FFR_SF425"
       ],
-      "source": "Grants.gov",
-      "source_url": "https://grants.gov/learn-grants/grant-reporting"
+      "source": "SF-425 instructions",
+      "source_url": "https://apply07.grants.gov/apply/forms/instructions/SF425_3_0-V3.0-Instructions.pdf"
     },
     {
       "term": "Federal funding rules apply",
@@ -1287,11 +1317,13 @@
     {
       "term": "Fringe benefits",
       "also": "Fringe, employee benefits",
-      "definition": "The cost of employee benefits charged along with salaries, usually as a percentage rate.",
+      "definition": "Allowances and services an employer provides in addition to salary, such as leave, insurance, and pensions. They can be charged directly or through a rate.",
       "domain": "Budget & costing",
       "udm": [
         "IndirectRate.Rate_Type=Fringe_Benefits"
-      ]
+      ],
+      "source": "2 CFR 200.431",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.431"
     },
     {
       "term": "Fulfilled",
@@ -1313,14 +1345,16 @@
     },
     {
       "term": "Funding mechanism",
-      "also": "Activity code, award type, grant type",
-      "definition": "The kind of funding vehicle, such as a research grant, training grant, cooperative agreement, or contract.",
+      "also": "Activity code, grant type",
+      "definition": "The sponsor's category of funding, such as an NIH R01 or T32. The legal kind of agreement is the instrument type.",
       "domain": "Proposal",
       "udm": [
         "Award.Mechanism_Value_ID",
         "Proposal.Mechanism_Value_ID",
         "RFA.Mechanism_Value_ID"
-      ]
+      ],
+      "source": "NIH Grants Policy Statement 1.2",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_1/1.2_definition_of_terms.htm"
     },
     {
       "term": "Funding opportunity",
@@ -1372,8 +1406,8 @@
       "udm": [
         "OrganizationRole.Role_Value_ID=Grants_Management_Specialist"
       ],
-      "source": "NIH Grants Policy Statement",
-      "source_url": "https://grants.nih.gov/grants/policy/nihgps/nihgps_2021.pdf"
+      "source": "NIH Grants Policy Statement 2.1.1",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_2/2.1.1_nih_and_hhs_staff.htm"
     },
     {
       "term": "Grants.gov",
@@ -1382,7 +1416,7 @@
       "domain": "Federal identifiers & rules",
       "udm": [],
       "source": "Grants.gov",
-      "source_url": "https://grants.gov/learn-grants/grant-making-agencies/"
+      "source_url": "https://www.grants.gov/"
     },
     {
       "term": "HERD survey",
@@ -1517,7 +1551,7 @@
     },
     {
       "term": "Instrument type",
-      "also": "Agreement type",
+      "also": "Agreement type, award type",
       "definition": "The legal kind of an award: a grant, cooperative agreement, contract, or other transaction. A funding mechanism such as R01 is a more detailed code within one of these.",
       "domain": "Agreements",
       "udm": [
@@ -1578,7 +1612,9 @@
       "domain": "Award & lifecycle",
       "udm": [
         "Report.Report_Type=Invention_Statement"
-      ]
+      ],
+      "source": "NIH Grants Policy Statement 8.6.3",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_8/8.6.3_final_invention_statement_and_certification.htm"
     },
     {
       "term": "Investigator credit",
@@ -1633,7 +1669,7 @@
     {
       "term": "Key personnel",
       "also": "Senior/key personnel",
-      "definition": "People the sponsor considers essential to the project, often named in the award. Changing them may need sponsor approval.",
+      "definition": "People who contribute in a substantive way to the scientific development or execution of a project. Changing those identified in the award generally needs sponsor approval.",
       "domain": "People & organizations",
       "udm": [
         "TeamRole.Is_Key_Personnel"
@@ -1653,7 +1689,7 @@
     {
       "term": "Letter of credit",
       "also": "LOC",
-      "definition": "A federal arrangement that lets an institution draw funds as it needs them. Check the sponsor for its current payment system.",
+      "definition": "A federal arrangement that lets an institution draw funds as it needs them. Treasury has replaced its own letter-of-credit method with its ASAP payment system, so check the sponsor for its current payment system.",
       "domain": "Agreements",
       "udm": [
         "Terms.Payment_Method=Letter_of_Credit"
@@ -1681,6 +1717,15 @@
       "udm": [
         "AllowedValues"
       ]
+    },
+    {
+      "term": "Malign foreign talent recruitment program",
+      "also": "MFTRP",
+      "definition": "A foreign program, position, or activity that offers a person compensation in exchange for certain listed actions, such as unauthorized transfer of intellectual property, and that has a sponsor of the kind the law names, such as a foreign country of concern. Federally funded researchers may have to certify they aren't part of one, a requirement that comes from the CHIPS and Science Act. Check the law and the sponsor's current rules for details.",
+      "domain": "Compliance & research security",
+      "udm": [],
+      "source": "42 U.S.C. 19237",
+      "source_url": "https://www.law.cornell.edu/uscode/text/42/19237"
     },
     {
       "term": "Materialized view",
@@ -1823,11 +1868,13 @@
     {
       "term": "Notice of Award",
       "also": "NOA, award letter, notice of grant award",
-      "definition": "The sponsor's official document announcing an award and its terms.",
+      "definition": "The sponsor's official, legally binding document announcing an award, with its budget and conditions.",
       "domain": "Agreements",
       "udm": [
         "Document.Document_Type_Value_ID=NOA"
-      ]
+      ],
+      "source": "NIH Grants Policy Statement 1.2",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_1/1.2_definition_of_terms.htm"
     },
     {
       "term": "NSF PAPPG",
@@ -1836,7 +1883,7 @@
       "domain": "Federal identifiers & rules",
       "udm": [],
       "source": "NSF PAPPG",
-      "source_url": "https://www.nsf.gov/policies/pappg/24-1"
+      "source_url": "https://www.nsf.gov/policies/pappg"
     },
     {
       "term": "Open",
@@ -2031,7 +2078,9 @@
       "domain": "Agreements",
       "udm": [
         "Terms.Payment_Method"
-      ]
+      ],
+      "source": "2 CFR 200.305",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.305"
     },
     {
       "term": "Pending",
@@ -2064,12 +2113,14 @@
     },
     {
       "term": "Person-months",
-      "also": "Calendar months, PM",
-      "definition": "Effort expressed in months: the effort percentage times the months in the appointment.",
+      "also": "PM",
+      "definition": "The time a person spends on a project, in months: their effort percentage times the months in their appointment, whether calendar year, academic year, or summer.",
       "domain": "Effort",
       "udm": [
         "Effort.Person_Months"
-      ]
+      ],
+      "source": "NIH: What is a person month?",
+      "source_url": "https://grants.nih.gov/news-events/nih-extramural-nexus-news/2026/06/what-is-a-person-month-how-do-i-calculate-it"
     },
     {
       "term": "PI eligibility",
@@ -2179,11 +2230,13 @@
     {
       "term": "Principal investigator",
       "also": "PI, project director, PD/PI",
-      "definition": "The person who leads the project and is responsible for its science and administration.",
+      "definition": "The person the institution designates to lead a project, with authority over its science and administration. Some sponsors allow several people to share this role.",
       "domain": "People & organizations",
       "udm": [
         "TeamRole.Role_Value_ID=PI"
-      ]
+      ],
+      "source": "NIH Grants Policy Statement 1.2",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_1/1.2_definition_of_terms.htm"
     },
     {
       "term": "Prior approval",
@@ -2221,14 +2274,14 @@
     },
     {
       "term": "Program officer",
-      "also": "PO, program manager, program director",
+      "also": "PO, program official, program manager",
       "definition": "The sponsor's contact for the science and goals of a program or award.",
       "domain": "People & organizations",
       "udm": [
         "OrganizationRole.Role_Value_ID=Program_Officer"
       ],
-      "source": "NIH Grants Policy Statement",
-      "source_url": "https://grants.nih.gov/grants/policy/nihgps/nihgps_2021.pdf"
+      "source": "NIH Grants Policy Statement 2.1.1",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_2/2.1.1_nih_and_hhs_staff.htm"
     },
     {
       "term": "Project",
@@ -2277,7 +2330,9 @@
       "domain": "Proposal",
       "udm": [
         "Proposal.Proposal_Type_Value_ID"
-      ]
+      ],
+      "source": "NIH Grants Policy Statement 1.2",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_1/1.2_definition_of_terms.htm"
     },
     {
       "term": "Proposal volume",
@@ -2310,8 +2365,8 @@
     },
     {
       "term": "Protocol deviation",
-      "also": "Deviation, noncompliance",
-      "definition": "A departure from what the approved protocol says to do. Major deviations affect safety or data and need committee review.",
+      "also": "Deviation",
+      "definition": "A departure from what the approved protocol says to do. How deviations are classified and reported depends on the reviewing committee.",
       "domain": "Compliance & research security",
       "udm": [
         "ProtocolDeviation"
@@ -2557,7 +2612,9 @@
       "domain": "Compliance & research security",
       "udm": [
         "ComplianceRequirement.Review_Pathway_Value_ID"
-      ]
+      ],
+      "source": "45 CFR 46.109",
+      "source_url": "https://www.ecfr.gov/current/title-45/section-46.109"
     },
     {
       "term": "Revoked",
@@ -2583,13 +2640,13 @@
     {
       "term": "Salary cap",
       "also": "NIH salary cap, over-cap salary",
-      "definition": "A sponsor limit on the salary rate that can be charged; the part above the cap must be paid from other money.",
+      "definition": "A sponsor limit on the salary rate that can be charged. The sponsor won't pay the part above the cap.",
       "domain": "Budget & costing",
       "udm": [
         "Effort.Over_Cap_Amount"
       ],
-      "source": "NIH NOT-OD-26-034",
-      "source_url": "https://grants.nih.gov/grants/guide/notice-files/NOT-OD-26-034.html"
+      "source": "NIH salary cap summary",
+      "source_url": "https://grants.nih.gov/policy-and-compliance/policy-topics/nih-fiscal-policies/salary-cap-summary"
     },
     {
       "term": "SAM.gov",
@@ -2641,6 +2698,15 @@
       "udm": [
         "Proposal.Submission_Status=Signed_Off"
       ]
+    },
+    {
+      "term": "Significant financial interest",
+      "also": "SFI",
+      "definition": "A financial interest of an investigator, or their spouse or dependent children, that reasonably appears related to the investigator's institutional responsibilities and meets the rule's criteria. The institution reviews these to find financial conflicts of interest. Check the governing rule for current criteria.",
+      "domain": "Compliance & research security",
+      "udm": [],
+      "source": "42 CFR 50.603",
+      "source_url": "https://www.ecfr.gov/current/title-42/section-50.603"
     },
     {
       "term": "Single Audit",
@@ -2883,16 +2949,20 @@
       "domain": "Subawards",
       "udm": [
         "Subaward.Monitoring_Frequency_Months"
-      ]
+      ],
+      "source": "2 CFR 200.332",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.332"
     },
     {
       "term": "Subrecipient risk review",
       "also": "Risk assessment",
-      "definition": "An assessment of a subrecipient's risk before issuing or continuing a subaward.",
+      "definition": "An assessment of a subrecipient's risk of fraud and noncompliance, used to decide how closely to monitor it.",
       "domain": "Subawards",
       "udm": [
         "Action.Action_Type_Value_ID=Subrecipient_Risk_Review"
-      ]
+      ],
+      "source": "2 CFR 200.332",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.332"
     },
     {
       "term": "Success rate",
@@ -2909,11 +2979,12 @@
     },
     {
       "term": "Supplement",
-      "also": "Administrative supplement, supplemental funding",
-      "definition": "Extra money added to an existing award for added or expanded work. Unlike incremental funding, it wasn't part of the planned total.",
+      "also": "Supplemental funding",
+      "definition": "Extra money added to an existing award beyond the planned total. Unlike incremental funding, it wasn't part of the planned total.",
       "domain": "Award & lifecycle",
       "udm": [
-        "Modification.Event_Type_Value_ID=Supplement"
+        "Modification.Event_Type_Value_ID=Supplement",
+        "Modification.Requires_Peer_Review"
       ]
     },
     {
@@ -2978,7 +3049,9 @@
       "also": "TCP",
       "definition": "A plan controlling who can access export-controlled items or information on a project.",
       "domain": "Compliance & research security",
-      "udm": []
+      "udm": [],
+      "source": "BIS deemed exports guidelines",
+      "source_url": "https://www.bis.gov/sites/default/files/documents/deemed-exports-licensing-guidelines-foreign-persons.pdf"
     },
     {
       "term": "Terminated (award)",
@@ -3047,7 +3120,9 @@
       "domain": "Budget & costing",
       "udm": [
         "Equipment.Title_Vesting"
-      ]
+      ],
+      "source": "2 CFR 200.313",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.313"
     },
     {
       "term": "Total costs",
@@ -3056,7 +3131,9 @@
       "domain": "Budget & costing",
       "udm": [
         "Proposal.Total_Proposed_Budget"
-      ]
+      ],
+      "source": "NIH Grants Policy Statement 1.2",
+      "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_1/1.2_definition_of_terms.htm"
     },
     {
       "term": "Traceability",
@@ -3082,6 +3159,17 @@
       "udm": [],
       "source": "2 CFR 200.308",
       "source_url": "https://www.ecfr.gov/current/title-2/section-200.308"
+    },
+    {
+      "term": "Unanticipated problem",
+      "also": "Unanticipated problem involving risks to subjects or others",
+      "definition": "An incident in research that was unexpected, is related or possibly related to participation, and suggests greater risk of harm than previously known. Only a small share of adverse events qualify, and some unanticipated problems aren't adverse events. These must be reported under federal human subjects rules.",
+      "domain": "Compliance & research security",
+      "udm": [
+        "ProtocolAdverseEvent"
+      ],
+      "source": "HHS OHRP guidance (2007)",
+      "source_url": "https://www.hhs.gov/ohrp/regulations-and-policy/guidance/reviewing-unanticipated-problems/index.html"
     },
     {
       "term": "Unapproved",
@@ -3116,8 +3204,8 @@
       "udm": [
         "OrganizationIdentifier"
       ],
-      "source": "2 CFR 200.211",
-      "source_url": "https://www.ecfr.gov/current/title-2/section-200.211"
+      "source": "2 CFR 25.400",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-25.400"
     },
     {
       "term": "Unobligated balance",

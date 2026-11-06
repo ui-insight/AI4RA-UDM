@@ -494,6 +494,7 @@ The following rules require enforcement beyond what a single column declaration 
 | Modification | `Prior_Approval_Granted_Date` is required when `Requires_Prior_Approval = true` and `Approval_Status = 'Approved'` |
 | Modification | `Carryover_Amount` is required when the Event_Type value resolves to a carryover event |
 | Modification | `Termination_Basis` is required when Event_Type resolves to Partial_Termination, and null otherwise |
+| Modification | `Requires_Peer_Review` is set only when Event_Type resolves to Supplement |
 | Modification | `Funding_Change_Amount` is required for Incremental_Funding and Supplement, and for a Budget_Revision that changes the total; null is permitted for non-financial event types (No_Cost_Extension, PI_Change, Scope_Change), Rebudget, and a Budget_Revision that does not change the total. When the modification does not change funding, the value is null (not zero) |
 | Modification | Exactly one of `Award_ID` or `Subaward_ID` is non-null |
 | Modification | `Modification_Number` is unique within the parent agreement (Award or Subaward) |
@@ -923,6 +924,7 @@ A change to an Award or Subaward after initial funding. Modification is XOR-atta
 | Approval_Status | Status | required | Requested, Approved, Rejected, Withdrawn, Not_Required, Reversed. Withdrawn before a decision; Reversed after approval or after being recorded as Not_Required, and excluded from the derived award totals and dates |
 | Priority | Status | required | Constrained: Low / Medium / High / Critical. Processing priority the office assigned, Medium unless set; Critical is a rush |
 | Requires_Prior_Approval | Boolean | required | |
+| Requires_Peer_Review | Boolean | optional | Whether a supplement goes through peer review. Set only when Event_Type resolves to Supplement. False matches NIH's administrative supplement and true its competitive revision; null means the sponsor doesn't distinguish or it isn't known |
 | Prior_Approval_Granted_Date | Date | conditional | Required when Requires_Prior_Approval is true and Approval_Status is Approved |
 | Funding_Change_Amount | Money | conditional | Positive for adds, negative for reductions. Required for Incremental_Funding and Supplement, and for a Budget_Revision that changes the total; null for non-financial event types, Rebudget, and a Budget_Revision that does not change the total |
 | New_End_Date | Date | conditional | The revised end date of the parent agreement after this Modification takes effect. Non-null exactly when the Modification changes the end date; null when it does not. Required when `Event_Type` resolves to No_Cost_Extension. Used by the derived `Award.Current_End_Date` and `Subaward.Current_End_Date` rules |
