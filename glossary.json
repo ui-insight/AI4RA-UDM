@@ -357,14 +357,14 @@
     {
       "term": "Award rate",
       "also": "",
-      "definition": "The share of applications that are funded, following NIH's method, with each resubmission counted separately. It is usually lower than the success rate because the bottom number is larger.",
+      "definition": "The share of reviewed applications that are funded, following NIH's method: applications awarded divided by applications reviewed. NIH treats it as distinct from the success rate, which counts an application and its resubmissions in the same fiscal year once.",
       "domain": "Research metrics & reporting",
       "udm": [
         "Proposal.Decision_Status=Awarded",
         "Proposal.Decision_Status=Declined"
       ],
-      "source": "NIH success rates",
-      "source_url": "https://edgeforscholars.vumc.org/?p=21258"
+      "source": "NIH budget and spending data",
+      "source_url": "https://report.nih.gov/funding/nih-budget-and-spending-data-past-fiscal-years/budget-and-spending"
     },
     {
       "term": "Award status",
@@ -1122,8 +1122,8 @@
       "definition": "Recovered indirect costs as a percentage of direct costs. It is usually well below the negotiated rate because some costs carry no indirect costs and some sponsors pay less than that rate. Sponsors don't define a standard formula, so this follows common university usage.",
       "domain": "Research metrics & reporting",
       "udm": [],
-      "source": "UC Davis Indirect Cost Overview",
-      "source_url": "https://ucaft.org/sites/default/files/main/Indirect%20Cost%20Overview-UCD.pdf"
+      "source": "UC Berkeley F&A overview",
+      "source_url": "https://spo.berkeley.edu/Policy/fa_presentation.pdf"
     },
     {
       "term": "Effort",
@@ -1240,8 +1240,8 @@
       "udm": [
         "ComplianceRequirement.Requirement_Type=Export_Control"
       ],
-      "source": "BIS deemed exports",
-      "source_url": "https://www.bis.gov/learn-support/deemed-exports"
+      "source": "15 CFR 734.13",
+      "source_url": "https://www.ecfr.gov/current/title-15/section-734.13"
     },
     {
       "term": "Externally funded R&D expenditures",
@@ -1693,13 +1693,13 @@
     {
       "term": "Key personnel",
       "also": "Senior/key personnel",
-      "definition": "People who contribute in a substantive way to the scientific development or execution of a project. Changing those identified in the award generally needs sponsor approval.",
+      "definition": "People who contribute in a substantive way to the scientific development or execution of a project, following NSF's definition. Changing those identified in the award generally needs sponsor approval under 2 CFR 200.308.",
       "domain": "People & organizations",
       "udm": [
         "TeamRole.Is_Key_Personnel"
       ],
-      "source": "2 CFR 200.308",
-      "source_url": "https://www.ecfr.gov/current/title-2/section-200.308"
+      "source": "NSF PAPPG personnel definitions",
+      "source_url": "https://www.nsf.gov/policies/pappg/24-1/ch-2-exhibit-3"
     },
     {
       "term": "Late",
@@ -2556,7 +2556,7 @@
     {
       "term": "Research Performance Progress Report",
       "also": "RPPR",
-      "definition": "The standard federal format for interim and final progress reports on research grants and cooperative agreements.",
+      "definition": "A standard federal format that agencies may use for interim and final progress reports on research grants and cooperative agreements.",
       "domain": "Federal identifiers & rules",
       "udm": [
         "Report.Report_Type=RPPR"
