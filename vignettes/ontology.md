@@ -1,6 +1,6 @@
 # UDM Ontology
 
-This document describes the structure, conventions, and purpose of every entity in the AI4RA Unified Data Model. The current version is in the [VERSION](../VERSION) file. The UDM contains **47 tables** organized into **6 core modules** plus two implementation tables, along with reference views.
+This document describes the structure, conventions, and purpose of every entity in the AI4RA Unified Data Model. The current version is in the [VERSION](../VERSION) file. The UDM is organized into core modules plus implementation tables, along with reference views.
 
 For the canonical machine-readable specification, see [udm-system-of-record.md](udm-system-of-record.md) (prose) and [udm_schema.json](../udm_schema.json) (at the repository root, in an engine-neutral type vocabulary).
 
@@ -249,7 +249,7 @@ Three mechanisms answer "when did this change?", each at a different scope:
 
 ## Domains
 
-The 47 tables organize into 6 core modules plus two implementation tables:
+The tables organize into core modules plus implementation tables:
 
 | Core module | Tables |
 |---|---|

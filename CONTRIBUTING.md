@@ -53,4 +53,6 @@ By submitting a contribution you agree that it is licensed under the same terms 
 - [Apache-2.0](LICENSE-APACHE-2.0) for the code (the scripts, the dashboard and the build workflows).
 - Both licenses for the machine-readable schema files, so that they remain available under either license at the adopter's option.
 
+Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md).
+
 You represent that you have the right to license your contribution under those terms. Contributions keep the attribution in NOTICE intact.

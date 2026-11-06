@@ -14,6 +14,8 @@ While the UDM is in active development and has no production adopters, breaking 
 - **Dashboard: status chart tooltips.** Hover over or tap a status on the Statuses tab to see its Glossary definition. Each tooltip matches its box's colors. `check_glossary.py` fails if a chart box has no term. The tab now says the charts show the main paths, not every possible status change.
 - **Glossary: compliance, closeout, and lifecycle statuses.** Adds 25 terms, so every status on the charts has a definition.
 - **Glossary sources.** Adds checked federal and sponsor sources to more terms, and corrects `Submission status`, `Software as a Service`, `IBC`, and `NSF PAPPG`. `Approval of the material` is removed, since `Internal approval` covers it.
+- **README rewritten.** It is shorter, puts the site and the AI4RA list first, and no longer repeats table counts. The hand-kept ERD and JSON walkthrough are gone, since the site covers them.
+- **Code of Conduct added,** using the Contributor Covenant.
 - **Cleanup.** Removes an unused image and an old AI tool instructions file, and updates examples that still named older versions.
 - **Versioning.** While the UDM is in active development, breaking changes can ship in a minor version and are marked as breaking here.
 - **`Submission_Status` drops `Unapproved` (breaking).** `Internal_Approval_Status` already holds that fact, so a proposal that isn't approved is `Unsubmitted`. No attempt can be created until the proposal is approved.

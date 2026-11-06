@@ -72,11 +72,6 @@ def main():
             r"\*\*Current version: v[^*]+\*\* \(released [^)]+\)",
             f"**Current version: v{version}** (released {released})",
         ),
-        replace_once(
-            "README.md",
-            r'("metadata": \{ "name": "UDM", "version": ")[^"]+"',
-            rf'\g<1>{version}"',
-        ),
         replace_once("vignettes/udm-system-of-record.md", r"^\*\*Version:\*\* [^ ]+\.", f"**Version:** {version}."),
         replace_once("vignettes/udm-conformance.md", r'("udm_version": ")[^"]+"', rf'\g<1>{version}"'),
     ]
