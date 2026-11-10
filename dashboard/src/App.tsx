@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import Header from './components/Header';
 import TabBar from './components/TabBar';
 import HomeTab from './components/Home/HomeTab';
@@ -12,10 +11,10 @@ import GlossaryTab from './components/Glossary/GlossaryTab';
 import StatusesTab from './components/Statuses/StatusesTab';
 import InfrastructureTab from './components/Infrastructure/InfrastructureTab';
 import { useSchemaData } from './hooks/useSchemaData';
-import type { TabName } from './types';
+import { useHashTab } from './hooks/useHashTab';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<TabName>('home');
+  const [activeTab, setActiveTab] = useHashTab();
   const { dataDictionary, relationships, reverseRelationships, loading, error, exampleViews } = useSchemaData();
 
   if (error) {
@@ -32,7 +31,7 @@ export default function App() {
   return (
     <>
       <Header version={dataDictionary?.version} released={dataDictionary?.released} />
-      <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
+      <TabBar activeTab={activeTab} />
       <div style={{ display: activeTab === 'home' ? 'block' : 'none' }}>
         {dataDictionary && (
           <HomeTab dataDictionary={dataDictionary} relationships={relationships} onNavigate={setActiveTab} />

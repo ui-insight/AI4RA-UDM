@@ -1,4 +1,5 @@
 import type { TabName } from '../types';
+import { TAB_SLUGS } from '../hooks/useHashTab';
 
 const tabs: { id: TabName; label: string }[] = [
   { id: 'home', label: 'Home' },
@@ -14,10 +15,10 @@ const tabs: { id: TabName; label: string }[] = [
 
 interface Props {
   activeTab: TabName;
-  onTabChange: (tab: TabName) => void;
 }
 
-export default function TabBar({ activeTab, onTabChange }: Props) {
+// Each tab is a link to its own hash, so it can be copied, bookmarked, or opened in a new tab.
+export default function TabBar({ activeTab }: Props) {
   return (
     <div style={{
       background: 'white',
@@ -26,10 +27,15 @@ export default function TabBar({ activeTab, onTabChange }: Props) {
     }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', gap: 0, overflowX: 'auto' }}>
         {tabs.map(tab => (
-          <button
+          <a
             key={tab.id}
-            onClick={() => onTabChange(tab.id)}
+            href={`#${TAB_SLUGS[tab.id]}`}
+            aria-current={activeTab === tab.id ? 'page' : undefined}
             style={{
+              display: 'flex',
+              alignItems: 'center',
+              textAlign: 'center',
+              textDecoration: 'none',
               padding: '1rem 2rem',
               background: 'none',
               border: 'none',
@@ -42,7 +48,7 @@ export default function TabBar({ activeTab, onTabChange }: Props) {
             }}
           >
             {tab.label}
-          </button>
+          </a>
         ))}
       </div>
     </div>

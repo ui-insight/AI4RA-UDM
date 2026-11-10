@@ -11,6 +11,7 @@ While the UDM is in active development and has no production adopters, breaking 
 
 ## [Unreleased]
 
+- **Dashboard: direct links to each tab.** Each tab has its own address, such as `#statuses` or `#data-dictionary`, so it can be shared, bookmarked, or opened in a new tab, and the back button moves between tabs.
 - **Dashboard: Home feedback section reworded.** "Tell us what you think!" replaces "Help us evaluate it", with shorter questions.
 - **Dashboard: "Where to start" card removed from Home.** The tabs already show where everything is.
 - **Dashboard: shorter Home intro.** The text is condensed and the "Start here" heading is gone.
