@@ -587,6 +587,15 @@
       ]
     },
     {
+      "term": "Changes Requested",
+      "also": "",
+      "definition": "A decision status: the sponsor asked for changes or more information before deciding, such as just-in-time information or a revised budget. It does not imply an award.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Decision_Status=Changes_Requested"
+      ]
+    },
+    {
       "term": "Charged",
       "also": "",
       "definition": "An effort stage: salary actually charged for the period.",
