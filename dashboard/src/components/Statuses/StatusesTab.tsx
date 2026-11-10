@@ -18,6 +18,8 @@ export default function StatusesTab() {
           time. Hover over or tap a status to see its definition from the Glossary. The charts show the
           main paths, not every possible status change. For example, a withdrawn proposal that is revised
           goes back through internal approval, which the Glossary explains and the chart doesn't draw.
+          A record holds only its current status. The sponsor's date for each decision is kept on the
+          communication that made it, and the full edit history is kept by the storage layer.
         </p>
 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem' }}>

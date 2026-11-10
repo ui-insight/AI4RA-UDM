@@ -146,6 +146,7 @@ The UDM controls the values of a column in one of two ways.
 | `Communication.Related_Entity_Type` | `Award`, `Subaward`, `Proposal`, `SubmissionAttempt`, `RFA`, `Modification`, `Negotiation`, `Terms`, `ComplianceRequirement`, `Personnel`, `Closeout`, `Deliverable` |
 | `Communication.Communication_Type` | `Email`, `Phone_Call`, `Meeting`, `Letter`, `Portal_Message`, `Other` |
 | `Communication.Direction` | `Inbound`, `Outbound` |
+| `Communication.Sets_Status` | `Pending`, `Changes_Requested`, `Intent_to_Award`, `Awarded`, `Declined`, `Not_Reviewed`, `Withdrawn` |
 | `Restriction.Related_Entity_Type` | `Award`, `Subaward`, `Proposal`, `Personnel`, `Equipment` |
 | `Restriction.Restriction_Status` | `Active`, `Expired`, `Lifted`, `Pending_Review` |
 | `Deadline.Related_Entity_Type` | `Award`, `Subaward`, `Proposal`, `Approval`, `ComplianceRequirement`, `Modification`, `RFA`, `Closeout`, `Deliverable`, `Communication` |

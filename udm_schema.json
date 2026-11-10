@@ -1,8 +1,8 @@
 {
   "metadata": {
     "name": "UDM",
-    "version": "5.1.1",
-    "released": "2026-11-06",
+    "version": "5.2.0",
+    "released": "2026-11-10",
     "description": "Vendor-neutral research administration data model. This JSON is the machine-readable serialization of the specification in vignettes/udm-system-of-record.md: modules, tables, columns in the abstract type vocabulary, constraints, conventions, and derivation rules. It names no database engine; types.dialects maps the abstract types to native ones per engine.",
     "spec_source": "vignettes/udm-system-of-record.md",
     "changelog": "vignettes/CHANGELOG.md",
@@ -1960,7 +1960,11 @@
               "Decision_Date": {
                 "type": "Date",
                 "required": false,
-                "description": "When the proposal's outcome was recorded: the Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn date. Cleared if Intent_to_Award returns to Pending"
+                "description": "The date of the proposal's current outcome: Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn. Derived from the Communication that set it, and kept on the Proposal because most reports want this one date",
+                "derived": {
+                  "rule": "The date of Communication_Date on the newest Communication attached to the Proposal whose Sets_Status is set, when that value is Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn and Decision_Status still holds it; null otherwise.",
+                  "recompute_triggers": "On insert/update of any Communication for the Proposal; on update of Proposal.Decision_Status."
+                }
               },
               "Risk_Level": {
                 "type": "Status",
@@ -2051,6 +2055,9 @@
             "constraints": [
               {
                 "rule": "Decision_Status is Unrequested while no SubmissionAttempt made since the latest approval has Attempt_Status Accepted, or while the newest attempt is Recalled or Sent_Back, unless a sponsor request, a sponsor outcome, or a withdrawal is recorded (Changes_Requested, Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn); otherwise it is Pending or one of those recorded values. A recorded outcome stays when the proposal is re-approved."
+              },
+              {
+                "rule": "Each recorded Decision_Status (Changes_Requested, Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn, and Pending when Intent_to_Award is walked back) has a Communication attached to the Proposal whose Sets_Status is that value. While the decision is recorded, Decision_Status equals the Sets_Status of the newest such Communication."
               },
               {
                 "rule": "Decision_Status = 'Withdrawn' only when at least one SubmissionAttempt for the Proposal was sent. When a withdrawn proposal is revised, a Returned_for_Revision Approval row returns Internal_Approval_Status to Returned and Decision_Status becomes Unrequested."
@@ -7651,11 +7658,55 @@
                 },
                 "description": "The external party's organization",
                 "synonyms": "External Org, Counterparty Organization"
-              }
+              },
+              "Sets_Status": {
+                  "type": "Status",
+                  "required": false,
+                  "allowed_values": [
+                    "Pending",
+                    "Changes_Requested",
+                    "Intent_to_Award",
+                    "Awarded",
+                    "Declined",
+                    "Not_Reviewed",
+                    "Withdrawn"
+                  ],
+                  "value_definitions": {
+                    "Pending": {
+                      "definition": "The sponsor walked back an intent to award, returning the decision to Pending"
+                    },
+                    "Changes_Requested": {
+                      "definition": "The sponsor asked for changes or more information before deciding"
+                    },
+                    "Intent_to_Award": {
+                      "definition": "The sponsor signalled funding before an agreement exists"
+                    },
+                    "Awarded": {
+                      "definition": "The sponsor funded the proposal"
+                    },
+                    "Declined": {
+                      "definition": "The sponsor reviewed the proposal and did not fund it"
+                    },
+                    "Not_Reviewed": {
+                      "definition": "The sponsor removed the proposal from consideration without reviewing it"
+                    },
+                    "Withdrawn": {
+                      "definition": "The institution asked the sponsor to withdraw the proposal; the only value set by an outbound communication"
+                    }
+                  },
+                  "description": "The status this communication moved its record to. On a Proposal, the Decision_Status value, so the sponsor's own date for each decision is kept as Communication_Date. Null for correspondence that changed no status, and on every record type other than Proposal",
+                  "synonyms": "Status Change, Decision Notice, Sponsor Decision"
+                }
             },
             "constraints": [
               {
                 "rule": "Exactly one of External_Personnel_ID or External_Party_Name is non-null."
+              },
+              {
+                "rule": "Sets_Status is null unless Related_Entity_Type = 'Proposal'."
+              },
+              {
+                "rule": "Sets_Status = 'Withdrawn' only when Direction = 'Outbound'; every other Sets_Status value only when Direction = 'Inbound'."
               }
             ]
           },

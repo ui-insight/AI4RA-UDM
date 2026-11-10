@@ -787,10 +787,11 @@
     {
       "term": "Communication",
       "also": "Correspondence",
-      "definition": "A message between the institution and an outside party.",
+      "definition": "A message between the institution and an outside party. A sponsor's message that changes a proposal's decision, such as an intent to award or a notice of award, records the status it set, so the sponsor's own date for each decision is kept.",
       "domain": "Records & workflow",
       "udm": [
-        "Communication"
+        "Communication",
+        "Communication.Sets_Status"
       ]
     },
     {
