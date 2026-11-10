@@ -91,6 +91,15 @@ jobs:
       - name: Build dashboard
         run: cd dashboard && npm run build
 
+      # The Statuses tab's download button links to this file. Liberation Sans stands in for
+      # Helvetica and Arial so the labels keep their widths inside the boxes.
+      - name: Render the proposal and award status path as a PDF
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q librsvg2-bin fonts-liberation
+          mkdir -p docs/downloads
+          rsvg-convert -f pdf dashboard/src/assets/proposal-award-status-path.svg -o docs/downloads/proposal-award-status-path.pdf
+
       - uses: actions/configure-pages@v5
         if: github.event_name != 'pull_request'
 

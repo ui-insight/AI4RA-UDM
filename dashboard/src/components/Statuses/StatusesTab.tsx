@@ -20,9 +20,22 @@ export default function StatusesTab() {
           goes back through internal approval, which the Glossary explains and the chart doesn't draw.
         </p>
 
-        <h3 style={{ color: '#2c3e50', marginBottom: '1rem', fontSize: '1.3rem' }}>
-          Proposal and Award Status Path
-        </h3>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+          <h3 style={{ color: '#2c3e50', margin: 0, fontSize: '1.3rem' }}>
+            Proposal and Award Status Path
+          </h3>
+          {/* The PDF is rendered from the same SVG when the site is deployed. */}
+          <a
+            href={`${import.meta.env.BASE_URL}downloads/proposal-award-status-path.pdf`}
+            download
+            style={{
+              padding: '0.4rem 0.9rem', border: '1.5px solid #667eea', borderRadius: 6,
+              color: '#667eea', fontWeight: 600, fontSize: '0.9rem', textDecoration: 'none',
+            }}
+          >
+            Download PDF
+          </a>
+        </div>
         <p style={{ color: '#546e7a', marginBottom: '1rem' }}>
           A proposal has three status stages, and the award that follows has its own. The status that
           ends one stage starts the next.
