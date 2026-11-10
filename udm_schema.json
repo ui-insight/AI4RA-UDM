@@ -1921,13 +1921,14 @@
                     ]
                   },
                   "Intent_to_Award": {
-                    "definition": "The sponsor signalled funding before an agreement exists; at-risk spending may be authorized. The sponsor can walk the signal back, which returns the decision to Pending",
+                    "definition": "The sponsor signalled funding before an agreement exists; at-risk spending may be authorized. The sponsor can walk the signal back, which returns the decision to Pending, or ask for changes first, which moves it to Changes_Requested",
                     "set_by": "Recorded from the sponsor's communication",
                     "next": [
                       "Awarded",
                       "Declined",
                       "Withdrawn",
-                      "Pending"
+                      "Pending",
+                      "Changes_Requested"
                     ]
                   },
                   "Awarded": {

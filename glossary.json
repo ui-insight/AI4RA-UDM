@@ -1730,7 +1730,7 @@
     {
       "term": "Intent to Award",
       "also": "",
-      "definition": "A decision status: the sponsor has signaled funding, but no agreement exists yet. The sponsor can walk the signal back, which returns the decision to Pending.",
+      "definition": "A decision status: the sponsor has signaled funding, but no agreement exists yet. The sponsor can walk the signal back, which returns the decision to Pending, or ask for changes first, which moves it to Changes Requested.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Decision_Status=Intent_to_Award"
