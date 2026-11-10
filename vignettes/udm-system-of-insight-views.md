@@ -505,7 +505,7 @@ CREATE VIEW v_pipeline AS
 SELECT p.Proposal_ID, p.Proposal_Number, p.Total_Proposed_Budget, p.Submission_Status, p.Decision_Status
 FROM Proposal p
 WHERE p.Is_Active = true
-  AND (p.Decision_Status IN ('Pending', 'Intent_to_Award')
+  AND (p.Decision_Status IN ('Pending', 'Changes_Requested', 'Intent_to_Award')
        OR (p.Decision_Status = 'Unrequested' AND p.Submission_Status IN ('Submitted', 'Received', 'Validated')));
 
 -- Proposal volume and proposal dollars: filter by Submission_Date. A proposal counts once however many attempts it took

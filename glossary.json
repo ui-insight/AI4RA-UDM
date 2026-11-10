@@ -1112,7 +1112,7 @@
     {
       "term": "Decision status",
       "also": "Funding decision, proposal outcome",
-      "definition": "The outcome of the funding request: unrequested, pending, intent to award, awarded, declined, not reviewed, or withdrawn.",
+      "definition": "The outcome of the funding request: unrequested, pending, changes requested, intent to award, awarded, declined, not reviewed, or withdrawn.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Decision_Status"
@@ -2330,6 +2330,7 @@
         "Proposal.Submission_Status=Received",
         "Proposal.Submission_Status=Validated",
         "Proposal.Decision_Status=Pending",
+        "Proposal.Decision_Status=Changes_Requested",
         "Proposal.Decision_Status=Intent_to_Award"
       ]
     },

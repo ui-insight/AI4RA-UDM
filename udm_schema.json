@@ -1881,6 +1881,7 @@
                 "allowed_values": [
                   "Unrequested",
                   "Pending",
+                  "Changes_Requested",
                   "Intent_to_Award",
                   "Awarded",
                   "Declined",
@@ -1900,12 +1901,21 @@
                     "definition": "The sponsor holds the proposal and has not decided",
                     "set_by": "Derived; the system computes it",
                     "next": [
+                      "Changes_Requested",
                       "Intent_to_Award",
                       "Awarded",
                       "Declined",
                       "Not_Reviewed",
                       "Withdrawn",
                       "Unrequested"
+                    ]
+                  },
+                  "Changes_Requested": {
+                    "definition": "The sponsor asked for changes or more information before deciding, such as just-in-time information or a revised budget. It does not imply an award",
+                    "set_by": "Recorded from the sponsor's communication",
+                    "next": [
+                      "Intent_to_Award",
+                      "Awarded"
                     ]
                   },
                   "Intent_to_Award": {
@@ -1941,7 +1951,7 @@
                     ]
                   }
                 },
-                "description": "The outcome of the funding request. Unrequested until an attempt made since the latest approval is Accepted, and while the newest attempt is Recalled or Sent_Back; Pending once the sponsor holds it; Intent_to_Award when the sponsor signals funding before an agreement; Awarded, Declined, Not_Reviewed, or Withdrawn as the outcome. Unrequested and Pending follow the submission stage; the rest are recorded by the institution",
+                "description": "The outcome of the funding request. Unrequested until an attempt made since the latest approval is Accepted, and while the newest attempt is Recalled or Sent_Back; Pending once the sponsor holds it; Changes_Requested when the sponsor asks for changes or more information before deciding; Intent_to_Award when the sponsor signals funding before an agreement; Awarded, Declined, Not_Reviewed, or Withdrawn as the outcome. Unrequested and Pending follow the submission stage; the rest are recorded by the institution",
                 "synonyms": "Outcome, Sponsor Decision, Award Decision"
               },
               "Decision_Date": {
@@ -2037,7 +2047,7 @@
             },
             "constraints": [
               {
-                "rule": "Decision_Status is Unrequested while no SubmissionAttempt made since the latest approval has Attempt_Status Accepted, or while the newest attempt is Recalled or Sent_Back, unless a sponsor outcome or a withdrawal is recorded (Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn); otherwise it is Pending or one of those recorded values. A recorded outcome stays when the proposal is re-approved."
+                "rule": "Decision_Status is Unrequested while no SubmissionAttempt made since the latest approval has Attempt_Status Accepted, or while the newest attempt is Recalled or Sent_Back, unless a sponsor request, a sponsor outcome, or a withdrawal is recorded (Changes_Requested, Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn); otherwise it is Pending or one of those recorded values. A recorded outcome stays when the proposal is re-approved."
               },
               {
                 "rule": "Decision_Status = 'Withdrawn' only when at least one SubmissionAttempt for the Proposal was sent. When a withdrawn proposal is revised, a Returned_for_Revision Approval row returns Internal_Approval_Status to Returned and Decision_Status becomes Unrequested."
@@ -2378,7 +2388,7 @@
                 "rule": "Authorization_Date and Authorizing_Personnel_ID are required when Authorization_Status is Approved, Converted_To_Award, or Expired_Unused, and kept if an approved authorization is later Revoked."
               },
               {
-                "rule": "While Authorization_Status is Requested or Approved, the Proposal referenced by Proposal_ID has Decision_Status Pending or Intent_to_Award."
+                "rule": "While Authorization_Status is Requested or Approved, the Proposal referenced by Proposal_ID has Decision_Status Pending, Changes_Requested, or Intent_to_Award."
               },
               {
                 "rule": "When Authorization_Status is Converted_To_Award, the Proposal referenced by Proposal_ID has Decision_Status Awarded."

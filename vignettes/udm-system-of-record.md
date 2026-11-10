@@ -374,7 +374,7 @@ Universal status taxonomies are listed here in one place. The JSON artifact carr
 | `Subaward_Status` | Proposed, In_Setup, Active, Suspended, Closing, Closed, Adjusting, Terminated, Not_Issued |
 | `Proposal.Internal_Approval_Status` | Draft, In_Review, Returned, Approved, Rejected |
 | `Proposal.Submission_Status` | Unsubmitted, Signed_Off, Submitted, Received, Validated, Invalid, Accepted, Failed, Recalled, Sent_Back (derived) |
-| `Proposal.Decision_Status` | Unrequested, Pending, Intent_to_Award, Awarded, Declined, Not_Reviewed, Withdrawn |
+| `Proposal.Decision_Status` | Unrequested, Pending, Changes_Requested, Intent_to_Award, Awarded, Declined, Not_Reviewed, Withdrawn |
 | `SubmissionAttempt.Attempt_Status` | Unsubmitted, Submitted, Received, Validated, Invalid, Accepted, Failed, Recalled, Sent_Back |
 | `RFA_Status` | Active, Closed, Superseded, Cancelled |
 | `Negotiation_Status` | Pending, Active, On_Hold, Resolved, Abandoned |
@@ -462,7 +462,7 @@ The following rules require enforcement beyond what a single column declaration 
 | ContactDetails | Exactly one of `Personnel_ID` or `Organization_ID` is non-null |
 | Communication | Exactly one of `External_Personnel_ID` or `External_Party_Name` is non-null. Every Communication row identifies its external party either via FK to Personnel or via free-text name |
 | ContactDetails | At most one row per (referenced entity, `Contact_Type_Value_ID`) has `Is_Primary = true` |
-| Proposal | `Decision_Status` is Unrequested while no SubmissionAttempt made since the latest approval has `Attempt_Status` Accepted, or while the newest attempt is Recalled or Sent_Back, unless a sponsor outcome or a withdrawal is recorded (Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn); otherwise it is Pending or one of those recorded values. A recorded outcome stays when the proposal is re-approved |
+| Proposal | `Decision_Status` is Unrequested while no SubmissionAttempt made since the latest approval has `Attempt_Status` Accepted, or while the newest attempt is Recalled or Sent_Back, unless a sponsor request, a sponsor outcome, or a withdrawal is recorded (Changes_Requested, Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn); otherwise it is Pending or one of those recorded values. A recorded outcome stays when the proposal is re-approved |
 | Proposal | `Decision_Status = 'Withdrawn'` only when at least one SubmissionAttempt for the Proposal was sent. When a withdrawn proposal is revised, a Returned_for_Revision Approval row returns `Internal_Approval_Status` to Returned and `Decision_Status` becomes Unrequested |
 | Proposal | `Decision_Status = 'Awarded'` only when `Internal_Approval_Status = 'Approved'` |
 | SubmissionAttempt | `Attempt_Number` is unique within the Proposal and consecutive from 1 |
@@ -473,7 +473,7 @@ The following rules require enforcement beyond what a single column declaration 
 | SubmissionAttempt | An attempt becomes Recalled only while the Proposal's `Decision_Status` is Unrequested or Pending |
 | SubmissionAttempt | An attempt moves from Accepted to Sent_Back only while the Proposal's `Decision_Status` is Pending |
 | PreAwardAuthorization | `Authorization_Date` and `Authorizing_Personnel_ID` are required when `Authorization_Status` is Approved, Converted_To_Award, or Expired_Unused, and kept if an approved authorization is later Revoked |
-| PreAwardAuthorization | While `Authorization_Status` is Requested or Approved, the Proposal referenced by `Proposal_ID` has `Decision_Status` Pending or Intent_to_Award |
+| PreAwardAuthorization | While `Authorization_Status` is Requested or Approved, the Proposal referenced by `Proposal_ID` has `Decision_Status` Pending, Changes_Requested, or Intent_to_Award |
 | PreAwardAuthorization | When `Authorization_Status` is Converted_To_Award, the Proposal referenced by `Proposal_ID` has `Decision_Status` Awarded |
 | Approval | `Approver_Personnel_ID` and `Action_Date` are required when `Approval_Status` is Approved, Rejected, Bypassed, or Returned_for_Revision |
 | Approval | `Review_Topic_Value_ID` is required when `Step_Type` resolves to Supplementary_Review; `Signed_Package_Hash` when it resolves to Final_Sign_off and the step is Approved; `Delegate_Personnel_ID` when it resolves to Release_to_Submit and the step is Approved |
@@ -827,7 +827,7 @@ A formal request for funding submitted to a sponsor.
 | Submission_Date | Date | derived | The date the proposal last went to the sponsor: `Submitted_At` of the newest SubmissionAttempt that reached Submitted or later; null before then |
 | Internal_Approval_Status | Status | required | Where the proposal stands in the institution's decision to pursue the opportunity: Draft, In_Review, Returned, Approved, Rejected. Approved counts every step except Final_Sign_off and Release_to_Submit. A changed package voids only the sign-off, a separate gate tracked in `Submission_Status` |
 | Submission_Status | Status | derived | Where the proposal stands with the sponsor's submission system: Unsubmitted until the current package is signed off, which requires internal approval; Signed_Off once it is ready to send; then the newest SubmissionAttempt's `Attempt_Status` |
-| Decision_Status | Status | required | The outcome of the funding request: Unrequested, Pending, Intent_to_Award, Awarded, Declined, Not_Reviewed, Withdrawn. Unrequested and Pending follow the submission stage; the rest are recorded by the institution. Withdrawn means a submitted proposal was pulled from the sponsor's consideration; the institution then stops there, or revises it, and internal approval returns to Returned and the decision to Unrequested |
+| Decision_Status | Status | required | The outcome of the funding request: Unrequested, Pending, Changes_Requested, Intent_to_Award, Awarded, Declined, Not_Reviewed, Withdrawn. Unrequested and Pending follow the submission stage; the rest are recorded by the institution. Withdrawn means a submitted proposal was pulled from the sponsor's consideration; the institution then stops there, or revises it, and internal approval returns to Returned and the decision to Unrequested |
 | Decision_Date | Date | optional | When the proposal's outcome was recorded: the Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn date. Cleared if Intent_to_Award returns to Pending |
 | Risk_Level | Status | optional | See Status taxonomy |
 | Proposal_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'ProposalType'`. Recommended values: New / Resubmission / Renewal / Continuation / Revision / Task_Order |
