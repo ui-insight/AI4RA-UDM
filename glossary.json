@@ -254,7 +254,7 @@
     {
       "term": "Approved (internal approval)",
       "also": "",
-      "definition": "An internal approval status: the institution approved pursuing this opportunity. It doesn't mean the package is ready to send, which is what Signed Off means.",
+      "definition": "An internal approval status: every required approval step, such as the department and the sponsored programs office (OSP), approved pursuing this opportunity. It doesn't mean the package is ready to send, which is what Signed Off means.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Internal_Approval_Status=Approved"

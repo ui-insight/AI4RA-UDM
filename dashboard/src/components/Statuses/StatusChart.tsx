@@ -20,9 +20,6 @@ interface Tip {
 
 const TIP_WIDTH = 320;
 const TIP_MARGIN = 8;
-// Withdrawn's box is half amber and half red, and a tooltip can't use its gradient.
-const SOLID_FILL = '#fef3c7';
-const SOLID_STROKE = '#b45309';
 const TIP_ROOM = 220; // room to leave below a box before the tooltip moves above it
 
 // Every "Table.Column=Value" reference in the glossary, in lower case.
@@ -94,9 +91,15 @@ export default function StatusChart({ svg, idPrefix, minWidth }: Props) {
       const shape = box.querySelector('rect');
       const fill = shape?.getAttribute('fill') ?? '';
       const stroke = shape?.getAttribute('stroke') ?? '';
+      // A two-color box, such as Withdrawn, fills with a gradient a tooltip can't use, so the
+      // tooltip takes the gradient's first color.
+      const solid = (paint: string) => {
+        const id = paint.match(/^url\(#([^)]+)\)$/)?.[1];
+        return id ? root.querySelector(`[id="${id}"] stop`)?.getAttribute('stop-color') ?? '#ffffff' : paint;
+      };
       const colors = {
-        fill: fill.startsWith('url') ? SOLID_FILL : fill,
-        stroke: stroke.startsWith('url') ? SOLID_STROKE : stroke,
+        fill: solid(fill),
+        stroke: solid(stroke),
         color: box.querySelector('text')?.getAttribute('fill') ?? '#1e293b',
       };
       const left = Math.max(TIP_MARGIN, Math.min(r.left, window.innerWidth - Math.min(TIP_WIDTH, window.innerWidth - 2 * TIP_MARGIN) - TIP_MARGIN));

@@ -15,6 +15,9 @@ While the UDM is in active development and has no production adopters, breaking 
 - **Dashboard: "Where to start" card removed from Home.** The tabs already show where everything is.
 - **Dashboard: shorter Home intro.** The text is condensed and the "Start here" heading is gone.
 - **Dashboard: Home feedback section is easier to read.** It now uses the same white card as the rest of the page, and asks for input on the Glossary and Data Dictionary tabs.
+- **Status chart: Approved shows several approvals.** The Approved box is half green and half purple, and a legend entry says it rolls up several approval steps. The Glossary definition names the department and the sponsored programs office (OSP) as examples.
+- **Status chart: Changes Requested drafted.** A sponsor can ask for changes before deciding, such as just-in-time information. Pending moves to Changes Requested, then to Intent to Award or Awarded. The status is not in the schema or Glossary yet.
+- **Dashboard: two-color tooltips.** A split box's tooltip takes its gradient's first color instead of always using amber.
 
 ## [5.1.1] - 2026-11-06
 
