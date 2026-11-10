@@ -1915,7 +1915,9 @@
                     "set_by": "Recorded from the sponsor's communication",
                     "next": [
                       "Intent_to_Award",
-                      "Awarded"
+                      "Awarded",
+                      "Declined",
+                      "Pending"
                     ]
                   },
                   "Intent_to_Award": {

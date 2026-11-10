@@ -15,9 +15,9 @@ While the UDM is in active development and has no production adopters, breaking 
 - **Dashboard: "Where to start" card removed from Home.** The tabs already show where everything is.
 - **Dashboard: shorter Home intro.** The text is condensed and the "Start here" heading is gone.
 - **Dashboard: Home feedback section is easier to read.** It now uses the same white card as the rest of the page, and asks for input on the Glossary and Data Dictionary tabs.
-- **Status chart: Approved shows several approvals.** The Approved box is half green and half purple, and a legend entry says it rolls up several approval steps. The Glossary definition names the department and the sponsored programs office (OSP) as examples.
-- **Status chart: Changes Requested drafted.** A sponsor can ask for changes before deciding, such as just-in-time information. Pending moves to Changes Requested, then to Intent to Award or Awarded. `Proposal.Decision_Status` gains `Changes_Requested`, recorded from the sponsor's communication, with next statuses `Intent_to_Award` and `Awarded`. It counts in the Pipeline metric and `v_pipeline`, and early setup can stay Requested or Approved while a proposal is in it.
-- **Dashboard: two-color tooltips.** A split box's tooltip takes its gradient's first color instead of always using amber.
+- **Status chart: In Review shows several approval steps.** The In Review box is drawn as a stack. Its Glossary definition names the department and the sponsored programs office (OSP) as examples, and Approved now says every required approval step approved.
+- **Status chart: Changes Requested drafted.** A sponsor can ask for changes before deciding, such as just-in-time information. Pending moves to Changes Requested, then to Intent to Award, Awarded, or Declined, or back to Pending. `Proposal.Decision_Status` gains `Changes_Requested`, recorded from the sponsor's communication, with next statuses `Intent_to_Award`, `Awarded`, `Declined`, and `Pending`. The sponsor decision stage is redrawn so Intent to Award and Changes Requested sit between Pending and the outcomes, with one tight cross. It counts in the Pipeline metric and `v_pipeline`, and early setup can stay Requested or Approved while a proposal is in it.
+- **Dashboard: two-color tooltips.** A split box's tooltip, such as Withdrawn's, takes its gradient's first color instead of a fixed amber.
 
 ## [5.1.1] - 2026-11-06
 
