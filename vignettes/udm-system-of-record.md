@@ -288,7 +288,7 @@ Foreign-engagement disclosures (foreign affiliations, foreign appointments, fore
 
 **Sponsor decision artifacts (NoA, decline letter, modification notice).** Sponsor-issued decision documents have three independent representations:
 
-- The **document** itself (the NoA PDF, the modification notice email) is a `Document` row with the appropriate Document_Type (NOA / Modification_Notice / Decline_Letter / etc.) attached to the relevant entity (Proposal, Award, Modification).
+- The **document** itself (the NoA PDF, the modification notice email) is a `Document` row with the appropriate Document_Type (NOA / MOU / MOA / Modification_Notice / Decline_Letter / etc.) attached to the relevant entity (Proposal, Award, Modification).
 - The **decision's effect on schema state** is captured by updating the relevant status field (Proposal.Decision_Status='Awarded', Modification.Approval_Status='Approved') with the transition preserved by the storage layer's versioned history.
 - The **accompanying correspondence** (program officer's email transmitting the decision) is a `Communication` row attached to the same parent.
 
@@ -370,11 +370,12 @@ Universal status taxonomies are listed here in one place. The JSON artifact carr
 
 | Field | Allowed values |
 |---|---|
+| `Award.Acceptance_Status` | Terms_Review, Negotiating, On_Hold, Accepted, Not_Accepted |
 | `Award_Status` | In_Setup, Active, Suspended, Closing, Closed, Adjusting, Terminating, Terminated |
 | `Subaward_Status` | Proposed, In_Setup, Active, Suspended, Closing, Closed, Adjusting, Terminated, Not_Issued |
 | `Proposal.Internal_Approval_Status` | Draft, In_Review, Returned, Approved, Rejected |
 | `Proposal.Submission_Status` | Unsubmitted, Signed_Off, Submitted, Received, Validated, Invalid, Accepted, Failed, Recalled, Sent_Back (derived) |
-| `Proposal.Decision_Status` | Unrequested, Pending, Changes_Requested, Intent_to_Award, Awarded, Declined, Not_Reviewed, Withdrawn |
+| `Proposal.Decision_Status` | Unrequested, Pending, Changes_Requested, Intent_to_Award, Awarded, Declined, No_Decision, Not_Reviewed, Withdrawn |
 | `SubmissionAttempt.Attempt_Status` | Unsubmitted, Submitted, Received, Validated, Invalid, Accepted, Failed, Recalled, Sent_Back |
 | `RFA_Status` | Active, Closed, Superseded, Cancelled |
 | `Negotiation_Status` | Pending, Active, On_Hold, Resolved, Abandoned |
@@ -464,8 +465,8 @@ The following rules require enforcement beyond what a single column declaration 
 | Communication | `Sets_Status` is null unless `Related_Entity_Type = 'Proposal'` |
 | Communication | `Sets_Status = 'Withdrawn'` only when `Direction = 'Outbound'`; every other `Sets_Status` value only when `Direction = 'Inbound'` |
 | ContactDetails | At most one row per (referenced entity, `Contact_Type_Value_ID`) has `Is_Primary = true` |
-| Proposal | `Decision_Status` is Unrequested while no SubmissionAttempt made since the latest approval has `Attempt_Status` Accepted, or while the newest attempt is Recalled or Sent_Back, unless a sponsor request, a sponsor outcome, or a withdrawal is recorded (Changes_Requested, Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn); otherwise it is Pending or one of those recorded values. A recorded outcome stays when the proposal is re-approved |
-| Proposal | Each recorded `Decision_Status` (Changes_Requested, Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn, and Pending when Intent_to_Award is walked back) has a Communication attached to the Proposal whose `Sets_Status` is that value. While the decision is recorded, `Decision_Status` equals the `Sets_Status` of the newest such Communication |
+| Proposal | `Decision_Status` is Unrequested while no SubmissionAttempt made since the latest approval has `Attempt_Status` Accepted, or while the newest attempt is Recalled or Sent_Back, unless a sponsor request, a sponsor outcome, or a withdrawal is recorded (Changes_Requested, Intent_to_Award, Awarded, Declined, No_Decision, Not_Reviewed, or Withdrawn); otherwise it is Pending or one of those recorded values. A recorded outcome stays when the proposal is re-approved |
+| Proposal | Each recorded `Decision_Status` (Changes_Requested, Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn, and Pending when Intent_to_Award is walked back) has a Communication attached to the Proposal whose `Sets_Status` is that value. While the decision is recorded, `Decision_Status` equals the `Sets_Status` of the newest such Communication. No_Decision is the institution's own record and has no sponsor Communication |
 | Proposal | `Decision_Status = 'Withdrawn'` only when at least one SubmissionAttempt for the Proposal was sent. When a withdrawn proposal is revised, a Returned_for_Revision Approval row returns `Internal_Approval_Status` to Returned and `Decision_Status` becomes Unrequested |
 | Proposal | `Decision_Status = 'Awarded'` only when `Internal_Approval_Status = 'Approved'` |
 | SubmissionAttempt | `Attempt_Number` is unique within the Proposal and consecutive from 1 |
@@ -476,7 +477,7 @@ The following rules require enforcement beyond what a single column declaration 
 | SubmissionAttempt | An attempt becomes Recalled only while the Proposal's `Decision_Status` is Unrequested or Pending |
 | SubmissionAttempt | An attempt moves from Accepted to Sent_Back only while the Proposal's `Decision_Status` is Pending |
 | PreAwardAuthorization | `Authorization_Date` and `Authorizing_Personnel_ID` are required when `Authorization_Status` is Approved, Converted_To_Award, or Expired_Unused, and kept if an approved authorization is later Revoked |
-| PreAwardAuthorization | While `Authorization_Status` is Requested or Approved, the Proposal referenced by `Proposal_ID` has `Decision_Status` Pending, Changes_Requested, or Intent_to_Award |
+| PreAwardAuthorization | While `Authorization_Status` is Requested or Approved, the Proposal referenced by `Proposal_ID` has `Decision_Status` Pending, Changes_Requested, Intent_to_Award, or Awarded, and an Awarded proposal's Award is not yet accepted |
 | PreAwardAuthorization | When `Authorization_Status` is Converted_To_Award, the Proposal referenced by `Proposal_ID` has `Decision_Status` Awarded |
 | Approval | `Approver_Personnel_ID` and `Action_Date` are required when `Approval_Status` is Approved, Rejected, Bypassed, or Returned_for_Revision |
 | Approval | `Review_Topic_Value_ID` is required when `Step_Type` resolves to Supplementary_Review; `Signed_Package_Hash` when it resolves to Final_Sign_off and the step is Approved; `Delegate_Personnel_ID` when it resolves to Release_to_Submit and the step is Approved |
@@ -493,6 +494,7 @@ The following rules require enforcement beyond what a single column declaration 
 | Award | `Award_Status` is Closed only when every Subaward whose `Prime_Award_ID` is the Award has `Subaward_Status` Closed, Terminated, or Not_Issued |
 | Award | An Award at Adjusting returns to the `Award_Status` it came from, Closed or Terminated |
 | Award | `Termination_Basis` is required when `Award_Status` is Terminating or Terminated, and null otherwise |
+| Award | `Award_Status` is Active, Suspended, Closing, Closed, or Adjusting only when `Acceptance_Status` = 'Accepted'. An award that is not accepted can only stay In_Setup or end through Terminating |
 | Subaward | `Termination_Basis` is required when `Subaward_Status` is Terminated, and null otherwise |
 | Subaward | A Subaward at Adjusting returns to the `Subaward_Status` it came from, Closed or Terminated |
 | Modification | `Prior_Approval_Granted_Date` is required when `Requires_Prior_Approval = true` and `Approval_Status = 'Approved'` |
@@ -591,13 +593,16 @@ Applications often track more statuses than the UDM, because many of them are qu
 
 | What the application tracks | UDM representation |
 |---|---|
-| Proposal dropped before it was sent | A `Rejected` `Approval` row from the PI or the office, in a new `Approval_Round` if the proposal was already approved, with the reason in `Notes`. `Internal_Approval_Status` becomes `Rejected` |
+| Proposal dropped before it was sent, including a missed deadline | A `Rejected` `Approval` row from the PI or the office, in a new `Approval_Round` if the proposal was already approved, with the reason in `Notes`. `Internal_Approval_Status` becomes `Rejected` |
 | Any setup step before the award is open for spending | `Award_Status = In_Setup` |
 | Award open for spending | `Award_Status = Active` |
 | Modification or no-cost extension in progress | `Award_Status = Active` plus a `Modification` with `Approval_Status = Requested` |
 | Prior approval in progress | A `Modification` with `Approval_Status = Requested` and `Requires_Prior_Approval = true` |
 | Advance funding | A `Modification` with event type `Advance_Funding` |
-| Negotiation in progress | The current `Award_Status` (`In_Setup` or `Active`) plus an open `Negotiation` row |
+| Award terms under review | `Acceptance_Status = Terms_Review`, with `Award_Status = In_Setup` |
+| Negotiation of the award's terms | `Acceptance_Status = Negotiating` (or `On_Hold` while paused) plus an open `Negotiation` row |
+| Negotiation during the award, such as a modification | The current `Award_Status` (`Active`) plus an open `Negotiation` row |
+| Sponsor never decided | `Decision_Status = No_Decision`, set by the office after its own cutoff |
 | Suspended | `Award_Status = Suspended` |
 | Part of an award suspended or terminated | `Award_Status` stays `Active`, plus a `Modification` with event type `Partial_Suspension` or `Partial_Termination`. `Description` says which part, a cut in funding goes in `Funding_Change_Amount` as a negative number, and a lifted suspension or overturned termination moves to `Reversed` |
 | Closeout in process | `Award_Status = Closing`; `Closeout.Final_Invoice_Status` records the final invoice |
@@ -828,10 +833,10 @@ A formal request for funding submitted to a sponsor.
 | Total_Proposed_Budget | Money | optional | |
 | Submission_Deadline | Date | optional | The sponsor deadline this proposal targets |
 | Submission_Date | Date | derived | The date the proposal last went to the sponsor: `Submitted_At` of the newest SubmissionAttempt that reached Submitted or later; null before then |
-| Internal_Approval_Status | Status | required | Where the proposal stands in the institution's decision to pursue the opportunity: Draft, In_Review, Returned, Approved, Rejected. Approved counts every step except Final_Sign_off and Release_to_Submit. A changed package voids only the sign-off, a separate gate tracked in `Submission_Status` |
+| Internal_Approval_Status | Status | required | Where the proposal stands in the institution's decision to pursue the opportunity: Draft, In_Review, Returned, Approved, Rejected. Rejected covers a refusal by a step or the PI, or an opportunity that closed before it was sent. Approved counts every step except Final_Sign_off and Release_to_Submit. A changed package voids only the sign-off, a separate gate tracked in `Submission_Status` |
 | Submission_Status | Status | derived | Where the proposal stands with the sponsor's submission system: Unsubmitted until the current package is signed off, which requires internal approval; Signed_Off once it is ready to send; then the newest SubmissionAttempt's `Attempt_Status` |
-| Decision_Status | Status | required | The outcome of the funding request: Unrequested, Pending, Changes_Requested, Intent_to_Award, Awarded, Declined, Not_Reviewed, Withdrawn. Unrequested and Pending follow the submission stage; the rest are recorded by the institution. Withdrawn means a submitted proposal was pulled from the sponsor's consideration; the institution then stops there, or revises it, and internal approval returns to Returned and the decision to Unrequested |
-| Decision_Date | Date | derived | The date of the proposal's current outcome (Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn): `Communication_Date` of the newest Communication on the Proposal whose `Sets_Status` set it; null while the decision is Unrequested, Pending, or Changes_Requested. Kept on the Proposal because most reports want this one date |
+| Decision_Status | Status | required | The outcome of the funding request: Unrequested, Pending, Changes_Requested, Intent_to_Award, Awarded, Declined, No_Decision, Not_Reviewed, Withdrawn. No_Decision means the sponsor never decided and the institution stopped waiting; a late decision still moves it on. Unrequested and Pending follow the submission stage; the rest are recorded by the institution. Withdrawn means a submitted proposal was pulled from the sponsor's consideration; the institution then stops there, or revises it, and internal approval returns to Returned and the decision to Unrequested |
+| Decision_Date | Date | derived | The date of the proposal's current outcome (Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn): `Communication_Date` of the newest Communication on the Proposal whose `Sets_Status` set it; null while the decision is Unrequested, Pending, Changes_Requested, or No_Decision. Kept on the Proposal because most reports want this one date |
 | Risk_Level | Status | optional | See Status taxonomy |
 | Proposal_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'ProposalType'`. Recommended values: New / Resubmission / Renewal / Continuation / Revision / Task_Order |
 | Mechanism_Value_ID | ID | optional | → AllowedValues with `Value_Group = 'FundingMechanism'`. The funding mechanism / activity code the proposal targets |
@@ -869,7 +874,7 @@ An institutional pre-award authorization to spend at-risk on a Proposal that has
 | Effective_End_Date | Date | required | |
 | Authorizing_Personnel_ID | ID | conditional | → Personnel. The institutional officer who authorized the at-risk spending. Required when `Authorization_Status` is Approved, Converted_To_Award, or Expired_Unused; kept if an approved authorization is later Revoked |
 | Authorization_Status | Status | required | Constrained: Requested / Approved / Revoked / Converted_To_Award / Expired_Unused |
-| Converted_To_Award_ID | ID | conditional | → Award. Required when `Authorization_Status = 'Converted_To_Award'`; otherwise null. Populated once the Proposal becomes an Award and the pre-award authorization is folded into the executed funding |
+| Converted_To_Award_ID | ID | conditional | → Award. Required when `Authorization_Status = 'Converted_To_Award'`; otherwise null. Populated once the Award is accepted and the pre-award authorization is folded into the executed funding |
 | Notes | LongText | optional | |
 
 #### Award
@@ -907,7 +912,8 @@ A funded grant, contract, or cooperative agreement. The central post-award entit
 | Current_Total_Funded | Money | derived | Originally funded amount plus the sum of Approved or Not_Required funding-changing Modifications. Derivation rule documented in *Derived values* |
 | Current_PI_Personnel_ID | ID | derived | → Personnel. The current PI on this Award when the agreement is in single-PI mode; null when in Multi_PI mode (multiple Multi_PI rows are active) or when no PI is active (community-partner Subaward case). Derivation rule documented in *Derived values*. The canonical source for "who is on this team" remains TeamRole; this column is a query-convenience denormalization parallel to Current_End_Date and Current_Total_Funded |
 | Total_Anticipated_Funding | Money | optional | |
-| Award_Status | Status | required | The award's lifecycle state: In_Setup, Active, Suspended, Closing, Closed, Adjusting, Terminating, Terminated. Terminating means termination is being processed; Adjusting is a late correction after Closed or Terminated, not open for spending |
+| Acceptance_Status | Status | required | Whether the institution has accepted the award and its terms: Terms_Review, Negotiating, On_Hold, Accepted, Not_Accepted. The Negotiation table keeps each round of bargaining |
+| Award_Status | Status | required | The award's lifecycle state: In_Setup, Active, Suspended, Closing, Closed, Adjusting, Terminating, Terminated. In_Setup lasts until the award is accepted and setup completes. Terminating means termination is being processed; Adjusting is a late correction after Closed or Terminated, not open for spending |
 | Termination_Basis | Status | conditional | Why the award was terminated: Noncompliance / Mutual_Agreement / Recipient_Request / Sponsor_Priorities. Required when `Award_Status` is Terminating or Terminated; cleared on reinstatement |
 | Risk_Level | Status | optional | See Status taxonomy |
 | Priority | Status | required | Constrained: Low / Medium / High / Critical. Processing priority the office assigned, Medium unless set; Critical is a rush under the office's rush criteria |
@@ -1467,7 +1473,7 @@ Files associated with any entity.
 | Document_ID | ID | required | PK |
 | Related_Entity_Type | Status | required | Constrained: Award / Subaward / Proposal / SubmissionAttempt / Approval / PreAwardAuthorization / Personnel / PersonnelCredential / ComplianceRequirement / Modification / Action / Restriction / Budget / Negotiation / Terms / Deliverable / Closeout / Equipment |
 | Related_Entity_ID | ID | required | The PK value in the table named by Related_Entity_Type |
-| Document_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'DocumentType'`. Recommended values: NOA / Biosketch / DMP / Budget_Justification / Other_Support / Public_Access_Plan / LOI / Sponsor_Agreement / Subaward_Agreement / Modification_Notice / Approved_Items_Schedule / Closeout_Document / Compliance_Approval_Letter / Restriction_Authority_Document / Training_Certificate |
+| Document_Type_Value_ID | ID | required | → AllowedValues with `Value_Group = 'DocumentType'`. Recommended values: NOA / MOU / MOA / Biosketch / DMP / Budget_Justification / Other_Support / Public_Access_Plan / LOI / Sponsor_Agreement / Subaward_Agreement / Modification_Notice / Approved_Items_Schedule / Closeout_Document / Compliance_Approval_Letter / Restriction_Authority_Document / Training_Certificate |
 | File_Name | MediumName | required | |
 | File_Path | URL | required | Path or URI to the file in object storage / content management |
 | File_Hash | Hash | required | SHA-256 of the file content |

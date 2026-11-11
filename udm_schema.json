@@ -1750,12 +1750,12 @@
                     ]
                   },
                   "Rejected": {
-                    "definition": "Refused inside the institution, by an approval step or by the PI deciding not to submit; the proposal does not proceed",
+                    "definition": "Refused inside the institution, by an approval step or by the PI deciding not to submit, or the opportunity closed before it was sent; the proposal does not proceed",
                     "set_by": "Derived from the Approval rows of the current round",
                     "next": []
                   }
                 },
-                "description": "Where the proposal stands in the institution's decision to pursue the opportunity. Draft until routed; In_Review while steps are pending; Returned when a step sent it back for revision, the institution reopened consideration of the opportunity, or a withdrawn proposal is being revised; Approved once every step except Final_Sign_off and Release_to_Submit has approved; Rejected when a step or the PI refused it, at any point before it was sent. A changed package voids only the sign-off, a separate gate tracked in Submission_Status",
+                "description": "Where the proposal stands in the institution's decision to pursue the opportunity. Draft until routed; In_Review while steps are pending; Returned when a step sent it back for revision, the institution reopened consideration of the opportunity, or a withdrawn proposal is being revised; Approved once every step except Final_Sign_off and Release_to_Submit has approved; Rejected when a step or the PI refused it, or the opportunity closed, at any point before it was sent. A changed package voids only the sign-off, a separate gate tracked in Submission_Status",
                 "synonyms": "Internal Routing Status, OSP Approval",
                 "derived": {
                   "rule": "Draft when no Approval row exists for the Proposal; otherwise, over the rows of the highest Approval_Round: Rejected if any row is Rejected; Returned if any row is Returned_for_Revision; Approved if every row other than Final_Sign_off and Release_to_Submit is Approved or Bypassed; In_Review otherwise.",
@@ -1885,6 +1885,7 @@
                   "Intent_to_Award",
                   "Awarded",
                   "Declined",
+                  "No_Decision",
                   "Not_Reviewed",
                   "Withdrawn"
                 ],
@@ -1905,6 +1906,7 @@
                       "Intent_to_Award",
                       "Awarded",
                       "Declined",
+                      "No_Decision",
                       "Not_Reviewed",
                       "Withdrawn",
                       "Unrequested"
@@ -1917,6 +1919,7 @@
                       "Intent_to_Award",
                       "Awarded",
                       "Declined",
+                      "No_Decision",
                       "Pending"
                     ]
                   },
@@ -1941,6 +1944,15 @@
                     "set_by": "Recorded from the sponsor's communication",
                     "next": []
                   },
+                  "No_Decision": {
+                    "definition": "The sponsor never decided, and the institution stopped waiting after its own cutoff. A late sponsor decision still moves it to Intent_to_Award, Awarded, or Declined",
+                    "set_by": "Sponsored programs office",
+                    "next": [
+                      "Intent_to_Award",
+                      "Awarded",
+                      "Declined"
+                    ]
+                  },
                   "Not_Reviewed": {
                     "definition": "The sponsor received the proposal but removed it from consideration without reviewing it",
                     "set_by": "Recorded from the sponsor's communication",
@@ -1954,13 +1966,13 @@
                     ]
                   }
                 },
-                "description": "The outcome of the funding request. Unrequested until an attempt made since the latest approval is Accepted, and while the newest attempt is Recalled or Sent_Back; Pending once the sponsor holds it; Changes_Requested when the sponsor asks for changes or more information before deciding; Intent_to_Award when the sponsor signals funding before an agreement; Awarded, Declined, Not_Reviewed, or Withdrawn as the outcome. Unrequested and Pending follow the submission stage; the rest are recorded by the institution",
+                "description": "The outcome of the funding request. Unrequested until an attempt made since the latest approval is Accepted, and while the newest attempt is Recalled or Sent_Back; Pending once the sponsor holds it; Changes_Requested when the sponsor asks for changes or more information before deciding; Intent_to_Award when the sponsor signals funding before an agreement; Awarded, Declined, Not_Reviewed, or Withdrawn as the outcome; No_Decision when the sponsor never decided and the institution stopped waiting. Unrequested and Pending follow the submission stage; the rest are recorded by the institution",
                 "synonyms": "Outcome, Sponsor Decision, Award Decision"
               },
               "Decision_Date": {
                 "type": "Date",
                 "required": false,
-                "description": "The date of the proposal's current outcome: Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn. Derived from the Communication that set it, and kept on the Proposal because most reports want this one date",
+                "description": "The date of the proposal's current outcome: Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn. Derived from the Communication that set it, and kept on the Proposal because most reports want this one date. Null for No_Decision, which has no sponsor date",
                 "derived": {
                   "rule": "The date of Communication_Date on the newest Communication attached to the Proposal whose Sets_Status is set, when that value is Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn and Decision_Status still holds it; null otherwise.",
                   "recompute_triggers": "On insert/update of any Communication for the Proposal; on update of Proposal.Decision_Status."
@@ -2054,10 +2066,10 @@
             },
             "constraints": [
               {
-                "rule": "Decision_Status is Unrequested while no SubmissionAttempt made since the latest approval has Attempt_Status Accepted, or while the newest attempt is Recalled or Sent_Back, unless a sponsor request, a sponsor outcome, or a withdrawal is recorded (Changes_Requested, Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn); otherwise it is Pending or one of those recorded values. A recorded outcome stays when the proposal is re-approved."
+                "rule": "Decision_Status is Unrequested while no SubmissionAttempt made since the latest approval has Attempt_Status Accepted, or while the newest attempt is Recalled or Sent_Back, unless a sponsor request, a sponsor outcome, or a withdrawal is recorded (Changes_Requested, Intent_to_Award, Awarded, Declined, No_Decision, Not_Reviewed, or Withdrawn); otherwise it is Pending or one of those recorded values. A recorded outcome stays when the proposal is re-approved."
               },
               {
-                "rule": "Each recorded Decision_Status (Changes_Requested, Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn, and Pending when Intent_to_Award is walked back) has a Communication attached to the Proposal whose Sets_Status is that value. While the decision is recorded, Decision_Status equals the Sets_Status of the newest such Communication."
+                "rule": "Each recorded Decision_Status (Changes_Requested, Intent_to_Award, Awarded, Declined, Not_Reviewed, or Withdrawn, and Pending when Intent_to_Award is walked back) has a Communication attached to the Proposal whose Sets_Status is that value. While the decision is recorded, Decision_Status equals the Sets_Status of the newest such Communication. No_Decision is the institution's own record and has no sponsor Communication."
               },
               {
                 "rule": "Decision_Status = 'Withdrawn' only when at least one SubmissionAttempt for the Proposal was sent. When a withdrawn proposal is revised, a Returned_for_Revision Approval row returns Internal_Approval_Status to Returned and Decision_Status becomes Unrequested."
@@ -2365,7 +2377,7 @@
                     "next": []
                   },
                   "Converted_To_Award": {
-                    "definition": "The award arrived; at-risk spending folds into the executed funding",
+                    "definition": "The award was accepted; at-risk spending folds into the executed funding",
                     "set_by": "Derived; the system computes it",
                     "next": []
                   },
@@ -2385,7 +2397,7 @@
                   "column": "Award_ID"
                 },
                 "conditional_required": "Required when Authorization_Status = 'Converted_To_Award'; otherwise null",
-                "description": "Required when Authorization_Status = 'Converted_To_Award'; otherwise null. Populated once the Proposal becomes an Award and the pre-award authorization is folded into the executed funding"
+                "description": "Required when Authorization_Status = 'Converted_To_Award'; otherwise null. Populated once the Award is accepted and the pre-award authorization is folded into the executed funding"
               },
               "Notes": {
                 "type": "LongText",
@@ -2398,7 +2410,7 @@
                 "rule": "Authorization_Date and Authorizing_Personnel_ID are required when Authorization_Status is Approved, Converted_To_Award, or Expired_Unused, and kept if an approved authorization is later Revoked."
               },
               {
-                "rule": "While Authorization_Status is Requested or Approved, the Proposal referenced by Proposal_ID has Decision_Status Pending, Changes_Requested, or Intent_to_Award."
+                "rule": "While Authorization_Status is Requested or Approved, the Proposal referenced by Proposal_ID has Decision_Status Pending, Changes_Requested, Intent_to_Award, or Awarded, and an Awarded proposal's Award is not yet accepted."
               },
               {
                 "rule": "When Authorization_Status is Converted_To_Award, the Proposal referenced by Proposal_ID has Decision_Status Awarded."
@@ -2704,6 +2716,58 @@
                 "required": false,
                 "description": "Total funding anticipated across all periods if all increments are funded"
               },
+              "Acceptance_Status": {
+                "type": "Status",
+                "required": true,
+                "allowed_values": [
+                  "Terms_Review",
+                  "Negotiating",
+                  "On_Hold",
+                  "Accepted",
+                  "Not_Accepted"
+                ],
+                "value_definitions": {
+                  "Terms_Review": {
+                    "definition": "The award arrived, and the institution is reviewing its terms",
+                    "set_by": "Sponsored programs office",
+                    "next": [
+                      "Accepted",
+                      "Negotiating"
+                    ]
+                  },
+                  "Negotiating": {
+                    "definition": "The institution and the sponsor are bargaining over the terms. Each round is a Negotiation row",
+                    "set_by": "Sponsored programs office",
+                    "next": [
+                      "Accepted",
+                      "On_Hold",
+                      "Not_Accepted"
+                    ]
+                  },
+                  "On_Hold": {
+                    "definition": "Bargaining is paused, waiting on the sponsor or an internal decision",
+                    "set_by": "Sponsored programs office",
+                    "next": [
+                      "Negotiating",
+                      "Not_Accepted"
+                    ]
+                  },
+                  "Accepted": {
+                    "definition": "The institution accepted the award and its terms. Setup can finish and the award can open",
+                    "set_by": "Sponsored programs office",
+                    "next": []
+                  },
+                  "Not_Accepted": {
+                    "definition": "The institution turned down the award on the terms offered. The sponsor can reopen bargaining",
+                    "set_by": "Sponsored programs office",
+                    "next": [
+                      "Negotiating"
+                    ]
+                  }
+                },
+                "description": "Whether the institution has accepted the award and its terms. Terms_Review when the award arrives; Accepted when the terms are accepted as offered or after Negotiating, with On_Hold while bargaining is paused; Not_Accepted when the institution turns it down. The Negotiation table keeps each round of bargaining",
+                "synonyms": "Award Acceptance, Terms Acceptance"
+              },
               "Award_Status": {
                 "type": "Status",
                 "required": true,
@@ -2719,7 +2783,7 @@
                 ],
                 "value_definitions": {
                   "In_Setup": {
-                    "definition": "Received and in setup; not yet open for spending",
+                    "definition": "Received and in setup; not yet open for spending. It stays here until the award is accepted",
                     "set_by": "Sponsored programs office",
                     "next": [
                       "Active",
@@ -2785,7 +2849,7 @@
                     ]
                   }
                 },
-                "description": "The award's lifecycle state. In_Setup until setup completes; Closing once closeout has begun; Suspended and Terminating for sponsor or institutional stop actions, Terminated once the termination is processed. Authoritative for the award's state; Is_Active only hides rows. Adjusting is a late correction after Closed or Terminated; the award can be reopened or reinstated to Active"
+                "description": "The award's lifecycle state. In_Setup until the award is accepted and setup completes; Closing once closeout has begun; Suspended and Terminating for sponsor or institutional stop actions, Terminated once the termination is processed. Authoritative for the award's state; Is_Active only hides rows. Adjusting is a late correction after Closed or Terminated; the award can be reopened or reinstated to Active"
               },
               "Termination_Basis": {
                 "type": "Status",
@@ -2926,6 +2990,9 @@
               },
               {
                 "rule": "Termination_Basis is required when Award_Status is Terminating or Terminated, and null otherwise."
+              },
+              {
+                "rule": "Award_Status is Active, Suspended, Closing, Closed, or Adjusting only when Acceptance_Status = 'Accepted'. An award that is not accepted can only stay In_Setup or end through Terminating."
               },
               {
                 "rule": "Research_Character is null unless Activity_Type = 'Organized_Research'."
@@ -7399,6 +7466,8 @@
                 "value_group": "DocumentType",
                 "recommended_values": [
                   "NOA",
+                  "MOU",
+                  "MOA",
                   "Biosketch",
                   "DMP",
                   "Budget_Justification",
@@ -7660,43 +7729,43 @@
                 "synonyms": "External Org, Counterparty Organization"
               },
               "Sets_Status": {
-                  "type": "Status",
-                  "required": false,
-                  "allowed_values": [
-                    "Pending",
-                    "Changes_Requested",
-                    "Intent_to_Award",
-                    "Awarded",
-                    "Declined",
-                    "Not_Reviewed",
-                    "Withdrawn"
-                  ],
-                  "value_definitions": {
-                    "Pending": {
-                      "definition": "The sponsor walked back an intent to award, returning the decision to Pending"
-                    },
-                    "Changes_Requested": {
-                      "definition": "The sponsor asked for changes or more information before deciding"
-                    },
-                    "Intent_to_Award": {
-                      "definition": "The sponsor signalled funding before an agreement exists"
-                    },
-                    "Awarded": {
-                      "definition": "The sponsor funded the proposal"
-                    },
-                    "Declined": {
-                      "definition": "The sponsor reviewed the proposal and did not fund it"
-                    },
-                    "Not_Reviewed": {
-                      "definition": "The sponsor removed the proposal from consideration without reviewing it"
-                    },
-                    "Withdrawn": {
-                      "definition": "The institution asked the sponsor to withdraw the proposal; the only value set by an outbound communication"
-                    }
+                "type": "Status",
+                "required": false,
+                "allowed_values": [
+                  "Pending",
+                  "Changes_Requested",
+                  "Intent_to_Award",
+                  "Awarded",
+                  "Declined",
+                  "Not_Reviewed",
+                  "Withdrawn"
+                ],
+                "value_definitions": {
+                  "Pending": {
+                    "definition": "The sponsor walked back an intent to award, returning the decision to Pending"
                   },
-                  "description": "The status this communication moved its record to. On a Proposal, the Decision_Status value, so the sponsor's own date for each decision is kept as Communication_Date. Null for correspondence that changed no status, and on every record type other than Proposal",
-                  "synonyms": "Status Change, Decision Notice, Sponsor Decision"
-                }
+                  "Changes_Requested": {
+                    "definition": "The sponsor asked for changes or more information before deciding"
+                  },
+                  "Intent_to_Award": {
+                    "definition": "The sponsor signalled funding before an agreement exists"
+                  },
+                  "Awarded": {
+                    "definition": "The sponsor funded the proposal"
+                  },
+                  "Declined": {
+                    "definition": "The sponsor reviewed the proposal and did not fund it"
+                  },
+                  "Not_Reviewed": {
+                    "definition": "The sponsor removed the proposal from consideration without reviewing it"
+                  },
+                  "Withdrawn": {
+                    "definition": "The institution asked the sponsor to withdraw the proposal; the only value set by an outbound communication"
+                  }
+                },
+                "description": "The status this communication moved its record to. On a Proposal, the Decision_Status value, so the sponsor's own date for each decision is kept as Communication_Date. Null for correspondence that changed no status, and on every record type other than Proposal",
+                "synonyms": "Status Change, Decision Notice, Sponsor Decision"
+              }
             },
             "constraints": [
               {

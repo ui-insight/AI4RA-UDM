@@ -28,6 +28,7 @@ LIFECYCLE_COLUMNS = [
     ("Proposal", "Internal_Approval_Status"),
     ("Proposal", "Submission_Status"),
     ("Proposal", "Decision_Status"),
+    ("Award", "Acceptance_Status"),
     ("Award", "Award_Status"),
     ("Subaward", "Subaward_Status"),
     ("PreAwardAuthorization", "Authorization_Status"),
@@ -48,7 +49,9 @@ CHARTS = sorted((ROOT / "dashboard" / "src" / "assets").glob("*status*.svg")) + 
 )
 CHART_RECORD = re.compile(r'<text x="[\d.]+" y="([\d.]+)" font-size="12" fill="#64748b">([^<]*)</text>')
 CHART_COLUMN = re.compile(r'<text x="[\d.]+" y="([\d.]+)"[^>]*font-family="Menlo[^>]*>([^<]*)</text>')
-CHART_BOX = re.compile(r'<rect x="[\d.]+" y="([\d.]+)" width="[\d.]+" height="\d+" rx="7"[^>]*/><text[^>]*font-weight="600"[^>]*>([^<]*)</text>')
+CHART_BOX = re.compile(r'<rect x="[\d.]+" y="([\d.]+)" width="[\d.]+" height="\d+" rx="7"([^>]*)/><text[^>]*font-weight="600"[^>]*>([^<]*)</text>')
+# A box from another record, such as a ghost box, names its value with data-ref.
+CHART_REF = re.compile(r'data-ref="([^"]+)"')
 
 
 def chart_problems(path, referenced):
@@ -64,7 +67,12 @@ def chart_problems(path, referenced):
         return [f"{path.name}: found no status boxes"]
     known = {ref.lower() for ref in referenced}
     problems = []
-    for y, label in boxes:
+    for y, attrs, label in boxes:
+        explicit = CHART_REF.search(attrs)
+        if explicit:
+            if explicit.group(1).lower() not in known:
+                problems.append(f"{path.name}: no glossary term for the {label} box ({explicit.group(1)})")
+            continue
         record = [name for top, name in records if top - 60 <= float(y)][-1]
         column = [name for top, name in columns if top - 40 <= float(y)][-1]
         key = f"{record}.{column}={label.replace(' ', '_')}".lower()

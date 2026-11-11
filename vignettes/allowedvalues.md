@@ -27,7 +27,7 @@ The UDM controls the values of a column in one of two ways.
 | ContactType | `ContactDetails.Contact_Type_Value_ID` | `Email`, `Phone`, `Mobile`, `Fax`, `Mailing_Address` |
 | CostShareCommitmentType | `CostShare.Commitment_Type_Value_ID` | `Cash`, `In_Kind`, `Third_Party`, `Waived_IDC`, `Effort_Only` |
 | DeadlineType | `Deadline.Deadline_Type_Value_ID` | None. Institutions define their own |
-| DocumentType | `Document.Document_Type_Value_ID` | `NOA`, `Biosketch`, `DMP`, `Budget_Justification`, `Other_Support`, `Public_Access_Plan`, `LOI`, `Sponsor_Agreement`, `Subaward_Agreement`, `Modification_Notice`, `Approved_Items_Schedule`, `Closeout_Document`, `Compliance_Approval_Letter`, `Restriction_Authority_Document`, `Training_Certificate` |
+| DocumentType | `Document.Document_Type_Value_ID` | `NOA`, `MOU`, `MOA`, `Biosketch`, `DMP`, `Budget_Justification`, `Other_Support`, `Public_Access_Plan`, `LOI`, `Sponsor_Agreement`, `Subaward_Agreement`, `Modification_Notice`, `Approved_Items_Schedule`, `Closeout_Document`, `Compliance_Approval_Letter`, `Restriction_Authority_Document`, `Training_Certificate` |
 | FinanceCodePurpose | `FinanceCode.Purpose_Value_ID` | `Direct_Costs`, `Cost_Share`, `Indirect_Costs`, `Subcontract` |
 | FundType | `Fund.Fund_Type_Value_ID` | `Restricted`, `Unrestricted`, `Endowment`, `Sponsored_Program` |
 | FundingMechanism | `RFA.Mechanism_Value_ID`, `Proposal.Mechanism_Value_ID`, `Award.Mechanism_Value_ID` | `Research_Project`, `Center_Or_Program`, `Career_Development`, `Fellowship`, `Training`, `Small_Business`, `Equipment_Infrastructure`, `Conference`, `Planning`, `Construction`, `Other` |
@@ -70,7 +70,7 @@ The UDM controls the values of a column in one of two ways.
 | `RFARequirement.Requirement_Category` | `Eligibility`, `Budget`, `Format`, `Compliance`, `Reporting`, `Personnel`, `Document`, `Review_Criterion`, `Submission`, `Deadline`, `Special_Condition`, `PAPPG_Deviation`, `Other` |
 | `Proposal.Internal_Approval_Status` | `Draft`, `In_Review`, `Returned`, `Approved`, `Rejected` |
 | `Proposal.Submission_Status` | `Unsubmitted`, `Signed_Off`, `Submitted`, `Received`, `Validated`, `Invalid`, `Accepted`, `Failed`, `Recalled`, `Sent_Back` |
-| `Proposal.Decision_Status` | `Unrequested`, `Pending`, `Changes_Requested`, `Intent_to_Award`, `Awarded`, `Declined`, `Not_Reviewed`, `Withdrawn` |
+| `Proposal.Decision_Status` | `Unrequested`, `Pending`, `Changes_Requested`, `Intent_to_Award`, `Awarded`, `Declined`, `No_Decision`, `Not_Reviewed`, `Withdrawn` |
 | `Proposal.Risk_Level` | `Low`, `Medium`, `High` |
 | `Proposal.Activity_Type` | `Organized_Research`, `Instruction`, `Other_Sponsored_Activity` |
 | `SubmissionAttempt.Attempt_Status` | `Unsubmitted`, `Submitted`, `Received`, `Validated`, `Invalid`, `Accepted`, `Failed`, `Recalled`, `Sent_Back` |
@@ -78,6 +78,7 @@ The UDM controls the values of a column in one of two ways.
 | `Award.Instrument_Type` | `Grant`, `Cooperative_Agreement`, `Contract`, `Other_Transaction`, `Other` |
 | `Award.Activity_Type` | `Organized_Research`, `Instruction`, `Other_Sponsored_Activity` |
 | `Award.Research_Character` | `Basic_Research`, `Applied_Research`, `Experimental_Development` |
+| `Award.Acceptance_Status` | `Terms_Review`, `Negotiating`, `On_Hold`, `Accepted`, `Not_Accepted` |
 | `Award.Award_Status` | `In_Setup`, `Active`, `Suspended`, `Closing`, `Closed`, `Adjusting`, `Terminating`, `Terminated` |
 | `Award.Termination_Basis` | `Noncompliance`, `Mutual_Agreement`, `Recipient_Request`, `Sponsor_Priorities` |
 | `Award.Risk_Level` | `Low`, `Medium`, `High` |

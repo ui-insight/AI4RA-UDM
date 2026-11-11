@@ -33,11 +33,12 @@ for (const term of glossary) {
 }
 
 // A box's table and column come from the labels of the lane it sits in, and its value comes from
-// its own label. scripts/check_glossary.py follows the same lookup and fails if a box has no term.
-function findTerm(record: string, column: string, label: string): GlossaryTerm | undefined {
-  const key = `${record}.${column}=${label.replace(/ /g, '_')}`.toLowerCase();
+// its own label. A box from another record, such as a ghost box, names its value with data-ref
+// instead. scripts/check_glossary.py follows the same lookup and fails if a box has no term.
+function findTerm(record: string, column: string, label: string, ref: string | null): GlossaryTerm | undefined {
+  const key = (ref ?? `${record}.${column}=${label.replace(/ /g, '_')}`).toLowerCase();
   let terms = termsByRef.get(key);
-  if (!terms) {
+  if (!terms && !ref) {
     // A shortened label, such as "Conditional" for Conditional_Approval.
     const longer = [...termsByRef.keys()].find((ref) => ref.startsWith(`${key}_`));
     terms = longer ? termsByRef.get(longer) : undefined;
@@ -116,7 +117,7 @@ export default function StatusChart({ svg, idPrefix, minWidth }: Props) {
       if (label?.tagName !== 'text' || label.getAttribute('font-weight') !== '600') continue;
       const y = Number(rect.getAttribute('y'));
       const text = label.textContent ?? '';
-      const term = findTerm(lastAtOrAbove(records, y, 60), lastAtOrAbove(columns, y, 40), text);
+      const term = findTerm(lastAtOrAbove(records, y, 60), lastAtOrAbove(columns, y, 40), text, rect.getAttribute('data-ref'));
       if (!term) continue;
 
       const box = document.createElementNS('http://www.w3.org/2000/svg', 'g');

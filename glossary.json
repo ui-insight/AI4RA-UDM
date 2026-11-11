@@ -17,12 +17,30 @@
   ],
   "terms": [
     {
+      "term": "Acceptance status",
+      "also": "Award acceptance",
+      "definition": "Whether the institution has accepted an award and its terms: terms review, negotiating, on hold, accepted, or not accepted. An award opens for spending only after it is accepted.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Acceptance_Status"
+      ]
+    },
+    {
       "term": "Accepted",
       "also": "",
       "definition": "A submission status: the sponsor took the proposal in for consideration. This doesn't promise a review or an award, and the sponsor can still return it. This starts the sponsor decision stage.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Submission_Status=Accepted"
+      ]
+    },
+    {
+      "term": "Accepted (award acceptance)",
+      "also": "Award acceptance, fully executed",
+      "definition": "An award acceptance status: the institution accepted the award and its terms, as offered or after negotiation. This starts award setup.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Acceptance_Status=Accepted"
       ]
     },
     {
@@ -934,7 +952,7 @@
     {
       "term": "Converted to Award",
       "also": "",
-      "definition": "An early setup status: the award arrived, and the at-risk spending folds into the executed funding.",
+      "definition": "An early setup status: the award was accepted, and the at-risk spending folds into the executed funding.",
       "domain": "Proposal",
       "udm": [
         "PreAwardAuthorization.Authorization_Status=Converted_To_Award"
@@ -1113,7 +1131,7 @@
     {
       "term": "Decision status",
       "also": "Funding decision, proposal outcome",
-      "definition": "The outcome of the funding request: unrequested, pending, changes requested, intent to award, awarded, declined, not reviewed, or withdrawn.",
+      "definition": "The outcome of the funding request: unrequested, pending, changes requested, intent to award, awarded, declined, no decision, not reviewed, or withdrawn.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Decision_Status"
@@ -1656,7 +1674,7 @@
     {
       "term": "In Setup (award)",
       "also": "",
-      "definition": "An award status: the award has been received and is in setup, and it is not yet open for spending. Review, negotiation, and account setup can all happen here.",
+      "definition": "An award status: the award has been received and is in setup, and it is not yet open for spending. It stays here until the institution accepts the award and setup completes.",
       "domain": "Award & lifecycle",
       "udm": [
         "Award.Award_Status=In_Setup"
@@ -1903,6 +1921,28 @@
       "udm": []
     },
     {
+      "term": "Memorandum of agreement",
+      "also": "MOA",
+      "definition": "A written agreement between the institution and another party that sets out commitments each side will meet, often including payment for services. It commits the parties more than a memorandum of understanding, though some organizations use the two names for the same thing.",
+      "domain": "Agreements",
+      "udm": [
+        "Document.Document_Type_Value_ID=MOA"
+      ],
+      "source": "U.S. Army Corps of Engineers, MOUs and MOAs",
+      "source_url": "https://corpslakes.erdc.dren.mil/partners/pdfs/partnership0617/MOUs%20and%20MOAs.pdf"
+    },
+    {
+      "term": "Memorandum of understanding",
+      "also": "MOU",
+      "definition": "A written statement of shared intent between the institution and another party, setting out each side's role in a planned collaboration. It usually does not bind either party or move money.",
+      "domain": "Agreements",
+      "udm": [
+        "Document.Document_Type_Value_ID=MOU"
+      ],
+      "source": "U.S. Army Corps of Engineers, MOUs and MOAs",
+      "source_url": "https://corpslakes.erdc.dren.mil/partners/pdfs/partnership0617/MOUs%20and%20MOAs.pdf"
+    },
+    {
       "term": "Met",
       "also": "",
       "definition": "A cost share stage: the commitment has been satisfied by documented contributions.",
@@ -1979,6 +2019,15 @@
       "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_2/2.1.2_recipient_staff.htm"
     },
     {
+      "term": "Negotiating",
+      "also": "",
+      "definition": "An award acceptance status: the institution and the sponsor are bargaining over the award's terms. Each round is kept as a negotiation record.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Acceptance_Status=Negotiating"
+      ]
+    },
+    {
       "term": "Negotiation",
       "also": "Contract negotiation, agreement negotiation",
       "definition": "The back-and-forth with a sponsor or subrecipient over agreement terms before they are accepted.",
@@ -2000,6 +2049,15 @@
       "source_url": "https://www.hhs.gov/sites/default/files/hhs-grants-policy-statement-oct-2025.pdf"
     },
     {
+      "term": "No Decision",
+      "also": "",
+      "definition": "A decision status: the sponsor never decided, and the institution stopped waiting. A late sponsor decision still moves it to Intent to Award, Awarded, or Declined.",
+      "domain": "Proposal",
+      "udm": [
+        "Proposal.Decision_Status=No_Decision"
+      ]
+    },
+    {
       "term": "No-cost extension",
       "also": "NCE",
       "definition": "Extending an award's end date without adding money.",
@@ -2009,6 +2067,15 @@
       ],
       "source": "2 CFR 200.308",
       "source_url": "https://www.ecfr.gov/current/title-2/section-200.308"
+    },
+    {
+      "term": "Not Accepted",
+      "also": "",
+      "definition": "An award acceptance status: the institution turned down the award on the terms offered. The sponsor can reopen negotiation.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Acceptance_Status=Not_Accepted"
+      ]
     },
     {
       "term": "Not Applicable",
@@ -2057,7 +2124,7 @@
     },
     {
       "term": "Notice of Award",
-      "also": "NOA, award letter, notice of grant award",
+      "also": "NOA, award letter, notice of grant award, grant award notice",
       "definition": "The sponsor's official, legally binding document announcing an award, with its budget and conditions.",
       "domain": "Agreements",
       "udm": [
@@ -2074,6 +2141,15 @@
       "udm": [],
       "source": "NSF PAPPG",
       "source_url": "https://www.nsf.gov/policies/pappg"
+    },
+    {
+      "term": "On Hold (award acceptance)",
+      "also": "",
+      "definition": "An award acceptance status: bargaining over the terms is paused, waiting on the sponsor or an internal decision.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Acceptance_Status=On_Hold"
+      ]
     },
     {
       "term": "Open",
@@ -2399,6 +2475,15 @@
       "source_url": "https://www.ecfr.gov/current/title-2/section-200.458"
     },
     {
+      "term": "Preliminary setup",
+      "also": "Advance account, at-risk account",
+      "definition": "An optional step: the institution opens an account early, at its own risk, so work can start at intent to award or after the award is made, before the award is accepted and set up. It does not replace the official path: the award still goes through acceptance and setup.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "PreAwardAuthorization.Authorization_Status=Approved"
+      ]
+    },
+    {
       "term": "Prime award",
       "also": "",
       "definition": "The award a subaward's money comes from.",
@@ -2635,7 +2720,7 @@
     {
       "term": "Received",
       "also": "",
-      "definition": "A submission status: the sponsor's system acknowledged the attempt.",
+      "definition": "A submission status: the sponsor's system acknowledged the attempt. Some sponsors don't report this step, so a submission can move past it unseen.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Submission_Status=Received"
@@ -2695,7 +2780,7 @@
     {
       "term": "Rejected (internal approval)",
       "also": "",
-      "definition": "An internal approval status: the proposal was refused inside the institution, by an approval step or by the PI deciding not to submit, and it goes no further.",
+      "definition": "An internal approval status: the proposal was refused inside the institution, by an approval step or by the PI deciding not to submit, or the opportunity closed before it was sent. It goes no further.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Internal_Approval_Status=Rejected"
@@ -3388,6 +3473,15 @@
       "source_url": "https://grants.nih.gov/grants/policy/nihgps/HTML5/section_1/1.2_definition_of_terms.htm"
     },
     {
+      "term": "Terms Review",
+      "also": "",
+      "definition": "An award acceptance status: the award arrived, and the institution is reviewing its terms. This starts the acceptance stage.",
+      "domain": "Award & lifecycle",
+      "udm": [
+        "Award.Acceptance_Status=Terms_Review"
+      ]
+    },
+    {
       "term": "Title vesting",
       "also": "Equipment ownership, title",
       "definition": "Who owns a piece of equipment: the institution, the sponsor, the vendor, shared, or not yet decided.",
@@ -3534,7 +3628,7 @@
     {
       "term": "Validated",
       "also": "",
-      "definition": "A submission status: the attempt passed the sponsor's system checks.",
+      "definition": "A submission status: the attempt passed the sponsor's system checks. Some sponsors don't report this step. Where a second system checks it next, such as an agency system after Grants.gov, those checks can still find errors and make it Invalid.",
       "domain": "Proposal",
       "udm": [
         "Proposal.Submission_Status=Validated"
