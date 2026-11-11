@@ -17,7 +17,7 @@ While the UDM is in active development and has no production adopters, breaking 
 - **Pre-award authorization can follow the award.** A `PreAwardAuthorization` can be Requested or Approved while the decision is Awarded and the award is not yet accepted. It becomes Converted_To_Award once the award is accepted.
 - **MOU and MOA document types.** `Document.Document_Type_Value_ID` recommends `MOU` and `MOA` alongside `NOA`, and the Glossary defines memorandum of understanding and memorandum of agreement.
 - **Status chart: optional ghost boxes.** A dashed box marks an optional step. Received and Validated are ghost boxes, since some sponsors don't report them, which removes the skip line in stage 2. Preliminary Setup, an at-risk account linked to `PreAwardAuthorization` Approved, appears after Awarded and before In Setup. Its hover says the award still goes through acceptance and setup. Stage 1 now has Rejected on the left and Returned on the right, so no arrow crosses a green line, and the Validated to Invalid arrow is left to the Validated hover.
-- **Glossary.** New terms for No Decision, the acceptance statuses, Preliminary setup, and MOU and MOA; "grant award notice" is another name for Notice of Award.
+- **Glossary.** New terms for No Decision, the acceptance statuses, Preliminary setup, and MOU and MOA; effort certification methods (certification method, personnel activity report, activity report, timesheet, and payroll certification); "grant award notice" is another name for Notice of Award.
 
 ## [5.2.0] - 2026-11-10
 

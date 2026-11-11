@@ -102,6 +102,15 @@
       ]
     },
     {
+      "term": "Activity report",
+      "also": "",
+      "definition": "A record of a person's activities, other than a personnel activity report, used to certify effort, such as a project report or a log of duties.",
+      "domain": "Effort",
+      "udm": [
+        "Effort.Certification_Method=Activity_Report"
+      ]
+    },
+    {
       "term": "Activity type",
       "also": "Sponsored activity type",
       "definition": "What kind of work an award or proposal funds: organized research, instruction, or another sponsored activity.",
@@ -594,6 +603,17 @@
       ],
       "source": "2 CFR 200.308",
       "source_url": "https://www.ecfr.gov/current/title-2/section-200.308"
+    },
+    {
+      "term": "Certification method",
+      "also": "Effort reporting method, certification type",
+      "definition": "How an institution documents and certifies effort: personnel activity reports, other activity reports, timesheets, or payroll certification. Federal rules set the standard the records must meet, not the method.",
+      "domain": "Effort",
+      "udm": [
+        "Effort.Certification_Method"
+      ],
+      "source": "2 CFR 200.430",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.430"
     },
     {
       "term": "Certified",
@@ -2349,6 +2369,15 @@
       "source_url": "https://www.ecfr.gov/current/title-2/section-200.305"
     },
     {
+      "term": "Payroll certification",
+      "also": "Project-based certification",
+      "definition": "A method of certifying effort by project rather than by person: someone with knowledge of the work, usually the PI, confirms that the salaries charged to the project match the work done.",
+      "domain": "Effort",
+      "udm": [],
+      "source": "COGR, Guide to 2 CFR 200.430",
+      "source_url": "https://www.cogr.edu/sites/default/files/Guide%20to%202%20CFR%20200%20430%20Compensation_Personal%20Services.pdf"
+    },
+    {
       "term": "Pending",
       "also": "",
       "definition": "A decision status: the sponsor has the proposal and has not decided. It does not imply an award.",
@@ -2387,6 +2416,17 @@
       ],
       "source": "NIH: What is a person month?",
       "source_url": "https://grants.nih.gov/news-events/nih-extramural-nexus-news/2026/06/what-is-a-person-month-how-do-i-calculate-it"
+    },
+    {
+      "term": "Personnel activity report",
+      "also": "PAR, effort report, effort certification form",
+      "definition": "A report, certified after the fact, that shows how one person's compensated effort was spread across all their activities for a period, sponsored and not. It is a reasonable estimate, not an exact accounting of hours.",
+      "domain": "Effort",
+      "udm": [
+        "Effort.Certification_Method=PAR"
+      ],
+      "source": "2 CFR 200.430",
+      "source_url": "https://www.ecfr.gov/current/title-2/section-200.430"
     },
     {
       "term": "PI eligibility",
@@ -3479,6 +3519,15 @@
       "domain": "Award & lifecycle",
       "udm": [
         "Award.Acceptance_Status=Terms_Review"
+      ]
+    },
+    {
+      "term": "Timesheet",
+      "also": "Time record, time and attendance record",
+      "definition": "A record of the hours a person worked, by project or activity, used to certify effort. It is common for hourly staff.",
+      "domain": "Effort",
+      "udm": [
+        "Effort.Certification_Method=Timesheet"
       ]
     },
     {
