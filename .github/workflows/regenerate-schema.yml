@@ -91,14 +91,20 @@ jobs:
       - name: Build dashboard
         run: cd dashboard && npm run build
 
-      # The Statuses tab's download button links to this file. Liberation Sans stands in for
-      # Helvetica and Arial so the labels keep their widths inside the boxes.
+      # The Statuses tab's download button links to this file. Chrome comes with the runner, so
+      # this step downloads nothing. The page is sized to the chart's viewBox, so it prints on one
+      # page. Liberation Sans, also on the runner, stands in for Helvetica and Arial.
       - name: Render the proposal and award status path as a PDF
         run: |
-          sudo apt-get update -q
-          sudo apt-get install -y -q librsvg2-bin fonts-liberation
           mkdir -p docs/downloads
-          rsvg-convert -f pdf dashboard/src/assets/proposal-award-status-path.svg -o docs/downloads/proposal-award-status-path.pdf
+          svg=dashboard/src/assets/proposal-award-status-path.svg
+          read -r w h < <(sed -n 's/.*viewBox="0 0 \([0-9.]*\) \([0-9.]*\)".*/\1 \2/p' "$svg" | head -1)
+          work=$(mktemp -d)
+          cp "$svg" "$work/chart.svg"
+          printf '<!doctype html><style>@page{size:%spx %spx;margin:0}html,body{margin:0}img{display:block;width:%spx;height:%spx}</style><img src="chart.svg">' "$w" "$h" "$w" "$h" > "$work/print.html"
+          google-chrome --headless --no-sandbox --disable-gpu --no-pdf-header-footer \
+            --print-to-pdf="$PWD/docs/downloads/proposal-award-status-path.pdf" "file://$work/print.html"
+          test -s docs/downloads/proposal-award-status-path.pdf
 
       - uses: actions/configure-pages@v5
         if: github.event_name != 'pull_request'
