@@ -544,6 +544,7 @@ The companion JSON ships worked CREATE VIEW examples, written against the MySQL 
 | `vw_Active_Personnel_Roles` | Active personnel assignments with role and effort |
 | `vw_HERD_Expenditures` | R&D spending per transaction, with the HERD survey's categories worked out |
 | `vw_HERD_Expenditures_By_Field` | The same, with the HERD field of R&D, prorated |
+| `vw_Indirect_Cost_Recovery_By_Credit` | Recovered indirect costs per transaction, split by investigator credit, for totals by PI or unit |
 
 ## Optional Extensions
 

@@ -4546,6 +4546,12 @@
             "purpose": "vw_HERD_Expenditures with the HERD field of R&D, prorated by Allocation_Percent. Awards without a field show as Unmapped.",
             "dialect": "mysql",
             "sql": "CREATE VIEW vw_HERD_Expenditures_By_Field AS\nSELECT\n  h.Transaction_ID,\n  h.Transaction_Date,\n  h.Award_ID,\n  COALESCE(f.Value_Code, 'Unmapped') AS HERD_Field,\n  h.Amount * COALESCE(f.Allocation_Percent, 100) / 100 AS Amount,\n  h.Origin_Organization_ID,\n  h.Is_Federal,\n  h.Source_Of_Funds,\n  h.HERD_Cost_Type\nFROM vw_HERD_Expenditures h\nLEFT JOIN Classification f\n  ON f.Related_Entity_Type = 'Award'\n  AND f.Related_Entity_ID = h.Award_ID\n  AND f.Scheme = 'HERD_Field';"
+          },
+          {
+            "name": "vw_Indirect_Cost_Recovery_By_Credit",
+            "purpose": "Recovered indirect costs on sponsored awards, split by investigator credit: one row per transaction and per role holding credit on the transaction date. Sum Credited_Amount by Personnel_ID, or by Credit_Unit_Organization_ID and roll units up to a college through Organization.Parent_Organization_ID. A row with no Personnel_ID is recovered indirect cost that no one holds credit for.",
+            "dialect": "mysql",
+            "sql": "CREATE VIEW vw_Indirect_Cost_Recovery_By_Credit AS\nSELECT\n  t.Transaction_ID,\n  t.Transaction_Date,\n  t.Award_ID,\n  r.TeamRole_ID,\n  r.Personnel_ID,\n  r.Credit_Unit_Organization_ID,\n  r.Credit_Percent,\n  t.Transaction_Amount AS Indirect_Amount,\n  t.Transaction_Amount * COALESCE(r.Credit_Percent, 100) / 100 AS Credited_Amount\nFROM Transaction t\nJOIN (\n  SELECT AllowedValue_ID, COALESCE(Canonical_Value_Code, Value_Code) AS Code\n  FROM AllowedValues\n) ty ON ty.AllowedValue_ID = t.Transaction_Type_Value_ID\nJOIN Award a ON a.Award_ID = t.Award_ID\nJOIN Organization sp ON sp.Organization_ID = a.Sponsor_Organization_ID\nJOIN Budget b ON b.Budget_ID = t.Budget_ID\nJOIN BudgetCategory c ON c.BudgetCategory_ID = b.Budget_Category_ID\nLEFT JOIN TeamRole r\n  ON r.Award_ID = t.Award_ID\n  AND r.Credit_Percent IS NOT NULL\n  AND r.Is_Active = true\n  AND r.Start_Date <= t.Transaction_Date\n  AND (r.End_Date IS NULL OR r.End_Date >= t.Transaction_Date)\nWHERE c.Is_Direct_Cost = false\n  AND COALESCE(sp.Sponsor_Type, '') <> 'Internal'\n  AND ty.Code IN ('Expense', 'Cost_Transfer_In', 'Cost_Transfer_Out', 'Adjustment', 'Reversal')\n  AND t.Is_Active = true;"
           }
         ]
       },
