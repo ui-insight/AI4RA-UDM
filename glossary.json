@@ -102,6 +102,13 @@
       ]
     },
     {
+      "term": "Activity date",
+      "also": "Purchase date, service date",
+      "definition": "The date a purchase or service actually happened, not when the money moved. It can fall days or weeks before the transaction date. Some financial systems use the name for the date a record was last changed, which is a different thing.",
+      "domain": "Budget & costing",
+      "udm": []
+    },
+    {
       "term": "Activity report",
       "also": "",
       "definition": "A record of a person's activities, other than a personnel activity report, used to certify effort, such as a project report or a log of duties.",
@@ -1732,6 +1739,13 @@
       "source_url": "https://www.nsf.gov/policies/pappg/24-1/ch-6-nsf-awards"
     },
     {
+      "term": "Indirect cost return",
+      "also": "F&A return, IDC return, overhead return, indirect cost recovery distribution",
+      "definition": "The share of recovered indirect costs that the institution passes back to the units that earned them, such as the college, department, or PI. Each institution sets its own split in policy.",
+      "domain": "Budget & costing",
+      "udm": []
+    },
+    {
       "term": "Indirect costs",
       "also": "F&A, facilities and administrative costs, overhead, IDC",
       "definition": "Shared institutional costs that support research but cannot be tied to one project, such as buildings, utilities, libraries, and administration.",
@@ -2953,6 +2967,15 @@
       ]
     },
     {
+      "term": "Revenue",
+      "also": "Income",
+      "definition": "Money coming into an award from outside the institution, such as a sponsor's payment. Compare Transfer, which moves the institution's own money.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Transaction.Transaction_Type_Value_ID=Revenue"
+      ]
+    },
+    {
       "term": "Reversed",
       "also": "",
       "definition": "A modification status: an Approved or Not_Required modification was later withdrawn by the sponsor or invalidated by correction. It no longer counts in the award's totals and dates, and its budget rows are unwound.",
@@ -3003,6 +3026,24 @@
       ],
       "source": "NIH salary cap summary",
       "source_url": "https://grants.nih.gov/policy-and-compliance/policy-topics/nih-fiscal-policies/salary-cap-summary"
+    },
+    {
+      "term": "Salary encumbrance",
+      "also": "Payroll encumbrance, labor encumbrance",
+      "definition": "An encumbrance for the salary and benefits expected to be charged to an award for the rest of an appointment. Each payroll moves part of it into actual expense.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Transaction.Transaction_Type_Value_ID=Encumbrance"
+      ],
+      "source": "Infor, What Are Salary Encumbrances?",
+      "source_url": "https://docs.infor.com/lwsnapps/10.1/en-us/lwsncsolh/lwsngmug/fmh1584460243931.html"
+    },
+    {
+      "term": "Salary projection",
+      "also": "Payroll projection, labor projection",
+      "definition": "An estimate of the salary and benefits that will be charged to an award through a future date, based on current appointments and how each person's pay is split across awards. Used to forecast an award's balance.",
+      "domain": "Budget & costing",
+      "udm": []
     },
     {
       "term": "SAM.gov",
@@ -3566,6 +3607,35 @@
       "domain": "Budget & costing",
       "udm": [
         "Transaction"
+      ]
+    },
+    {
+      "term": "Transaction date",
+      "also": "Posting date, GL date",
+      "definition": "The date a transaction posted to the financial system. It can come days or weeks after the purchase, while payments are processed and checks clear. Compare Activity date.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Transaction.Transaction_Date"
+      ]
+    },
+    {
+      "term": "Transaction detail report",
+      "also": "TDR, detail transaction report",
+      "definition": "A report type that lists each transaction posted to an award over a period. Departments use it to review and reconcile an award's charges.",
+      "domain": "Research metrics & reporting",
+      "udm": [
+        "Transaction"
+      ],
+      "source": "University of Iowa Grant Accounting Office",
+      "source_url": "https://gao.fo.uiowa.edu/managing-grants-contracts/sponsored-programs-definitions"
+    },
+    {
+      "term": "Transfer",
+      "also": "Internal transfer, interfund transfer",
+      "definition": "Money moved between the institution's own funds or accounts, such as institutional money moved into an award to cover cost share. It is neither revenue nor an expense. Not the same as a cost transfer, which moves a charge already posted.",
+      "domain": "Budget & costing",
+      "udm": [
+        "Transaction.Transaction_Type_Value_ID=Transfer"
       ]
     },
     {
